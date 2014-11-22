@@ -1,0 +1,24 @@
+/*! \page pagephilosophy  Philosophy
+
+At the beginning of my PhD in 2005, the original motivation was to deal with segmentation and characterization of cement paste images. I encounter these problems:
+<ul>
+<li><b>%Image versatility</b>: how to implement some programs working on image with different dimensions and the pixel/voxel types,</li>
+<li><b>Large volume of data</b>: how to implement some optimized algorithms to deal with images of 2 Giga of voxels,</li>
+<li><b>Single programmer</b>: how to implement an extended library image library when you cannot have some helps in your physical department,</li>
+<li> <b>End-users</b>: how to implement an user-friendly library when your end-users are physicists, no programming expert, with specific problems.</li>
+</ul>
+To address complexity, a strategy is an architecture at a different scales with a productivity constraint at each scale.  Following this strategy, the library architecture is as follows:
+\image html architecture.png
+with these scales:
+<ul>
+<li> <b>button</b>: I designed and implemented a generic programming button-architecture following this fundamental relation <em> Algorithms + Data Structures = Program</em> with + sign meaning orthogonality. In one side, some data-structures as Image, Matrix, function with symbolic link  are mapped in classes and contains some basic functionalities. In the other side, some algorithms as morphological filters, region growing, geometrical analysis, statistics, are mapped in functional classes to operate some generic and advanced processes. The orthogonality of the + sign was succeed thanks to concept/model programming given genericity with efficiency,</li>
+<li> <b>middle</b>: if you read the source code of my algorithms, you probably do not understand a line of code due to the template abstraction. But, at the middle-level, thanks to declaration simplification, you can write code in functional programming in C-style without template idioms for a easy readable code,</li>
+<li> <b>top</b>: the implementation of a image process is an iterative process for defining the algorithm scheme and its calibration. A compiled language as C++ is sure not the best choice. At this scale, we integrate the Population library as a dictionary of Caméléon, a graphical data-flow language language.</li>
+</ul>
+Now, under MIT license, the evolution of this library will be a community of contributors, users and industrials to increase:
+<ul>
+<li> <b>quality</b>: this library contains some bugs as errors, flaws, mistakes, failures, faults. This library covering a large field, contributors cannot implement all tests due to the combinatorial explosion. However, a large community of users is efficient to minimize bugs in a bug-tracker platform,</li>
+<li> <b>quantity</b>: this library contains numerous algorithms but few in comparison of the image processing/analysis field.  To answer the expectation of users, new algorithms will be included in this library by programmers. However, the risk of mess in the source code increases with the number of contributors. In this library, this risk is minimized thanks to an architecture with independent modules,</li>
+<li> <b>sustainability</b>: an economic situation ensures viability of the library. Because this library can be incorporated within proprietary software keeping its proprietary license, industrials will hire or post invitation to tender for developers having some skills with this library.</li>
+</ul>
+*/

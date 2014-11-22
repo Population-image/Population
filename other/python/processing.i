@@ -1,0 +1,105 @@
+//###Processing###
+%include "../../include/algorithm/Processing.h"
+typedef pop::Processing Processing;
+
+//Generator
+ALL_IMAGE_DIM_TYPE(Processing,randomField,randomField)
+ALL_IMAGE_DIM_TYPE(Processing,fill,fill)
+
+
+
+
+ALL_IMAGE_DIM_TYPE(Processing,threshold,threshold);
+%template(thresholdColorInRange) pop::Processing::thresholdColorInRange<2>;
+%template(thresholdColorInRange) pop::Processing::thresholdColorInRange<3>;
+ALL_IMAGE_DIM_TYPE(Processing,thresholdKMeansVariation,thresholdKMeansVariation)
+ALL_IMAGE_DIM_TYPE(Processing,_thresholdOtsuMethod,thresholdOtsuMethod)
+ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphological,thresholdToggleMappingMorphological)
+ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphologicalFabrizio,thresholdToggleMappingMorphologicalFabrizio)
+ALL_IMAGE_DIM_TYPE(Processing,thresholdNiblackMethod,thresholdNiblackMethod)
+ALL_IMAGE_DIM_TYPE(Processing,thresholdMultiValley,thresholdMultiValley)
+ALL_IMAGE_DIM_TYPE(Processing,edgeDetectorCanny,edgeDetectorCanny)
+
+ALL_IMAGE_DIM_TYPE(Processing,fofx,fofx)
+ALL_IMAGE_DIM_TYPE(Processing,greylevelScaleContrast,greylevelScaleContrast)
+ALL_IMAGE_DIM_TYPE(Processing,greylevelRange,greylevelRange)
+ALL_IMAGE_DIM_TYPE(Processing,greylevelTranslateMeanValue,greylevelTranslateMeanValue)
+ALL_IMAGE_DIM_TYPE(Processing,greylevelRemoveEmptyValue,greylevelRemoveEmptyValue)
+ALL_IMAGE_DIM_TYPE(Processing,integral,integral)
+ALL_IMAGE_DIM_TYPE(Processing,integralPower2,integralPower2)
+ALL_IMAGE_DIM_TYPE(Processing,mask,mask)
+
+
+ //Neighborhood
+ALL_IMAGE_DIM_TYPE(Processing,minimaLocal,minimaLocal)
+ALL_IMAGE_DIM_TYPE(Processing,minimaLocalMap,minimaLocalMap);
+ALL_IMAGE_DIM_TYPE(Processing,maximaLocal,maximaLocal)
+ALL_IMAGE_DIM_TYPE(Processing,maximaLocalMap,maximaLocalMap);
+ALL_IMAGE_DIM_TYPE(Processing,extremaLocal,extremaLocal)
+ALL_IMAGE_DIM_TYPE(Processing,extremaLocalMap,extremaLocalMap);
+ALL_IMAGE_DIM_TYPE(Processing,erosion,erosion)
+ALL_IMAGE_DIM_TYPE(Processing,erosionStructuralElement,erosionStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,dilation,dilation)
+ALL_IMAGE_DIM_TYPE(Processing,dilationStructuralElement,dilationStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,median,median)
+ALL_IMAGE_DIM_TYPE(Processing,medianStructuralElement,medianStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,mean,mean)
+ALL_IMAGE_DIM_TYPE(Processing,meanStructuralElement,meanStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,closing,closing)
+ALL_IMAGE_DIM_TYPE(Processing,closingStructuralElement,closingStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,opening,opening)
+ALL_IMAGE_DIM_TYPE(Processing,openingStructuralElement,openingStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,alternateSequentialCO,alternateSequentialCO)
+ALL_IMAGE_DIM_TYPE(Processing,alternateSequentialCOStructuralElement,alternateSequentialCOStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,alternateSequentialOC,alternateSequentialOC)
+ALL_IMAGE_DIM_TYPE(Processing,alternateSequentialOCStructuralElement,alternateSequentialOCStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,hitOrMiss,hitOrMiss)
+ALL_IMAGE_DIM_TYPE(Processing,meanShiftFilter,meanShiftFilter)
+ALL_IMAGE_DIM_TYPE(Processing,gradientMagnitudeSobel,gradientMagnitudeSobel)
+ALL_IMAGE_DIM_TYPE(Processing,gradientSobel,gradientSobel)
+ALL_IMAGE_DIM_TYPE(Processing,gradientVecSobel,gradientVecSobel)
+
+ALL_IMAGE_DIM_TYPE(Processing,gradientMagnitudeGaussian,gradientMagnitudeGaussian)
+ALL_IMAGE_DIM_TYPE(Processing,gradientGaussian,gradientGaussian)
+ALL_IMAGE_DIM_TYPE(Processing,gradientVecGaussian,gradientVecGaussian)
+ALL_IMAGE_DIM_TYPE(Processing,smoothGaussian,smoothGaussian)
+
+ALL_IMAGE_DIM_TYPE(Processing,gradientMagnitudeDeriche,gradientMagnitudeDeriche)
+ALL_IMAGE_DIM_TYPE(Processing,gradientDeriche,gradientDeriche)
+ALL_IMAGE_DIM_TYPE(Processing,gradientVecDeriche,gradientVecDeriche)
+ALL_IMAGE_DIM_TYPE(Processing,smoothDeriche,smoothDeriche)
+
+
+ //Seeds
+ALL_IMAGE_UINT_TYPE(Processing,labelMerge,labelMerge)
+ALL_IMAGE_LABEL_TYPE(Processing,labelFromSingleSeed)
+
+
+
+ //Region growing
+%template(holeFilling) pop::Processing::holeFilling<2>;
+%template(holeFilling) pop::Processing::holeFilling<3>;
+ALL_IMAGE_LABEL_TYPE(Processing,regionGrowingAdamsBischofMeanOverStandardDeviation)
+ALL_IMAGE_LABEL_TYPE(Processing,regionGrowingAdamsBischofMean)
+%template(clusterToLabel) pop::Processing::clusterToLabel<2>;
+%template(clusterToLabel) pop::Processing::clusterToLabel<3>;
+%template(clusterMax) pop::Processing::clusterMax<2>;
+%template(clusterMax) pop::Processing::clusterMax<3>;
+ALL_IMAGE_DIM_TYPE(Processing,minimaRegional,minimaRegional)
+ALL_IMAGE_LABEL_TYPE(Processing,watershed)
+ALL_IMAGE_LABEL_TYPE(Processing,watershedBoundary)
+ALL_IMAGE_UINT_TYPE(Processing,geodesicReconstruction,geodesicReconstruction)
+ALL_IMAGE_UINT_TYPE(Processing,dynamic,dynamic)
+ALL_IMAGE_UINT_TYPE(Processing,voronoiTesselation,voronoiTesselation)
+ALL_IMAGE_UINT_TYPE(Processing,voronoiTesselationEuclidean,voronoiTesselationEuclidean)
+ALL_IMAGE_UINT_TYPE(Processing,distance,distance)
+ALL_IMAGE_UINT_TYPE(Processing,distanceEuclidean,distanceEuclidean)
+ALL_IMAGE_UINT_TYPE(Processing,dilationRegionGrowing,dilationRegionGrowing)
+ALL_IMAGE_UINT_TYPE(Processing,erosionRegionGrowing,erosionRegionGrowing)
+ALL_IMAGE_UINT_TYPE(Processing,openingRegionGrowing,openingRegionGrowing)
+ALL_IMAGE_UINT_TYPE(Processing,closingRegionGrowing,closingRegionGrowing)
+ALL_IMAGE_UINT_TYPE(Processing,erosionRegionGrowingStructuralElement,erosionRegionGrowingStructuralElement)
+ALL_IMAGE_UINT_TYPE(Processing,dilationRegionGrowingStructuralElement,dilationRegionGrowingStructuralElement)
+ALL_IMAGE_UINT_TYPE(Processing,openingRegionGrowingStructuralElement,openingRegionGrowingStructuralElement)
+ALL_IMAGE_UINT_TYPE(Processing,closingRegionGrowingStructuralElement,closingRegionGrowingStructuralElement)
+ALL_IMAGE_DIM_TYPE(Processing,rotateAtHorizontal,rotateAtHorizontal)

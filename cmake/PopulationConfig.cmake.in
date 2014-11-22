@@ -1,0 +1,15 @@
+# - Config file for the Population package
+# It defines the following variables
+#  POPULATION_INCLUDE_DIRS - include directories for Population
+#  POPULATION_LIBRARY    - libraries to link against
+
+# Compute paths
+get_filename_component(POPULATION_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(POPULATION_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${POPULATION_CMAKE_DIR}/PopulationTargets.cmake")
+
+# These are IMPORTED targets created by PopulationTargets.cmake
+set(POPULATION_LIBRARY population)
+

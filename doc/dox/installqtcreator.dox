@@ -1,0 +1,26 @@
+/*! \page pagetechnicalqt Qt creator with qmake
+
+This page explains how to use Population library with QtCreator.
+
+\section PopulationQtCompilation Compilation
+
+You open the project $${POPULATIONPATH}/populationapp.pro. You compile this project and start to code in the main.cpp file (see \ref pagefirststep).
+
+\section PopulationCPractitioner Shared library
+
+You create the shared library by compiling this project $${POPULATIONPATH}/other/C++/population.pro. After the compilation, the population.dll (.so) is created in the directory  $${POPULATIONPATH}/bin .
+Then to load this library in your program,  you create a project file (.pro) containing these following lines (or open this project other/C++/populationsharedlibrarytest.pro).
+\code
+POPULATIONPATH=D:/Users/vtariel/Desktop/Population #replace by yours 
+TEMPLATE = app
+SOURCES +=  $${POPULATIONPATH}/main.cpp # simple segmentation routine 
+INCLUDEPATH +=$${POPULATIONPATH} # header path
+DESTDIR = $${POPULATIONPATH}/bin # directory target
+DEPENDPATH=$${POPULATIONPATH}/bin # the path where the dynamic shared library is located for the execution
+LIBS+=-L$${POPULATIONPATH}/bin # the path where the dynamic shared library is located for the linking
+LIBS += -lpopulation 
+\endcode
+You build and run this project. Now you can start to code in the main.cpp file (see \ref pagefirststep).
+
+*/
+

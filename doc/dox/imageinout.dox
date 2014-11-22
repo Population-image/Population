@@ -1,0 +1,59 @@
+/*! \page pageinout Load/save
+
+\section InOut2d Load/save 2d image 
+
+You can load various image formats as png, pgm, jpg, bmp. For other formats as tiff, you need to install Image Magick http://www.imagemagick.org/script/binary-releases.php (or use ImageJ to convert your images in png).
+
+\code
+Mat2UI8 m;//contruct an empty 2d matrix with 1 byte pixel type (grey-level)
+img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));//load the image
+m = m+100;//add the value 100 at each pixel value
+m.display();//display the image
+
+Mat2RGBUI8 m_rgb;//contruct an empty 2d matrix with RGB pixel type
+m_rgb.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));//load the image
+RGBUI8 red_value(100,0,0);//   RGB value with Red=100, Green =0, Blue =0 
+m_rgb = m_rgb+red_value;//add this value at each pixel value
+m_rgb.display();//display the image
+\endcode
+<SMALL>The implementation of these methods are included in the header MatNInOut.h. So do not forget to Include #include"core/data/mat/MatNInOut.h" to avoid a such error message "undefined reference to `pop::MatN<2, unsigned char>::save(char const*) const'".</SMALL>
+\section InOut3d Load/save 3d image 
+\subsection InOut3dStack Stack of 2d images 
+The method \ref pop::MatN::loadFromDirectory attempts to load all files as 2d slices of the 3D matrix in the given directory.
+\code
+Mat3UI8 m;//contruct an empty 3d matrix with 1 byte pixel type (grey-level)
+m.loadFromDirectory("D:/Users/vtariel/Documents/binary/binary_b1/","binary",".png");//Load all slices in the directory "D:/Users/vtariel/Documents/binary/binary_b1/" with the given basefilename, "binary", and the extension ".png"
+//process ...
+
+m.display();//display the result use arrows to move in z-axis
+m.saveFromDirectory("D:/Users/vtariel/Documents/binary/binary_b1_process/","process",".bmp");//if the folder does not exist, we create it  
+\endcode
+ 
+\subsection InOut3dPGM pgm format
+
+The output of the 3d imaging device is usually a stack of 2d images. But after, it is easier to use a 3d format. So, you can save your image with the extension .pgm for 3d image.  
+\code
+Mat3UI8 m;//contruct an empty 3d matrix with 1 byte pixel type (grey-level)
+m.loadFromDirectory("D:/Users/vtariel/Documents/binary/binary_b1/","binary",".png");//Load all slices in the directory
+//process ...
+
+m.save("image_seg_3d.pgm");
+//after a while
+m.load("image_seg_3d.pgm");
+\endcode
+
+\subsection InOut3dRAW raw format
+The loader attempts to read the 3d raw matrix. The voxel type of the matrix must be the same as in raw file and, in more, you need to
+give the domain (size) of the image in the raw file.  It is why I do not recommend this format.
+For instance, if the voxel is coded in 1 byte with 256 raw, 256 columns and 100 depth, you write the following code
+\code
+Mat3UI8 m;//contruct an empty 3d matrix with 1 byte pixel type 
+m.loadRaw("D:/Users/vtariel/Documents/binary/data_256_256_100.raw",Vec3I32(256,256,100));
+\endcode
+
+
+
+
+
+
+*/

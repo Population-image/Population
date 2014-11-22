@@ -1,0 +1,19 @@
+/*! \page pagetechnicalpython Python
+
+You can start to execute this file other/tutorial/firststep.py with python 2.7 and your favourite
+IDE (PyDev plugging for eclipse is nice http://www.vogella.com/articles/Python/article.html)
+\include firststep.py
+and a grey image and a segmented image should be displayed. 
+
+
+The most important is that the notations remains almost the same with the C++ language. So the full documentation is also on the <a href="modules.html">module page</a>.   For each tutorial, you can find python code at $${PopulationPath}/other/tutorial/. 
+ <!--
+\section pagelinkpython Link with other Python image libraries
+
+To link the image population data-structure, namely pop::MatN, with other Python image library, I provide a method to access the data with a Python array. In the  
+  
+\include testPIL.py
+-->
+
+*/
+

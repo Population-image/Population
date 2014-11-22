@@ -1,0 +1,11 @@
+/*! \page Filtering Filtering
+The process of acquisition leads to image hampered by noise and artefacts. In order to do a qualitative and/or quantitative analysis, most often, a noise reduction with signal preservation has to be process.
+
+\image html Estaille.jpg‎ "Initial Image"
+\image html Estaillemedian.jpg‎  "Median filter"
+\image html EstailleMNLAD.jpg‎ "non-linear anisotropic diffusion filter"
+For this purpose, Population library includes:
+- a toolbox of morphological filters, in \ref pop::Processing::median , \ref pop::Processing::closing and so one
+- an extension of non-linear anisotropic diffusion combining efficient noise reduction with excellent signal conservation, structural features preservation and easy calibration, \ref pop::PDE::nonLinearAnisotropicDiffusionDeriche ,
+- a convolution algorithm, \ref pop::Processing::convolution
+ */ 

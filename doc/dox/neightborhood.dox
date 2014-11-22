@@ -1,0 +1,46 @@
+/*! \page DOCNeighborhood Neighborhood
+
+The output image h is defined as follows :
+\f[
+\forall x \in \mathcal{D} :\quad h(x)= H(\{f(x') : \forall x' \in N(x) \})
+\f]
+where f is the input function, N is the neighbourhood set and H returns a value from a list of values. In this definition, we have two coupled iterations: globally, \f$\forall x \in \mathcal{D}\f$, and locally, \f$\forall x' \in N(x)\f$. 
+ 
+
+
+ for instance:
+- the maximum value for the dilation filter, \f$h(x)= \max_{\forall x' \in N(x)}f(x') \f$,
+- the minimum value for the erosion filter, \f$h(x)= \min_{\forall x' \in N(x)}f(x') \f$,
+- the median value for the median filter. 
+ <table border="0">
+<tr>
+<td>\image html Dilationgrey.jpg grey-level image </td>
+<td>\image html Dilattion1.jpg dilation with r=1 </td>
+<td>\image html Dilattion2.jpg dilation with r=2 </td>
+<td>\image html Dilattion3.jpg dilation with r=3 </td>
+</tr>
+<tr>
+<td>\image html Dilationbin.jpg bin image </td>
+<td>\image html Dilattionbin1.jpg dilation with r=1 </td>
+<td>\image html Dilattionbin2.jpg dilation with r=2 </td>
+<td>\image html Dilattionbin3.jpg dilation with r=3 </td>
+</tr>
+</table> 
+
+
+\section Neighbourhoodset What is a neighbourhood set
+For many filtering,  the output value \f$ h(x)\f$  is an operation done on the neighbourhood of the point \f$x\f$  using the image, \f$  f(x)\f$ . A neighbourhood of a point is a set containing the point where you can move that point with some amount without leaving the set.  For instance, in the 2D grid, the 4-neighbourhood of a pixel x includes the pixel and the pixels up, down, left, right. 
+\image html  Neight.jpg Nx(r=1,n=1)
+For a formal definition independant of the space dimension, we define the neighborhood of the point, \f$\boldsymbol{x} \f$, with two parameters, the radius, r and the norm, n, as follows:
+\f[N_{r,n}(\boldsymbol{x}):= \{\forall \boldsymbol{y} \in E: \|\boldsymbol{y}-\boldsymbol{x}\|_n \leq r \}.\f]
+The n-norm is given by this formula:
+\f[\|\mathbf{x}\|_n := \bigg( \sum_{i} |x_i|^n \bigg)^{1/n}.\f]
+For instance, the 2-norm is the euclidean-norm: \f$\|\boldsymbol{x}\|_2 := \sqrt{\sum_{i} x_i^2}.\f$ and the 0-norm for \f$\infty\f$-norm is \f$\|\mathbf{x}\|_\infty := \max \left(|x_1|, \ldots ,|x_p| \right)\f$.
+<table border="0">
+<tr>
+<td>\image html NeightRadius.png radius dependency </td>
+<td>\image html NeightNorm.png norm dependency</td>
+</tr>
+</table> 
+ */
+

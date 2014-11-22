@@ -1,0 +1,23 @@
+/*-----------------------------------
+
+  Gallery
+  -------------------------------------*/
+/*! \page pagegallery Gallery
+\section Processing Processing
+- Segmentation of sedimentary rocks
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH>\image html Rock.gif "Initial image" </TH>
+ <TH>\image html Segmentation.gif  "Segmented image"</TH>
+  </TR>
+</TABLE>
+
+\section Analysis Analysis
+- Curvature using phase field:
+\image html Curvature.gif
+- Connectivity using topological graph:
+\image html Graph.gif
+\section RandomGeometry Random geometry
+Percolation threshold for boolean model with power law radius distribution
+\image html PowerLawCluster.png
+*/

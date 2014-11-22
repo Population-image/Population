@@ -1,0 +1,8 @@
+find_package(CUDA)
+if(CUDA_VERSION)
+    message(STATUS "With CUDA version ${CUDA_VERSION}")
+    set(HAVE_CUDA true)
+else()
+    message(STATUS "Without CUDA")
+    set(HAVE_CUDA false)
+endif(CUDA_VERSION)

@@ -1,0 +1,34 @@
+#ifndef POPCONFIG_H
+#define POPCONFIG_H
+
+/* FFMPEG video library */
+#cmakedefine HAVE_FFMPEG
+
+/* CImg library */
+#cmakedefine HAVE_CIMG
+
+/* VLC video library */
+#cmakedefine HAVE_VLC
+
+/* thread library */
+#cmakedefine HAVE_THREAD
+
+/* opengl library */
+#cmakedefine HAVE_OPENGL
+
+/* thread library */
+#cmakedefine HAVE_GLUT
+
+/* openmp library */
+#cmakedefine HAVE_OPENMP
+
+/* qt library */
+#cmakedefine HAVE_QT
+
+/* cuda library */
+#cmakedefine HAVE_CUDA
+
+
+#define POP_PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}"
+
+#endif

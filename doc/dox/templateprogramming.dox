@@ -1,0 +1,234 @@
+/*! \page pagetemplateprogramming Template progamming 
+
+Template metaprogramming (TMP) is a metaprogramming technique in which templates are used by a compiler to generate temporary source code, which is merged by the compiler with the rest of the source code and then compiled.  In this tutorial I give a short and incomplete introduction to the utilisation of C++ templates in Population library.  I will enlight the role of template metaprograms by a step by step abstraction. TMP is not user-friendly. If you join the developer community, you can gradually increase the level of generality of your code.
+
+
+The example is the erosion algorithm defined as follows :
+
+\f$ \forall x \in E : g(x) =\min_{\forall x' \in N(x)} f(x') \f$
+
+where \f$ N(x) \f$ is the neightborhood (the structural element) at the point x. 
+
+\section Level0 Level-0 no generecity
+
+In C-style, without any genericity,  you will write a code corresponding to the level-0 as follows:
+\code
+Mat2UI8 erosion_Level_0(Mat2UI8 m,double radius)
+{
+    Mat2UI8 m_erosion(m.getDomain());
+    //scan the domain of the matrix
+    for(unsigned int i = 0;i<m.sizeI();i++){
+        for(unsigned int j = 0;j<m.sizeJ();j++){
+            UI8 value = m(i,j);
+            //scan the neighborhood
+            for( int ki = -radius;ki<=radius;ki++){
+                for( int kj = -radius;kj<=radius;kj++){
+                    if(m.isValid(i+ki,j+kj)==true){
+                        value = std::min(value, m(i+ki,j+kj));
+                    }
+                }
+            }
+            m_erosion(i,j)=value;
+
+        }
+    }
+    return m_erosion;
+}
+int main(){
+	  Mat2UI8 m;
+    m.load("../image/Lena.bmp");
+    Mat2UI8 m_erosion = erosion_Level_0(m,3);
+    m_erosion.save("../doc/image/lena_template_0.jpg");
+}
+\endcode
+\image html lena_template_0.jpg "Erosion with radius=3"
+
+\section Level1 Level-1 Introduction of IteratorE 
+
+The previous code works only for a 2d matrix with 2 loops to scan the domain of the matrix. For 3d matrix, instead of you 2 loops, we have 3 loops to scan also in the z-direction. So how to implement an algorithm independent to the structure of the matrix.   We use the concept of iterator that  allows to access a collection of elements of the domain without exposing its underlying representation. We use two concept of iterator : one to iterate over the domain, one to iterate over the neighbourhood. 
+
+Also, to have a definition of the structural element independent of the dimension, we use the notion of ball :
+
+\f$ B(x,r,n)=\{x' :\|x'-x\|_n\leq r \}\f$
+
+where \f$r\f$ is the radius and \f$n\f$ is the norm (for n=2, we have a disk). 
+
+\code
+Mat2UI8 erosion_Level_1(Mat2UI8 m,double radius,int norm)
+{
+    Mat2UI8 m_erosion(m.getDomain());
+    Mat2UI8::IteratorEDomain it_global = m.getIteratorEDomain();
+    Mat2UI8::IteratorENeighborhood it_local = m.getIteratorENeighborhood(radius,norm);//
+    //scan the image domain
+    while(it_global.next()){//.next()->iterate over the domain 
+        UI8 value = m(it_global.x()); //.x()->access a 2d-vector (Vec2I32) of the domain as a pixel position   
+        //scan the neighborhood of a point
+        it_local.init(it_global.x());//.init(Vec2I32)->init the neighbohood at the given 2d-vector 
+        while(it_local.next()){//.next()->iterate over the neighborhood 
+            value = std::min(value, m(it_local.x()));//.x()->access a 2d-vector (Vec2I32) of the neighbohood as a pixel position 
+        }
+        m_erosion(it_global.x())=value;
+    }
+    return m_erosion;
+}
+int main(){
+	  Mat2UI8 m;
+    m.load("../image/Lena.bmp");
+    Mat2UI8 m_erosion = erosion_Level_1(m,3,2);
+    m_erosion.save("../doc/image/lena_template_1.jpg");
+}
+\endcode
+\image html lena_template_1.jpg "Erosion with radius=3 and norm=2"
+
+
+\section Level2 Level-2 free the pixel-type and the dimension
+In the previous code, the matrix is 2d with a pixel type coded in 1 byte (UI8).  We will extend this code to call this algorithm whatever the dimension or the pixel type.
+Therefore, the dimension or the pixel type become template parameters. That can be done because the IteratorE concept hides the structure.
+\code
+template<int Dim, typename PixelType>
+MatN<Dim,PixelType> erosion_Level_2(MatN<Dim,PixelType> m,double radius,int norm)
+{
+    MatN<Dim,PixelType> m_erosion(m.getDomain());
+    typename MatN<Dim,PixelType>::IteratorEDomain it_global = m.getIteratorEDomain();
+    typename MatN<Dim,PixelType>::IteratorENeighborhood it_local = m.getIteratorENeighborhood(radius,norm);
+    //scan the image domain
+    while(it_global.next()){
+        PixelType value = m(it_global.x());
+        //scan the neighborhood of a point
+        it_local.init(it_global.x());
+        while(it_local.next()){
+            value = pop::minimum(value, m(it_local.x()));//use pop::minimum rather than std::min because of template specilatization
+        }
+        m_erosion(it_global.x())=value;
+    }
+    return m_erosion;
+}
+int main(){
+    Mat2RGBUI8 m_color;
+    m_color.load("../image/Lena.bmp");
+    Mat2RGBUI8 m_erosion_color =  erosion_Level_2(m_color,3,2);
+    m_erosion_color.display("level-2",false);
+}
+\endcode
+\image html lena_template_2.jpg "Erosion on colored image with radius=3 and norm=2"
+
+\section Level3 Level-3 free the iteration
+In the previous code, the global iteration is done on the domain of the matrix and the local iteration is done on a ball.  We will extend this code to call this algorithm whatever the global iteration or the local iteration. Therefore, they become template parameters.
+\code
+template<int Dim, typename PixelType,typename IteratorEGlobal,typename IteratorELocal>
+MatN<Dim,PixelType> erosion_Level_3(const MatN<Dim,PixelType> & m,IteratorEGlobal it_global,IteratorELocal  it_local )
+{
+    MatN<Dim,PixelType> m_erosion(m);
+    //Global scan
+    while(it_global.next()){
+        it_local.init(it_global.x());
+        PixelType value = m(it_global.x());
+        //Local scan
+        while(it_local.next()){
+            value = pop::minimum(value, m(it_local.x()));
+        }
+        m_erosion(it_global.x())=value;
+
+    }
+    return m_erosion;
+}
+int main(){
+	  Mat2UI8 m;
+    m.load("../image/Lena.bmp");
+    pop::Mat2UI8::IteratorERectangle it_global = m.getIteratorERectangle(m.getDomain()/4,m.getDomain()*3/4);
+    pop::Mat2UI8::IteratorENeighborhoodAmoebas it_local = m.getIteratorENeighborhoodAmoebas(15,0.05);
+    m_erosion = erosion_Level_3(m,it_global,it_local);
+    m_erosion.save("../doc/image/lena_template_3.jpg");
+}
+\endcode
+\image html lena_template_3.jpg "Erosion restricted on a rectangle with amoeba as structural element"
+In the previous application, we instantiate the global iterator and the local iterator in the main and not in the erosion procedure. In this case, the global iterator is a rectangle of the domain and the local iterator is amoeba, a non-fixed shape kernel. Of course, we can create your own iterators with nice optimization or nice properties and call the erosion procedure.
+
+\section Level4 Level-4 free the function structure such that the matrix is a special case 
+
+At this level, programming becomes mathematics. In Populaton, I do quite the same job that the containers in the std library for the function concept (see \ref pageimagebasic). A matrix is just special case of function. A graph's structure is very useful for solving many types of problems in computer science. Here I define an algorithm working for matrix, graph and so one (see the chapter 2 of Population book for further information). In this case, the erosion algorithm is not very useful for graph but, for instance, I use the Processing::clusterToLabel to decompose my graph in term of connected components.
+\code
+template<typename Function,typename IteratorEGlobal,typename IteratorELocal>
+Function erosion_Level_4(const Function& m,IteratorEGlobal it_global,IteratorELocal  it_local )
+{
+    Function m_erosion(m.getDomain());
+    //Global scan
+    while(it_global.next()){
+        it_local.init(it_global.x());
+        typename Function::F value = m(it_global.x());
+        //Local scan
+        while(it_local.next()){
+            value = pop::minimum(value, m(it_local.x()));
+        }
+        m_erosion(it_global.x())=value;
+
+    }
+    return m_erosion;
+}
+
+int main(){
+    GraphAdjencyList<UI8> graph;//Adgency graph with a vertex type coded in 1 byte
+    int v0 = graph.addVertex();
+    int v1 = graph.addVertex();
+    int v2 = graph.addVertex();
+    int v3 = graph.addVertex();
+    graph(v0)=0;
+    graph(v1)=100;
+    graph(v2)=175;
+    graph(v3)=125;
+    int e0 = graph.addEdge();
+    int e1 = graph.addEdge();
+    int e2 = graph.addEdge();
+    graph.connection(e0,v0,v1);
+    graph.connection(e1,v1,v2);
+    graph.connection(e2,v2,v3);
+
+    std::cout<<"graph"<<std::endl;
+    std::cout<<(int)graph(v0)<<std::endl;
+    std::cout<<(int)graph(v1)<<std::endl;
+    std::cout<<(int)graph(v2)<<std::endl;
+    std::cout<<(int)graph(v3)<<std::endl;
+    GraphAdjencyList<UI8>::IteratorEDomain it_global = graph.getIteratorEDomain();
+    GraphAdjencyList<UI8>::IteratorENeighborhood it_local = graph.getIteratorENeighborhood();
+    graph = erosion_Level_4(graph,it_global,it_local);
+    std::cout<<"graph erosion"<<std::endl;
+    std::cout<<(int)graph(v0)<<std::endl;
+    std::cout<<(int)graph(v1)<<std::endl;
+    std::cout<<(int)graph(v2)<<std::endl;
+    std::cout<<(int)graph(v3)<<std::endl;
+}
+\endcode
+
+\section Level5 Level-5 free the operation done on the neighborhood
+The operation done on the neighborhood is the min value. But, we want the same procedure for the median value, the maximum value, the mean value and so one. To deal with that, we use a accumulator functor as template parameter.
+\code
+template<typename Function,typename FunctorAccumulator, typename IteratorEGlobal,typename IteratorELocal>
+Function neighbordhood_Algorithm_Level_5(const Function& m,FunctorAccumulator func,IteratorEGlobal it_global,IteratorELocal  it_local )
+{
+    Function m_neigh(m.getDomain());
+    //Global scan
+    while(it_global.next()){
+        it_local.init(it_global.x());
+        func.init();
+        //Local scan
+        while(it_local.next()){
+            //accumulate values
+            func(m(it_local.x()));
+        }
+        m_neigh(it_global.x())=func.getValue();
+
+    }
+    return m_neigh;
+}
+int main(){
+	  Mat2UI8 m;
+    m.load("../image/Lena.bmp");
+    FunctorF::FunctorAccumulatorMax<UI8> func_max;
+    Mat2UI8 m_dilation = neighbordhood_Algorithm_Level_5(m, func_max , m.getIteratorEDomain(), m.getIteratorENeighborhood(3,2));
+    m_dilation.save("../doc/image/lena_template_5.jpg");
+}
+\endcode
+\image html lena_template_5.jpg "dilation algorithm"
+I do not find more useful abstraction. So it is the last step for me. But perhaps, you have nice ideas. So do not hesitate to contact me. 
+
+*/

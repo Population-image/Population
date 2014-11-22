@@ -1,0 +1,110 @@
+/*! \page DOCRepresentation Representation
+
+In general, an image is a space-domain, a paving of a domain of the Euclidean space containing an information in each cell. This space-domain representation is usually the direct image obtained by a microscopy. However, there is different kinds of representations of the information. The Fourier transform allows the correspondence between the  space-domain and the frequency-domain.  The wavelet transform  allows the correspondence between the  space-domain and the scale-space-domain. The choice of the representation depends on the particular problem. For instance, the noise can be seen as fluctuation with a short length correlation. In the Fourier space, this noise corresponds to high frequency and it is removed easily with a low pass filter.
+
+\section Fourier Fourier analysis 
+
+\subsection PopulationLibrary A simple case study  : low-pass filter
+
+This library includes the Fast Fourier Transform (FFT) and some basics filter in the Fourier space. For instance, this code is a low(hight)-pass filter:   
+\code
+        Mat2UI8 img;//2d grey-level image object
+        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
+        Mat2ComplexF64 imgcomplex;
+        Convertor::fromRealImaginary(img,imgcomplex);
+        Mat2ComplexF64 fft = Representation::FFT(imgcomplex);
+        Mat2ComplexF64 filterlowpass(fft.getDomain());
+        Vec2I32 x(0,0);
+        Draw::disk(filterlowpass,x,20,NumericLimits<ComplexF64>::maximumRange(),1);
+        fft = Processing::mask(fft,filterlowpass);
+        //Representation::FFTDisplay(fft).display();
+        imgcomplex = Representation::FFT(fft,-1);
+        Mat2F64 imgd;
+        Convertor::toRealImaginary(imgcomplex,imgd);
+        Mat2UI8 filter = Processing::greylevelRange(imgd,0,255);
+        filter.save("/home/vincent/Population/doc/image/iexlowpass.jpg");
+        double threshold_automatic;
+        Mat2UI8 threshold = Processing::thresholdOtsuMethod(filter,threshold_automatic);
+        Visualization::labelForegroundBoundary(threshold,img,2).save("/home/vincent/Population/doc/image/iexseglowpass.jpg");
+\endcode
+\image html iexlowpass.jpg LowPass filter
+\image html iexseglowpass.jpg segmentation result
+
+For a filter with a custom mask, you can create it with the gimp sofware:
+- Open the image with this sofware,
+- Open a new layer with the onglet layer->New Layer,
+- Open the dialog for the selection of the layer with the onglet windows->Dockable dialogs->layer,  
+- In this dialog select the layer new lawer,
+- Create the mask with the utilisation of the pencil tool (select the black colour),
+- Invert the mask Colours->Invert,
+- Display only the new layer, in the dialog for the selection of the layer, remove the eye for the background layer,
+- Save the image. 
+
+
+\subsection Wave  Wave
+
+A wave is a oscillation that propagates through space. The observation of the surface wave after a stone throw leads to  a first level for the wave description, \f$f\f$, as a cosine wave described by the equation:
+\f[f(x,t) = A \cos (kx - wt + \phi )\,\f]
+where A is the amplitude of the wave, x is the space coordinate, t is the time coordinate, k is the wavenumber (spatial frequency), w is the temporal frequency, and \f$\phi \f$ is the phase. Moreover, the observation of the surface wave after a multiple stone throws leads to  a second level for the wave description, \f$f\f$, as a sum of cosine waves described by the equation
+\f[f(x,t) = \sum_i A_i \cos (k_ix - w_it + \phi_i ).\f]
+Now, let us consider that, at the given locating (x is fixed), we receive the sound, given by the signal \f$f(x=cst,t)\f$ with period \f$T\f$.  The measure starts at time  \f$t_0=0\f$ when the signal is maximum. The previous equation can be written in a such fashion way :
+\f[f(t) = \sum_{n=-\infty}^\infty  A_n \cos ( 2\pi \frac{n}{T} t).\f]
+The sound engineer aims the filtering of the sound. The first level is to recover the importance of the different frequency given by the amplitude \f$A_n\f$ starting from the original signal. The coefficient \f$A_n\f$ is given by this formula:
+\f[A_n = \frac{1}{T}\int_0^{T} f(t)\cdot e^{-i 2\pi \frac{n}{T} t}\, dt.\f]
+This last equation is the Fourier's formula for T-periodic functions using cosines.\n
+In Fourier space, a high (or low) amplitude \f$A_n\f$, means the contribution of the frequency, \f$w= 2\pi \frac{n}{T}\f$ is important for the reconstruction of the function \f$f\f$. For instance, the song ''enter of sandman'' of metalica [http://www.youtube.com/watch?v=1QP-SIW6iKY], seems dominated by low-pitched sounds whereas, the song of Kostas Kastanis for the movie Zorba the Greek [http://www.youtube.com/watch?v=8UgndyMfe-8] seems dominated by high-pitched sounds. The spectrum frequency  should show high value of the amplitude of coefficients \f$A_n\f$ at low frequency and  low value of the amplitude of coefficients \f$A_n\f$ at high frequency for ''enter of sandman'' and inversely for Kostas Kastanis.\n 
+For instance, in this signal, you have two frequencies, with an amplitude not equal to 0 
+<table border="0">
+<tr>
+<td>\image html Cosinus.jpg Original signal </td>
+<td>\image html CosinusFourrier.jpg Spectrum frequency</td>
+</tr>
+</table> 
+such that the original signal is   \f$f(t) = cos(2\pi t)+0.5cos(2\pi \frac{3}{2} t)  \f$.
+
+\subsection FourrierDiscrete Fourier transformation in discrete space
+
+For an image, the Fourier analysis is exactly the same expect:
+- the space replaces the time,
+- the space is dicrete.
+
+Let us consider a 2-D image of size N*N. The Fourier transformation of the function,''f'', noted, \f$\mathcal{F}[f]\f$  is, in this case:
+\f[\mathcal{F}[f](u,v)=\frac{1}{N^2}\sum_{i=0}^{N-1}\sum_{j=0}^{N-1}e^{-2\pi  (xu+yv)/N}f(x,y)\f]
+The inverse Fourier transformation of the function,''f'', noted, \f$\mathcal{F}^{-1}[f]\f$ is
+\f[\mathcal{F}^{-1}[f](x,y)=\sum_{i=0}^{N-1}\sum_{j=0}^{N-1}e^{2\pi  (xu+yv)/N}f(u,v)\f]
+Some important properties and remarks:
+- the norm of the Fourier space,   \f$\|\mathcal{F}[f]]\|= \sqrt{\mathcal{F}[f]\cdot\mathcal{F}[f]^* } \f$ is symmetric where the symbol \f$^*\f$ is the conjugate. 
+- due to the large variations of the function \f$\|\mathcal{F}[f]]\|\f$, the plot is done in log-scale \f$\log(\|\mathcal{F}[f]]\|+1)  \f$,
+- the frequency increases when the distance to the point and the center of image increases, and the direction between the point and the center gives the direction of oscillations. 
+- large values at high frequency components mean that the image is changing rapidly on a short length scale and inversely. 
+- the operator  \f$\mathcal{F}^{-1}\circ\mathcal{F}\f$ is the identity operator:  \f$\mathcal{F}^{-1}\circ\mathcal{F}[f]=f\f$.
+For the better understanding, we will filter the Fourier representation of Gaston with a mask then, we will reconstruct the image using the inverse Fourier transformation.<br>
+In this first raw, the reconstruct image has only the small frequencies since the mask is a low pass filtering. We observe that the tint is conserved (low frequencies) but many details are lose as the eyes, and the boundaries are blurred (high frequencies).  
+
+<table border="0">
+<tr>
+<td>\image html Gaston-Lagaffe.jpg Gaston Lagaffe </td>
+<td>\image html Reconstrucionmask.jpg keeping low frequencies</td>
+<td>\image html Reconstrucionmaskinvert.jpg keeping high frequencies</td>
+</tr>
+</table> 
+
+\subsection filtering  Filtering
+The noise is often a fluctuation with a correlation at short length. In the Fourier space, this noise corresponds to high frequency and it is removed easily with a low pass.
+\image html  Image.jpg image hampered by noise
+\image html  ImageFourriermaskinverse.jpg‎ low pass filter 
+
+
+\subsection Extraction Pattern extraction
+A image, f, can be the addition of different patterns, \f$g_i\f$:
+\f[f=\sum_i g_i.\f]
+If the patterns are periodics, the filtering in the Fourier space allows to recover their indvidually.
+In the image below, we observe a surface of clean Gold (Au(100)) imaging with Atomic Force Microscope (AFM) from [http://en.wikipedia.org/wiki/File:Atomic_resolution_Au100.JPG wikipedia]:
+\image html  Gold.jpg AFM image
+\image html Afmfourrier.jpg Fourier representation
+With a spot pass we can recover the large fluctuation
+\image html Afmfourrierspotinverse.jpg spot pass
+|}
+
+ */
+

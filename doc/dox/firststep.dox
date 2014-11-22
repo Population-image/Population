@@ -1,0 +1,114 @@
+/*! \page pagefirststep First step
+
+This first step explains how to write your first program. This program
+- loads a image,
+- filter the noise,
+- segments the granular phase,
+- displays and save the result.
+
+<!--In this presentation, you use the C++ language and you find the python, Java translation at the end of the page.  -->
+
+
+The code source of the main.cpp delivered in the Population project is :
+\code
+#include"Population.h"//Single header
+using namespace pop;//Population namespace
+int main()
+{
+    try{//Enclose this portion of code in a try block
+        Mat2UI8 img;
+        img.load("../image/iex.png");//replace this path by those on your computer
+        img.display("Initial image",false);
+        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+        double value;
+        Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
+        threshold.save("iexthreshold.png");
+        Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
+        color.display("Segmented image",true);
+    }
+    catch(const pexception &e){
+        e.display();//Display the error in a window
+    }
+    return 0;
+}
+\endcode
+producing this image.
+ 
+\image html iexseg.png
+Line by line,
+\code
+#include"Population.h"
+\endcode
+-> include the single header file of the Population library. 
+\code
+using namespace pop;
+\endcode
+-> population namespace to facilate the declarations in avoiding pop::
+\code
+try{
+\endcode
+-> enclose this portion of code in a try block to handle error exception
+\code
+Mat2UI8 img;
+\endcode
+-> instantiate an object as 2d image with grey-level values  
+\code
+img.load(../image/iex.png");
+\endcode
+-> load the image (iex.png file is contained in the population folder, Population manage pgm, png, jpg, bmp formats)
+\code
+img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+\endcode
+-> filter the image to remove the noise. The algorithms are organized in <a href="modules.html">modules</a> as “procedural” classes containing a collection of static
+function members. To access the algorithms, you can write the scope resolution operator.
+\code
+double value;
+Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
+\endcode 
+-> segment the image with the Otsu's threshold
+\code
+threshold.save("iexthreshold.png");
+\endcode
+-> save the image in the input path
+\code
+Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
+\endcode
+-> create a color image with the segmentation in foreground of the initial image
+\code
+color.display();
+\endcode
+-> display this image in a windows.
+
+Now, you are ready to code your own program by replacing these source lines of code by your !
+
+Pyton code:
+\include firststep.py
+
+
+<!--
+\section Java Java
+The code source of the main delivered in the Population project is:
+\code
+#include"Population.h"//Single header
+using namespace pop;//Population namespace
+int main()
+{
+    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//Activate the information manager
+    try{//Enclose this portion of code in a try block
+    	Img2d_grey img;//2d grey-level image object
+    	img.load("/home/vincent/Desktop/Population/iex.pgm");//replace this path by those on your computer
+    	img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+    	Img2d_grey threshold = Processing::threshold(img,0,130);//threshold segmentation
+    	threshold.save("/home/vincent/Desktop/Population/iexthreshold.pgm");
+    	Img2d_color color = Visualization::labelForeground(threshold,img);//Visual validation
+    	color.display();
+    }
+    catch(const pexception &e){
+        e.display();//Display the error in a window
+    }
+    return 0;
+}
+\endcode
+-->
+
+*/ 

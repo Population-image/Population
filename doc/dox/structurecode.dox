@@ -1,0 +1,21 @@
+/*! \page pagedirectoryorganisation directory organisation
+
+In the directory population, we have
+- bin/  : contains the executable binary files, the dynamic shared libraries, the python modules,
+- core/ : contains the C++ code organised following this paradigm Program=data+algorithm.  So inside it, we have two directories data containing the data-structures organized in classes oriented object and algorithm organized in classes oriented verb and one other dependency containing the code of external libraries,
+- doc/  : contains the doxygen files to generate this documentation,
+- file/ : contains some lock-up tables,  
+- image/: contains images used in examples, tutorial, articles,
+- other/: contains
+  - article/ : contains the code related to scientific articles based on Population library,  
+  - C++/     : contains project files (Qt, VS) to build an application, a C++ plugin,
+  - cameleon/: contains the C++ code to bind Population with Cameleon language
+  - python/  : contains the SWIG code to bind Population with Python language
+  - tutorial/: contains the code related to the tutorials of this documentation.
+- main.cpp          : first step routine
+- CMakeLists.txt    : input to the CMake build system
+- Population.h      : single header file of the Population library,
+- populationapp.pro : qt project file to build an application
+- populationcore.pri: list of all .cpp/.h files required to build population library
+- ReadMe            : a read me file   
+*/ 

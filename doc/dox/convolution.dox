@@ -1,0 +1,21 @@
+/*! \page DOCConvolution Convolution
+
+The convolution of the functions  \f$f\f$ and \f$g\f$ is defined as the integral: in 1D  \f$ (f\ast g) (x) := \int_{-\infty}^{+\infty} f(x-y) \cdot g(y) \, dy \f$, in nD  \f$(f\ast g) (\mathbf{r}) := \int_{\mathbf{R}^n} f(\mathbf{r}-\mathbf{r}^{'}) \cdot g(\mathbf{r}^{'}) \, d\mathbf{r}^{'}\f$
+\image html  Convolucion_Funcion_Pi.gif "Convolution of a Square Waveform (as input signal)"
+In order to compute the convolution in discrete space, the basic idea is the truncation of the infinite support of the filtering function by a finite support, a window of some finite size and shape. Then this windows is scanned across the image. The output pixel value is the weighted sum of the input pixels within the window where the weights are the values of the filter assigned to every pixel of the window itself. The window with its weights is called the convolution kernel. Because the algorithmic complexity is O(Nrd) where N is the number of pixels/voxels, r is the size of the window and d is the space dimension, the size of the window has to be small in order to have a resonnable computational time for large image. 
+
+\section SObel  Example: Sobel gradient
+For instance, the gradient of the image can be compute using the Sobels kernels  \f$g_x=\begin{bmatrix} 
++1 & 0 & -1 \\
++2 & 0 & -2 \\
++1 & 0 & -1 
+\end{bmatrix} \f$ and \f$g_y=\begin{bmatrix} 
++1 & +2 & +1  \\
+0 & 0 & 0 \\
+-1 & -2 & -1 
+\end{bmatrix} \f$.
+The convolution of the image with these  sobel kernels lead to the approximations of the derivatives - one for horizontal changes, and one for vertical. The magnitude of these two derivates \f$g\{f\} = \sqrt{ {g_x\{f\}}^2 + {g_x\{f\}}^2}\f$ is the Sobel gradient:
+\image html Sobelin.jpg input image
+\image html Sobelout.jpg  Magnitude of the Sobel's gradient of the input image
+
+ */

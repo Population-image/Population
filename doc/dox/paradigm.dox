@@ -1,0 +1,291 @@
+
+/*! \page pageprogrammingparadigms   Programming paradigms
+\tableofcontents
+Since programming problems become more and more complexes and transverses, my vision is that application development should be process at two scales: micro- and macro-programming where at the micro-programming the paradigm is <em> Algorithms + Data Structures = Program</em> and at macro-level the paradigm is emergence with a bottom-up functional programming.
+
+\section microprogramming Micro-programming in Algorithms + Data Structures = Program paradigm
+\subsection Versus Concept/model programming versus inheritance programming
+At this level, we follow the paradigm <em> Algorithms + Data Structures = Program</em> such that the + sign means orthogonality. Concerning the data-structures, we need to use a polymorphism mechanism
+to insure the orthogonality. I make the choice between the different polymorphism mechanisms by extracting the set of requirements for a collection of data-structures. Then, in C++ a strong typing language, I organize their following
+- a concept/model programming based on static polymorphism for an optimized access of attributes and/or for requirements including some parametric types (a STL vertor stores elements with a parametric type ordered following a strict linear sequence),
+- an inheritance programming based on dynamic polymorphism otherwise because concept/model programming is poorly understood by non-experts among others more technical reasons.
+
+In population library, the central collection of data-structures is a function with a direct link implemented in concept/model programming for an optimization reason and for the necessity of parametric types. The next subsections are the main original ideas of my book. 
+\subsection FunctionConcept Function Concept
+The basic idea of the function is that the input quantity completely determines the output quantity:
+\f[ \begin{matrix}  f\colon   \mathcal{D}\subset E & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
+with  \f$E\f$ the input set, \f$\mathcal{D}\f$ a domain of the set \f$E\f$ and \f$F\f$ the output set.
+
+This determination can be done with a symbolic relation as this relation to \f$x\rightarrow x^2\f$, such that the output element is evaluated by the multiplication of the input element by itself. In population library, a kind of function is represented by the class Distribution. This class allows the sampling of random numbers, the estimation of integrals. But, you cannot modify the relation between \f$x\sim y\f$ locally because the symbolic relation is not valid any more.  To overcome that, the determination of y from x can be done with a direct relation as a matrix with values stored in the computer memory. In this case, you can directly access the value stored in the computer memory to modify the relation between \f$x\sim y\f$ locally. This kind of function as table, matrix, image, graph, video, sound signal plays on important role in a wide range of applications. From this collection of data-structures, I extract the underlying requirements by removing any dependence on specific data with which it might originally have been connected to define the Function concept. To give you the intuition about this abstraction work, I increase the level of generality from a specific data until the function concept. At
+- <b>Level 1 in C-style:</b> a specific data-structure can be a 2d regular grid image with 1 byte (uchar) pixel type:
+\image html grid2.png "right figure is the grey-level representation of the left figure"
+The equivalent definition is:
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH> Mathematics </TH>
+ <TH> Programming </TH>
+  </TR>
+  <TR>
+ <TD>
+\f[ \begin{matrix}  f\colon   \mathcal{D}\subset Z^2 & \to& (0,1,\ldots,255) \\ x & \mapsto& y = f(x) \end{matrix} \f]
+ </TD>
+ <TD ALIGN="left">
+\code class ImageGrid2D_UC{
+ pair<int,int> _domain;
+ vector<vector<uchar> > _data;
+ uchar& operator()(int i, int j);
+ ImageGrid2D_UC(int sizei,int sizej);
+};
+int main(){
+  ImageGrid2D_UC img(5,5);
+  img(2,2)=120;
+}
+\endcode
+ </TD>
+  </TR>
+</TABLE>
+- <b>Level 2 in template class:</b> a collection of data-structure can be a nD regular grid image containing any kinds of information in each point :
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH>\image html lena.bmp "2D image with a color pixel type" </TH>
+ <TH>\image html CI_4_0205_18_00.png "3D image with 1 byte pixel type"  </TH>
+  </TR>
+</TABLE>
+The equivalent definition is:
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH> Mathematics </TH>
+ <TH> Programming </TH>
+  </TR>
+  <TR>
+ <TD>
+\f[ \begin{matrix}  f\colon   \mathcal{D}\subset Z^n & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
+ </TD>
+ <TD ALIGN="left">
+\code
+template<int D,typename Type>
+class ImageGrid{
+ Point<D,int> _domain;
+ vector<Type> _data;
+ Type& operator()(Point<D> x);
+};
+typedef ImageGrid<2,uchar> ImageGrid2D_UC;//the data-structure at level 1 is just a special case
+int main(){
+  ImageGrid<2,ColorUC> img;
+  img.load("lena.pgm");
+  ImageGrid<2,ColorUC>::E x(5,5);
+  cout<<img(x)<<endl;
+}
+\endcode
+ </TD>
+  </TR>
+</TABLE>
+- <b>Level 3 in concept/model programming:</b> a collection of data-structure can be any functions with a direct relation:
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH>\image html Graph.png "Topological graph" </TH>
+ <TH>\image html opencv.bmp "OpenCV data-structure image"  </TH>
+  </TR>
+</TABLE>
+The equivalent definition is:
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH> Mathematics </TH>
+ <TH> Programming </TH>
+  </TR>
+  <TR>
+ <TD>
+\f[ \begin{matrix}  f\colon   \mathcal{D}\subset E & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
+ </TD>
+ <TD ALIGN="left">
+\code
+class ConceptFunction{
+ typedef ... Domain;
+ typedef ... E;
+ typedef ... F;
+ ConceptFunction(Domain & d);
+ Domain getDomain();
+ F& operator()(E x);
+};
+//one model as the data-structure at level 2
+template<int D,typename Type>
+class ImageGrid{
+  typedef Point<D,int> Domain;
+  typedef Point<D,int> E;
+  typedef Type F;
+  ...
+};
+//another model
+template<typename Type>
+class OpenCVModel : public cv::Mat_<Type>
+{
+  typedef cv::Point Domain;
+  typedef cv::Point E;
+  typedef Type F;
+  F& operator()(E x){
+    return this->at<F>(x);
+  }
+   
+}
+\endcode
+ </TD>
+  </TR>
+</TABLE>
+ 
+\subsection IteratorConcept Iterator Concept
+With the function concept, we can already implement some generic procedures as the affection of one point with a given value:
+\code
+//useless procedure
+template<typename Function>
+void affect(typename Function::E x,typename Function::F y, Function & f ){
+  f(x)=y;
+}
+\endcode
+But this procedure is a bit useless. In almost all algorithms, you iterate a process on a set of points belonging to the input set . For instance, for the erosion algorithm, the output function, h, is equal to \f$\forall x\in \mathcal{D}: h(x) = \min_{\forall  x'\in N(x)}f(x')\f$  such that \f$N(x)\f$ is the neighbourhood of the point x. Here, you have two iterations:
+- global :\f$\forall x\in \mathcal{D}\f$,
+- local  :\f$\forall x'\in N(x)\f$.
+
+To implement this algorithm, you can have a specific algorithm for 2d regular grid:
+\code
+template<typename Type>
+ImageGrid<2,Type> erosion(const ImageGrid<2,Type> & in,double radius){
+    ImageGrid<2,Type> out(in.getDomain());
+    //Global iteration       
+    for(int i =0;i<in.sizeI();i++){
+        for(int j =0;j<in.sizeJ();j++){
+            Type mini=numeric_limits<Type>::max();
+            //Local iteration
+            for(int m= i-radius;m<i+radius;m++){
+                for(int n= j-radius;n<j+radius;n++){
+                    if(in.isValid(m,n))
+                        mini = min(mini,in(m,n));
+                }
+            }
+            out(i,j)= mini;
+        }
+    }
+    return out;
+}
+\endcode
+In this algorithm, the global and local iterations are done with the for loop idiom for a repetitive execution. This familiar way to access elements is easy but specific to the ImageGrid data-structure. For a generic implementation of a repetitive execution, we  use the concept of iterator enabling to traverse the set of points without exposing its underlying representation. In STL library, an iterator provides a direct way to access elements of the containers by "dereferencing".  In Population library, this access is indirect. First, an IteratorE  gives the access of points, \f$x\f$, of \f$\mathcal{D}\f$ belonging to the input set \f$E\f$ and then we call the object function with \f$x\f$ as argument, \f$f(x)\f$, to access elements of the output set \f$F\f$. We make this choice because we need to access to the position of the current point in the iteration, for instance for the initialization of the local iteration in the erosion algorithm.  The generic code becomes:
+\code
+template<typename Function>
+Function Erosion(const Function & in,double norm, double radius){
+    Function out(in.getDomain());
+    typename Function::IteratorEDomain it(in.getDomainIteratorEDomain());
+    typename Function::IteratorENeighborhood itn(in.getDomainIteratorENeighborhood(radius,norm));
+    while(it.next()){
+        typename Function::F mini=numeric_limits<typename Function::F>::max();
+        itn.init(it.x());
+        while(itn.next()){
+            mini = min(mini,in(itn.x()));
+        }
+        out(it.x())= mini;
+    }
+    return out;
+}
+\endcode
+As in STL library, for each kind of iterator, each function model (such as a ImageGrid) has
+- a specific iterator type designed to iterate through its elements in an efficient way,
+- a standard method and a standard associated type to create it (Function::IteratorETotal and getDomainIteratorEDomain()).
+\subsection Algorithms Algorithms
+Many algorithms can be catalogued in one of these two categories:
+- <b>point algorithm</b>: a core part based on a global iteration as explained (see the chapter 3 of my book)
+\f[
+\forall x \in\mathcal{D}'\subset \mathcal{D}:\text{DoSomething}
+\f]
+\image html Erosion.gif "iterative point process"
+as the finite-difference algorithms (a numerical methods for approximating the solutions to differential equation using finite difference equations to approximate derivatives), the morphological filters, basic arithmetics, and so on,
+- <b>region growing algorithm</b>: a core part based on a neighbourhood iteration on the regions boundaries, \f$N(\cup_i X_i)\f$, (see the chapter 4 of my book)
+\f[
+\forall x \in N(\cup_i X_i):\text{DoSomething}
+\f]
+\image html Lenawater.gif "region growing process"
+as the watershed transformation, the quasi-euclidean distance, region-growing erosion and so on.
+
+
+\section macroprogrammming  Macro-programmming in bottom-up functional programming
+At the micro-programmming level,  due to the programming abstraction coupled to the mathematics abstraction, the code is extremely compressed: each statement expresses a great deal of information. This style of programming is highly productive to implement rapidly efficient algorithms dealing with versatile data-structures.  However, it is not user-friendly. Most of the users do not want to be contributors. They just want to use this library to prototype a process for their specific problems. Therefore at the user-level, corresponding to the macro-programmming level, the programming paradigm should allow a productive work in the implementation of a prototype on specific data-structures. It appears that the efficient paradigm is a functional programming in 'C-style':
+
+<UL>
+<LI><b>Declaration simplification</b>:
+<UL>
+<LI><b>Template data-structures:</b>: their names can be very complicated and typedef provides a mechanism to assign a simple name to an instantiated template class. I assign with a specific simple name for the usual template parameters of the template classes. For the ImageGrid template class, the usual dimension is 2 or 3 and the usual pixel/voxel type is 1 grey-level byte, 3 color bytes.
+\code
+template<int Dim, typename Result,template<typename> class BoundaryCondition=BoundaryConditionBounded>
+class ImageGrid;
+typedef ImageGrid<2,puint8> pimg2d_grey;
+typedef ImageGrid<2,pcolor_uint8> pimg2d_color;
+int main()
+{   
+    pimg2d_grey lena;//2d image with grey-level pixel type
+    lena.load("iex.pgm");
+}   
+\endcode  
+<LI><b>Template algorithms:</b> their signatures with Function, Iterator, Functor template parameters can be very complicated and a specialized functional class provides a mechanism to assign a simple signature for a specific function in keeping the genericity concerning the Function concept.
+\code
+//specialized functionnal class
+class Processing{
+        //Contributor Level
+        template< typename Function>
+        static Function median(const Function & f,double radius,double norm=2)throw(pexception)
+        {
+        //Functor object   
+            FunctorAccumulatorMedianF<typename Function::F> funcAccumulator;
+        //Iterator objects
+            typename Function::IteratorEDomain itg (f.getDomainIteratorEDomain());
+            typename Function::IteratorENeighborhood itn (f.getDomainIteratorENeighborhood(radius,norm));
+            Function h(f.getDomain());
+            //call the generic template procedure with Function, Iterator and Functor objects
+            FunctionProcedureLocal(f,itglobal,itlocal,funcAccumulator, h);
+            return h;
+        }
+};
+int main(){
+    pimg2d_grey iex;
+    iex.load("iex.pgm");
+    //user Level
+    pimg2d_grey median= Processing::median(iex,4);
+    median.display();
+    return 1;
+}
+\endcode
+</UL>
+<LI><b>Functional programming</b>:  Functional programming can be top-down: decomposition of a problem into a set of functions or bottom-up: composition of a set of functions to solve a problem. This
+ bottom-up functional programming is the approach when an user prototypes a composition of algorithms. In population library, these algorithms are static member functions of functional classes. Due to static, functions only take inputs and produce outputs, and don't have any internal state that affects the output produced for a given input. Due to classes, functions are well organized for:
+<UL>
+<LI> <b>search</b>: an user can find rapidly the appropriate function with an auto-completion tool,
+<LI> <b>modularity</b>: developers can modify a part of source code without impacting the whole library facilitating the source code evolution.
+</UL>
+A prototype can be the segmentation of a 2d image of a granular material:
+\code
+#include"algorithm/Processing.h"
+#include"algorithm/Analysis.h"
+#include"algorithm/Visualization.h"
+int main(){
+    pimg2d_grey iex;
+    iex.load("iex.pgm");
+    //Filter
+    pimg2d_grey median= Processing::median(iex,4);
+    median.display();
+    //Find the threshold value as the argument value of the valley between the two peaks populated by a single phase for each one
+    pdistribution d = Analysis::histogram(median);
+    d.display();
+    //Threshold segmentation
+    pimg2d_grey grain = Processing::threshold(median,126);
+    //Check the agreement between visual segmentation and numerical segmentation
+    pimg2d_color visualcheck = Visualization::labelForegroundBoundary(grain,iex,3);
+    visualcheck.display();
+    return 1;
+};
+\endcode
+<TABLE ALIGN="center" BORDER="0">
+  <TR>
+ <TH>\image html iex.png "Granular material" </TH>
+ <TH>\image html iexseg.png "Segmentation validation with blue lines the boundary of the segmented phase"  </TH>
+  </TR>
+</TABLE>
+<LI><b>Binding caméléon:</b> Cameleon is a new data-flow language allowing an easy prototyping and a calibration in real-time. A programmer neophyte can learn it in 5 minues. For a democratization of the utilisation of the Population library, I do the caméléon binding.
+\image html RunTime.png "Population in Camélélon IDE"
+</UL>
+*/ 

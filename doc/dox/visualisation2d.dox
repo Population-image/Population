@@ -1,0 +1,59 @@
+/*! \page pagevisu2d  2d visualization
+
+In Image processing, a visual checking is essential to prototype and calibrate your process. Population library gives some basic and extended tools to visualize a matrix (image):
+- Direct display the image in standard output stream
+\code
+Mat2UI8 img(6,4);
+img(0,1)=100;
+std::cout<<img<<std::endl;//#display the image in console
+\endcode
+- Direct display the image in windows
+\code
+Mat2UI8 img("../image/Lena.bmp ");
+img.display();//#display the image
+img.display("lena",false,false);//#display the image with lena title without stopping the execution without resizing the image
+\endcode   
+See pop::MatN::display for further explanations. 
+- Used the class pop::MatNDisplay to create windows, to display images on them and to manage user events (keyboard, mouse and windows events). 
+\code
+Mat2UI8 img("../image/Lena.bmp ");
+MatNDisplay disp;//#class to display the image
+//#execute and display the result in the object window disp while this windows is not closed
+do{
+    img = Processing::erosion(img,1);
+    disp.display(img);
+}while(disp.is_closed()==false);
+\endcode
+ As the implementation is similar to the class CImgDisplay,   for the documentation see http://cimg.sourceforge.net/reference/structcimg__library_1_1CImgDisplay.html .
+- Used the class algorithm pop::Visualization to process image for a suitable  Visualization
+\code
+    //# label image in foreground of a grey(color) imageto check segmentation or seed localization
+Mat2UI8 img("../image/Lena.bmp ");
+double value;
+Mat2UI8 thre = Processing::thresholdOtsuMethod(img,value);
+Mat2RGBUI8 foreground = Visualization::labelForeground (thre,img,0.7);
+foreground.display();
+
+//# display each label with a random colour
+DistributionPoisson d(0.001);
+Mat2UI32 field(512,512);//#realisation of a discrete poisson field
+Mat2UI32::IteratorEDomain it = field.getIteratorEDomain();
+int label = 1;
+while(it.next()){
+	if(d.randomVariable() != 0){
+        field(it.x())=label;
+        label++;
+    }
+}
+Visualization::labelToRandomRGB(field).display("seed",false);
+field = Processing::voronoiTesselationEuclidean(field);//#voronoi tesselation with  2-norm
+Mat2RGBUI8 voronoi = Visualization::labelToRandomRGB(field);
+voronoi.display();
+\endcode
+
+C++ code
+\include visualization2d.cpp
+Pyton code
+\include visualization2d.py
+
+*/

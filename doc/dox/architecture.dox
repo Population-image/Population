@@ -1,0 +1,40 @@
+/*! \page pagearchitecture  Practitioner with functional programming
+
+\section Architecture Program =  Data  + Algorithm
+
+In Image Processing, the pipeline process is a combination of algorithms, for instance, a practitioner can say   “I apply the median filter following by the Otsu’s threshold, then I merge the previous seeds and so one”. Therefore the verb (the action) is important as the object. 
+The modern paradigm is object-oriented programming and not verb. Verb seems to be old school for C language and not for C++. But, in Population library, programming mix object- and verb-oriented programming redesigning an old assertion “Program =  Data  + Algorithm” in a fashion way (see my book for further explanations). Data, as pop::MatN, pop::VecN,  are object-oriented programming with class organisation. Algorithm as pop::Processing, pop::Analysis are verb-oriented programming. 
+
+So the code seems like that:
+\code
+Mat2UI8 m;//construct an object -> Data
+img.load("../image/iex.png");//load the image, facility of the class Mat2UI8  -> Data
+img.display("Initial image",false);//display the image, facility of the class Mat2UI8  -> Data
+img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering  -> Algorithm
+double value;
+Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//thresholding  -> Algorithm
+threshold.save("iexthreshold.pgm");
+Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//colored result -> Algorithm
+color.display("Segmented image",true);//display the image, facility of the class Mat2RGBUI8  -> Data
+\endcode
+\section TemplateParameter The template parameter <typename Function>
+When you find the template parameter Function that means the parameter can be a matrix. For instance, the signature of the threshold method, \ref pop::Processing::threshold of the algorithm \ref  pop::Processing, is 
+\code
+template<typename Function>
+static typename FunctionTypeTraitsSubstituteF<Function,UI8>::Result  threshold(const Function& f,typename Function::F ymin,typename Function::F ymax=NumericLimits<typename Function::F>::maximumRange() ){
+\endcode
+The parameters are:
+- const Function& f : the input function that can be a matrix,
+- typename Function::F ymin : the minimum value that can be an unsigned char (UI8) for a matrix with pixel type coded in 1 byte=8 bits
+- typename Function::F ymax : the maximum value that can be an unsigned char (UI8) for a matrix with pixel type coded in 1 byte=8 bits
+
+And this method return a binary image, so the pixel type is  an unsigned char (UI8), so it is why we substitute the pixel type of the input function by  an unsigned char (UI8)   (FunctionTypeTraitsSubstituteF<Function,UI8>::Result).
+For instance a code can be :
+\code
+Mat2UI8 m;//construct an object -> Data
+img.load("../image/iex.png");//load the image, 
+Mat2UI8 threshold = Processing::threshold(img,125,255);//thresholding  
+threshold.display();
+\endcode
+
+*/

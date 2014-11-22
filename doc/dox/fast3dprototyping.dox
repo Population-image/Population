@@ -1,0 +1,32 @@
+/*! \page pagefastprotyping  fast prototyping for 3d matrix
+
+For 3d images as tomographic reconstruction with a characteristic size of 1 Giga of voxels, the execution time is long. In image processing, a pipeline process should be set in agreement with your purpose in test-error method. In order to create a prototype and calibrate it rapidly, I propose 3 solutions. In this example,
+the original image is (256,256,256).
+\code
+Mat3UI8 img;
+img.load("../image/rock3d.pgm");//(256,256,256) image size
+\endcode
+\image html Rock.gif Initial image
+
+- to crop a small cube 
+\code
+// SMALL CUBE
+Mat3UI8 small_cube = img(Vec3I32(0,0,0),Vec3I32(64,64,64));//the button corner of the cube is (0,0,0) and the top corner (64,64,64)
+small_cube.display();//(64,64,64) 3d image size
+\endcode		
+\image html rock1.png Small cube		
+- to extract a 2d slice 
+\code
+// SLICE OF THE CUBE
+Mat2UI8 slice = img.getPlane(2,0);//the button corner of the cube is (0,0,0) and the top corner (64,64,64)
+slice.display();//(256,256) 2d image size
+\endcode
+- to scale the image with a sub-resolution
+\code
+// SLICE OF THE CUBE
+Mat3UI8 sub_resoltion =GeometricalTransformation::scale(img,Vec3F64(0.5,0.5,0.5));//scale the domain with the factor (0.5,0.5,0.5) so (256*0.5,256*0.5,256*0.5)=(128,128,128)
+sub_resoltion.display();//(128,128,128) 3d image size
+\endcode
+
+When the prototype is finished, you comment this line to process the full matrix.
+*/

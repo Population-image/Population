@@ -1,0 +1,51 @@
+/*! \page DOCRecursive Recursive
+
+
+A recursive algorithm uses one or more of its outputs as an input at each step. For a 2d grid image, we select the way to scan the grid: left to right along each row or right to left along each row or up to down along each column or down to up along each column. Then, we apply a recursive formula as the \f$\alpha\f$-recursive filter:\f[g(n)=\alpha f(n)+ (1-\alpha)g(n-1)\f]
+
+\image html lena.png Initial image
+\image html lenaalpha0_1.jpg alpha-recursive filter in vertical way
+
+
+\section ConvolutionToRecursive Convolution formulation to  recursive formulation
+
+\subsection Transformation Transformation
+
+The Z-transform converts a discrete spatial-domain representation  into a frequency-domain representation. Here, the definition for a 1-D image:
+\f[\mathcal{Z}\{f(n)\}(z) = \sum_{n=-\infty}^{\infty} f(n) z^{-n} \f]
+We suppose that the Z-transform of the function, g, can explicitly be decomposed in a such way (see an example in the next subsection):
+\f[\mathcal{Z}\{g(n)\}(z) = \frac{a^+_0 +a^+_1z^{-1}+\ldots+a^+_m z^{-m}}{1 +b^+_1z^{-1}+\ldots+b^+_p z^{-p}} +  \frac{a^-_0 +a^-_1z^{-1}\ldots+a^-_m z^{-m}}{1 +b^-_1z^{-1}+\ldots+b^-_p z^{-p}} \quad (1) \f]
+We apply the  Z-transform of the convolution of \f$f\f$ by \f$g\f$:
+\f[\mathcal{Z}\{h\}  = \mathcal{Z}\{f * g\}\f]
+Using the convolution theorem, we get:
+\f[ \mathcal{Z}\{h\}  =  \mathcal{Z}\{f\}\cdot \mathcal{Z}\{g\}\f] 
+Using equation (1), we get \f[\mathcal{Z}\{h(n)\}(z)  =  \mathcal{Z}\{f(n)\}(z) \cdot \left(\frac{a^+_0 +a^+_1z^{-1}+\ldots+a^+_m z^{-m}}{1 +b^+_1z^{-1}+\ldots+b^+_p z^{-p}} +  \frac{a^-_0 +a^-_1z^{-1}\ldots+a^-_m z^{-m}}{1 +b^-_1z^{-1}+\ldots+b^-_p z^{-p}} \right) \f] 
+With this decomposition \f$h(n) = h^+(n)+h^-(n) \f$,  we have:
+\f[ \mathcal{Z}\{h^+(n)\}(z)(1 +b^+_1z^{-1}+\ldots+b^+_p z^{-p}) =  \mathcal{Z}\{f(n)\}(z) \cdot (a^+_0 +a^+_1z^{-1}+\ldots+a^+_m z^{-m}) \f]
+\f[ \mathcal{Z}\{h^-(n)\}(z)(1 +b^-_1z^{1}+\ldots+b^-_p z^{p}) =  \mathcal{Z}\{f(n)\}(z) \cdot (a^-_0 +a^-_1z^{1}+\ldots+a^-_m z^{m})\f]
+As, \f$ \mathcal{Z}^{-1}(a z^{-1} \mathcal{Z}\{f\}(z)) =a f(n-1) \f$, in appling the inverse of the  Z-transform, in these previous relations, we get the recursive formulation:
+\f[h^+(n) +b^+_1h^+(n-1)+\ldots+b^+_p h^+(n-p) =  a^+_0 f(n) + a^+_1 f(n-1)+\ldots+a^+_m f(n-m) \f]
+\f[h^-(n) +b^-_1h^-(n+1)+\ldots+b^+_p h^-(n+p) =  a^-_0 f(n) + a^-_1 f(n+1)+\ldots+a^-_m f(n+m)\f]
+
+\subsection Deriche Deriche kernels
+
+For instance, the kernel of Deriche's gradient, \f$g\f$, is:
+\f[  g[n] = -c e^{-\alpha |n | }\sin (w n) \f]
+As \f$ \sin (x)  = \frac{e^{ix}-e^{-ix}}{2i}\f$, we have:
+\f[  g[n] = g^+[n] + g^-[n] \f]
+with:
+\f[ g^+[n] = -\frac{-c}{2i} \left((e^{- \alpha   + iw })^n - (e^{- \alpha   - iw })^n \right) \mbox{ for } n\geq 0, 0 \mbox{ otherwise }\f]
+and 
+\f[ g^-[n] = -\frac{-c}{2i} \left((e^{ \alpha   + iw })^n - (e^{ \alpha   - iw })^n \right) ) \mbox{ for } n< 0, 0 \mbox{ otherwise }\f]
+Thus,\f$ g^+[n] = \alpha_1 (p_1)^n + \alpha_1^*(p_1^*)^n  \mbox{ for } n\geq 0, 0 \mbox{ otherwise } \f$ with \f$  \alpha_1= -\frac{-c}{2i} \f$ and \f$  p_1= e^{ \alpha   + iw } \f$. Using the Z-transform, recognizing that each factor \f$ \alpha_1 (p_1)^n\f$ has Z-transform  \f$\alpha_1/(1- (p_1)z^{-1})\f$,  the factorization leads to:
+\f[ Z\{g^+\}[z] = \frac{az^{-1}}{1+b_1z^{-1}+b_2z^{-2}}\f]
+with  \f$a = -c e^{\alpha}\sin w\f$, \f$b_1=-2 e^{\alpha}\cos w\f$ and \f$b_2=-e^{2\alpha}\f$
+
+\image html Sobelin.jpg Initial image
+\image html Deriche2.jpg Magnitude of Deriche gradient with alpha=2
+\image html Deriche1.jpg Magnitude of Deriche gradient with alpha=1
+\image html Deriche0_5.jpg Magnitude of Deriche gradient with alpha=0.5
+ */
+
+
+
