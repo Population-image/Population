@@ -91,6 +91,8 @@ public:
     }
     int getMass()const;
 };
+
+
 template<typename Position=Vec2I32>
 class CharacteristicBoundingBox
 {
@@ -103,6 +105,7 @@ public:
     }
 
     void addPoint(const Position & x){
+
         _min = pop::minimum(x,_min);
         _max = pop::maximum(x,_max);
     }
@@ -228,7 +231,7 @@ struct DistanceSumCharacteristic  : public DistanceCharacteristic<TypeCharacteri
     }
 };
 template<typename Function>
-struct CharacteristicClusterMix :  CharacteristicMass,CharacteristicLabel, CharacteristicBoundingBox<typename Function::E>, CharacteristicGreyLevel< Function>
+struct CharacteristicClusterMix :  CharacteristicMass, CharacteristicBoundingBox<typename Function::E>, CharacteristicGreyLevel< Function>
 {
     void addPoint(const typename Function::E & x){
         CharacteristicMass::addPoint(x);

@@ -1,9 +1,38 @@
 ﻿#include"Population.h"//Single header
 using namespace pop;//Population namespace
+#include"dependency/tinythread.h"
 
+
+void erosion(void *){
+
+}
 
 int main()
 {
+    {
+    Mat2UI8 m;
+    m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+    m = GeometricalTransformation::scale(m,Vec2F64(4,4));
+    m = Processing::threshold(m,150,255);
+
+    std::cout<<m.getDomain()<<std::endl;
+    clock_t start_global, end_global;
+    start_global = clock();
+    Mat2UI32 cluster =Processing::clusterToLabel(m);
+    end_global = clock();
+    std::cout<<"cluster : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
+
+    cluster =cluster*4;
+
+    start_global = clock();
+    cluster = Processing::greylevelRemoveEmptyValue(cluster);
+    end_global = clock();
+    std::cout<<"greylevel : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
+    return 1;
+       }
+//    pop::ParallelWorkers paral(8);
+//    void * param=NULL;
+//    paral.addWork(erosion,param);
     try{//Enclose this portion of code in a try block
         {
             {

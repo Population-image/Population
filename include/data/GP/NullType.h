@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_NULLTYPE_INC_
 #define LOKI_NULLTYPE_INC_
-
+#include"iostream"
 // $Id: NullType.h 751 2006-10-17 19:50:37Z syntheticpp $
 
 
@@ -25,10 +25,14 @@ namespace Loki
 // Used as a placeholder for "no type here"
 // Useful as an end marker in typelists 
 ////////////////////////////////////////////////////////////////////////////////
-
     class NullType {};
-    
-}   // namespace Loki
+    inline std::ostream& operator << (std::ostream& out, const Loki::NullType & ){
+        return out;
+    }
+    inline std::istream& operator >> (std::istream& in, Loki::NullType & ){
+        return in;
+    }
 
+}   // namespace Loki
 
 #endif // end file guardian

@@ -133,7 +133,9 @@ template<typename VertexType=Loki::NullType,typename EdgeType=Loki::NullType>
 class POP_EXPORTS GraphAdjencyList
 {
 public:
-
+    enum{
+        NO_EDGE_INDEX=-1
+    };
     std::vector<VertexType> _v_vertex;
     std::vector<std::vector<int> > _v_adjency_list;
     std::vector<EdgeType> _v_edge;
@@ -147,6 +149,9 @@ public:
     GraphAdjencyList(){
 
     }
+    GraphAdjencyList(unsigned int nbr_vertex, VertexType v)
+        :_v_vertex(nbr_vertex,v),_v_adjency_list(nbr_vertex){}
+
     GraphAdjencyList(const GraphAdjencyList & graph, VertexType v)
     {
         _v_vertex.resize(graph._v_vertex.size());
@@ -183,6 +188,9 @@ public:
 
     int addVertex();
     VertexType & vertex(int vertex);
+    const VertexType & vertex(int vertex)const;
+    unsigned int sizeVertex()const;
+
     VertexType & operator()(int vertex){
         return _v_vertex[vertex];
     }
@@ -190,16 +198,23 @@ public:
         return _v_vertex[vertex];
     }
 
-    unsigned int sizeVertex();
+
     int addEdge();
     EdgeType & edge(int edge);
+    const EdgeType & edge(int edge)const;
+    unsigned int sizeEdge()const;
     void connection(int edge, int vertex1,int vertex2);
-    std::pair<int,int> getLink(int edge);
 
-    int getEdge(int vertex1,int vertex2);
-    unsigned int sizeEdge();
-//    void load(std::string file);
-//    void save(std::string file);
+    const std::vector<std::pair<int,int> >& links()const;
+    std::pair<int,int> getLink(int edge)const;
+
+    int getEdge(int vertex1,int vertex2)const;
+    std::vector<int> getEdges(int vertex1)const;
+    std::vector<int> getConnectedVertex(int vertex)const;
+
+
+        void load(std::string file);
+        void save(std::string file)const;
 };
 template<typename VertexType1,typename EdgeType,typename VertexType2>
 struct FunctionTypeTraitsSubstituteF<GraphAdjencyList<VertexType1,EdgeType>,VertexType2 >
@@ -208,10 +223,13 @@ struct FunctionTypeTraitsSubstituteF<GraphAdjencyList<VertexType1,EdgeType>,Vert
 };
 
 template<typename VertexType,typename EdgeType>
-std::pair<int,int> GraphAdjencyList<VertexType,EdgeType>::getLink(int edge){
+std::pair<int,int> GraphAdjencyList<VertexType,EdgeType>::getLink(int edge) const{
     return _v_edge_link[edge];
 }
-
+template<typename VertexType,typename EdgeType>
+const std::vector<std::pair<int,int> >& GraphAdjencyList<VertexType,EdgeType>::links()const{
+    return _v_edge_link;
+}
 
 template<typename VertexType,typename EdgeType>
 int GraphAdjencyList<VertexType,EdgeType>::addVertex(){
@@ -221,18 +239,21 @@ int GraphAdjencyList<VertexType,EdgeType>::addVertex(){
 
 }
 template<typename VertexType,typename EdgeType>
-unsigned int GraphAdjencyList<VertexType,EdgeType>::sizeVertex(){
+unsigned int GraphAdjencyList<VertexType,EdgeType>::sizeVertex()const{
     return (int)_v_vertex.size();
 }
 template<typename VertexType,typename EdgeType>
-unsigned int GraphAdjencyList<VertexType,EdgeType>::sizeEdge(){
+unsigned int GraphAdjencyList<VertexType,EdgeType>::sizeEdge() const{
     return (int)_v_edge.size();
 }
 template<typename VertexType,typename EdgeType>
 VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex){
     return _v_vertex[vertex];
 }
-
+template<typename VertexType,typename EdgeType>
+const VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex)const{
+    return _v_vertex[vertex];
+}
 template<typename VertexType,typename EdgeType>
 int GraphAdjencyList<VertexType,EdgeType>::addEdge(){
     _v_edge.push_back(EdgeType());
@@ -243,7 +264,10 @@ template<typename VertexType,typename EdgeType>
 EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge){
     return _v_edge[edge];
 }
-
+template<typename VertexType,typename EdgeType>
+const EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge)const{
+    return _v_edge[edge];
+}
 template<typename VertexType,typename EdgeType>
 void GraphAdjencyList<VertexType,EdgeType>::connection(int edge, int vertex1,int vertex2){
     _v_adjency_list[vertex1].push_back(edge);
@@ -251,97 +275,150 @@ void GraphAdjencyList<VertexType,EdgeType>::connection(int edge, int vertex1,int
     _v_edge_link[edge] = std::make_pair(vertex1,vertex2);
 }
 template<typename VertexType,typename EdgeType>
-int GraphAdjencyList<VertexType,EdgeType>::getEdge(int vertex1,int vertex2){
-    std::vector<int>::iterator it;
+int GraphAdjencyList<VertexType,EdgeType>::getEdge(int vertex1,int vertex2) const{
+    std::vector<int>::const_iterator it;
     for ( it=_v_adjency_list[vertex1].begin() ; it < _v_adjency_list[vertex1].end(); it++ ){
         int edge = *it;
         if(_v_edge_link[edge].second ==vertex2 )
             return edge;
+        else if(_v_edge_link[edge].first ==vertex2)
+            return edge;
     }
-    return -1;
+    return NO_EDGE_INDEX;
+}
+template<typename VertexType,typename EdgeType>
+std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getEdges(int vertex) const{
+    return _v_adjency_list[vertex] ;
+}
+template<typename VertexType,typename EdgeType>
+std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getConnectedVertex(int vertex) const{
+    std::vector<int> v_vertex;
+    std::vector<int>::const_iterator it;
+    for ( it=_v_adjency_list[vertex].begin() ; it < _v_adjency_list[vertex].end(); it++ ){
+        int edge = *it;
+        if(_v_edge_link[edge].second !=vertex )
+            v_vertex.push_back(_v_edge_link[edge].second);
+        else
+            v_vertex.push_back(_v_edge_link[edge].first);
+    }
+    return v_vertex;
+}
+
+namespace  Private {
+struct GraphOperation
+{
+
+    //g1 and g2 must have the same vertex indexation
+    template<typename VertexType,typename EdgeType>
+    static GraphAdjencyList<VertexType,EdgeType> restriction(const GraphAdjencyList<VertexType,EdgeType> & g1,const GraphAdjencyList<VertexType,EdgeType> & g2)
+    {
+        GraphAdjencyList<VertexType,EdgeType> g(g1.sizeVertex(),0);
+        for(unsigned int index_vertex=0;index_vertex<g1.sizeVertex();index_vertex++){
+            //copy the information
+            g.vertex(index_vertex)=g1.vertex(index_vertex);
+            //
+            std::vector<int> v_vertex1 = g1.getConnectedVertex(index_vertex);
+            std::vector<int> v_vertex2 = g2.getConnectedVertex(index_vertex);
+            for(unsigned int index_vertex1=0;index_vertex1<v_vertex1.size();index_vertex1++){
+                bool hit=false;
+                if(v_vertex1[index_vertex1]>=index_vertex){
+                    for(unsigned int index_vertex2=0;index_vertex2<v_vertex2.size();index_vertex2++){
+                        if(v_vertex1[index_vertex1]==v_vertex2[index_vertex2]){
+                            hit =true;
+                            break;
+                        }
+                    }
+                    if(hit==false){
+                        int edge = g.addEdge();
+                        g.connection(edge,index_vertex,v_vertex1[index_vertex1]);
+                    }
+                }
+            }
+
+        }
+        return g;
+    }
+};
 }
 
 
+template<typename VertexType,typename EdgeType>
+std::ostream& operator << (std::ostream& out, const GraphAdjencyList<VertexType,EdgeType>& m){
+    out<<"#NBR_VECTOR"<<std::endl;
+    out<<m._v_vertex.size()<<std::endl;
+    out<<"#DATA_VECTOR"<<std::endl;
+    for ( int i =0; i < (int)m._v_vertex.size(); i++ ){
+        out<<m._v_vertex[i]<<std::endl;
+    }
+    out<<"#NBR_EDGE"<<std::endl;
+    out<<m._v_edge.size()<<std::endl;
+    out<<"#DATA_EDGE"<<std::endl;
+    for ( int i =0; i < (int)m._v_edge.size(); i++ ){
+        out<<m._v_edge[i]<<std::endl;
+        out<<m._v_edge_link[i].first<<"\t"<<m._v_edge_link[i].second<<std::endl;
+    }
+    return out;
+}
+template<typename VertexType,typename EdgeType>
+std::istream& operator >> (std::istream& in, GraphAdjencyList<VertexType,EdgeType>& m){
+    std::string str;
+    in >> str;
+    in >> str;
+    int nbrvertex;
+    in>>nbrvertex;
+    in >> str;
+    for(int i =0;i<nbrvertex;i++)
+    {
+        m.addVertex();
+        VertexType v;
+        in >> v;
+        m.vertex(i)=v;
+    }
+    in >> str;
+    int nbredge;
+    in>>nbredge;
+    in >> str;
+    for(int i =0;i<nbredge;i++)
+    {
+        m.addEdge();
+        EdgeType e;
+        in>>e;
+        m.edge(i)=e;
+        int v1,v2;
+        in>>v1;
+        in>>v2;
+        m.connection(i,v1,v2);
 
-//template<typename VertexType,typename EdgeType>
-//std::ostream& operator << (std::ostream& out, const GraphAdjencyList<VertexType,EdgeType>& m){
+    }
+    return in;
+}
 
-//    out<<Type2Id<GraphAdjencyList<VertexType,EdgeType> >::id[0]<<std::endl;
-//    out<<"#NBR_VECTOR"<<std::endl;
-//    out<<m._v_vertex.size()<<std::endl;
-//    out<<"#DATA_VECTOR"<<std::endl;
-//    for ( int i =0; i < (int)m._v_vertex.size(); i++ ){
-//        out<<m._v_vertex[i]<<std::endl;
-//    }
-//    out<<"#NBR_EDGE"<<std::endl;
-//    out<<m._v_edge.size()<<std::endl;
-//    out<<"#DATA_EDGE"<<std::endl;
-//    for ( int i =0; i < (int)m._v_edge.size(); i++ ){
-//        out<<m._v_edge[i]<<std::endl;
-//        out<<m._v_edge_link[i].first<<"\t"<<m._v_edge_link[i].second<<std::endl;
-//    }
-//    return out;
-//}
-//template<typename VertexType,typename EdgeType>
-//std::istream& operator >> (std::istream& in, GraphAdjencyList<VertexType,EdgeType>& m){
-//    std::string str;
-//    in >> str;
-//    in >> str;
-//    int nbrvertex;
-//    in>>nbrvertex;
-//    in >> str;
-//    for(int i =0;i<nbrvertex;i++)
-//    {
-//        m.addVertex();
-//        VertexType v;
-//        in >> v;
-//        m.vertex(i)=v;
-//    }
-//    in >> str;
-//    int nbredge;
-//    in>>nbredge;
-//    in >> str;
-//    for(int i =0;i<nbredge;i++)
-//    {
-//        m.addEdge();
-//        EdgeType e;
-//        in>>e;
-//        m.edge(i)=e;
-//        int v1,v2;
-//        in>>v1;
-//        in>>v2;
-//        m.connection(i,v1,v2);
+template<typename VertexType,typename EdgeType>
+void GraphAdjencyList<VertexType,EdgeType>::load(std::string file){
+    std::ifstream  in(file.c_str());
+    if (in.fail())
+    {
+        std::cout<<"GraphAdjencyList: cannot open file: "<<file<<std::endl;
+    }
+    else
+    {
+        in>>*this;
+    }
 
-//    }
-//    return in;
-//}
+}
+template<typename VertexType,typename EdgeType>
+void GraphAdjencyList<VertexType,EdgeType>::save(std::string file) const{
+    std::ofstream  out(file.c_str());
+    if (out.fail())
+    {
+        std::cout<<"GraphAdjencyList: cannot open file: "<<file<<std::endl;
+    }
+    else
+    {
 
-//template<typename VertexType,typename EdgeType>
-//void GraphAdjencyList<VertexType,EdgeType>::load(std::string file){
-//    std::ifstream  in(file.c_str());
-//    if (in.fail())
-//    {
-//        std::cout<<"GraphAdjencyList: cannot open file: "<<file<<std::endl;
-//    }
-//    else
-//    {
-//        in>>*this;
-//    }
-
-//}
-//template<typename VertexType,typename EdgeType>
-//void GraphAdjencyList<VertexType,EdgeType>::save(std::string file){
-//    std::ofstream  out(file.c_str());
-//    if (out.fail())
-//    {
-//        std::cout<<"GraphAdjencyList: cannot open file: "<<file<<std::endl;
-//    }
-//    else
-//    {
-
-//        out<<*this;
-//    }
-//}
+        out<<*this;
+    }
+}
 
 }
 #endif // Graph_H

@@ -44,12 +44,7 @@ public:
     static QImage toQImage(const MatN<DIM,pop::UI8> & img,bool isfastconversion=false)throw(pexception){
         if(DIM!=2)
             throw(pexception("In Convertor::toQImage, Image must be bidimensionnel"));
-
-        QImage qimg( img.getDomain()(1),img.getDomain()(0),QImage::Format_Indexed8);
-        std::copy(img.begin(),img.end(),qimg.bits());
-        return qimg;
-
-
+        return toQImage(MatN<DIM,pop::RGBUI8>(img),isfastconversion);
     }
     template<pop::I32 DIM>
     static QImage toQImage(const MatN<DIM,RGBUI8> & img,bool isfastconversion=false)throw(pexception){
@@ -64,7 +59,7 @@ public:
                 }
             }
         }else{
-            std::copy(img.begin(),img.begin()+img.getDomain().multCoordinate(),qimg.bits());
+            std::copy(reinterpret_cast<const uchar *>(img.data()),reinterpret_cast<const uchar *>(img.data())+3*img.getDomain().multCoordinate(),qimg.bits());
         }
 
         return qimg;

@@ -212,7 +212,42 @@ struct AnalysisAdvanced
         return v;
 
     }
+    template<int DIM,typename TypePixel,typename Iterator>
+    static pop::Vec<MatN<DIM,UI8>  > labelToMatrices(const MatN<DIM,TypePixel> & label,  pop::Vec<typename MatN<DIM,TypePixel>::E> & v_xmin,pop::Vec<typename MatN<DIM,TypePixel>::E>&  v_xmax, Iterator & it)
+    {
 
+        v_xmin.clear();
+        v_xmax.clear();
+        while(it.next()){
+            if(static_cast<unsigned int>(label(it.x()))>v_xmin.size()){
+                typename MatN<DIM,TypePixel>::E xmin(+NumericLimits<int>::maximumRange());
+                typename MatN<DIM,TypePixel>::E xmax(-NumericLimits<int>::maximumRange());
+                v_xmin.resize(label(it.x()),xmin);
+                v_xmax.resize(label(it.x()),xmax);
+            }
+            if(label(it.x())>0){
+                v_xmin[label(it.x())-1]= minimum(it.x(),v_xmin[label(it.x())-1]);
+                v_xmax[label(it.x())-1]= maximum(it.x(),v_xmax[label(it.x())-1]) ;
+            }
+        }
+        pop::Vec<MatN<DIM,UI8> > v(v_xmin.size());
+        for(int i =0;i<(int)v_xmin.size();i++){
+            if(v_xmin[i][0]!=NumericLimits<int>::maximumRange()){
+                typename MatN<DIM,TypePixel>::E size = (v_xmax[i]-v_xmin[i])+1;
+                v[i] = MatN<DIM,UI8>(size);
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(label(it.x())>0){
+                int index = label(it.x())-1;
+                typename MatN<DIM,TypePixel>::E pos = it.x()-v_xmin[label(it.x())-1];
+                v(index)(pos)=255;
+            }
+        }
+        return v;
+
+    }
     template<typename Function,typename Iterator>
     static typename Function::F maxValue(const Function & f,  Iterator & it)
     {
