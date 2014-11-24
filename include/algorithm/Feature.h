@@ -54,7 +54,7 @@ private:
 
 
         Vec<DescriptorMatch<Descriptor<KeyPointPyramid<2> > >   > match = Feature::descriptorMatch(descriptors1,descriptors2);
-        int nbr_math_draw = minimum(match.size(),30);
+        int nbr_math_draw = std::min((int)match.size(),30);
         match.erase(match.begin()+nbr_math_draw,match.end());
         Feature::drawDescriptorMatch(img,imgt,match,1).display();
      * \endcode
@@ -174,7 +174,7 @@ public:
 
 
         const MatN<DIM+1,Type> & octaveinit = pyramid_G.octave(0);
-        typename MatNReference<DIM,Type>::IteratorENeighborhood itn (const_cast<MatN<DIM+1,Type>*>(&octaveinit)->getPlaneByReference(0).getIteratorENeighborhood(sigma*2*3*scale_factor_gaussien,2));
+        typename MatN<DIM,Type>::IteratorENeighborhood itn (pyramid_G.getLayer(0,0).getIteratorENeighborhood(sigma*2*3*scale_factor_gaussien,2));
         double k = std::pow( 2., 1. / (octaveinit.getDomain()(DIM)-pyramid_G.getNbrExtraLayerPerOctave()) );
 
 
@@ -182,9 +182,8 @@ public:
         for(int index_extrema=0;index_extrema<(int)keypoints.size();index_extrema++){
             const KeyPointPyramid<DIM>  & keypoint =keypoints[index_extrema];
             int octave =keypoint.octave();
-            const MatN<DIM+1,Type> & moctave = pyramid_G.octave(octave);
             double layer=round(keypoint.layer());
-            MatNReference<DIM,Type> plane= const_cast<MatN<DIM+1,Type>*>(&moctave)->getPlaneByReference(layer);
+            MatN<DIM,Type> plane= pyramid_G.getLayer(octave,layer);
             itn.setDomainMatN(plane.getDomain());
             VecN<DIM,F64> x =keypoint.xInPyramid();
             itn.init(round(x));

@@ -16,7 +16,11 @@ ALL_IMAGE_DIM_TYPE(Processing,thresholdKMeansVariation,thresholdKMeansVariation)
 ALL_IMAGE_DIM_TYPE(Processing,_thresholdOtsuMethod,thresholdOtsuMethod)
 ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphological,thresholdToggleMappingMorphological)
 ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphologicalFabrizio,thresholdToggleMappingMorphologicalFabrizio)
-ALL_IMAGE_DIM_TYPE(Processing,thresholdNiblackMethod,thresholdNiblackMethod)
+
+%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI8>;
+%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI16>;
+%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI32>;
+%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::F64>;
 ALL_IMAGE_DIM_TYPE(Processing,thresholdMultiValley,thresholdMultiValley)
 ALL_IMAGE_DIM_TYPE(Processing,edgeDetectorCanny,edgeDetectorCanny)
 
