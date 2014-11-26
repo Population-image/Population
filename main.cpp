@@ -9,28 +9,29 @@ void erosion(void *){
 
 int main()
 {
-    {
-        Mat3UI8 img;
-        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
-         Scene3d scene;
-         Visualization::plane(scene,img,50,2);
-        Visualization::plane(scene,img,50,1);
-         Visualization::plane(scene,img,200,0);
-         Visualization::lineCube(scene,img);
-         scene.display();
+//    {
+//        Mat3UI8 img;
+//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
+//         Scene3d scene;
+//         Visualization::plane(scene,img,50,2);
+//        Visualization::plane(scene,img,50,1);
+//         Visualization::plane(scene,img,200,0);
+//         Visualization::lineCube(scene,img);
+//         scene.display();
 
-    }
-    {
-        Mat2UI8 img;
-        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
-        img = Processing::threshold(img,125);
-//        img.display();
-        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
-//        img.display();
-    }
+//    }
+//    {
+//        Mat2UI8 img;
+//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+//        img = Processing::threshold(img,125);
+////        img.display();
+//        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
+////        img.display();
+//    }
 
     {
-
+//        Mat2UI8 m(50,50);
+//        m.display();
         std::string path= "D:/Users/vtariel/Downloads/";
         Mat2RGBUI8 img3;
         img3.load("/home/vincent/Desktop/images.jpeg");

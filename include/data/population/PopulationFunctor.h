@@ -257,7 +257,7 @@ public:
     }
 
     void addPoint(int label, const typename FunctionTopo::E&x){
-        if(_v_mean.size()<=label){
+        if(static_cast<int>(_v_mean.size())<=label){
             _v_mean.resize(label+1,0);
             _v_number.resize(label+1,0);
         }

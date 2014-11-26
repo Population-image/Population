@@ -799,10 +799,10 @@ struct POP_EXPORTS Visualization
             FigureTriangle * triangle = new FigureTriangle();
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
             triangle->x(0)=vert.x-2;triangle->x(1)=vert.y-2;triangle->x(2)=vert.z-2;
-            typename MatN<3,F64>::E x;
+            MatN<3,F64>::E x;
             x= triangle->x;
 
-            typename MatN<3,RGBUI8>::IteratorENeighborhood itn(RGBfield.getIteratorENeighborhood(1,0));
+            MatN<3,RGBUI8>::IteratorENeighborhood itn(RGBfield.getIteratorENeighborhood(1,0));
             if(RGBfield.isValid(x)){
                 RGBUI8 fRGB(RGBfield(x));
                 if((fRGB==RGBUI8(0,0,0))){
