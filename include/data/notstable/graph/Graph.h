@@ -209,7 +209,7 @@ public:
     std::pair<int,int> getLink(int edge)const;
 
     int getEdge(int vertex1,int vertex2)const;
-    std::vector<int> getEdges(int vertex1)const;
+    const std::vector<int>& getEdges(int vertex1)const;
     std::vector<int> getConnectedVertex(int vertex)const;
 
 
@@ -287,7 +287,7 @@ int GraphAdjencyList<VertexType,EdgeType>::getEdge(int vertex1,int vertex2) cons
     return NO_EDGE_INDEX;
 }
 template<typename VertexType,typename EdgeType>
-std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getEdges(int vertex) const{
+const std::vector<int> &GraphAdjencyList<VertexType,EdgeType>::getEdges(int vertex) const{
     return _v_adjency_list[vertex] ;
 }
 template<typename VertexType,typename EdgeType>
