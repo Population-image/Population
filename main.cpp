@@ -9,53 +9,111 @@ void erosion(void *){
 
 int main()
 {
+//    {
+//        Mat3UI8 img;
+//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
+//         Scene3d scene;
+//         Visualization::plane(scene,img,50,2);
+//        Visualization::plane(scene,img,50,1);
+//         Visualization::plane(scene,img,200,0);
+//         Visualization::lineCube(scene,img);
+//         scene.display();
+
+//    }
+//    {
+//        Mat2UI8 img;
+//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+//        img = Processing::threshold(img,125);
+////        img.display();
+//        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
+////        img.display();
+//    }
+
     {
-    Mat2UI8 m;
-    m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
-    m = GeometricalTransformation::scale(m,Vec2F64(4,4));
-    m = Processing::threshold(m,150,255);
+//        Mat2UI8 m(50,50);
+//        m.display();
+        std::string path= "D:/Users/vtariel/Downloads/";
+        Mat2RGBUI8 img3;
+        img3.load("/home/vincent/Desktop/images.jpeg");
+        Mat2RGBUI8 img4;
+        img4.load("/home/vincent/Desktop/index.jpeg");
+        Vec<Mat2RGBUI8> vv;
+        vv.push_back(img3);
+        vv.push_back(img4);
+        Mat2RGBUI8 panoimg = Feature::panoramic(vv);
+        panoimg.display();
+    }
+    {
+        Mat2UI8 img;
+        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+        double sigma = 1.6;
+        Pyramid<2,F64> pyramid1 = Feature::pyramidGaussian(img,sigma);
+        Vec<KeyPointPyramid<2> > keypoint1 = Feature::keyPointSIFT(pyramid1);
+        std::cout<<keypoint1.size()<<std::endl;
 
-    std::cout<<m.getDomain()<<std::endl;
-    clock_t start_global, end_global;
-    start_global = clock();
-    Mat2UI32 cluster =Processing::clusterToLabel(m);
-    end_global = clock();
-    std::cout<<"cluster : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
+        Vec<Descriptor<KeyPointPyramid<2> > > descriptors1 = Feature::descriptorPyramidPieChart(pyramid1,keypoint1,sigma);
 
-    cluster =cluster*4;
+        //Apply geometrical transformation
+        MatN<2,UI8> imgt(img);
+        imgt = GeometricalTransformation::scale(imgt,Vec2F64(0.5));
+        imgt = GeometricalTransformation::rotate(imgt,PI/6);
+        Pyramid<2,F64> pyramid2 = Feature::pyramidGaussian(imgt,sigma);
+        Vec<KeyPointPyramid<2> > keypoint2 = Feature::keyPointSIFT(pyramid2);
+        Vec<Descriptor<KeyPointPyramid<2> > > descriptors2 = Feature::descriptorPyramidPieChart(pyramid2,keypoint2,sigma);
 
-    start_global = clock();
-    cluster = Processing::greylevelRemoveEmptyValue(cluster);
-    end_global = clock();
-    std::cout<<"greylevel : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
-    return 1;
-       }
-//    pop::ParallelWorkers paral(8);
-//    void * param=NULL;
-//    paral.addWork(erosion,param);
+
+        Vec<DescriptorMatch<Descriptor<KeyPointPyramid<2> > >   > match = Feature::descriptorMatch(descriptors1,descriptors2);
+        int nbr_math_draw = std::min((int)match.size(),30);
+        match.erase(match.begin()+nbr_math_draw,match.end());
+        Feature::drawDescriptorMatch(img,imgt,match,1).display();
+    }
+    {
+        Mat2UI8 m;
+        m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+        m = GeometricalTransformation::scale(m,Vec2F64(4,4));
+        m = Processing::threshold(m,150,255);
+
+        std::cout<<m.getDomain()<<std::endl;
+        clock_t start_global, end_global;
+        start_global = clock();
+        Mat2UI32 cluster =Processing::clusterToLabel(m);
+        end_global = clock();
+        std::cout<<"cluster : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
+
+        cluster =cluster*4;
+
+        start_global = clock();
+        cluster = Processing::greylevelRemoveEmptyValue(cluster);
+        end_global = clock();
+        std::cout<<"greylevel : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
+        return 1;
+    }
+    //    pop::ParallelWorkers paral(8);
+    //    void * param=NULL;
+    //    paral.addWork(erosion,param);
     try{//Enclose this portion of code in a try block
         {
             {
-//                std::cout<<createGaussianKernelOneDimension(2,5)<<std::endl;
-//                std::cout<<createGaussianKernelMultiDimension<2>(1,2)<<std::endl;
-//                return 1;
+                //                std::cout<<createGaussianKernelOneDimension(2,5)<<std::endl;
+                //                std::cout<<createGaussianKernelMultiDimension<2>(1,2)<<std::endl;
+                //                return 1;
 
-//                Mat2UI8 lena;
-//                lena.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
-//                Mat2F64 d(7,7);
-//                d(3,3)=1;
-////                FunctorMatN::GaussianKernel<Mat2F64> g(d,2,3);
-//                Mat2F64::IteratorEDomain it = d.getIteratorEDomain();
-//                //std::cout<<FunctorMatN::convolutionSeperable(d,kernel_derivate,0,it,MatNBoundaryConditionMirror())<<std::endl;
-//                Mat2F64 out2 = FunctorMatN::convolutionGaussianDerivate(d,0,2,4);
+                //                Mat2UI8 lena;
+                //                lena.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+                //                Mat2F64 d(7,7);
+                //                d(3,3)=1;
+                ////                FunctorMatN::GaussianKernel<Mat2F64> g(d,2,3);
+                //                Mat2F64::IteratorEDomain it = d.getIteratorEDomain();
+                //                //std::cout<<FunctorMatN::convolutionSeperable(d,kernel_derivate,0,it,MatNBoundaryConditionMirror())<<std::endl;
+                //                Mat2F64 out2 = FunctorMatN::convolutionGaussianDerivate(d,0,2,4);
 
-//                std::cout<<out2<<std::endl;
-////                std::cout<<out2<<std::endl;
-//                //                out = out*30000;
-//                //                Scene3d scene;
-//                //                Visualization::topography(scene,out);
-//                //                scene.display();
-//                return 1;
+                //                std::cout<<out2<<std::endl;
+                ////                std::cout<<out2<<std::endl;
+                //                //                out = out*30000;
+                //                //                Scene3d scene;
+                //                //                Visualization::topography(scene,out);
+                //                //                scene.display();
+                //                return 1;
             }
             {
 
@@ -122,18 +180,18 @@ int main()
             img = GeometricalTransformation::scale(img,Vec2F64(10,10));
             start_global = clock();
             Mat2UI8::IteratorEDomain it = img.getDomain();
-//            Private::ConvolutionSeparableMirror<2> kernel;
+            //            Private::ConvolutionSeparableMirror<2> kernel;
             VecF64 v(7);
             v(0)=-1;
             v(1)=0;
             v(2)=1;
             //Mat2F64 m(3,3);
             //m(1,1)=1;
-//            kernel.setSingleKernel(v);
+            //            kernel.setSingleKernel(v);
             MatNDisplay disp;
             //
             //        while(1==1){
-//            img = kernel.operator ()(0,img,Vec2I32(0,0),Vec2I32(0,0));
+            //            img = kernel.operator ()(0,img,Vec2I32(0,0),Vec2I32(0,0));
 
             //            img = convolution1D(img,v,0);
             //        disp.display(img);

@@ -106,7 +106,12 @@ public:
                 if(index>=img.getDomain()(2))
                     index = img.getDomain()(2)-1;
                 MatN<DIM-1,PixelType> plane;
-                plane = img.getPlane(2,index);
+                typename MatN<DIM-1,PixelType>::IteratorEDomain it_plane(plane.getIteratorEDomain());
+                while(it_plane.next()){
+                    plane(it_plane.x()) = img(it_plane.x().addCoordinate(2,index));
+                }
+
+
                 MatN<DIM-1,UI8> threshold= pop::Processing::threshold(plane,low_value,high_value);
                 MatN<DIM-1,RGBUI8> visu = pop::Visualization::labelForeground(threshold,plane);
                 std::string title = "minValue="+BasicUtility::Any2String(low_value)+ " maxValue="+BasicUtility::Any2String(high_value)+" Use arrows to slide the threshold values and the Key C and V to move in z-axis";

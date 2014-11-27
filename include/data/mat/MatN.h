@@ -55,8 +55,6 @@ in the Software.
 
 namespace pop
 {
-template<int Dim, typename Type>
-class MatNReference;
 template<typename Type, int SIZEI, int SIZEJ>
 class  Mat2x;
 /*! \ingroup Data
@@ -469,18 +467,6 @@ public:
     */
     typedef MatN<Dim-1, Type>  Hyperplane;
 
-
-    /*!
-    \typedef HyperplaneReference
-    * Hyperplane type in reference to avoid data copy (use in SIFT algorithm ) MatNReference<Dim-1, Type>
-    */
-    typedef MatNReference<DIM-1, Type>  HyperplaneReference;
-
-    /*!
-    \typedef FunctionReference
-    * Hyperplane type that is MatN<Dim, Type>
-    */
-    typedef MatNReference<Dim, Type>  FunctionReference;
 
     //-------------------------------------
     //
@@ -1275,154 +1261,6 @@ public:
         return 0;
     }
 
-    /*!
-    \param fixed_coordinate fixed coordinate
-    \param slice_index slice index
-    \param plane a MatN slice of the domain
-    *
-    *  Assignment of the slice at the \a slice_index for the \a  fixed_coordinate  with the \a plane
-    * For instance, let x=(x_0,x_1,x_2) a VecN in three dimension plane,
-    * and fixed_coordinate = 1
-    * you have img((x_0,slice_index,x_2)) = plane( (x_0,x_2) ). This code
-    * \code
-    MatN<2,UI8 > img(3,4);
-    MatN<1,UI8 > slice();
-    VecN<1,int> xx;
-    xx(0)=0; slice(xx)=2; xx(0)=1; slice(xx)=2; xx(0)=2; slice(xx)=2;
-    img.SetPlane(1,2,slice);//Set the row of index 2
-    std::cout<<img;
-    return 1;
-    \endcode
-    produce this output
-    * \code
-    0 0 0
-    0 0 0
-    2 2 2
-    0 0 0
-    \endcode
-    *
-    */
-    void setPlane(int fixed_coordinate, int slice_index, const MatN<DIM-1, Type> &  plane)
-    {
-
-        POP_DbgAssertMessage(this->getPlaneDomain(fixed_coordinate)==plane.getDomain()&&slice_index>=0&&slice_index<this->getDomain()(fixed_coordinate),"In MatN::setPlane, slice must have the same dimension as the slice of the 3d matrix");
-        if((fixed_coordinate==2&&DIM==3)||(fixed_coordinate==0&&DIM==2)){
-            E x;
-            x(fixed_coordinate)=slice_index;
-            std::copy(plane.begin(),plane.end(),this->begin()+VecNIndice<DIM>::VecN2Indice(this->getDomain(),x));
-        }
-        else {
-            E x ;
-            x(fixed_coordinate)=slice_index;
-
-            typename Hyperplane::IteratorEDomain it(plane.getIteratorEDomain());
-            while(it.next())
-            {
-                for(int i=0;i<Dim;i++)
-                {
-                    if(i<fixed_coordinate)x[i] = it.x()(i);
-                    else if(i>fixed_coordinate)x[i] = it.x()(i-1);
-                }
-                (*this)(x)=plane(it.x());
-            }
-        }
-    }
-    /*!
-    \param fixed_coordinate fixed coordinate
-    \param slice_index slice index
-    \return plane
-    *
-    *  Assignment of the \a plane with the slice of the matrix at the \a slice_index for the \a  fixed_coordinate
-    * For instance, let x=(x_0,x_1,x_2) a VecN in three dimension plane,
-    * and fixed_coordinate = 1
-    * you have plane( (x_0,x_2) )= img((x_0,slice_index,x_2)). This code
-    * \code
-    Vec2I32 x;
-    x(0)=3;x(1)=4;
-    MatN<2,UI8 > img(x);
-    x(0)=0;x(1)=0;img(x)=1;x(0)=1;x(1)=0;img(x)=2;x(0)=2;x(1)=0;img(x)=3;
-    x(0)=0;x(1)=1;img(x)=4;x(0)=1;x(1)=1;img(x)=5;x(0)=2;x(1)=1;img(x)=6;
-    x(0)=0;x(1)=2;img(x)=7;x(0)=1;x(1)=2;img(x)=8;x(0)=2;x(1)=2;img(x)=9;
-    x(0)=0;x(1)=3;img(x)=10;x(0)=1;x(1)=3;img(x)=11;x(0)=2;x(1)=3;img(x)=12;
-    std::cout<<img;
-    MatN<1,UI8 > slice(img.getPlaneDomain(0));
-    slice = img.getPlane(0,1);//Get the column of index 1
-    std::cout<<slice;
-    return 1;
-    \endcode
-    produce this output
-    * \code
-    1 2 3
-    4 5 6
-    7 8 9
-    10 11 12
-
-    2 5 8 11
-    \endcode
-    */
-    MatN<DIM-1, Type> getPlane(int fixed_coordinate, int slice_index)const
-    {
-        if(fixed_coordinate<0||fixed_coordinate>=Dim)
-            fixed_coordinate=Dim-1;
-        MatN<DIM-1, Type> plane(getPlaneDomain(fixed_coordinate));
-        if(slice_index>=this->getDomain()(fixed_coordinate))slice_index =this->getDomain()(fixed_coordinate)-1;
-
-        if((fixed_coordinate==2&&DIM==3)||(fixed_coordinate==0&&DIM==2)){
-            E x1,x2;
-            x1(fixed_coordinate)=slice_index;
-            x2(fixed_coordinate)=slice_index+1;
-            std::copy(this->begin()+VecNIndice<DIM>::VecN2Indice(this->getDomain(),x1),this->begin()+VecNIndice<DIM>::VecN2Indice(this->getDomain(),x2),plane.begin() );
-            return plane;
-        }
-        else{
-            E x ;
-            x(fixed_coordinate)=slice_index;
-            typename MatN<DIM-1, Type>::IteratorEDomain it(plane.getIteratorEDomain());
-            while(it.next())
-            {
-                for(int i=0;i<Dim;i++)
-                {
-                    if(i<fixed_coordinate)x[i] = it.x()(i);
-                    else if(i>fixed_coordinate) x[i] = it.x()(i-1);
-                }
-                plane(it.x())=(*this)(x);
-
-            }
-            return plane;
-        }
-    }
-
-
-    /*!
-    \fn  VecN<Dim-1,int> getPlaneDomain(int fixed_coordinate)const
-    \param fixed_coordinate fixed coordinate
-    \return plane a MatN slice of the domain
-    *
-    *  return the domain of definition of the plane of the fixed direction
-    */
-    VecN<DIM-1,int> getPlaneDomain(int fixed_coordinate)const
-    {
-        VecN<Dim-1,int> x;
-        for(int i=0;i<Dim;i++){
-            if(i<fixed_coordinate)x(i) = this->getDomain()(i);
-            else if(i>fixed_coordinate)
-                x(i-1) = this->getDomain()(i);
-        }
-        return x;
-    }
-
-    /*!
-    \param slice_index index slice
-    \return plane
-    *
-    *  return a plane without copying the data for a fast access
-    */
-    HyperplaneReference getPlaneByReference(int slice_index)const{
-        E x;
-        x(DIM-1)=slice_index;
-        const Type * data = this->data()+VecNIndice<DIM>::VecN2Indice(this->getDomain(),x);
-        return HyperplaneReference(std::make_pair(data,this->MatN<Dim, Type>::getDomain()));
-    }
     /*!
     * Return a ptr to the first pixel value
     *
@@ -2318,23 +2156,26 @@ public:
 };
 
 typedef MatN<2,UI8> Mat2UI8;
+typedef MatN<2,UI16> Mat2UI16;
+typedef MatN<2,UI32> Mat2UI32;
 typedef MatN<2,F32> Mat2F32;
 typedef MatN<2,F64> Mat2F64;
+
 typedef MatN<2,RGBUI8> Mat2RGBUI8;
 typedef MatN<2,RGBF64> Mat2RGBF64;
 typedef MatN<2,ComplexF64> Mat2ComplexF64;
-typedef MatN<2,UI16> Mat2UI16;
-typedef MatN<2,UI32> Mat2UI32;
 typedef MatN<2,Vec2F64 >  Mat2Vec2F64;
 
 
 typedef MatN<3,UI8> Mat3UI8;
+typedef MatN<3,UI16> Mat3UI16;
+typedef MatN<3,UI32> Mat3UI32;
+typedef MatN<3,F32> Mat3F32;
 typedef MatN<3,F64> Mat3F64;
+
 typedef MatN<3,RGBUI8> Mat3RGBUI8;
 typedef MatN<3,RGBF64> Mat3RGBF64;
 typedef MatN<3,ComplexF64> Mat3ComplexF64;
-typedef MatN<3,UI16> Mat3UI16;
-typedef MatN<3,UI32> Mat3UI32;
 typedef MatN<3,VecN<3,F64> >  Mat3Vec3F64;
 
 
@@ -2605,87 +2446,7 @@ struct FunctionTypeTraitsSubstituteDIM<MatN<D1,F1>,D2 >
     for( x(1)=0;x(1)<img.getDomain()(1);x(1)++)
 
 
-template<int Dim, typename Type>
-class POP_EXPORTS MatNReference : public MatN<Dim,Type>
-{
-private:
 
-public:
-    Type * _ptr_data;
-    typedef Type F;
-    enum {DIM=Dim};
-    typedef VecN<Dim,int> E;
-    typedef VecN<Dim,int> Domain;
-    //typedef BaseMatN Base;
-    typedef MatNIteratorEDomain<E>  IteratorEDomain;
-    typedef MatNIteratorEROI<MatN<Dim, Type> >  IteratorEROI;
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionBounded> IteratorENeighborhood;
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionMirror> IteratorENeighborhoodMirror;
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionPeriodic> IteratorENeighborhoodPeriodic;
-    typedef MatNIteratorEOrder<E> IteratorEOrder;
-    typedef MatNIteratorERectangle<E> IteratorERectangle;
-    typedef MatN<Dim-1, Type>  Hyperplane;
-
-
-
-    MatNReference(const MatN<Dim, Type> & img )
-        :MatN<Dim, Type>()
-    {
-        _ptr_data =const_cast< Type*>(img.data());
-        this->_domain = img.getDomain();
-    }
-    MatNReference(const MatNReference<Dim, Type> & img )
-        :MatN<Dim, Type>(),_ptr_data(const_cast<Type*>(img.data()))
-    {
-        this->_domain = img.getDomain();
-    }
-
-    MatNReference(const std::pair<const Type*,Domain> & domain )
-        :MatN<Dim, Type>(),_ptr_data(const_cast<Type*>(domain.first))
-    {
-        this->_domain = domain.second;
-    }
-    inline F & operator ()(const E& x)
-    {
-        POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(this->getDomain()));
-        return  (_ptr_data)[VecNIndice<Dim>::VecN2Indice(this->_domain,x)];
-    }
-    inline const F & operator ()( const E& x)
-    const
-    {
-        POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(this->getDomain()));
-        return  (_ptr_data)[VecNIndice<Dim>::VecN2Indice(this->_domain,x)];
-    }
-    inline Type & operator ()(unsigned int i,unsigned int j)
-    {
-        POP_DbgAssert(  i<this->sizeI()&&j<this->sizeJ());
-        return  (_ptr_data)[j+i*this->_domain(1)];
-    }
-    inline const Type & operator ()(unsigned int i,unsigned int j)const
-    {
-        POP_DbgAssert(  i<this->sizeI()&&j<this->sizeJ());
-        return  (_ptr_data)[j+i*this->_domain(1)];
-    }
-    inline Type & operator ()(unsigned int i,unsigned int j,unsigned int k)
-    {
-        POP_DbgAssert(   i<this->sizeI()&&j<this->sizeJ()&&k<this->sizeK());
-        return  (_ptr_data)[j+i*this->_domain(1)+k*this->_domain(0)*this->_domain(1)];
-    }
-    inline const Type & operator ()(unsigned int i,unsigned int j,unsigned int k)const
-    {
-        POP_DbgAssert( i<this->sizeI()&&j<this->sizeJ()&&k<this->sizeK());
-        return  (_ptr_data)[j+i*this->_domain(1)+k*this->_domain(0)*this->_domain(1)];
-    }
-    Type* data()
-    {
-        return _ptr_data;
-    }
-    const Type *data()
-    const
-    {
-        return _ptr_data;
-    }
-};
 
 template<int D1,int D2,typename F1, typename F2>
 void FunctionAssert(const MatN<D1,F1> & f,const MatN<D2,F2> & g ,std::string message)

@@ -161,7 +161,7 @@ public:
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F64>::Result F_Float;
         typedef MatN<DIM,F_Float>            Function_Float;
         Function_Float fin(in);
-        FunctorPDE::DiffusionMalikPeronaDericheOneTime<2,VecN<DIM,F_Float > >  D(K,alpha);
+        FunctorPDE::DiffusionMalikPeronaDericheOneTime<DIM,VecN<DIM,F_Float > >  D(K,alpha);
         FunctorPDE::Gradient<FunctorPDE::PartialDerivateForward> grad;
         FunctorPDE::Divergence<FunctorPDE::PartialDerivateBackward> div;
         typename Function_Float::IteratorEDomain it = fin.getIteratorEDomain();

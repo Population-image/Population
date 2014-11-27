@@ -723,7 +723,6 @@ struct POP_EXPORTS Visualization
             img_time_t = img_time_t_plus_1;
         }
     Scene3d scene;
-        std::cout<<img_time_t.getPlane(2,10)<<std::endl;
         Visualization::marchingCubeLevelSet(scene, (img_time_t));
         Visualization::lineCube(scene,img_time_t);
     scene.display();
@@ -800,10 +799,10 @@ struct POP_EXPORTS Visualization
             FigureTriangle * triangle = new FigureTriangle();
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
             triangle->x(0)=vert.x-2;triangle->x(1)=vert.y-2;triangle->x(2)=vert.z-2;
-            typename MatN<3,F64>::E x;
+            MatN<3,F64>::E x;
             x= triangle->x;
 
-            typename MatN<3,RGBUI8>::IteratorENeighborhood itn(RGBfield.getIteratorENeighborhood(1,0));
+            MatN<3,RGBUI8>::IteratorENeighborhood itn(RGBfield.getIteratorENeighborhood(1,0));
             if(RGBfield.isValid(x)){
                 RGBUI8 fRGB(RGBfield(x));
                 if((fRGB==RGBUI8(0,0,0))){
@@ -983,7 +982,7 @@ struct POP_EXPORTS Visualization
     {
 
 
-        typename MatN<3,TypePixel>::Hyperplane hyperff;
+
 
         if(direction<0||direction>=3)
             direction=2;
@@ -991,8 +990,14 @@ struct POP_EXPORTS Visualization
             slice =img.getDomain()(direction)-1;
         if(slice<0)
             slice =0;
-        hyperff = img.getPlane(direction,slice);
-        typename MatN<3,TypePixel>::Hyperplane::IteratorEDomain it (hyperff.getIteratorEDomain());
+
+
+        MatN<2,TypePixel> hyperff(img.getDomain().removeCoordinate(direction));
+        typename MatN<2,TypePixel> ::IteratorEDomain it_plane(hyperff.getIteratorEDomain());
+        while(it_plane.next()){
+            hyperff(it_plane.x()) = img(it_plane.x().addCoordinate(direction,slice));
+        }
+        typename MatN<2,TypePixel>::IteratorEDomain it (hyperff.getIteratorEDomain());
         VecN<3,F64 > normal;
         if(normal_way==1)
             normal(direction)=1;

@@ -20,12 +20,22 @@ struct Pyramid
     pop::MatN<DIM,Type>  getLayer(unsigned int index_octave,unsigned int index_layer)const{
 
         const pop::MatN<DIM+1,Type> &  moctave = octave(index_octave);
-        return moctave.getPlane(DIM,index_layer);
+        MatN<DIM,Type> layer(moctave.getDomain().removeCoordinate(DIM));
+        typename MatN<DIM,Type> ::IteratorEDomain it_plane(layer.getIteratorEDomain());
+        while(it_plane.next()){
+            layer(it_plane.x()) = moctave(it_plane.x().addCoordinate(DIM,index_layer));
+        }
+
+        return layer;
     }
     void setLayer(unsigned int index_octave,unsigned int index_layer,const pop::MatN<DIM,Type> & layer){
 
         pop::MatN<DIM+1,Type> &  moctave = octave(index_octave);
-        moctave.setPlane(DIM,index_layer,layer);
+        typename pop::MatN<DIM,Type>::IteratorEDomain it(layer.getIteratorEDomain());
+        while(it.next())
+        {
+            moctave(it.x().addCoordinate(DIM,index_layer))=layer(it.x());
+        }
     }
     void pushOctave(const VecN<DIM,int>& size,unsigned int nbr_layers)
     {

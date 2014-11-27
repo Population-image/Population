@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 #Déclaration du projet
 project(population)
 
@@ -32,16 +32,16 @@ POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 
 # Population build components
 # ===================================================
-POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF )
-POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON)
-POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF)
-POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
-POP_OPTION(BUILD_ARTICLE    "Build article code" OFF )
+POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
+POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF)
+POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" ON)
+POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
+POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )
 POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
 POP_OPTION(BUILD_TEST        "Test" ON )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(CMAKE_VERBOSE "Verbose mode" ON )
+POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
 # Offer the user the choice of overriding the installation directories

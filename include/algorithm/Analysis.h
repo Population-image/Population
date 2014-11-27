@@ -1581,7 +1581,9 @@ struct POP_EXPORTS Analysis
             size(1)=bin.getDomain()(1);
             size(2)=1;
             MatN<DIM+1,UI8> Img3d(size);
-            Img3d.setPlane(2,0,bin);
+            ForEachDomain2D(x,bin){
+                Img3d(x.addCoordinate(2,0))=bin(x);
+            }
             return AnalysisAdvanced::eulerPoincare3D(Img3d,file_eulertab);
         }
         else
