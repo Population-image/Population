@@ -53,7 +53,6 @@ in the Software.
 #endif
 namespace pop
 {
-
 /*! \ingroup Data
 * \defgroup TypeF TypeF
 * \brief type for scalar/vector elements in matrix or vector coordinate 
@@ -66,6 +65,7 @@ namespace pop
 template<class Type>
 class POP_EXPORTS RGB
 {
+
     /*!
 	* \class pop::RGB
 	* \brief Red Green Blue channel

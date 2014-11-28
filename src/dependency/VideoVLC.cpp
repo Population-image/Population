@@ -5,9 +5,39 @@
 #include"dependency/tinythread.h"
 namespace pop
 {
+
+
+struct ConvertRV32ToGrey{
+    static bool init;
+    static UI8 _look_up_table[256][256][256];
+    static UI8 lumi(const pop::VecN<4,UI8> &rgb){
+        if(init==false){
+            init= true;
+            for(unsigned int i=0;i<256;i++){
+                for(unsigned int j=0;j<256;j++){
+                    for(unsigned int k=0;k<256;k++){
+                        _look_up_table[i][j][k]=ArithmeticsSaturation<pop::UI8,F64>::Range(0.299*i + 0.587*j + 0.114*k+0.000001);
+                    }
+                }
+            }
+        }
+        return _look_up_table[rgb(2)][rgb(1)][rgb(0)];
+    }
+};
+bool ConvertRV32ToGrey::init =false;
+UI8 ConvertRV32ToGrey::_look_up_table[256][256][256];
+
+struct ConvertRV32ToRGBUI8
+{
+    static RGBUI8 lumi(const pop::VecN<4,UI8> &rgb){
+        return RGBUI8(rgb(2),rgb(1),rgb(0));
+    }
+};
+
+
 struct ctx
 {
-    pop::MatN<2,pop::RGBAUI8> * image;
+    pop::MatN<2,pop::VecN<4,UI8> > * image_RV32;
     tthread::mutex * pmutex;
     int * index;
 };
@@ -15,7 +45,7 @@ void *lock_vlc(void *data, void**p_pixels)
 {
     ctx *context = static_cast<ctx*>(data);
     context->pmutex->lock();
-    *p_pixels = (unsigned char *)context->image->data();
+    *p_pixels = (unsigned char *)context->image_RV32->data();
     return NULL;
 }
 void display_vlc(void *data, void *id)
@@ -40,7 +70,7 @@ VideoVLC::VideoVLC()
     mediaPlayer = NULL;
     context = new  ctx;
     context->pmutex = new tthread::mutex();
-    context->image = new pop::MatN<2,pop::RGBAUI8>(10,10);
+    context->image_RV32 = new pop::MatN<2,pop::VecN<4,UI8> > (10,10);
     context->index = new int(-1);
     my_index = -1;
     isplaying = false;
@@ -64,7 +94,7 @@ VideoVLC::~VideoVLC()
 {
     release();
     delete context->pmutex;
-    delete context->image;
+    delete context->image_RV32;
     delete context->index;
     delete context;
     libvlc_release(instance);
@@ -95,7 +125,7 @@ bool VideoVLC::open(const std::string & path)throw(pexception){
         if(libvlc_media_player_play(mediaPlayer)==-1)
             return false;
         libvlc_video_set_callbacks(mediaPlayer, lock_vlc, unlock_vlc, display_vlc, context);
-        libvlc_video_set_format(mediaPlayer, "RV32", context->image->sizeJ(), context->image->sizeI(), context->image->sizeJ()*4);
+        libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
 
         unsigned int w=0,h=0;
         bool find=false;
@@ -127,7 +157,7 @@ bool VideoVLC::open(const std::string & path)throw(pexception){
             mediaPlayer =NULL;
             std::cout<<h<<std::endl;
             std::cout<<w<<std::endl;
-            context->image->resize(h,w);
+            context->image_RV32->resize(h,w);
             media = libvlc_media_new_path(instance, path.c_str());
             if(isfile==true){
 #if Pop_OS==2
@@ -143,7 +173,7 @@ bool VideoVLC::open(const std::string & path)throw(pexception){
             libvlc_media_release (media);
             libvlc_media_player_play(mediaPlayer);
             libvlc_video_set_callbacks(mediaPlayer, lock_vlc, unlock_vlc, display_vlc, context);
-            libvlc_video_set_format(mediaPlayer, "RV32", context->image->sizeJ(), context->image->sizeI(), context->image->sizeJ()*4);
+            libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
             *(context->index) =0;
 //                std::cout<<"return true"<<std::endl;
 #if Pop_OS==2
@@ -190,7 +220,7 @@ bool VideoVLC::tryOpen(const std::string & path){
         media =NULL;
         libvlc_media_player_play(mediaPlayer);
         libvlc_video_set_callbacks(mediaPlayer, lock_vlc, unlock_vlc, display_vlc, context);
-        libvlc_video_set_format(mediaPlayer, "RV32", context->image->sizeJ(), context->image->sizeI(), context->image->sizeJ()*4);
+        libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
 #if Pop_OS==2
         Sleep(2000);
 #endif
@@ -214,6 +244,10 @@ bool VideoVLC::tryOpen(const std::string & path){
 }
 bool VideoVLC::grabMatrixGrey(){
     if(isplaying==true){
+        if(my_index!=*context->index){
+            my_index=*context->index;
+            return true;
+        }else{
         while(my_index==*context->index){
             if(_isfile==true&&libvlc_media_player_is_playing(mediaPlayer)==false){
                 isplaying = false;
@@ -228,8 +262,9 @@ bool VideoVLC::grabMatrixGrey(){
 #endif
             }
         }
-        my_index=*context->index;
         return true;
+        }
+
     }else
     {
         return false;
@@ -237,7 +272,8 @@ bool VideoVLC::grabMatrixGrey(){
 }
 Mat2UI8& VideoVLC::retrieveMatrixGrey(){
     context->pmutex->lock();
-    imggrey = *context->image;
+    imggrey.resize(context->image_RV32->getDomain());
+    std::transform(context->image_RV32->begin(),context->image_RV32->end(),imggrey.begin(),ConvertRV32ToGrey::lumi);
     context->pmutex->unlock();
     return imggrey;
 }
@@ -263,7 +299,8 @@ bool VideoVLC::grabMatrixRGB(){
 }
 Mat2RGBUI8& VideoVLC::retrieveMatrixRGB(){
     context->pmutex->lock();
-    imgcolor = *context->image;
+    imgcolor.resize(context->image_RV32->getDomain());
+    std::transform(context->image_RV32->begin(),context->image_RV32->end(),imgcolor.begin(),ConvertRV32ToRGBUI8::lumi);
     context->pmutex->unlock();
     return imgcolor;
 }

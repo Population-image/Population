@@ -398,6 +398,9 @@ struct ArithmeticsPeriodic
         return (p+NumericLimits<R>::maximumRange())%NumericLimits<R>::maximumRange();
     }
 };
+
+
+
 }
 
 #endif // TYPETRAITSF_HPP

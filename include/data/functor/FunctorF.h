@@ -705,6 +705,8 @@ public:
 namespace Private{
     template< typename T>struct sumNorm{sumNorm(int norm):_norm(norm){}int _norm;double operator()(double p1,T p2){if(_norm!=0)return p1+normPowerValue(p2,_norm);else return  maximum( p1,static_cast<double>(absolute(p2)));}};
     template<typename T1>struct PowF{double _exponent;PowF(double exponent):_exponent(exponent){}T1 operator()(T1 p1){return pop::ArithmeticsSaturation<T1,T1 >::Range(std::pow(p1,_exponent));}};
+
+
 }
 /// @endcond
 }
