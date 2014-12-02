@@ -560,8 +560,6 @@ public:
                 match.erase(match.begin()+number_match_point,match.end());
             match = Feature::descriptorFilterNoOverlap(match,min_overlap);
             matchs.push_back(match);
-            //Feature::drawDescriptorMatch(V_img_fromleft_toright[i],V_img_fromleft_toright[i+1],match,1).display();
-
         }
         Vec<Mat2x33F64 > v_hom;
         for(unsigned int i=0;i<matchs.size();i++){
