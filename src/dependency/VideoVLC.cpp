@@ -5,8 +5,6 @@
 #include"dependency/tinythread.h"
 namespace pop
 {
-
-
 struct ConvertRV32ToGrey{
     static bool init;
     static UI8 _look_up_table[256][256][256];
@@ -33,8 +31,6 @@ struct ConvertRV32ToRGBUI8
         return RGBUI8(rgb(2),rgb(1),rgb(0));
     }
 };
-
-
 struct ctx
 {
     pop::MatN<2,pop::VecN<4,UI8> > * image_RV32;

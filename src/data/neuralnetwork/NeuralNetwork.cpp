@@ -27,7 +27,7 @@ NeuralNetworkFeedForward & NeuralNetworkFeedForward::operator=(const NeuralNetwo
         {
             if(layer->_type==NNLayer::INPUTMATRIX){
                 NNLayerMatrix* inputlayer = dynamic_cast<NNLayerMatrix*>(layer);
-                this->addInputLayerMatrix(inputlayer->_neurons_matrix[0].getDomain()(0),inputlayer->_neurons_matrix[0].getDomain()(1),inputlayer->_method);
+                this->addInputLayerMatrix(inputlayer->_neurons_matrix[0].getDomain()(0),inputlayer->_neurons_matrix[0].getDomain()(1),inputlayer->_method,inputlayer->_normalization_value);
             }else{
                 this->addInputLayer(layer->_neurons.size());
             }

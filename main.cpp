@@ -3,12 +3,11 @@ using namespace pop;//Population namespace
 #include"dependency/tinythread.h"
 
 
-void erosion(void *){
 
-}
 
 int main()
 {
+
 //    {
 //        Mat3UI8 img;
 //        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
@@ -88,9 +87,7 @@ int main()
         std::cout<<"greylevel : "<<(double) (end_global - start_global) / CLOCKS_PER_SEC<<std::endl;
         return 1;
     }
-    //    pop::ParallelWorkers paral(8);
-    //    void * param=NULL;
-    //    paral.addWork(erosion,param);
+
     try{//Enclose this portion of code in a try block
         {
             {

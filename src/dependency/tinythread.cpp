@@ -300,4 +300,59 @@ thread::id this_thread::get_id()
 }
 
 }
+
 #endif
+
+namespace pop {
+ParallelWorkers::ParallelWorkers(int nbr_thread)
+#if defined(HAVE_THREAD)
+    :_v_thread(nbr_thread,NULL),_current_thread(0)
+#endif
+{
+
+}
+int ParallelWorkers::getIdNextThread(){
+    return _current_thread;
+}
+
+void ParallelWorkers::addWork(void (*myfunction)(void *), void * param){
+#if defined(HAVE_THREAD)
+    if(_v_thread[_current_thread]!=NULL){
+        tthread::thread * thread = _v_thread[_current_thread];
+        if (thread->joinable())
+            thread->join();
+        delete thread;
+    }
+    tthread::thread * thread =  new tthread::thread(myfunction,param);
+    _v_thread[_current_thread] = thread;
+    _current_thread++;
+    _current_thread=_current_thread%_v_thread.size();
+#else
+    myfunction(param) ;
+#endif
+}
+
+void ParallelWorkers::endAllWorkExecuted(){
+    #if defined(HAVE_THREAD)
+    for(unsigned int i=0;i<_v_thread.size();i++)
+    if(_v_thread[i]!=NULL){
+        tthread::thread * thread = _v_thread[i];
+        if (thread->joinable())
+            thread->join();
+    }
+    _current_thread=0;
+    #endif
+}
+ParallelWorkers::~ParallelWorkers(){
+    #if defined(HAVE_THREAD)
+    for(unsigned int i=0;i<_v_thread.size();i++){
+    if(_v_thread[i]!=NULL){
+        tthread::thread * thread = _v_thread[i];
+        if (thread->joinable())
+            thread->join();
+        delete thread;
+    }
+    }
+    #endif
+}
+}

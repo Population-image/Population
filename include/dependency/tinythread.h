@@ -712,17 +712,21 @@ namespace this_thread {
 
 // Define/macro cleanup
 #undef _TTHREAD_DISABLE_ASSIGNMENT
+#endif
 namespace pop {
 class ParallelWorkers
 {
 public:
     ParallelWorkers(int nbr_thread);
+    ~ParallelWorkers();
+    int getIdNextThread();
     void addWork(void (*myfunction)(void *), void * param);
     void endAllWorkExecuted();
 private:
     int _current_thread;
+#if defined(HAVE_THREAD)
     std::vector<tthread::thread *> _v_thread;
+#endif
 };
 }
-#endif
 #endif // _TINYTHREAD_H_
