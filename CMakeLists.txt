@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_VERBOSE_MAKEFILE 0)
 #Déclaration du projet
 project(population)
 
@@ -27,7 +28,7 @@ POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF
 POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
-POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   OFF   IF (NOT ANDROID))
+POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON   IF (NOT ANDROID))
 POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 
 # Population build components
@@ -36,11 +37,12 @@ POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of stati
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
-POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
+POP_OPTION(BUILD_ARTICLE     "Build article code" ON )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )
 POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
+POP_OPTION(BUILD_EXPORT      "export library" OFF )
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -122,6 +124,7 @@ endif()
 if(BUILD_SHARED_LIBS)
     add_library(${POPULATION_LIB_NAME}  SHARED ${POPULATION_SOURCES})
     target_link_libraries(${POPULATION_LIB_NAME} ${POPULATION_LIBRARY})
+if(BUILD_EXPORT)
     file(COPY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${PROJECT_BINARY_DIR}/include)
     file(COPY ${PROJECT_SOURCE_DIR}/image/ DESTINATION ${PROJECT_BINARY_DIR}/image)
     file(COPY ${PROJECT_SOURCE_DIR}/file/ DESTINATION ${PROJECT_BINARY_DIR}/file)
@@ -132,6 +135,7 @@ if(BUILD_SHARED_LIBS)
   LIBRARY DESTINATION "${POPULATION_LIB_DIR}" COMPONENT shlib
   PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/include/"
     COMPONENT dev)
+endif(BUILD_EXPORT)
 endif(BUILD_SHARED_LIBS)
 
 
@@ -172,7 +176,7 @@ if(BUILD_CUDA)
 endif(BUILD_CUDA)
 
 
-if(BUILD_SHARED_LIBS)
+if(BUILD_EXPORT)
 
     # Add all targets to the build-tree export set
     export(TARGETS ${POPULATION_LIB_NAME}  FILE "${PROJECT_BINARY_DIR}/PopulationTargets.cmake")
@@ -202,7 +206,7 @@ if(BUILD_SHARED_LIBS)
     install(EXPORT PopulationTargets DESTINATION
         "${POPULATION_CMAKE_DIR}" COMPONENT dev)
 
-endif(BUILD_SHARED_LIBS)
+endif(BUILD_EXPORT)
 get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     set(POPULATION_LIBRARIES "${POPULATION_LIBRARY}" PARENT_SCOPE)

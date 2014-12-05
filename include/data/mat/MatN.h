@@ -461,11 +461,6 @@ public:
     typedef typename std::vector<Type>::difference_type				 difference_type;
     typedef typename std::vector<Type>::allocator_type                        		 allocator_type;
 
-    /*!
-    \typedef Hyperplane
-    * Hyperplane type that is MatN<Dim-1, Type>
-    */
-    typedef MatN<Dim-1, Type>  Hyperplane;
 
 
     //-------------------------------------

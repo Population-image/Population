@@ -9,8 +9,92 @@ using namespace pop;
 #include <omp.h>
 
 
+template<typename Functor,typename ArgShared>
+void ForEachParall(Functor  f,ArgShared & arg_shared, Loki::Int2Type<2> ){
+    int i,j;
+#pragma omp parallel shared(arg_shared) private(i,j,f)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<arg_shared.sizeI();i++){
+            for(j=0;j<arg_shared.sizeJ();j++){
 
-inline Mat2F64  testee(const Mat2F64 & in,const Mat2F64 &m)
+                Vec2I32 x(i,j);
+                f(x,arg_shared);
+            }
+        }
+    }
+}
+
+
+//template<typename Functor,typename ArgShared>
+
+//void ForEachParall(Functor & f, ArgShared & arg_shared, Loki::Int2Type<3> ){
+
+//    int i,j,k;
+//#pragma omp parallel shared(arg_shared) private(i,j,k,f)
+//    {
+//#pragma omp for schedule (static)
+//        for(i=0;i<in.sizeI();i++){
+//            for(j=0;j<m.sizeJ();j++){
+//                for(k=0;k<m.sizeK();k++){
+//                    Vec3I32 x(i,j,k);
+//                    f(x,arg_shared);
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+template<typename TypePixel>
+struct FunctorMultMatrix
+{
+    struct ArgShared
+    {
+        ArgShared(){}
+        ArgShared(const MatN<2,TypePixel>& in,const MatN<2,TypePixel>& trans,MatN<2,TypePixel>& out)
+            : _in(in),_trans(trans),_out(out){}
+        const MatN<2,TypePixel>& _in;
+        const MatN<2,TypePixel>& _trans;
+        MatN<2,TypePixel>& _out;
+
+        const unsigned int sizeI(){
+            return _in.sizeI();
+        }
+        const unsigned int sizeJ(){
+            return _trans.sizeI();
+        }
+    };
+    TypePixel sum ;
+    typename MatN<2,TypePixel>::const_iterator this_it  ;
+    typename MatN<2,TypePixel>::const_iterator mtrans_it;
+    void operator ()(const Vec2I32 &x, ArgShared & shared){
+        sum = 0;
+        this_it  = shared._in.begin() +  x(0)*shared._in.sizeJ();
+        mtrans_it= shared._trans.begin() + x(1)*shared._trans.sizeJ();
+        for(unsigned int k=0;k<shared._in.sizeJ();k++){
+            sum+=(* this_it) * (* mtrans_it);
+            this_it++;
+            mtrans_it++;
+        }
+        shared._out(x(0),x(1))=sum;
+    }
+};
+
+inline Mat2F64  testee(const Mat2F64 & m1,const Mat2F64 &m2)
+{
+    Mat2F64 trans = m2.transpose();
+    Mat2F64 out(m1.sizeI(),m2.sizeJ());
+    FunctorMultMatrix<F64>::ArgShared shared(m1,trans,out);
+    FunctorMultMatrix<F64> f;
+    int time1=time(NULL);
+    ForEachParall(f,shared,Loki::Int2Type<2>());
+    int time2=time(NULL);
+    std::cout<<time2-time1<<std::endl;
+    return shared._out;
+}
+
+inline Mat2F64  testee2(const Mat2F64 & in,const Mat2F64 &m)
 {
     Mat2F64 mtrans = m.transpose();
     Mat2F64 mout(in.sizeI(),m.sizeJ());
@@ -20,7 +104,7 @@ inline Mat2F64  testee(const Mat2F64 & in,const Mat2F64 &m)
     int i,j,k;
 #pragma omp parallel shared(in,mout,m) private(i,j,k,this_it,mtrans_it)
     {
-        #pragma omp for schedule (static)
+#pragma omp for schedule (static)
         for(i=0;i<in.sizeI();i++){
             for(j=0;j<m.sizeJ();j++){
                 sum = 0;
@@ -36,8 +120,6 @@ inline Mat2F64  testee(const Mat2F64 & in,const Mat2F64 &m)
         }
     }
     return mout;
-
-
 }
 
 void testMatN(){
@@ -54,9 +136,9 @@ void testMatN(){
     m2(0,0)=5; m2(0,1)=1;
     m2(1,0)=2; m2(1,1)=3;
     m2(2,0)=3; m2(2,1)=4;
-//    Mat2F64 m3 = m1*m2;
+    //    Mat2F64 m3 = m1*m2;
     Mat2F64 m3 = testee(m1,m2);
-
+    std::cout<<m3<<std::endl;
     Mat2F64 mout(2,2);
     mout(0,0)=9; mout(0,1)=7;
     mout(1,0)=23; mout(1,1)=9;
@@ -75,6 +157,10 @@ void testMatN(){
     m  = testee(m,m);
     int time2=time(NULL);
     std::cout<<time2-time1<<std::endl;
+    time1=time(NULL);
+        m  = m*m;
+      time2=time(NULL);
+        std::cout<<time2-time1<<std::endl;
     test.end();
 
     VecF64 v1(3);

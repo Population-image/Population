@@ -57,6 +57,30 @@ struct POP_EXPORTS GeometricalTransformation
     //! \name Direct transformation
     //@{
     //-------------------------------------
+
+    /*!
+     * \brief get a 2d matrix from a 3d matrix (e.g. a slice in a core sample)
+     * \param in input 3d matrix
+     * \param index_plane plane index
+     * \param fixed_coordinate coordinate fixed
+     *
+     * \code
+     * \endcode
+     * \image html Lena.bmp
+     * \image html Lenascale.png
+    */
+    template<typename VoxelType>
+    static MatN<2,VoxelType> plane(const MatN<3,VoxelType> &m , int index_plane, int fixed_coordinate=2)
+    {
+        MatN<2,VoxelType> plane (m.getDomain().removeCoordinate(2));
+        ForEachDomain2D(x2d,plane){
+            Vec3I32 x3d = x2d.addCoordinate(fixed_coordinate,index_plane);
+            plane(x2d)= m(x3d);
+        }
+        return plane;
+    }
+
+
     /*!
      * \brief scale the image
      * \param scale vector of scale factor

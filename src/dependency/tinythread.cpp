@@ -306,10 +306,11 @@ thread::id this_thread::get_id()
 namespace pop {
 ParallelWorkers::ParallelWorkers(int nbr_thread)
 #if defined(HAVE_THREAD)
-    :_v_thread(nbr_thread,NULL),_current_thread(0)
+    :_current_thread(0),_v_thread(nbr_thread)
 #endif
 {
-
+    for(unsigned int i=0;i<_v_thread.size();i++)
+        _v_thread[i]=NULL;
 }
 int ParallelWorkers::getIdNextThread(){
     return _current_thread;
