@@ -307,9 +307,9 @@ namespace pop {
 ParallelWorkers::ParallelWorkers(int nbr_thread)
 #if defined(HAVE_THREAD)
     :_v_thread(nbr_thread),_current_thread(0)
-#endif
 {
-
+    for(unsigned int i=0;i<_v_thread.size();i++)
+        _v_thread[i]=NULL;
 }
 int ParallelWorkers::getIdNextThread(){
     return _current_thread;

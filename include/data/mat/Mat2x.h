@@ -40,7 +40,6 @@ public:
     typedef Type F;
     typedef typename MatN<2,Type>::IteratorEDomain  IteratorEDomain;
     typedef typename MatN<2,Type>::IteratorENeighborhood IteratorENeighborhood;
-    typedef MatN<1, F>  Hyperplane;
     Mat2x(Type value=Type());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);
@@ -598,7 +597,6 @@ public:
     typedef Type F;
     typedef typename MatN<2,Type>::IteratorEDomain  IteratorEDomain;
     typedef typename MatN<2,Type>::IteratorENeighborhood IteratorENeighborhood;
-    typedef MatN<1, F>  Hyperplane;
     Mat2x(Type value=Type());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);
@@ -1125,7 +1123,6 @@ public:
     typedef Type F;
     typedef typename MatN<2,Type>::IteratorEDomain  IteratorEDomain;
     typedef typename MatN<2,Type>::IteratorENeighborhood IteratorENeighborhood;
-    typedef MatN<1, F>  Hyperplane;
     Mat2x(F value=F());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);

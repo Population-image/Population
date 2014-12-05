@@ -93,7 +93,7 @@ Mat2UI32 poreDecompositionGrainContactNarrowContact2D(Mat2UI8 m ){
     return m_grain_labelled;
 
 }
-Mat2UI32 poreDecompositionMixedMethod2D(Mat2UI8 m ){
+Mat2UI32 poreDecompositionMixedMethod2D(Mat2UI8 m,double alpha=1 ){
 
     //SEGMENTATION
     Mat2UI8 m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
@@ -102,28 +102,38 @@ Mat2UI32 poreDecompositionMixedMethod2D(Mat2UI8 m ){
     //GRAIN PARTITION OF THE BINARY IMAGE
     //create the distunce function
     Mat2UI8 m_pore = m_grain_binary.opposite();
-    Mat2UI16 m_dist = Processing::distanceEuclidean(m_pore)*2;
 
+    Mat2F64 m_dist = Processing::distanceEuclidean(m_pore);
+    //normalization
+    m_dist =Processing::greylevelRange(m_dist,0,1);
 
-    m_dist = (m_dist.opposite()-300) + Mat2UI16(m_filter.opposite() );
+    //
+    Mat2F64 m_filter_normalization =Processing::greylevelRange(Mat2F64(m_filter.opposite()),0,1);
 
-    Mat2UI16 m_dist_disp(m_dist);
-    ForEachDomain2D(x,m_dist_disp){
+    m_dist = m_dist + 0.5*m_filter_normalization;
+
+    Mat2UI8 m_dist_int = Processing::greylevelRange(m_dist,0,255);
+
+    ForEachDomain2D(x,m_dist_int){
         if(m_grain_binary(x)==0)
-            m_dist_disp(x)=0;
+            m_dist_int(x)=0;
     }
-    Visualization::labelToRGBGradation( m_dist_disp).save("in2d_mixed_distance.bmp");
+    m_dist_int = m_dist_int.opposite();
+//    m_dist_int.display();
+//            save("in2d_mixed_distance.bmp");
 
     //dynamic filter to avoid over-partition
-    m_dist = Processing::dynamic(m_dist,18,0);
+    m_dist_int = Processing::dynamic(m_dist_int,30,0);
 
+//    m_dist_int.display();
     //regional minima with with the norm-0 (the norm is here important with norm-1 ->over-partition)
-    Mat2UI32 m_seed = Processing::minimaRegional(m_dist,0);
-
+    Mat2UI32 m_seed = Processing::minimaRegional(m_dist_int,0);
+    Visualization::labelForeground(m_seed,m_dist_int,0).display("seed",false);
 
     //watershed ytansformation with the seeds as minima of the distunce function, with the topographic surface as the distunce function, and the growing region is restricted by a mask function as the granular phase
     Mat2UI32 m_grain_labelled = Processing::watershed(m_seed,m_dist,m_grain_binary,0);
-    Visualization::labelForegroundBoundary(m_grain_labelled,m,2).save("in2d_mixed_grain.bmp");
+    Visualization::labelForegroundBoundary(m_grain_labelled,m,1).display();
+    //save("in2d_mixed_grain.bmp");
     return m_grain_labelled;
 }
 
@@ -220,9 +230,18 @@ Mat3UI32 poreDecompositionMixedMethod3D(Mat3UI8 m ){
 int main(){
     CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
     //m.getPlane(2,160);
+    {
+        Mat2UI8 m(2,2);
+        m.display("init",false);
+        m.display();
+    }
     try{
         Mat3UI8 m;
+#if Pop_OS==2
+        std::string dir = "C:/Users/tariel/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
+#else
         std::string dir = "/home/vincent/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
+#endif
         m.loadFromDirectory(dir.c_str());
         //        Scene3d scene;
         //                Visualization::cubeExtruded(scene,m);
@@ -252,9 +271,9 @@ int main(){
         //        }
 
         {
-            Mat2UI8 plane = m.getPlane(0,120);
-            Mat2UI32 grain = poreDecompositionGrainContactNarrowContact2D(plane);
-            Visualization::labelForegroundBoundary(grain,plane).display();
+//            Mat2UI8 plane = m.getPlane(0,120);
+//            Mat2UI32 grain = poreDecompositionGrainContactNarrowContact2D(plane);
+//            Visualization::labelForegroundBoundary(grain,plane).display();
         }
 
         //        {
@@ -273,8 +292,9 @@ int main(){
         //            scene.display();
         //        }
         {
-            Mat2UI8 plane = m.getPlane(0,120);
-            Mat2UI32 grain = poreDecompositionMixedMethod2D(plane);
+
+            Mat2UI8 plane = GeometricalTransformation::plane(m,120);
+            Mat2UI32 grain = poreDecompositionMixedMethod2D(plane,1);
         }
         //        {
         //            Mat3UI32 grain = poreDecompositionMixedMethod3D(m);
