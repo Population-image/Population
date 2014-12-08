@@ -302,7 +302,6 @@ thread::id this_thread::get_id()
 }
 
 #endif
-
 namespace pop {
 ParallelWorkers::ParallelWorkers(int nbr_thread)
 #if defined(HAVE_THREAD)
@@ -315,7 +314,6 @@ ParallelWorkers::ParallelWorkers(int nbr_thread)
 int ParallelWorkers::getIdNextThread(){
     return _current_thread;
 }
-
 void ParallelWorkers::addWork(void (*myfunction)(void *), void * param){
 #if defined(HAVE_THREAD)
     if(_v_thread[_current_thread]!=NULL){

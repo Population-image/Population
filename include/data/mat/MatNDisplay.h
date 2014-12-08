@@ -381,7 +381,7 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
 
     MatN<Dim,Type>  img(*this);
     VecN<Dim,pop::F64> scale(1,1,1);
-    if(automaticresize ==true){
+    if(automaticresize ==true&&Dim==2){
         scale = scale*(600./img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale,0);
     }

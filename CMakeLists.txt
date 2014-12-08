@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_VERBOSE_MAKEFILE 0)
+
 #Déclaration du projet
 project(population)
 
@@ -9,11 +8,12 @@ set(POP_MINOR_VERSION 2)
 set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
-
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_VERSION VERSION_GREATER "2.8")
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
+#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
 # ----------------------------------------------------------------------------
@@ -56,6 +56,7 @@ set(POPULATION_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}
 
 
 
+
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)
   set(var POPULATION_${p}_DIR)
@@ -63,6 +64,7 @@ foreach(p LIB BIN INCLUDE CMAKE)
     set(${var} "${CMAKE_CURRENT_SOURCE_DIR}/${${var}}")
   endif()
 endforeach()
+
 
 #source file
 file(
@@ -74,10 +76,12 @@ file(
 )
 set(POPULATION_SOURCES "${source_file}" CACHE STRING "population library")
 
+
 if(CMAKE_VERBOSE)
   set(CMAKE_VERBOSE_MAKEFILE 1)
 endif()
 
+message(STATUS ${CMAKE_BUILD_TYPE})
 # ----------------------------------------------------------------------------
 # In case of Makefiles if the user does not setup CMAKE_BUILD_TYPE, assume it's Release:
 if(CMAKE_GENERATOR MATCHES "Makefiles|Ninja" AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
