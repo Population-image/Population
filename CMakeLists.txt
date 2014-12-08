@@ -81,7 +81,6 @@ if(CMAKE_VERBOSE)
   set(CMAKE_VERBOSE_MAKEFILE 1)
 endif()
 
-message(STATUS ${CMAKE_BUILD_TYPE})
 # ----------------------------------------------------------------------------
 # In case of Makefiles if the user does not setup CMAKE_BUILD_TYPE, assume it's Release:
 if(CMAKE_GENERATOR MATCHES "Makefiles|Ninja" AND "${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -105,7 +104,6 @@ include(cmake/FindTHREAD.cmake)
 include(cmake/FindX11.cmake)
 include(cmake/FindCUDA.cmake)
 
-message(STATUS "With QT: ${WITH_QT}")
 if(WITH_QT)
     set(HAVE_QT true)
 endif(WITH_QT)

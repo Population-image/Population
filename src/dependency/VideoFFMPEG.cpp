@@ -145,8 +145,8 @@ bool VideoFFMPEG::grabMatrixGrey(){
                         stream = avformat_new_stream(oc,const_cast<AVCodec *>(context->streams[video_stream_index]->codec->codec));
                         avcodec_copy_context(stream->codec,context->streams[video_stream_index]->codec);
                         stream->sample_aspect_ratio = context->streams[video_stream_index]->codec->sample_aspect_ratio;
-                        picture = avcodec_alloc_frame();
-                        picture_grey = avcodec_alloc_frame();
+                        picture = av_frame_alloc();
+                        picture_grey = av_frame_alloc();
                         int size2 = avpicture_get_size(PIX_FMT_GRAY8, ccontext->width, ccontext->height);
                         picture_grey_buf = (uint8_t*)(av_malloc(size2));
                         avpicture_fill((AVPicture *) picture_grey, picture_grey_buf, PIX_FMT_GRAY8, ccontext->width, ccontext->height);
@@ -193,8 +193,8 @@ bool VideoFFMPEG::grabMatrixRGB(){
                         stream = avformat_new_stream(oc,const_cast<AVCodec *>(context->streams[video_stream_index]->codec->codec));
                         avcodec_copy_context(stream->codec,context->streams[video_stream_index]->codec);
                         stream->sample_aspect_ratio = context->streams[video_stream_index]->codec->sample_aspect_ratio;
-                        picture = avcodec_alloc_frame();
-                        picture_RGB = avcodec_alloc_frame();
+                        picture = av_frame_alloc();
+                        picture_RGB = av_frame_alloc();
                         int size2 = avpicture_get_size(PIX_FMT_RGB24, ccontext->width, ccontext->height);
                         picture_RGB_buf = (uint8_t*)(av_malloc(size2));
                         result=avpicture_fill((AVPicture *) picture_RGB, picture_RGB_buf, PIX_FMT_RGB24, ccontext->width, ccontext->height);
