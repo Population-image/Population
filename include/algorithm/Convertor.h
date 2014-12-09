@@ -88,7 +88,7 @@ struct POP_EXPORTS Convertor
         POP_DbgAssertMessage(r.getDomain()==g.getDomain()&&g.getDomain()==b.getDomain(),"In MatN::fromRGB, R G B matrixs must have the same size");
         fRGB.resize(r.getDomain());
         FunctorF::FunctorFromMultiCoordinatesToVector<TypeRGBChannel,RGB<TypeRGBChannel> > f;
-        std::transform3(r.begin(),r.end(),g.begin(),b.begin(),fRGB.begin(),f);
+        transform3(r.begin(),r.end(),g.begin(),b.begin(),fRGB.begin(),f);
     }
 
     /*!
@@ -258,6 +258,20 @@ struct POP_EXPORTS Convertor
 
 
 private:
+    template <typename In1, typename In2, typename In3, typename Out, typename FUNC>
+    Out transform3(In1 first1, In1 last1, In2 first2, In3 first3, Out out, FUNC f) {
+        while (first1 != last1) {
+            *out++ = f(*first1++, *first2++, *first3++);
+        }
+        return out;
+    }
+    template <typename In1, typename In2, typename In3,typename In4, typename Out, typename FUNC>
+    Out transform4(In1 first1, In1 last1, In2 first2, In3 first3, In4 first4,Out out, FUNC f) {
+        while (first1 != last1) {
+            *out++ = f(*first1++, *first2++, *first3++,*first4++);
+        }
+        return out;
+    }
     template<typename FunctionVec, typename FunctionScalar>
     static void fromVecN( const VecN<1,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<1>)
     {
@@ -283,7 +297,7 @@ private:
         const FunctionScalar & f2= vecf(2);
         f.resize(f0.getDomain());
         FunctorF::FunctorFromMultiCoordinatesToVector<typename FunctionScalar::F,typename FunctionVec::F> func;
-        std::transform3(f0.begin(),f0.end(),f1.begin(),f2.begin(),f.begin(),func);
+        transform3(f0.begin(),f0.end(),f1.begin(),f2.begin(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
     static void fromVecN( const VecN<4,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<4>)
@@ -294,7 +308,7 @@ private:
         const FunctionScalar & f3= vecf(3);
         f.resize(f0.getDomain());
         FunctorF::FunctorFromMultiCoordinatesToVector<typename FunctionScalar::F,typename FunctionVec::F> func;
-        std::transform4(f0.begin(),f0.end(),f1.begin(),f2.begin(),f3.begin(),f.begin(),func);
+        transform4(f0.begin(),f0.end(),f1.begin(),f2.begin(),f3.begin(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
     static void toVecN(const FunctionVec& f, VecN<1,FunctionScalar >& vecf,Loki::Int2Type<1>)

@@ -2,12 +2,8 @@
 using namespace pop;//Population namespace
 #include"dependency/tinythread.h"
 
-
-
-
 int main()
 {
-
 //    {
 //        Mat3UI8 img;
 //        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));

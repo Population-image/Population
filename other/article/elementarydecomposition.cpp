@@ -88,9 +88,6 @@ MatN<DIM,UI32> poreDecompositionGrainContactNarrowContact(MatN<DIM,UI8> m ){
     return m_grain_labelled;
 }
 
-
-
-
 int main(){
     CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
     try{
