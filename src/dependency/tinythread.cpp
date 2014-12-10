@@ -308,8 +308,10 @@ ParallelWorkers::ParallelWorkers(int nbr_thread)
     :_v_thread(nbr_thread),_current_thread(0)
 #endif
 {
+#if defined(HAVE_THREAD)
     for(unsigned int i=0;i<_v_thread.size();i++)
         _v_thread[i]=NULL;
+#endif
 }
 int ParallelWorkers::getIdNextThread(){
     return _current_thread;
