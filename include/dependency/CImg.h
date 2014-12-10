@@ -43713,7 +43713,7 @@ namespace cimg_library_suffixed {
       static AVFormatContext *format_ctx = 0;
       static AVCodecContext *codec_ctx = 0;
       static AVCodec *codec = 0;
-      static AVFrame *avframe = avcodec_alloc_frame(), *converted_frame = avcodec_alloc_frame();
+      static AVFrame *avframe = av_frame_alloc(), *converted_frame = av_frame_alloc();
       static int vstream = 0;
 
       if (resume) {
@@ -44430,7 +44430,7 @@ namespace cimg_library_suffixed {
                               cimglist_instance,
                               filename);
 
-      tmp_pict = avcodec_alloc_frame();
+      tmp_pict = av_frame_alloc();
       if (!tmp_pict) { // Failed to allocate memory for tmp_pict frame.
         avcodec_close(video_str->codec);
         av_free(oc);
@@ -44455,7 +44455,7 @@ namespace cimg_library_suffixed {
 
       // Associate buffer with tmp_pict.
       avpicture_fill((AVPicture*)tmp_pict,tmp_buffer,src_pxl_fmt,frame_dimx,frame_dimy);
-      picture = avcodec_alloc_frame();
+      picture = av_frame_alloc();
       if (!picture) { // Failed to allocate picture frame.
         av_free(tmp_pict->data[0]);
         av_free(tmp_pict);
