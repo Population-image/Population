@@ -42,17 +42,17 @@ MatNDisplay & 	MatNDisplay::operator= (const MatNDisplay &disp){
 }
 
 MatNDisplay & MatNDisplay::display(const MatN<2, RGBUI8 > & m){
-    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";std::cout<<m;}else _impl->display(m);
+    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
     return *this;
 }
 
 MatNDisplay & MatNDisplay::display(const MatN<2, RGBAUI8 > &m){
-    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";std::cout<<m;}else _impl->display(m);
+    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
     return *this;
 }
 
 MatNDisplay & MatNDisplay::display(const MatN<2, UI8 > &m){
-    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";std::cout<<m;}else _impl->display(m);
+    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
     return *this;
 }
 
@@ -95,7 +95,7 @@ bool 	MatNDisplay::is_empty () const{
     if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_empty();
 }
 bool 	MatNDisplay::is_closed () const{
-    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_closed();
+    if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";return true;}else return _impl->is_closed();
 }
 bool 	MatNDisplay::is_resized () const{
     if(_impl==NULL){std::cout<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_resized();
