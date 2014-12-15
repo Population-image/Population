@@ -35,7 +35,7 @@ POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
-POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" ON )
+POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
 POP_OPTION(BUILD_ARTICLE     "Build article code" ON )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )
