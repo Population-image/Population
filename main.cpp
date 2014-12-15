@@ -4,6 +4,27 @@ using namespace pop;//Population namespace
 
 int main()
 {
+	/*
+	char key[] = {'t', 'h', 'i', 's', ' ', 'i', 's', ' ', 't', 'h', 'e', ' ', 'e', 'n', 'c', 'r', 'y', 'p', 't', 'i', 'o', 'n', ' ', 'k', 'e', 'y'};
+	int key_len = 26;
+
+	std::string text_to_encrypt = "Hello world! This is the computer talking.";
+	int size;
+	char* encrypted_text = pop::Cryptography::xor_encryptText(text_to_encrypt, &size, key, key_len);
+	std::string decrypted_text = pop::Cryptography::xor_decryptText(encrypted_text, size, key, key_len);
+	std::cout << "Text to encrypt: " << text_to_encrypt << "\nDecrypted text: " << decrypted_text << "\nAre they the same? " << (text_to_encrypt == decrypted_text) << std::endl;
+	delete[] encrypted_text;
+
+	pop::Cryptography::xor_encryptToFile(text_to_encrypt.c_str(), text_to_encrypt.length()+1, "test.txt", key, key_len);
+	char* file_decrypted_data = pop::Cryptography::xor_decryptFile("test.txt", key, key_len);
+	std::string decrypted_from_file = std::string(file_decrypted_data);
+	std::cout << "Decrypted from file: " << decrypted_from_file << "\nAre they the same? " << (text_to_encrypt == decrypted_from_file) << std::endl;
+	delete[] file_decrypted_data;
+
+	return 0;
+*/
+
+
 //    {
 //        Mat3UI8 img;
 //        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
