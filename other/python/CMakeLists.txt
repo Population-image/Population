@@ -1,3 +1,6 @@
+#Linux: need to install swig and python-dev
+#Ubuntu/Debian: aptitude install swig python-dev
+
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
@@ -12,6 +15,3 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${POPULATION_LIB_DIR})
 SET_SOURCE_FILES_PROPERTIES(population.i PROPERTIES CPLUSPLUS ON)
 SWIG_ADD_MODULE(population python population.i ${POPULATION_SOURCES})
 SWIG_LINK_LIBRARIES(population ${PYTHON_LIBRARIES} ${POPULATION_LIBRARY})
-
-
-

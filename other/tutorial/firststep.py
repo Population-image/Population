@@ -6,7 +6,7 @@ if (sys.platform == "win32" or sys.platform == "win64"):
 	sys.path.append(PathPop)
 	from population import * #uncomment this line for windoww
 else:
-	PathPop= "/home/vincent/Population-build/"
+	PathPop= "/home/pl/cuda-workspace/Population/"
 	sys.path.append(PathPop)
 	from population import * #uncomment this line for linux
 
