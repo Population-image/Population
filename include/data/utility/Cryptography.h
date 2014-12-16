@@ -53,8 +53,8 @@ public:
 	// Encrypt or decrypt the binary data d of size len in place using the key key of size key_len
 	static void xor_encryptOrDecryptBinary(char* d, const int len, const char* key, const int key_len);
 
-	// Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char
-	static char* xor_decryptFile(const std::string filename, const char* key, const int key_len);
+    // Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char of size *len
+    static char* xor_decryptFile(const std::string filename, int *len, const char* key, const int key_len);
 
 	// Encrypt d and write it in filename
 	static void xor_encryptToFile(const char* d, const int len, const std::string filename, const char* key, const int key_len);

@@ -40,19 +40,19 @@ void Cryptography::xor_encryptOrDecryptBinary(char* d, const int len,
 	}
 }
 
-// Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char
-char* Cryptography::xor_decryptFile(const std::string filename, const char* key,
+// Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char of size *len
+char* Cryptography::xor_decryptFile(const std::string filename, int *len, const char* key,
 		const int key_len) {
 	std::ifstream infile(filename.c_str(), std::ios::binary);
 	infile.seekg(0, infile.end);
-	long size = infile.tellg();
+    *len = infile.tellg();
 
-	char* c = new char[size];
+    char* c = new char[*len];
 	infile.seekg(0, std::ios::beg);
-	infile.read(c, size);
+    infile.read(c, *len);
 	infile.close();
 
-	xor_encryptOrDecryptBinary(c, size, key, key_len);
+    xor_encryptOrDecryptBinary(c, *len, key, key_len);
 
 	return c;
 }
