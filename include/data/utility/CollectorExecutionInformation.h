@@ -34,9 +34,12 @@ in the Software.
 
 #ifndef COLLECTOREXECUTIONINFORMATION_H
 #define COLLECTOREXECUTIONINFORMATION_H
-#include<string>
+
+#include <iostream>
+#include <string>
 #include"data/GP/Singleton.h"
 #include"data/typeF/TypeF.h"
+
 namespace pop
 {
 

@@ -305,7 +305,7 @@ thread::id this_thread::get_id()
 namespace pop {
 ParallelWorkers::ParallelWorkers(int nbr_thread)
 #if defined(HAVE_THREAD)
-    :_v_thread(nbr_thread),_current_thread(0)
+    :_current_thread(0), _v_thread(nbr_thread)
 #endif
 {
 #if defined(HAVE_THREAD)
