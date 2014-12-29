@@ -31,6 +31,13 @@ namespace pop
 class POP_EXPORTS Video
 {
 public:
+    /*!
+     \brief The different implementations of Video.
+    */
+    enum VideoImpl{
+        VLC,
+        FFMPEG
+    };
 
     /*!
   \class pop::Video
@@ -57,6 +64,11 @@ public:
 
 \endcode
   */
+
+    /*!
+     \brief generic constructor of the different implementations of Video, e.g., VideoVLC if impl==VLC or VideoFFMPEG if imple==FFMPEG.
+    */
+    static Video* create(VideoImpl impl);
 
     /*!
     \brief destructor
