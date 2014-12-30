@@ -98,7 +98,6 @@ public:
 
     virtual bool grabMatrixRGB()=0;
     virtual Mat2RGBUI8 &retrieveMatrixRGB()=0;
-    virtual bool tryOpen(const std::string & filename)=0;
 };
 }
 /// @endcond

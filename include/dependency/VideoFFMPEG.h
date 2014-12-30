@@ -4,6 +4,8 @@
 #if defined(HAVE_FFMPEG)
 #include"string"
 #include"data/mat/MatN.h"
+#include "data/video/Video.h"
+
 class AVFormatContext;
 class  AVPacket;
 class  AVStream;
@@ -15,7 +17,7 @@ struct SwsContext;
 
 namespace pop
 {
-class POP_EXPORTS VideoFFMPEG
+class POP_EXPORTS VideoFFMPEG: public Video
 {
 private:
     static bool init_global;
@@ -52,7 +54,6 @@ public:
     Mat2UI8 &retrieveMatrixGrey();
     bool grabMatrixRGB();
     Mat2RGBUI8 &retrieveMatrixRGB();
-    bool tryOpen(const std::string & filename);
         bool isFile()const;
 };
 }

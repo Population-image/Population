@@ -7,6 +7,7 @@
 
 #include"string"
 #include"data/mat/MatN.h"
+#include "data/video/Video.h"
 
 #include <vlc/vlc.h>
 
@@ -15,7 +16,7 @@ namespace pop
 
 
 struct ctx;
-class POP_EXPORTS VideoVLC
+class POP_EXPORTS VideoVLC: public Video
 {
 private:
     libvlc_instance_t* instance;

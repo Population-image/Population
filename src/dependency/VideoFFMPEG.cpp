@@ -49,16 +49,7 @@ VideoFFMPEG::VideoFFMPEG()
     packet->data=NULL;
 
 }
-bool VideoFFMPEG::tryOpen(const std::string & str)
-{
-    AVFormatContext* contexttemp=NULL;
-    if(avformat_open_input(&contexttemp,str.c_str() ,NULL,NULL) != 0){
-        return false;
-    }
-    if(contexttemp!=NULL)
-        avformat_close_input(&contexttemp);
-    return true;
-}
+
 VideoFFMPEG::VideoFFMPEG(const VideoFFMPEG & video)
 {
     if(video.isplaying==true){
