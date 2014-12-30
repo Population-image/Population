@@ -151,7 +151,6 @@ void VideoVLC::release(){
     isplaying = false;
 
     if(mediaPlayer!=NULL){
-        std::cout << "release video" << std::endl;
         if(libvlc_media_player_is_playing(mediaPlayer)) {
             libvlc_media_player_stop(mediaPlayer);
         }
@@ -232,7 +231,7 @@ bool VideoVLC::grabMatrixGrey(){
     }
 
     if (context->encoutered_error) {
-        std::cout << "VIDEO ERROR ENCOUNTERED" << std::endl;
+        //std::cerr << "VIDEO ERROR ENCOUNTERED" << std::endl;
         return false;
     }
 
