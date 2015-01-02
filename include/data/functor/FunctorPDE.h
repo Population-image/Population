@@ -71,6 +71,14 @@ namespace pop
 class POP_EXPORTS FunctorPDE
 {
 public:
+    template<int DIM,typename TypePixel1,typename TypePixel2,typename FunctorPDE>
+    static void forEachDomain(const MatN<DIM,TypePixel1>& in,FunctorPDE func,MatN<DIM,TypePixel2>& out){
+        typename MatN<DIM,TypePixel1>::IteratorEDomain it = in.getIteratorEDomain();
+        FunctionProcedureFunctorUnaryE(in, func, it , out);
+    }
+
+
+
     /*!
      * \class pop::FunctorPDE
      * \ingroup FunctorPDE
@@ -116,7 +124,6 @@ public:
     public:
         static const double DIV_INVERSE;
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -130,7 +137,7 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E  x,int coordinate)
         {
             x(coordinate)++;
             TypePixel y;
@@ -154,25 +161,6 @@ public:
             }
 
         }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
-        }
     };
     /*!
     \class pop::FunctorPDE::PartialDerivateForward
@@ -185,7 +173,6 @@ public:
     {
     public:
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -196,7 +183,7 @@ public:
         * For a vectoriel field, the functor returns the partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
         template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f,  typename MatN<DIM,TypePixel>::E  x,int coordinate)
         {
             TypePixel y=TypePixel(0)-f(x);
             x(coordinate)++;
@@ -209,25 +196,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
 
     };
@@ -242,7 +210,6 @@ public:
     {
     public:
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -253,7 +220,7 @@ public:
         * For a vectoriel field, the functor returns the partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
         template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f,  typename MatN<DIM,TypePixel>::E  x,int coordinate)
         {
             TypePixel y=f(x);
             x(coordinate)--;
@@ -266,25 +233,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -302,7 +250,6 @@ public:
         PartialDerivateCentered partiatcentered;
     public:
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -317,7 +264,7 @@ public:
         * For a vectoriel field, the functor returns the vector partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
         template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E  x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
@@ -335,26 +282,6 @@ public:
                 x(coordinate_j)++;
                 return y*0.5;
             }
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate_i first derivative direction
-        * \param  coordinate_j second derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate_i,int coordinate_j){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate_i,coordinate_j);
-            }
-            return derivate;
         }
 
     };
@@ -376,7 +303,6 @@ public:
             _bulk = & bulk;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -387,7 +313,7 @@ public:
         *
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             x(coordinate)++;
             TypePixel y;
@@ -411,25 +337,6 @@ public:
             }
 
         }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
-        }
     };
     /*!
     \class pop::FunctorPDE::PartialDerivateForwardInBulk
@@ -447,7 +354,6 @@ public:
             _bulk = & bulk;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -459,7 +365,7 @@ public:
         * \sa PartialDerivateForward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixel y=-f(x);
             x(coordinate)++;
@@ -472,25 +378,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -510,7 +397,6 @@ public:
             _bulk = & bulk;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -521,7 +407,7 @@ public:
         * \sa PartialDerivateBackward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixel y=f(x);
             x(coordinate)--;
@@ -534,25 +420,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -579,7 +446,6 @@ public:
         PartialDerivateBackwardInBulk<DIM > partiatbackward;
         PartialDerivateCenteredInBulk<DIM > partiatcentered;
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -592,7 +458,7 @@ public:
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
@@ -610,25 +476,6 @@ public:
                 x(coordinate_j)++;
                 return y;
             }
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -648,7 +495,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -659,7 +505,7 @@ public:
         *
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             x(coordinate)++;
@@ -690,25 +536,6 @@ public:
             }
 
         }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
-        }
     };
     /*!
     \class pop::FunctorPDE::PartialDerivateForwardMultiPhaseField
@@ -727,7 +554,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -739,7 +565,7 @@ public:
         * \sa PartialDerivateForward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=-f(x);
@@ -756,25 +582,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -794,7 +601,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -805,7 +611,7 @@ public:
         * \sa PartialDerivateBackward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=f(x);
@@ -822,25 +628,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -868,7 +655,6 @@ public:
         PartialDerivateBackwardMultiPhaseField<DIM,TypePixelLabel > partiatbackward;
         PartialDerivateCenteredMultiPhaseField<DIM,TypePixelLabel > partiatcentered;
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -881,7 +667,7 @@ public:
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
@@ -900,25 +686,6 @@ public:
                 x(coordinate_j)++;
                 return 0;
             }
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -942,7 +709,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -953,7 +719,7 @@ public:
         *
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             x(coordinate)++;
@@ -984,25 +750,6 @@ public:
             }
 
         }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
-        }
     };
     /*!
     \class pop::FunctorPDE::PartialDerivateForwardInBulkMultiPhaseField
@@ -1024,7 +771,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -1036,7 +782,7 @@ public:
         * \sa PartialDerivateForward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=-f(x);
@@ -1053,25 +799,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -1095,7 +822,6 @@ public:
             _label = & label;
         }
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -1106,7 +832,7 @@ public:
         * \sa PartialDerivateBackward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
         {
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=f(x);
@@ -1123,25 +849,6 @@ public:
                 return TypePixel(0);
             }
 
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
     /*!
@@ -1175,7 +882,6 @@ public:
         PartialDerivateBackwardInBulkMultiPhaseField<DIM,TypePixelLabel> partiatbackward;
         PartialDerivateCenteredInBulkMultiPhaseField<DIM,TypePixelLabel> partiatcentered;
         /*!
-        \fn  inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
@@ -1188,7 +894,7 @@ public:
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
@@ -1206,25 +912,6 @@ public:
                 x(coordinate_j)++;
                 return 0;
             }
-        }
-        /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate)
-        * \brief iterate the partial derivate for scalar/vectoriel field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \param  coordinate derivative direction
-        * \return output derived scalar/vectoriel field
-        *
-        */
-        template<typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it,int coordinate){
-
-            MatN<DIM,TypePixel> derivate(f.getDomain());
-            it.init();
-            while(it.next()){
-                derivate(it.x())=this->operator ()(f,it.x(),coordinate);
-            }
-            return derivate;
         }
     };
 
@@ -1247,30 +934,7 @@ public:
     {
     public:
         PartialDerivate partial;
-
-
         /*!
-        \fn  MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it)
-        * \brief iterate the gradient for scalar field
-        * \param  f input scalar/vectoriel field
-        * \param  it iterator
-        * \return output derived vectoriel field
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,VecN<DIM, TypePixel> > iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-            MatN<DIM,VecN<DIM, TypePixel> > grad(f.getDomain());
-            it.init();
-            while(it.next()){
-                for(int i = 0;i<DIM;i++)
-                    grad(it.x())(i)=partial(f,it.x(),i);
-
-            }
-            return grad;
-        }
-
-        /*!
-        \fn VecN<DIM, TypePixel> operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
         * \param  f input scalar field
         * \param  x input VecN
         * \return a vectoriel value
@@ -1279,7 +943,7 @@ public:
         * with the partial derivate given by the template paramater
         */
         template<int DIM,typename TypePixel>
-        inline VecN<DIM, TypePixel> operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
+        inline VecN<DIM, TypePixel> operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x)
         {
             VecN<DIM, TypePixel> grad;
             for(int i = 0;i<DIM;i++)
@@ -1300,22 +964,7 @@ public:
     {
     public:
         PartialDerivate partial;
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,VecN<DIM,TypePixel> > &f,Iterator &it){
-            MatN<DIM,TypePixel> div(f.getDomain());
-            it.init();
-            while(it.next()){
-                TypePixel divergence(0);
-                for(int i = 0;i<DIM;i++){
-                    divergence+= partial(f,it.x(),i)(i);
-                }
-                div(it.x())=divergence;
-
-            }
-            return div;
-        }
         /*!
-        \fn typename Identity<TypePixel>::Result::F operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
         * \param  f input vectoriel field
         * \param  x input VecN
         * \return a scalar value
@@ -1325,7 +974,7 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,VecN<DIM,TypePixel> > & f,  typename MatN<DIM,TypePixel>::E & x)
+        TypePixel operator()(const MatN<DIM,VecN<DIM,TypePixel> > & f,  const typename MatN<DIM,TypePixel>::E & x)
         {
             TypePixel divergence(0);
             for(int i = 0;i<DIM;i++){
@@ -1346,18 +995,7 @@ public:
     {
     public:
         PartialDerivate partial;
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-            MatN<DIM,TypePixel> curl(f.getDomain());
-            it.init();
-            while(it.next()){
-                curl = this->operator ()(f,it.x());
-
-            }
-            return curl;
-        }
         /*!
-        \fn TypePixel operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
         * \param  f input vectoriel field
         * \param  x input VecN
         * \return a vectoriel value
@@ -1367,7 +1005,7 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
+        TypePixel operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x)
         {
             TypePixel curl;
             TypePixel divx = partial(f,x,0);
@@ -1390,29 +1028,8 @@ public:
     {
     public:
         PartialDerivateSecond partialsecond;
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-
-            Vec<MatN<DIM,TypePixel> > vf;
-            for(int i = 0;i<DIM;i++)
-                vf.push_back(partialsecond.iterate(f,it,i,i));
-
-            MatN<DIM,TypePixel> laplacien(f.getDomain());
-            it.init();
-            while(it.next()){
-                TypePixel sum=0;
-                for(int i = 0;i<DIM;i++)
-                    sum += vf[i](it.x());
-                laplacien(it.x())=sum;
-            }
-            return laplacien;
-        }
-
-
-
 
         /*!
-        \fn TypePixel operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
         * \return a scalar/vectoriel value
@@ -1422,7 +1039,7 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x){
+        TypePixel operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x){
             TypePixel laplacien(0);
             for(int i = 0;i<DIM;i++){
                 laplacien+=partialsecond(f,x,i,i);
@@ -1449,18 +1066,7 @@ public:
     {
     public:
         PartialDerivateSecond partialsecond;
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,Mat2x<F64,DIM,DIM> > iterate(const MatN<DIM,TypePixel> &f,Iterator it){
-            MatN<DIM,Mat2x<F64,DIM,DIM> > hessian(f.getDomain());
-            it.init();
-            while(it.next()){
-
-                hessian(it.x())=operator ()(f,it.x());
-            }
-            return hessian;
-        }
         /*!
-        \fn TypePixel operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x)
         * \param  f input scalar/vectoriel field
         * \param  x input VecN
         * \return a scalar/vectoriel value
@@ -1470,7 +1076,7 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        inline Mat2x<F64,DIM,DIM> operator()(const MatN<DIM,TypePixel> & f,  typename MatN<DIM,TypePixel>::E & x){
+        inline Mat2x<F64,DIM,DIM> operator()(const MatN<DIM,TypePixel> & f, const typename MatN<DIM,TypePixel>::E & x){
             typedef Mat2x<F64,DIM,DIM> Mat2x22f;
             Mat2x22f m;
             for(int i = 0;i<DIM;i++){
@@ -1495,169 +1101,58 @@ public:
     //-------------------------------------
 
     /*!
-    \class pop::FunctorPDE::DiffusionMalikPeronaGaussian
+    \class pop::FunctorPDE::DiffusionMalikPerona
     \brief  Malika Peronna \f$ D( \overrightarrow{\nabla} f )= c(\| \overrightarrow{\nabla} f *G_\sigma  \| )\overrightarrow{\nabla} f \f$ with \f$c(x)= \frac{1}{1 + \left(\frac{x}{K}\right)^2}  \f$
     * where \f$G_\sigma\f$ the centered gaussian(normal) kernel with \f$\sigma\f$ the standard deviation as scale paramete
     *
     *
     */
-    class POP_EXPORTS DiffusionMalikPeronaGaussian
+
+
+    class POP_EXPORTS DiffusionMalikPerona
     {
     private:
 
-        F64 _kpower2;
-        double _sigma;
-        double _kernel_size;
-
-        inline F64 fPower2(F64 v,const int dim) {
-            return 0.5 /(1 + (v*80)/(_kpower2))*1.0/dim;
+        F32 _kpower2;
+        template<typename TypePixel>
+        inline F32 f(TypePixel v) {
+            return 0.5 /(1 + pop::productInner(v,v)/(_kpower2));
         }
+        PartialDerivateBackward derivate_backward;
+        PartialDerivateForward derivate_forward;
     public:
 
         /*!
-        \fn DiffusionMalikPeronaGaussian(F64 K,double sigma=1,int kernel_size=2)
         * \param K the constant in the monotonically decreasing function c
-        * \param sigma standard deviation of the gaussian kernel (scale parameter)
-        * \param kernel_size radius of the gaussian kernel (kernel_size>sigma)
         *
         * Construct the functor
         *
         */
-        DiffusionMalikPeronaGaussian(F64 K,double sigma=1,int kernel_size=2)
-            :_kpower2(K*K),_sigma(sigma),_kernel_size(kernel_size)
+        DiffusionMalikPerona(F64 K)
+            :_kpower2(K*K/(80))
         {
         }
-
-        /*!
-        \fn MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it)
-        * \param f input function
-        * \param it iterator
-        *
-        * smooth the function on the domain defined by the iterator
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-
-            MatN<DIM,TypePixel> out = FunctorMatN::convolutionGaussian(f,it,_sigma,_kernel_size);
-            it.init();
-            while(it.next()){
-                for(int i =0;i<DIM;i++){
-                    out(it.x())(i)=fPower2(productInner(out(it.x())(i),out(it.x())(i)),DIM)*f(it.x())(i);
-                }
-            }
-            return out;
-        }
-    };
-    /*!
-    \class pop::FunctorPDE::DiffusionMalikPeronaDeriche
-    \brief  Malika Peronna \f$ D( \overrightarrow{\nabla} f )= c(\| \overrightarrow{\nabla} f *G_\alpha  \| )\overrightarrow{\nabla} f \f$ with \f$c(x)= \frac{1}{1 + \left(\frac{x}{K}\right)^2}  \f$
-    * where \f$G_\alpha\f$ the smooth Deriche kernel
-    *
-    *
-    */
-    class POP_EXPORTS DiffusionMalikPeronaDeriche
-    {
-    private:
-
-        inline F64 fPower2(F64 v,const int dim) {
-            return 0.5 /(1 + (v*80)/(kpower2))*1.0/ dim;
-        }
-        F64 kpower2;
-        F64 alpha;
-    public:
-        /*!
-        \fn DiffusionMalikPeronaDeriche(F64 K,F64 alpha=1)
-        * \param K the constant in the monotonically decreasing function c
-        * \param alpha \f$\alpha\f$ a parameter (0.5= high smooth, 2 = low smooth)
-        *
-        * Construct the functor
-        *
-        */
-        DiffusionMalikPeronaDeriche(F64 K,F64 alpha=1)
-            :kpower2(K*K),alpha(alpha)
+        DiffusionMalikPerona(const DiffusionMalikPerona& k)
+            :_kpower2(k._kpower2)
         {
+            //        std::cout<<_kpower2<<std::endl;
         }
 
-        /*!
-        \fn MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it)
-        * \param f input function
-        * \param it iterator
-        *
-        * smooth the function on the domain defined by the iterator
-        *
-        */
-        template<int DIM,typename TypePixel,typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-            MatN<DIM,TypePixel> out = FunctorMatN::smoothDeriche(f,alpha);
-            it.init();
-            while(it.next()){
-                for(int i =0;i<DIM;i++){
-                    out(it.x())(i)=fPower2(normValue(out(it.x())(i))*normValue(out(it.x())(i)),DIM)*f(it.x())(i);
-                }
+
+        template<int DIM,typename TypePixel>
+        TypePixel operator()(const MatN<DIM,TypePixel > &field,const  typename MatN<DIM,TypePixel>::E & x){
+            TypePixel flow=0;
+            for(unsigned int i=0;i<DIM;i++){
+                TypePixel diff_backward=-derivate_backward(field,x,i);
+                TypePixel diff_forward=derivate_forward(field,x,i);
+                F32 c_backward = f(diff_backward);
+                F32 c_forward = f(diff_forward);
+                flow+=(c_backward*diff_backward+c_forward*diff_forward);
             }
-            return out;
+            return field(x)+flow*(0.5/DIM);
         }
     };
 
-    /*!
-    \class pop::FunctorPDE::DiffusionMalikPeronaDericheOneTime
-    \brief  Malika Peronna \f$ D( \overrightarrow{\nabla} f )= c(\| \overrightarrow{\nabla} f *G_\alpha  \| )\overrightarrow{\nabla} f \f$ with \f$c(x)= \frac{1}{1 + \left(\frac{x}{K}\right)^2}  \f$
-    * where \f$G_\alpha\f$ the smooth Deriche kernel
-    *
-    *
-    */
-    template<int DIM,typename TypePixel>
-    class POP_EXPORTS DiffusionMalikPeronaDericheOneTime
-    {
-    private:
-
-        inline F64 fPower2(F64 v,const int dim) {
-            return 0.5 /(1 + (v*80)/(kpower2))*1.0/ dim;
-        }
-        F64 kpower2;
-        F64 alpha;
-        MatN<DIM,TypePixel> deriche;
-        bool firsttime;
-        MatN<DIM,TypePixel> outsmooth;
-    public:
-        /*!
-        \fn DiffusionMalikPeronaDericheOneTime(F64 K,F64 alpha=1)
-        * \param K the constant in the monotonically decreasing function c
-        * \param alpha \f$\alpha\f$ a parameter (0.5= high smooth, 2 = low smooth)
-        *
-        * Construct the functor
-        *
-        */
-        DiffusionMalikPeronaDericheOneTime(F64 K,F64 alpha=1)
-            :kpower2(K*K),alpha(alpha),firsttime(false)
-        {
-        }
-
-        /*!
-        \fn MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it)
-        * \param f input function
-        * \param it iterator
-        *
-        * smooth the function on the domain defined by the iterator
-        *
-        */
-        template<typename Iterator>
-        MatN<DIM,TypePixel> iterate(const MatN<DIM,TypePixel> &f,Iterator &it){
-            if(firsttime==false){
-                firsttime =true;
-                outsmooth = FunctorMatN::smoothDeriche(f,alpha);
-            }
-            MatN<DIM,TypePixel> out(f.getDomain());
-            it.init();
-            while(it.next()){
-                for(int i =0;i<DIM;i++){
-                    out(it.x())(i)=fPower2(normValue(outsmooth(it.x())(i))*normValue(outsmooth(it.x())(i)),DIM)*f(it.x())(i);
-                }
-            }
-            return out;
-        }
-    };
     //@}
 
     /*!
@@ -1669,21 +1164,7 @@ public:
     class POP_EXPORTS  FreeEnergy
     {
     private:
-        //        Vec<F64> v;
-        //        F64 step;
-        //        F64 xmin;
-        //        F64 xmax;
-    public:
-        //        FreeEnergy()
-        //        {
-        //            step=0.01;
-        //            xmin = -2;
-        //            xmax =  2;
-        //            int x = ;
-        //            for(int i)
-        //        }
         /*!
-        \fn Type operator()(Type x)
         * \param x input value
         * \return \f$\phi(1-\phi^2)\f$,
         *

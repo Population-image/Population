@@ -1539,7 +1539,8 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename TypePixel,typename BoundaryCondition>
     static MatN<DIM,TypePixel> convolutionSeperable(const MatN<DIM,TypePixel> & f, const Vec<F64> & kernel,int direction,BoundaryCondition condition)
     {
-        return FunctorMatN::convolutionSeperable(f,kernel,direction,condition);
+        typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
+        return FunctorMatN::convolutionSeperable(f,kernel,direction,itg,condition);
     }
     /*!
      *  \brief Magnitude of the Sobel's gradient

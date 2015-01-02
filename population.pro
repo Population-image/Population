@@ -21,7 +21,7 @@ CONFIG += HAVE_CIMG #CIMG to display 2d image in windows
 #CONFIG += HAVE_FFMPEG #VideoVLC to load stream video (as rtsp)  or file video
 CONFIG += HAVE_QT #convert QImage to pop::Mat2UI8 or pop::Mat2RGBUI8
 #CONFIG += HAVE_OPENCV #convert cv::Mat to pop::Mat2UI8 or pop::Mat2RGBUI8
-
+CONFIG += HAVE_OPENMP #openmp optoimization
 ##### Common #####
 ##For linux,  install  glut (ubunto sudo apt-get install freeglut3-dev)
 CONFIG += HAVE_QMAKE

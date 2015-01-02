@@ -259,14 +259,14 @@ struct POP_EXPORTS Convertor
 
 private:
     template <typename In1, typename In2, typename In3, typename Out, typename FUNC>
-    Out transform3(In1 first1, In1 last1, In2 first2, In3 first3, Out out, FUNC f) {
+    static Out transform3(In1 first1, In1 last1, In2 first2, In3 first3, Out out, FUNC f) {
         while (first1 != last1) {
             *out++ = f(*first1++, *first2++, *first3++);
         }
         return out;
     }
     template <typename In1, typename In2, typename In3,typename In4, typename Out, typename FUNC>
-    Out transform4(In1 first1, In1 last1, In2 first2, In3 first3, In4 first4,Out out, FUNC f) {
+    static Out transform4(In1 first1, In1 last1, In2 first2, In3 first3, In4 first4,Out out, FUNC f) {
         while (first1 != last1) {
             *out++ = f(*first1++, *first2++, *first3++,*first4++);
         }

@@ -91,10 +91,12 @@ public:
         FunctorPDE::HessianMatrix<> func_hessian;
         typename MatN<DIM,F64>::IteratorEDomain itdomain(imgf.getIteratorEDomain());
 
+        MatN<DIM,Mat2x<F64,DIM,DIM> >  img_hessian(imgf.getDomain());
+        FunctionProcedureFunctorUnaryE(imgf, func_hessian, itdomain , img_hessian);
 
-        MatN<DIM,Mat2x<F64,DIM,DIM> >  img_hessian = func_hessian.iterate(imgf,itdomain);
 
         itdomain.init();
+
         img_hessian = FunctorMatN::convolutionGaussian(img_hessian,itdomain,sigma,2*sigma);
         itdomain.init();
         while(itdomain.next()){
@@ -579,7 +581,7 @@ public:
                 v_hom.push_back(model.getTransformation());
             }
         }
-        Mat2x33F64 Mmult = LinearAlgebra::identity(3);
+        Mat2x33F64 Mmult = Mat2x33F64::identity();
         MatN<2,TypePixel> panoramic(V_img_fromleft_toright[0]);
         for(unsigned int i=0;i<v_hom.size();i++){
 

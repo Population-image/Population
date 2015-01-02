@@ -17,7 +17,6 @@ void ForEachParall(Functor  f,ArgShared & arg_shared, Loki::Int2Type<2> ){
 #pragma omp for schedule (static)
         for(i=0;i<arg_shared.sizeI();i++){
             for(j=0;j<arg_shared.sizeJ();j++){
-
                 Vec2I32 x(i,j);
                 f(x,arg_shared);
             }
@@ -26,24 +25,65 @@ void ForEachParall(Functor  f,ArgShared & arg_shared, Loki::Int2Type<2> ){
 }
 
 
-//template<typename Functor,typename ArgShared>
+template<typename Functor,typename ArgShared>
+void ForEachParall(Functor  f,ArgShared & arg_shared, Loki::Int2Type<3> ){
+    int i,j,k;
+#pragma omp parallel shared(arg_shared) private(i,j,f)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<arg_shared.sizeI();i++){
+            for(j=0;j<arg_shared.sizeJ();j++){
+                for(k=0;k<arg_shared.sizeK();k++){
+                    Vec3I32 x(i,j,k);
+                    f(x,arg_shared);
+                }
+            }
+        }
+    }
+}
 
-//void ForEachParall(Functor & f, ArgShared & arg_shared, Loki::Int2Type<3> ){
+template<typename TypePixel>
+MatN<2,TypePixel> transpose(const MatN<2,TypePixel>& m){
+    MatN<2,TypePixel> temp(m.sizeJ(),m.sizeI());
+    typename MatN<2,TypePixel>::const_iterator this_ptr;
+    typename MatN<2,TypePixel>::iterator temp_ptr;
+    unsigned int i,j;
+#pragma omp parallel shared(m,temp) private(this_ptr,temp_ptr,i,j)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<m.sizeI();i++){
+            this_ptr  =  m.begin() + i*m.sizeJ();
+            temp_ptr =     temp.begin() + i;
+            for( j=0;j<m.sizeJ();j++){
+                * temp_ptr =  * this_ptr;
+                temp_ptr   +=  m.sizeI();
+                this_ptr++;
+            }
+        }
+    }
+    return temp;
+}
+template<typename TypePixel>
+void transpose2( MatN<2,TypePixel> m){
 
-//    int i,j,k;
-//#pragma omp parallel shared(arg_shared) private(i,j,k,f)
-//    {
-//#pragma omp for schedule (static)
-//        for(i=0;i<in.sizeI();i++){
-//            for(j=0;j<m.sizeJ();j++){
-//                for(k=0;k<m.sizeK();k++){
-//                    Vec3I32 x(i,j,k);
-//                    f(x,arg_shared);
-//                }
-//            }
-//        }
-//    }
-//}
+    typename MatN<2,TypePixel>::iterator this_ptr;
+    typename MatN<2,TypePixel>::iterator temp_ptr;
+    unsigned int i,j;
+#pragma omp parallel shared(m) private(this_ptr,temp_ptr,i,j)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<m.sizeI();i++){
+            this_ptr  =  m.begin() + i*m.sizeJ();
+            temp_ptr =     m.begin() + i;
+            for( j=0;j<m.sizeJ();j++){
+                * temp_ptr =  * this_ptr;
+                temp_ptr   +=  m.sizeI();
+                this_ptr++;
+            }
+        }
+    }
+}
+
 
 
 template<typename TypePixel>
@@ -122,16 +162,54 @@ inline Mat2F64  testee2(const Mat2F64 & in,const Mat2F64 &m)
     return mout;
 }
 
+
+
 void testMatN(){
-
-
+    {
+        Mat2UI8 img;
+        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+        Vec<KeyPoint<2> > v_harris = Feature::keyPointHarris(img,2,0.20);
+        Feature::drawKeyPointsCircle(img,v_harris,3).display();
+    }
     pop::PopTest test;
     test._bool_write = true;
 
     Mat2F64 m1(2,3);
     m1(0,0)=1; m1(0,1)=2; m1(0,2)=0;
     m1(1,0)=4; m1(1,1)=3; m1(1,2)=-1;
+    {
 
+        int iter =20;
+        clock_t start_global, end_global;
+
+        //    Mat2UI8 mmm;
+        //    mmm.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+        Mat3UI8 mmm;
+        mmm.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
+        //    mmm = pop::GeometricalTransformation::scale(mmm,Vec2F64(10,10));
+
+        start_global = clock();
+        int time1,time2;
+        time1 =time(NULL);
+        //    PDE::nonLinearAnisotropicDiffusionGaussian
+        mmm = Processing::smoothGaussian(mmm,10);
+        //    for(unsigned int i=0;i<iter;i++)
+        //    mmm+mmm;
+        end_global = clock();
+        time2 =time(NULL);
+        std::cout<< (end_global - start_global) <<std::endl;
+        std::cout<< (time2 - time1) <<std::endl;
+        mmm.display();
+        //    start_global = clock();
+        //    time1 =time(NULL);
+        //    for(unsigned int i=0;i<iter;i++)
+        //    transpose2(mmm);
+        //    end_global = clock();
+        //    time2 =time(NULL);
+        //    std::cout<< (end_global - start_global) <<std::endl;
+        //    std::cout<< (time2 - time1) <<std::endl;
+        exit(0);
+    }
     Mat2F64 m2(3,2);
     m2(0,0)=5; m2(0,1)=1;
     m2(1,0)=2; m2(1,1)=3;
@@ -158,9 +236,9 @@ void testMatN(){
     int time2=time(NULL);
     std::cout<<time2-time1<<std::endl;
     time1=time(NULL);
-        m  = m*m;
-      time2=time(NULL);
-        std::cout<<time2-time1<<std::endl;
+    m  = m*m;
+    time2=time(NULL);
+    std::cout<<time2-time1<<std::endl;
     test.end();
 
     VecF64 v1(3);

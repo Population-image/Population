@@ -7,7 +7,7 @@ int main(){
         img.loadFromDirectory("/home/vincent/Desktop/WorkSegmentation/RockANU/tomo/","tomo2048","pgm");
         img = img(Vec3I32(0,0,0),Vec3I32(128,128,128));
 //        img.display();
-        Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusionDericheFast(img);
+        Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusion(img);
         //       int lowvalue,highvalue;
         //       Application::thresholdSelection(imgfilter,lowvalue,highvalue);
         Mat3UI8 grain= Processing::threshold(imgfilter,155);

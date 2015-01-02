@@ -6,7 +6,7 @@ if (sys.platform == "win32" or sys.platform == "win64"):
 	sys.path.append(PathPop)
 	from population import * #uncomment this line for windoww
 else:
-	PathPop= "/home/pl/cuda-workspace/Population/"
+	PathPop= "/home/vincent/DEV2/Population-build/"
 	sys.path.append(PathPop)
 	from population import * #uncomment this line for linux
 
@@ -17,7 +17,9 @@ try:
 	img.load(PathPop+"/image/iex.png")#replace this path by those on your computer
 	#img.display("initial")
 	proc = Processing()
-	img = proc.median(img,3,2)#filtering
+#	img = proc.median(img,20,2)#filtering
+	pde = PDE()
+	img = pde.nonLinearAnisotropicDiffusion(img)
 	threshold = proc.thresholdOtsuMethod(img)#threshold segmentation with OtsuMethod
 	threshold.save("iexseg.png")
 	visu = Visualization()

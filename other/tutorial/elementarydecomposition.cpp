@@ -45,7 +45,7 @@ Mat2UI32 poreDecompositionGrainContactNarrowContact2D(Mat2UI8 m ){
 
     m.save("in2d_graincontact.bmp");
     //SEGMENTATION
-    Mat2UI8 m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    Mat2UI8 m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     m_filter.save("in2d_graincontact_filter.bmp");
     //    Draw::mergeTwoMatrixHorizontal(m, m_filter).display();
     double value;
@@ -96,7 +96,7 @@ Mat2UI32 poreDecompositionGrainContactNarrowContact2D(Mat2UI8 m ){
 Mat2UI32 poreDecompositionMixedMethod2D(Mat2UI8 m ){
 
     //SEGMENTATION
-    Mat2UI8 m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    Mat2UI8 m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     double value;
     Mat2UI8 m_grain_binary =  Processing::thresholdOtsuMethod(m_filter,value);
     //GRAIN PARTITION OF THE BINARY IMAGE
@@ -166,7 +166,7 @@ Mat3UI32 poreDecompositionGrainContactNarrowContact3D(Mat3UI8 m ){
 
 
     //SEGMENTATION
-    Mat3UI8 m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    Mat3UI8 m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     //    Draw::mergeTwoMatrixHorizontal(m, m_filter).display();
     double value;
     Mat3UI8 m_grain_binary =  Processing::thresholdOtsuMethod(m_filter,value);
@@ -193,7 +193,7 @@ Mat3UI32 poreDecompositionMixedMethod3D(Mat3UI8 m ){
 
 
     //SEGMENTATION
-    Mat3UI8 m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    Mat3UI8 m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     double value;
     Mat3UI8 m_grain_binary =  Processing::thresholdOtsuMethod(m_filter,value);
     //GRAIN PARTITION OF THE BINARY IMAGE

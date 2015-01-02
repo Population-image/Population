@@ -36,7 +36,7 @@ Mat2x33F64 GeometricalTransformation::rotationFromAxis(Vec3F64 u,double angle_ra
 Mat2x33F64 GeometricalTransformation::rotationFromVectorToVector(const Vec3F64 & s, const Vec3F64 &  t)
 {
     if(s==t)
-       return LinearAlgebra::identity(3);
+       return Mat2x33F64::identity();
     Vec3F64 source=s/s.norm();
     Vec3F64 target=t/t.norm();
     double dot = productInner(source, target);

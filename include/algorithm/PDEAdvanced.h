@@ -91,22 +91,7 @@ void createVelocityFieldMAKGrid(MatN<DIM,UI8 > porespace, int direction, F64 vel
 
 struct PDEAdvanced
 {
-    template<typename Function,typename Iterator,typename FunctorDiffusion,typename FunctorGradient,typename FunctorDivergence >
-    static void diffusion(Function & field, int nbrstep, Iterator & it,FunctorDiffusion& fD,FunctorGradient & fgrad,  FunctorDivergence & fdiv){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("diffusion");
-        Function fieldtimetdelatt(field);
-        typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM, typename Function::F> >::Result grad(field.getDomain());
 
-        for(int i=0;i<nbrstep;i++)
-        {
-            CollectorExecutionInformationSingleton::getInstance()->progression(i/(1.0*nbrstep));
-            grad = fgrad.iterate(field,it);
-            grad = fD.iterate(grad,it);
-            fieldtimetdelatt= fdiv.iterate(grad,it);
-            field = fieldtimetdelatt+field;;
-        }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("diffusion");
-    }
 
 
     /*! \fn void timeDerivateInMultiPhaseFieldModelWithTarielFormalism( Function & field,FunctionMultiPhase & multiphase,int nbrstep,typename Function::F deltat, Iterator & it,FunctorMultiPhase& f )

@@ -272,7 +272,7 @@ public:
     try{
     Mat2RGBUI8 img;
     img.load("../image/Lena.bmp");
-    img = PDE::nonLinearAnisotropicDiffusionGaussian(img,10,50);
+    img = PDE::nonLinearAnisotropicDiffusion(img,10,50);
     img.display();
     }catch(const pexception & e){
     std::cerr<<e.what()<<std::endl;
@@ -2089,6 +2089,14 @@ public:
     For large matrix, you should use LinearAlgebra::inverseGaussianElimination()
     */
     MatN inverse()const;
+
+    /*! \brief  \f$I_n = \begin{bmatrix}1 & 0 & \cdots & 0 \\0 & 1 & \cdots & 0 \\\vdots & \vdots & \ddots & \vdots \\0 & 0 & \cdots & 1 \end{bmatrix}\f$
+     * \return  Identity matrix
+     *
+     *  Generate the identity matrix or unit matrix of square matrix with the given size for size!=0 or this matrix size with ones on the main diagonal and zeros elsewhere
+    */
+    MatN identity(int size=0)const;
+
     //@}
 
 #ifdef HAVE_SWIG
@@ -2270,8 +2278,9 @@ MatN<DIM,Type> MatN<DIM,Type>::transpose()const
     MatN<DIM,Type> temp(sizej,sizei);
     for(unsigned int i=0;i<sizei;i++){
         typename MatN<DIM,Type>::const_iterator this_ptr  =  this->begin() + i*sizej;
+        typename MatN<DIM,Type>::const_iterator this_end_ptr  =  this_ptr + sizej;
         typename MatN<DIM,Type>::iterator temp_ptr =     temp.begin() + i;
-        for(unsigned int j=0;j<sizej;j++){
+        while(this_ptr!=this_end_ptr){
             * temp_ptr =  * this_ptr;
             temp_ptr   +=  sizei;
             this_ptr++;
@@ -2308,6 +2317,17 @@ Type MatN<DIM,Type>::trace() const
 
 
 }
+template<int DIM, typename Type>
+MatN<DIM,Type> MatN<DIM,Type>::identity(int size)const{
+    if(size==0)
+        size=this->sizeI();
+    MatN<DIM,Type> I(size,size);
+    for(unsigned int i=0;i<I.sizeI();i++){
+        I(i,i)=1;
+    }
+    return I;
+}
+
 template<int DIM, typename Type>
 MatN<DIM,Type> MatN<DIM,Type>::inverse()const{
     if(sizeI()==2&&sizeJ()==2){

@@ -798,6 +798,24 @@ public:
     void display(){
         std::cout<<*this<<std::endl;
     }
+    /*!
+    * Return a ptr to the first vector value
+    *
+    *
+    * direct access to the vector data
+    */
+    Type * data(){
+        return _dat;
+    }
+    /*!
+    * Return a ptr to the first vector value
+    *
+    *
+    * direct access to the vector data
+    */
+    const Type * data()const{
+        return _dat;
+    }
 };
 
 

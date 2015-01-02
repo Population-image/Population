@@ -43,11 +43,11 @@ public:
     Mat2x(Type value=Type());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);
-//    Mat2x(const Type* v_value );
+    Mat2x(const Type* v_value );
     unsigned int sizeI()const;
     unsigned int sizeJ()const;
     const Type & operator ()( const E &  i_j)const;
-    Type & operator ()( const E &  i_j);
+    Type & operator ()( const E &  i_j);//
     const Type & operator ()( unsigned int  i,unsigned int j)const;
     Type & operator ()(unsigned int  i,unsigned int j);
     bool isValid(int  i,int j) const;
@@ -68,6 +68,7 @@ public:
     Type cofactor(unsigned int i,unsigned int j)const;
     Mat2x cofactor()const;
     Mat2x<Type,SIZEJ,SIZEI> transpose()const;
+    static Mat2x<Type,SIZEI,SIZEI> identity();
     Type determinant()const;
     Type trace()const ;
     Mat2x inverse()const;
@@ -165,11 +166,12 @@ Mat2x<Type, SIZEI, SIZEJ>::Mat2x(Type value)
     for(int i=0;i<SIZEI*SIZEJ;i++)
         this->_dat[i]=value;
 }
-//template<typename Type, int SIZEI, int SIZEJ>
-//Mat2x<Type, SIZEI, SIZEJ>::Mat2x(const Type* v_value ){
-//    for(int i=0;i<SIZEI*SIZEJ;i++)
-//        this->_dat[i]=v_value[i];
-//}
+
+template<typename Type, int SIZEI, int SIZEJ>
+Mat2x<Type, SIZEI, SIZEJ>::Mat2x(const Type* v_value ){
+    for(int i=0;i<SIZEI*SIZEJ;i++)
+        this->_dat[i]=v_value[i];
+}
 
 template<typename Type, int SIZEI, int SIZEJ>
 Mat2x<Type, SIZEI, SIZEJ>::Mat2x(const Mat2x &f)
@@ -365,7 +367,7 @@ Mat2x<Type, SIZEI, SIZEJ> Mat2x<Type, SIZEI, SIZEJ>::cofactor()const{
 template<typename Type, int SIZEI, int SIZEJ>
 Mat2x<Type, SIZEJ, SIZEI> Mat2x<Type, SIZEI, SIZEJ>::transpose()const
 {
-    Mat2x<Type, SIZEJ, SIZEJ> temp;
+    Mat2x<Type, SIZEJ, SIZEI> temp;
     for( int i=0;i<SIZEI;i++)
         for( int j=0;j<SIZEJ;j++)
         {
@@ -399,6 +401,15 @@ Mat2x<Type, SIZEI, SIZEJ> Mat2x<Type, SIZEI, SIZEJ>::inverse()const{
     temp/=det;
     return temp;
 }
+template<typename Type, int SIZEI, int SIZEJ>
+Mat2x<Type, SIZEI, SIZEI> Mat2x<Type, SIZEI, SIZEJ>::identity(){
+    Mat2x<Type, SIZEI, SIZEI> I;
+    for(unsigned int i=0;i<SIZEI;i++){
+        I(i,i)=1;
+    }
+    return I;
+}
+
 template<typename Type, int SIZEI, int SIZEJ>
 Mat2x<Type, SIZEI, SIZEJ> &Mat2x<Type, SIZEI, SIZEJ>::operator =(const Mat2x& f)
 {
@@ -600,7 +611,7 @@ public:
     Mat2x(Type value=Type());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);
-//    Mat2x(const Type* v_value );
+    Mat2x(const Type* v_value );
     unsigned int sizeI()const;
     unsigned int sizeJ()const;
     const Type & operator ()( const E &  i_j)const;
@@ -624,6 +635,7 @@ public:
     Type cofactor(unsigned int i,unsigned int j)const;
     Mat2x cofactor()const;
     Mat2x transpose()const;
+    static Mat2x identity();
     Type determinant()const;
     Type trace()const ;
     Mat2x inverse()const;
@@ -725,13 +737,13 @@ Mat2x<Type,2,2>::Mat2x(Type value)
     this->_dat[2]=value;
     this->_dat[3]=value;
 }
-//template<typename Type>
-//Mat2x<Type,2,2>::Mat2x(const Type* v_value ){
-//    this->_dat[0]=v_value[0];
-//    this->_dat[1]=v_value[1];
-//    this->_dat[2]=v_value[2];
-//    this->_dat[3]=v_value[3];
-//}
+template<typename Type>
+Mat2x<Type,2,2>::Mat2x(const Type* v_value ){
+    this->_dat[0]=v_value[0];
+    this->_dat[1]=v_value[1];
+    this->_dat[2]=v_value[2];
+    this->_dat[3]=v_value[3];
+}
 
 template<typename Type>
 Mat2x<Type,2,2>::Mat2x(const Mat2x &m)
@@ -931,6 +943,14 @@ Mat2x<Type,2,2> Mat2x<Type,2,2>::transpose()const
     return temp;
 }
 template<typename Type>
+Mat2x<Type,2,2> Mat2x<Type,2,2>::identity(){
+    Mat2x<Type, 2, 2> I;
+    I._dat[0]= 1;
+    I._dat[3]= 1;
+    return I;
+}
+
+template<typename Type>
 Type Mat2x<Type,2,2>::determinant() const{
     return this->_dat[0] * this->_dat[3] - this->_dat[1] * this->_dat[2] ;
 
@@ -1126,7 +1146,7 @@ public:
     Mat2x(F value=F());
     Mat2x(const Mat2x &m);
     Mat2x(const MatN<2,Type> &m);
-//    Mat2x(const Type* v_value );
+    Mat2x(const Type* v_value );
     unsigned int sizeI()const;
     unsigned int sizeJ()const;
     const Type & operator ()( const E &  i_j)const;
@@ -1150,6 +1170,7 @@ public:
     Type cofactor(unsigned int i,unsigned  int j)const;
     Mat2x cofactor()const;
     Mat2x transpose()const;
+    static Mat2x identity();
     Type determinant()const;
     Type trace()const ;
     Mat2x inverse()const;
@@ -1339,18 +1360,18 @@ Mat2x<Type,3,3>::Mat2x(const MatN<2,Type> &m)
     this->_dat[8]=m.operator [](8);
 
 }
-//template<typename Type>
-//Mat2x<Type,3,3>::Mat2x(const Type* v_value ){
-//    this->_dat[0]=v_value[0];
-//    this->_dat[1]=v_value[1];
-//    this->_dat[2]=v_value[2];
-//    this->_dat[3]=v_value[3];
-//    this->_dat[4]=v_value[4];
-//    this->_dat[5]=v_value[5];
-//    this->_dat[6]=v_value[6];
-//    this->_dat[7]=v_value[7];
-//    this->_dat[8]=v_value[8];
-//}
+template<typename Type>
+Mat2x<Type,3,3>::Mat2x(const Type* v_value ){
+    this->_dat[0]=v_value[0];
+    this->_dat[1]=v_value[1];
+    this->_dat[2]=v_value[2];
+    this->_dat[3]=v_value[3];
+    this->_dat[4]=v_value[4];
+    this->_dat[5]=v_value[5];
+    this->_dat[6]=v_value[6];
+    this->_dat[7]=v_value[7];
+    this->_dat[8]=v_value[8];
+}
 template<typename Type>
 unsigned int Mat2x<Type,3,3>::sizeI()const {
     return 3;
@@ -1606,6 +1627,15 @@ Mat2x<Type,3,3> Mat2x<Type,3,3>::transpose()const
     return temp;
 }
 template<typename Type>
+Mat2x<Type,3,3> Mat2x<Type,3,3>::identity(){
+    Mat2x<Type, 3, 3> I;
+    I._dat[0]= 1;
+    I._dat[4]= 1;
+    I._dat[8]= 1;
+    return I;
+}
+
+template<typename Type>
 Type Mat2x<Type,3,3>::determinant() const{
     return this->_dat[0] * (this->_dat[4]*this->_dat[8] - this->_dat[7] * this->_dat[5])-this->_dat[1] * (this->_dat[3]*this->_dat[8] - this->_dat[6] * this->_dat[5]) +this->_dat[2] * (this->_dat[3]*this->_dat[7] - this->_dat[4] * this->_dat[6]);
 
@@ -1823,6 +1853,13 @@ std::istream& operator >> (std::istream& in, pop::Mat2x<Type,3,3>& m)
     }
     return in;
 }
+
+template<int Dim1, int Dim2,typename Type>
+Mat2x<Type,Dim1,Dim2>  operator*(Type value, const Mat2x<Type,Dim1,Dim2>&f)
+{
+    return f*value;
+}
+
 template<typename Type>
 pop::Mat2x<Type,3,3>  maximum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Type,3,3> & g)throw(pop::pexception)
 {

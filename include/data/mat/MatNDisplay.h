@@ -386,7 +386,7 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
         img= GeometricalTransformation::scale(img,scale,0);
     }
 
-    if(DIM==2){
+    if(Dim==2){
 
 
         Private::Display< Dim, Type>::v_display.push_back(MatNDisplay());

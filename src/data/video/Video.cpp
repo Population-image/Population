@@ -4,13 +4,13 @@
 
 namespace pop {
 Video * Video::create(VideoImpl impl){
-    if(impl==VideoImpl::VLC){
+    if(impl==Video::VLC){
 #if defined(HAVE_VLC)
         return new VideoVLC();
 #else
         return NULL;
 #endif
-    } else if (impl==VideoImpl::FFMPEG){
+    } else if (impl==Video::FFMPEG){
 #if defined(HAVE_FFMPEG)
         return new VideoFFMPEG();
 #else
