@@ -52,6 +52,7 @@ private:
     int _e;
 public:
     typedef VecN  Domain;
+
     MatNIteratorEDomain(const MatNIteratorEDomain& it)
         :_domain(it.getDomain())
     {
@@ -195,6 +196,9 @@ public:
     double _norm;
     typedef std::pair<VecN,Vec<VecN> > Domain;
 
+    MatNIteratorENeighborhood(){
+
+    }
 
     MatNIteratorENeighborhood(const MatNIteratorENeighborhood& it)
         :_domain(it._domain),_tab(it._tab),_init(true),_isball(it._isball),_radius(it._radius),_norm(it._norm)

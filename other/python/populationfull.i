@@ -195,8 +195,7 @@
 
 
 
-
-
+%include PDE.i
 %include processing.i
 %include analysis.i
 %include visualization.i
@@ -210,7 +209,7 @@
 %include geometricaltransformation.i
 %include "../../include/algorithm/Statistics.h"
 %include "../../include/algorithm/LinearAlgebra.h"
-%include PDE.i
+
 /*
 //%include vision.i
 */

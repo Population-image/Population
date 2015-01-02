@@ -3,13 +3,9 @@
 #include"algorithm/FunctionProcedureFunctorF.h"
 namespace pop{
 
-Mat2F64 LinearAlgebra::identity(int size){
-    Mat2F64 I(size,size);
-    for(unsigned int i=0;i<I.sizeI();i++){
-        I(i,i)=1;
-    }
-    return I;
-}
+
+
+
 Mat2F64 LinearAlgebra::random(int size_i,int size_j, Distribution  proba){
     Mat2F64 m(size_i,size_j);
     Mat2F64::iterator __first = m.begin();
@@ -41,19 +37,19 @@ Mat2F64 LinearAlgebra::orthogonalGramSchmidt(const Mat2F64& m)throw(pexception)
 {
     if(m.sizeI()!=m.sizeI())
         throw(pexception("In linearAlgebra::orthogonalGramSchmidt, Mat2F64 must be square"));
-    std::vector<VecF64> u(m.sizeI(),VecF64(m.sizeI()));
+    Vec<VecF64> u(m.sizeI(),VecF64(m.sizeI()));
     for(unsigned int k=0;k<m.sizeI();k++){
         VecF64 v_k = m.getCol(k);
         VecF64 temp(m.sizeI());
         for(unsigned int p=0;p<k;p++){
             temp+=productInner(u[p],v_k)/productInner(u[p],u[p])*u[p];
         }
-        u[k]=v_k-temp;
+        u(k)=v_k-temp;
     }
     Mat2F64 out(m.sizeI(),m.sizeI());
     for(unsigned int k=0;k<m.sizeI();k++){
-        u[k]/=u[k].norm();
-        out.setCol(k,u[k]);
+        u(k)/=u(k).norm();
+        out.setCol(k,u(k));
     }
     return out;
 
@@ -75,18 +71,72 @@ void LinearAlgebra::QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R)thr
         }
     }
 }
-VecF64 LinearAlgebra::eigenValueQR(const Mat2F64 &m,F64 error)throw(pexception){
+VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,2,2> &m)throw(pexception){
+    double T = m.trace();
+    double D = m.determinant();
+    double sum = T*T/4 -D;
+    VecF64 eigen_value(2);
+    if(sum>0)
+    {
+        sum = std::sqrt(sum);
+        eigen_value(0) = T/2 + (sum);
+        eigen_value(1) = T/2 - (sum);
+        return eigen_value;
+    }else{
+        return VecF64();
+    }
+
+}
+VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,3,3> &A,EigenValueMethod method ,F64 error)throw(pexception){
+
+
+    if(method==Symmetric){
+    // Given a real symmetric 3x3 matrix A, compute the eigenvalues
+
+    double p1 = A(0,1)*A(0,1) + A(0,2)*A(0,2) + A(1,2)*A(1,2);
+    if (p1 == 0) {
+        // A is diagonal.
+        VecF64 eig(3);
+        eig(0) = A(0,0);
+        eig(1) = A(1,1);
+        eig(2) = A(2,2);
+        return eig;
+    }
+    else{
+        double q = A.trace()/3;
+        double p2 = std::pow(A(0,0) - q,2) + std::pow(A(1,1) - q,2) + std::pow(A(2,2) - q,2) + 2 * p1;
+        double        p = std::sqrt(p2 / 6);
+
+        Mat2x<F64,3,3>  B = (1 / p)*(A - q*A.identity());//      % I is the identity matrix
+        double        r = B.determinant() / 2;
+
+        //In exact arithmetic for a symmetric matrix  -1 <= r <= 1
+        //but computation error can leave it slightly outside this range.
+        double phi;
+        if (r <= -1)
+            phi = pop::PI / 3;
+        else if (r >= 1)
+            phi = 0;
+        else
+            phi = std::acos(r) / 3;
+        VecF64 eig(3);
+        eig(0)= q + 2 * p * std::cos(phi);
+        eig(2) = q + 2 * p * std::cos(phi + (2*pop::PI/3));
+        eig(1) = 3 * q - eig(0) - eig(2) ;   // since trace(A) = eig1 + eig2 + eig3;
+        return eig;
+    }
+    }else{
+        return eigenValue(Mat2F64(A),method,error);
+    }
+}
+VecF64 LinearAlgebra::eigenValue(const Mat2F64 &m,EigenValueMethod ,F64 error)throw(pexception){
     Mat2F64 M_k(m);
     Mat2F64 Q_k;
     Mat2F64 R_k;
-    F64 current_error=NumericLimits<F64>::maximumRange();
-    while(current_error>error){
+
+    while(LinearAlgebra::isDiagonal(M_k)==false){
         LinearAlgebra::QRDecomposition(M_k,Q_k,R_k);
         M_k = R_k * Q_k;
-        current_error =0;
-        for(unsigned int i=1;i<M_k.sizeI();i++){
-            current_error = maximum( current_error ,absolute(M_k(i,0)));
-        }
     }
     VecF64 v(M_k.sizeI());
     for(unsigned int i=0;i<v.size();i++){
@@ -112,7 +162,7 @@ Mat2F64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &m){
         }
         if( M(i_max, k) == 0){
 
-//            std::cout<< "Matrix is singular!";
+            //            std::cout<< "Matrix is singular!";
             return M;
         }
         M.swapRow(k,i_max);
@@ -197,9 +247,8 @@ void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M)throw(pexcep
         }
     }
 }
-
 Mat2F64 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value)throw(pexception){
-    Mat2F64 I = LinearAlgebra::identity(m.sizeI());
+    Mat2F64 I = m.identity(m.sizeI());
     Mat2F64 EigenVec(m.sizeI(),m.sizeI());
 
     for(unsigned int j =0;j<v_eigen_value.size();j++){

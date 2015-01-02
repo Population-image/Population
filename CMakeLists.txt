@@ -12,8 +12,8 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_VERSION VERSION_GREATER "2.8")
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
-#set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_VERBOSE_MAKEFILE 1)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
 # ----------------------------------------------------------------------------
@@ -33,9 +33,9 @@ POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 
 # Population build components
 # ===================================================
-POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF )
+POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
-POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
+POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )

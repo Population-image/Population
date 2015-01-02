@@ -4,9 +4,10 @@ using namespace pop;//Population namespace
 
 
 int main(){
-    pop::Mat3UI8 m(5,5);
-    m.load("../image/rock3d.pgm");
-    m.display();
+//    pop::Mat3UI8 m(5,5);
+//    m.load("../image/rock3d.pgm");
+//    m.display();
+//    Processing::gradientGaussian
     //    Mat3UI8 fb;
 
     //    fb.load("../image/rock3d.pgm");

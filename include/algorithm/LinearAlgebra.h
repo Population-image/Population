@@ -54,7 +54,7 @@ namespace pop
 * m(0,0)=1.5;m(0,1)=0;m(0,2)=1;
 * m(1,0)=-0.5;m(1,1)=0.5;m(1,2)=-0.5;
 * m(2,0)=-0.5;m(2,1)=0;m(2,2)=0;
-* VecF64 v_eigen_value = LinearAlgebra::eigenValueQR(m,0.001);
+* VecF64 v_eigen_value = LinearAlgebra::eigenValue(m);
 * std::cout<<v_eigen_value<<std::endl;
 * Mat2F64 m_eigen_vector= LinearAlgebra::eigenVectorGaussianElimination(m,v_eigen_value);
 * std::cout<<m_eigen_vector<<std::endl;
@@ -80,13 +80,19 @@ struct POP_EXPORTS LinearAlgebra
 
 
 
-    /*! \brief  \f$I_n = \begin{bmatrix}1 & 0 & \cdots & 0 \\0 & 1 & \cdots & 0 \\\vdots & \vdots & \ddots & \vdots \\0 & 0 & \cdots & 1 \end{bmatrix}\f$
-     * \param size input matrix
-     * \return  Identity matrix
+
+
+
+    /*! \brief Determine if matrix is diagonal
+     *  \param m input matrix
+     *  \param error tolerance value
      *
-     *  Generate the identity matrix or unit matrix of square matrix of the given \a size with ones on the main diagonal and zeros elsewhere
-    */
-    static Mat2F64 identity(int size);
+     */
+    template<typename Matrix>
+    static bool isDiagonal(const Matrix &m,double error=0.01);
+
+
+
     /*! \brief \f$I_n = \begin{bmatrix}X_{0,0} & X_{0,1} & \cdots & X_{0,n-1} \\X_{1,0} & 1 & \cdots & X_{1,n-1} \\\vdots & \vdots & \ddots & \vdots \\X_{n-1,0} & 0 & \cdots & X_{n-1,n-1} \end{bmatrix}\f$ with \f$X_{n-1,n-1}\f$ independent and identically distributed random variable following the probability distribution
      * \param size_i row size
      * \param size_j column size
@@ -197,7 +203,7 @@ struct POP_EXPORTS LinearAlgebra
      * m(1,0)=-0.5;m(1,1)=0.5;m(1,2)=-0.5;
      * m(2,0)=-0.5;m(2,1)=0;m(2,2)=0;
 
-     * VecF64 v_eigen_value = LinearAlgebra::eigenValueQR(m,0.001);
+     * VecF64 v_eigen_value = LinearAlgebra::eigenValue(m);
      * std::cout<<v_eigen_value<<std::endl;
 
      * Mat2F64 m_eigen_vector= LinearAlgebra::eigenVectorGaussianElimination(m,v_eigen_value);
@@ -207,7 +213,15 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<m*m_eigen_vector.getCol(2)<<" is equal to "<<v_eigen_value(2)*m_eigen_vector.getCol(2)<<std::endl;
      * \endcode
     */
-    static VecF64 eigenValueQR(const Mat2F64 &m,F64 error=0.01)throw(pexception);
+    enum EigenValueMethod{
+        QR,
+        Symmetric
+    };
+
+    static VecF64 eigenValue(const Mat2F64 &m,EigenValueMethod method = QR,F64 error=0.01)throw(pexception);
+    static VecF64 eigenValue(const Mat2x<F64,3,3> &m,EigenValueMethod method = QR,F64 error=0.01)throw(pexception);
+    static VecF64 eigenValue(const Mat2x<F64,2,2> &m)throw(pexception);
+
 
     /*! \brief  gaussian elimination algorithm
      * \param m input Mat2F64
@@ -277,7 +291,7 @@ struct POP_EXPORTS LinearAlgebra
      * m(1,0)=-0.5;m(1,1)=0.5;m(1,2)=-0.5;
      * m(2,0)=-0.5;m(2,1)=0;m(2,2)=0;
 
-     * VecF64 v_eigen_value = LinearAlgebra::eigenValueQR(m,0.001);
+     * VecF64 v_eigen_value = LinearAlgebra::eigenValue(m);
      * std::cout<<v_eigen_value<<std::endl;
 
      * Mat2F64 m_eigen_vector= LinearAlgebra::eigenVectorGaussianElimination(m,v_eigen_value);
@@ -286,7 +300,7 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<m*m_eigen_vector.getCol(1)<<" is equal to "<<v_eigen_value(1)*m_eigen_vector.getCol(1)<<std::endl;
      * std::cout<<m*m_eigen_vector.getCol(2)<<" is equal to "<<v_eigen_value(2)*m_eigen_vector.getCol(2)<<std::endl;
      *  * \endcode
-     \sa eigenValueQR
+     \sa eigenValue
     */
     static Mat2F64 eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value)throw(pexception);
 
@@ -360,5 +374,22 @@ struct POP_EXPORTS LinearAlgebra
     static Vec2F64  linearLeastSquares(const Mat2F64 &X,const VecF64 &Y);
 
 };
+
+template<typename Matrix>
+bool LinearAlgebra::isDiagonal(const Matrix &m,double error){
+    double error_diff=0;
+    for(unsigned int i=0;i<m.sizeI();i++){
+        for(unsigned int j=0;j<m.sizeJ();j++){
+            if(i!=j){
+                error_diff = std::max(error_diff,std::abs(m(i,j)));
+            }
+        }
+    }
+    if(error_diff>error)
+        return false;
+    else
+        return true;
+}
+
 }
 #endif // LINEARALGEBRA_H

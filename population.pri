@@ -142,7 +142,8 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/utility/Cryptography.cpp \
            $${PWD}/src/data/utility/CollectorExecutionInformation.cpp \
            $${PWD}/src/data/utility/Exception.cpp \
-           $${PWD}/src/data/utility/XML.cpp
+           $${PWD}/src/data/utility/XML.cpp \
+           $${PWD}/src/data/video/Video.cpp
 
 #Path to the project
 DEFINES += 'POP_PROJECT_SOURCE_DIR=\'\"$${PWD}\"\''
@@ -197,3 +198,12 @@ HAVE_OPENCV {
     unix:CONFIG += link_pkgconfig
     unix:PKGCONFIG += opencv
 }
+HAVE_OPENMP {
+    DEFINES+= HAVE_OPENMP
+    unix:QMAKE_CXXFLAGS+= -fopenmp
+    unix:QMAKE_LFLAGS +=  -fopenmp
+    win32:QMAKE_CXXFLAGS+= -openmp
+    win32:QMAKE_LFLAGS +=  -openmp
+}else {
+    QMAKE_CXXFLAGS+= -Wunknown-pragmas
+ }

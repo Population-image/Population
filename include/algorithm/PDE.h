@@ -43,7 +43,52 @@ in the Software.
 
 namespace pop
 {
+namespace Private{
 
+template<int DIM,typename TypePixel>
+class LaplacienSmooth
+{
+private:
+    MatNIteratorENeighborhood<VecN<DIM,int>,MatNBoundaryConditionMirror> itn;
+    std::vector<F64> v_value;
+    double sigma;
+    int radius_kernel;
+public:
+    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel=1)
+        :itn(f.getIteratorENeighborhood(radius_kernel,0)),sigma(sigma),radius_kernel(radius_kernel){
+        F64 sum=0;
+        itn.init(0);
+        while(itn.next()){
+            double dist = itn.xreal().normPower();
+            if(dist!=0){
+                F64  value = std::exp(-0.5*dist/(sigma*sigma));
+                v_value.push_back(value);
+                sum+=value;
+            }
+            else
+                v_value.push_back(-2*DIM);
+
+        }
+        //normalisation
+        for(int i=0;i<(int)v_value.size();i++){
+            if(v_value[i]>0)
+                v_value[i]*=(2*DIM/sum);
+
+        }
+    }
+    TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
+        F64 sum=0;
+        FunctorF::FunctorMultiplicationF2<TypePixel,F64,F64> op;
+        itn.init( x);
+        std::vector<F64>::iterator it = v_value.begin();
+        while(itn.next()){
+            sum += op((*it),f(itn.x()));
+            it ++;
+        }
+        return sum;
+    }
+};
+}
 /*!
 \defgroup PDE PDE
 \ingroup Algorithm
@@ -92,96 +137,19 @@ public:
     //@{
     //-------------------------------------
 
-    /*!
-      * \param f input matrix
-      * \param Nstep number of time-steps
-      * \param K kappa
-      * \param alpha deriche paremeter for the gradient
-      * \return out matrix h
-      *
-      * Application of the non-linear anistropic diffusion with the deriche' gradient. The field \f$\phi\f$ is gouverned by this equation:
-      * \f[\frac{\partial\phi(\mathbf{r},t)}{\partial t} = \nabla \cdot \big[ D(\phi,\mathbf{r},t) \, \vec{\nabla\phi}(\mathbf{r},t) \big] .\f]
-      * The input matrix is the field at time t=0  \f$\phi(\mathbf{r},t=0) = f(\mathbf{r})  \f$ and the output matrix is the field at time=t \f$\phi(\mathbf{r},t=\text{time}) = h(\mathbf{r})  \f$.
-      * The time/space step is normalized at 1 and the coefficient of diffusion \f$D(\phi,\mathbf{r},t)=\begin{pmatrix}
-      *  D_0(\phi,\mathbf{r},t)    & 0      & \ldots & 0      \\
-      *    0      & D_2(\phi,\mathbf{r},t)  & \ddots & \vdots \\
-      *  \vdots & \ddots & \ddots & 0      \\
-      *  0      & \ldots & 0      & D_{n-1}(\phi,\mathbf{r},t)
-      * \end{pmatrix}\f$ where \f$D_i(\phi,\mathbf{r},t)=P\left( \frac{\|\nabla_i^{\sigma}\phi(\mathbf{r},t)\|}{\kappa}\right)\f$, \f$
-      * P(x) =\frac{1}{1+x^2}\f$ and \f$\nabla_i^{\sigma}\f$ is a the directional scale gradient operator following the direction i and the scale \f$\sigma\f$.\n
-      * The typical calibration is:
-      * - Nstep is equal 20 ,
-      * - \f$\kappa\f$ is little bit smaller than the grey-level dynamic between phases
-      * The parameter K should be choose as the mean difference of grey-level between the phase (to estimate this value you can plot the histogram and calculate the grey-level difference between two peaks),
-      * - \f$\sigma\f$ is in the gradient parameter as an inverse of a scale parameter
-      * (alpha=2=low scale in keeping the feature of small lenght characteristic, alpha=0.5  high scale in removing the feature of small lenght characteristic).
-      *
-      * For instance, this code produce the following matrix
-      * \code
-      * Mat3UI8 img;
-      * img.load("../image/rock3d.pgm");
-      * img = PDE::nonLinearAnisotropicDiffusionDeriche(img,20,50,1);
-      * img.display();
-      * Scene3d scene;
-      * pop::Visualization::cube(scene,img);
-      * pop::Visualization::lineCube(scene,img);
-      * scene.display();
-      * \endcode
-      * \image html nonlinearderiche.png
-      * \image html diffusion.gif "Evolution"
-      * \sa pop::Processing::gradientMagnitudeDeriche
-    */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusionDeriche(const MatN<DIM,TypePixel>& f,int Nstep=20,F64 K=50,F64  alpha=1)
-    {
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F64>::Result F_Float;
-        typedef MatN<DIM,F_Float>            Function_Float;
 
-        Function_Float fin(f);
-        FunctorPDE::DiffusionMalikPeronaDeriche  D(K,alpha);
-        FunctorPDE::Gradient<FunctorPDE::PartialDerivateForward> grad;
-        FunctorPDE::Divergence<FunctorPDE::PartialDerivateBackward> div;
-        typename Function_Float::IteratorEDomain it = fin.getIteratorEDomain();
-        PDEAdvanced::diffusion(fin,Nstep,it,D,grad,div);
-        MatN<DIM,TypePixel> fout(fin);
-        return fout;
-    }
-    /*!
-      * \param in input matrix
-      * \param Nstep number of time-steps
-      * \param K kappa
-      * \param alpha deriche paremeter for the gradient
-      * \return filter matrix
-      *
-      * see pop::Processing::gradientMagnitudeDeriche
-    */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusionDericheFast(const MatN<DIM,TypePixel>& in,int Nstep=20,F64 K=50,F64  alpha=1)
-    {
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F64>::Result F_Float;
-        typedef MatN<DIM,F_Float>            Function_Float;
-        Function_Float fin(in);
-        FunctorPDE::DiffusionMalikPeronaDericheOneTime<DIM,VecN<DIM,F_Float > >  D(K,alpha);
-        FunctorPDE::Gradient<FunctorPDE::PartialDerivateForward> grad;
-        FunctorPDE::Divergence<FunctorPDE::PartialDerivateBackward> div;
-        typename Function_Float::IteratorEDomain it = fin.getIteratorEDomain();
-        PDEAdvanced::diffusion(fin,Nstep,it,D,grad,div);
-        MatN<DIM,TypePixel> fout(fin);
-        return fout;
-    }
 
     /*!
       * \param in input matrix
       * \param Nstep number of time-steps
       * \param K kappa
-      * \param sigma deriche paremeter for the gradient
       * \return filter matrix
       *
-      * see pop::Processing::gradientMagnitudeDeriche except that the paremeter alpha is the gradient parameter as a scale parameter
+
       * \code
       * Mat3UI8 img;
       * img.load("../image/rock3d.pgm");
-      * img = PDE::nonLinearAnisotropicDiffusionGaussian(img);
+      * img = PDE::nonLinearDiffusion(img);
       * img.display();
       * Scene3d scene;
       * pop::Visualization::cube(scene,img);
@@ -191,18 +159,17 @@ public:
       * \image html nonlineargaussian.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusionGaussian(const MatN<DIM,TypePixel>& in,int Nstep=20,F64 K=50,F64  sigma=1)
+    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusion(const MatN<DIM,TypePixel>& in,int Nstep=20,F64 K=50)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F64>::Result F_Float;
-        typedef MatN<DIM,F_Float>            Function_Float;
-        Function_Float fin(in);
-        FunctorPDE::DiffusionMalikPeronaGaussian  D(K,sigma,2*sigma);
-        FunctorPDE::Gradient<FunctorPDE::PartialDerivateForward> grad;
-        FunctorPDE::Divergence<FunctorPDE::PartialDerivateBackward> div;
-        typename Function_Float::IteratorEDomain it = fin.getIteratorEDomain();
-        PDEAdvanced::diffusion(fin,Nstep,it,D,grad,div);
-        MatN<DIM,TypePixel> fout(fin);
-        return fout;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F32>::Result F_Float;
+
+        MatN<DIM,F_Float> fieldtimet(in),fieldtimet_deltat(in.getDomain());
+        FunctorPDE::DiffusionMalikPerona diffusion(K);
+        for(int i=0;i<Nstep;i++){
+            FunctorPDE::forEachDomain(fieldtimet, diffusion,  fieldtimet_deltat);
+            fieldtimet = fieldtimet_deltat;
+        }
+        return fieldtimet;
     }
     //@}
 
@@ -689,7 +656,7 @@ int main(){
             else
                 phasefield(it.x())=-1;
         }
-        PDE::LaplacienSmooth<DIM,F64 > laplacien(phasefield,1,2);
+        Private::LaplacienSmooth<DIM,F64 > laplacien(phasefield,1,2);
         PDEAdvanced::allenCahnInSinglePhaseField(phasefield,nbriteration,it,laplacien,3);
 
 
@@ -741,7 +708,7 @@ int main(){
             else
                 phasefield(it.x())=-1;
         }
-        PDE::LaplacienSmooth<DIM,F64> laplacien(phasefield,1,2);
+        Private::LaplacienSmooth<DIM,F64> laplacien(phasefield,1,2);
         it.init();
         PDEAdvanced::allenCahnInSinglePhaseField(phasefield,nbriteration,it,laplacien,3);
         MatN<DIM,VecN<DIM,F64> > gradnormalized(phasefield.getDomain());
@@ -821,50 +788,6 @@ private:
             return true;
         }
     }
-    template<int DIM,typename TypePixel>
-    class LaplacienSmooth
-    {
-    private:
-        typename MatN<DIM,TypePixel>::IteratorENeighborhoodMirror itn;
-        std::vector<F64> v_value;
-        double sigma;
-        int radius_kernel;
-    public:
-        LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel=1)
-            :itn(f.getIteratorENeighborhood(radius_kernel,0)),sigma(sigma),radius_kernel(radius_kernel){
-            F64 sum=0;
-            itn.init(0);
-            while(itn.next()){
-                double dist = itn.xreal().normPower();
-                if(dist!=0){
-                    F64  value = std::exp(-0.5*dist/(sigma*sigma));
-                    v_value.push_back(value);
-                    sum+=value;
-                }
-                else
-                    v_value.push_back(-2*DIM);
-
-            }
-            //normalisation
-            for(int i=0;i<(int)v_value.size();i++){
-                if(v_value[i]>0)
-                    v_value[i]*=(2*DIM/sum);
-
-            }
-        }
-        typename MatN<DIM,TypePixel>::F operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
-            typedef typename FunctionTypeTraitsSubstituteF<TypePixel,F64>::Result TypeFloat;
-            typename FunctionTypeTraitsSubstituteF<TypePixel,F64>::Result sum=0;
-            FunctorF::FunctorMultiplicationF2<TypePixel,F64,TypeFloat> op;
-            itn.init( x);
-            std::vector<F64>::iterator it = v_value.begin();
-            while(itn.next()){
-                sum += op((*it),f(itn.x()));
-                it ++;
-            }
-            return sum;
-        }
-    };
 };
 }
 #endif // PDE_H

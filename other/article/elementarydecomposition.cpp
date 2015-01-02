@@ -7,7 +7,7 @@ template<int DIM>
 MatN<DIM,UI32> poreDecompositionMixedMethod(MatN<DIM,UI8> m,F32 alpha=1 ){
 
     //###SEGMENTATION###
-    MatN<DIM,UI8> m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    MatN<DIM,UI8> m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     double value;
     MatN<DIM,UI8> m_grain_binary =  Processing::thresholdOtsuMethod(m_filter,value);
 
@@ -68,7 +68,7 @@ template<int DIM>
 MatN<DIM,UI32> poreDecompositionGrainContactNarrowContact(MatN<DIM,UI8> m ){
 
     //SEGMENTATION
-    MatN<DIM,UI8> m_filter = PDE::nonLinearAnisotropicDiffusionDericheFast(m,20,10,2);
+    MatN<DIM,UI8> m_filter = PDE::nonLinearAnisotropicDiffusion(m,20,10);
     double value;
     MatN<DIM,UI8> m_grain_binary =  Processing::thresholdOtsuMethod(m_filter,value);
 

@@ -65,31 +65,22 @@ struct POP_EXPORTS FunctorMatN
     //@{
     //-------------------------------------
 
-
-    template<int DIM,typename TypePixel1,typename TypePixel2,typename BoundaryCondition>
-    static MatN<DIM,TypePixel1> convolutionSeperable(const MatN<DIM,TypePixel1> & f, const Vec<TypePixel2> & kernel,int direction,BoundaryCondition boundary)
-    {
-        typename MatN<DIM,TypePixel1>::IteratorEDomain it = f.getIteratorEDomain();
-        return convolutionSeperable(f,kernel,direction,it,boundary);
-    }
-
     template<int DIM,typename TypePixel1,typename TypePixel2,typename IteratorE,typename BoundaryCondition>
     static MatN<DIM,TypePixel1> convolutionSeperable(const MatN<DIM,TypePixel1> & f, const Vec<TypePixel2> & kernel,int direction,IteratorE itglobal,BoundaryCondition)
     {
 
         MatN<DIM,TypePixel1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
+           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         int radius = (kernel.size()-1)/2;
         while(itglobal.next()){
+            typename MatN<DIM,TypePixel1>::E x = itglobal.x()  ;
             Type_F64 value(0);
-            for(unsigned int i=0;i<kernel.size();i++){
-                typename MatN<DIM,TypePixel1>::E x = itglobal.x();
-                x(direction)+= (radius-i);
-                if(MatNBoundaryConditionMirror::isValid(f.getDomain(),x)){
-                    MatNBoundaryConditionMirror::apply(f.getDomain(),x);
-                    Type_F64 v(f(x));
-                    Type_F64 v2(kernel(i));
-                    value+=v*v2;
+            for(unsigned int k=0;k<kernel.size();k++){
+                x(direction)= itglobal.x()(direction)+(radius-k);
+                if(BoundaryCondition::isValid(f.getDomain(),x)){
+                    BoundaryCondition::apply(f.getDomain(),x);
+                    value+=Type_F64(f(x))*Type2_F64(kernel(k));
                 }
             }
 
@@ -97,12 +88,80 @@ struct POP_EXPORTS FunctorMatN
         }
         return h;
     }
+    template<typename TypePixel1,typename TypePixel2,typename BoundaryCondition>
+    static MatN<2,TypePixel1> convolutionSeperable(const MatN<2,TypePixel1> & f, const Vec<TypePixel2> & kernel,int direction,MatNIteratorEDomain<Vec2I32> ,BoundaryCondition)
+    {
 
+        MatN<2,TypePixel1> h(f.getDomain());
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        int radius;
+        int i,j,k,dir;
+        Type_F64 value;
+        Vec2I32 x;
+#pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
+        {
+            radius = (kernel.size()-1)/2;
+#pragma omp for schedule (static)
+            for(i=0;i<f.sizeI();i++){
+                for(j=0;j<f.sizeJ();j++){
+                    x(0)=i;x(1)=j;
+                    dir = x(direction);
+                    value=0;
+                    for(k=0;k<kernel.size();k++){
+                        x(direction)= dir+(radius-k);
+                        if(BoundaryCondition::isValid(f.getDomain(),x)){
+                            BoundaryCondition::apply(f.getDomain(),x);
+                            value+=Type_F64(f(x))*Type2_F64(kernel(k));
+                        }
+                    }
+                    h(i,j)=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+                }
+            }
+        }
+        return h;
+    }
+    template<typename TypePixel1,typename TypePixel2,typename BoundaryCondition>
+    static MatN<3,TypePixel1> convolutionSeperable(const MatN<3,TypePixel1> & f, const Vec<TypePixel2> & kernel,int direction,MatNIteratorEDomain<Vec3I32> ,BoundaryCondition)
+    {
+
+        MatN<3,TypePixel1> h(f.getDomain());
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
+           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        int radius;
+        int i,j,z,k,dir;
+        Type_F64 value;
+        Vec3I32 x;
+#pragma omp parallel shared(f,h) private(i,j,z,k,dir,value,x,radius)
+        {
+            radius = (kernel.size()-1)/2;
+#pragma omp for schedule (static)
+            for(i=0;i<f.sizeI();i++){
+                for(j=0;j<f.sizeJ();j++){
+                    for(z=0;z<f.sizeK();z++){
+                        x(0)=i;x(1)=j;x(2)=z;
+                        dir = x(direction);
+                        value=0;
+                        for(k=0;k<kernel.size();k++){
+                            x(direction)= dir+(radius-k);
+                            if(BoundaryCondition::isValid(f.getDomain(),x)){
+                                BoundaryCondition::apply(f.getDomain(),x);
+                                value+=Type_F64(f(x))*Type2_F64(kernel(k));
+                            }
+                        }
+                        h(i,j,z)=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+                    }
+                }
+            }
+        }
+        return h;
+    }
     template<int DIM,typename TypePixel1,typename TypePixel2,typename IteratorE,typename BoundaryCondition>
     static MatN<DIM,TypePixel1> convolution(const MatN<DIM,TypePixel1> & f, const MatN<DIM,TypePixel2> & kernel,IteratorE itglobal,BoundaryCondition)
     {
         MatN<DIM,TypePixel1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
+           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         typename MatN<DIM,TypePixel2>::IteratorEDomain itlocal(kernel.getIteratorEDomain());
         typename MatN<DIM,TypePixel2>::E center = (kernel.getDomain()-1)/2;
 
@@ -113,31 +172,12 @@ struct POP_EXPORTS FunctorMatN
                 typename MatN<DIM,TypePixel2>::E x = itglobal.x()-itlocal.x()+center;
                 if(BoundaryCondition::isValid(f.getDomain(),x)){
                     BoundaryCondition::apply(f.getDomain(),x);
-                    Type_F64 v(f(x));
-                    Type_F64 v2(kernel(itlocal.x()));
-                    value+=v*v2;
+                    value+=Type_F64(f(x))*Type2_F64(kernel(itlocal.x()));
                 }
             }
             h(itglobal.x())=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
         }
         return h;
-    }
-    template<int DIM,typename TypePixel1,typename TypePixel2,typename BoundaryCondition>
-    static MatN<DIM,TypePixel1> convolution(const MatN<DIM,TypePixel1> & f, const MatN<DIM,TypePixel2> & kernel,VecN<DIM,int> x,BoundaryCondition){
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-        typename MatN<DIM,TypePixel2>::IteratorEDomain itlocal(kernel.getIteratorEDomain());
-        typename MatN<DIM,TypePixel2>::E center = (kernel.getDomain()-1)/2;
-        Type_F64 value(0);
-        while(itlocal.next()){
-            typename MatN<DIM,TypePixel2>::E xx = x-itlocal.x()+center;
-            if(BoundaryCondition::isValid(f.getDomain(),xx)){
-                BoundaryCondition::apply(f.getDomain(),xx);
-                Type_F64 v(f(xx));
-                Type_F64 v2(kernel(itlocal.x()));
-                value+=v*v2;
-            }
-        }
-        return ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
     }
 
     //@}
@@ -396,7 +436,7 @@ struct POP_EXPORTS FunctorMatN
 
 
 
-     /*!
+    /*!
       * \brief recursive filter
       * \param f input function
       * \param it order iterator

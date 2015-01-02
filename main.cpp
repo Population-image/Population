@@ -2,52 +2,93 @@
 using namespace pop;//Population namespace
 #include"dependency/tinythread.h"
 
+
+
+
+
+
+
 int main()
 {
-	/*
-	char key[] = {'t', 'h', 'i', 's', ' ', 'i', 's', ' ', 't', 'h', 'e', ' ', 'e', 'n', 'c', 'r', 'y', 'p', 't', 'i', 'o', 'n', ' ', 'k', 'e', 'y'};
-	int key_len = 26;
 
-	std::string text_to_encrypt = "Hello world! This is the computer talking.";
-	int size;
-	char* encrypted_text = pop::Cryptography::xor_encryptText(text_to_encrypt, &size, key, key_len);
-	std::string decrypted_text = pop::Cryptography::xor_decryptText(encrypted_text, size, key, key_len);
-	std::cout << "Text to encrypt: " << text_to_encrypt << "\nDecrypted text: " << decrypted_text << "\nAre they the same? " << (text_to_encrypt == decrypted_text) << std::endl;
-	delete[] encrypted_text;
+    //    VecN<3,F64> v(2,3,4);
+    //    Mat2x<F64,3,1> m_v(v.data());
+    //    Mat2x<F64,3,3> J_0 = m_v*m_v.transpose();//structure tensor
+    //    VecF64 eigen_value = LinearAlgebra::eigenValue(J_0,LinearAlgebra::Symmetric);
+    //    LinearAlgebra::eigenVectorGaussianElimination(J_0,eigen_value);
 
-	pop::Cryptography::xor_encryptToFile(text_to_encrypt.c_str(), text_to_encrypt.length()+1, "test.txt", key, key_len);
-	char* file_decrypted_data = pop::Cryptography::xor_decryptFile("test.txt", key, key_len);
-	std::string decrypted_from_file = std::string(file_decrypted_data);
-	std::cout << "Decrypted from file: " << decrypted_from_file << "\nAre they the same? " << (text_to_encrypt == decrypted_from_file) << std::endl;
-	delete[] file_decrypted_data;
-
-	return 0;
-*/
-
-
-//    {
-//        Mat3UI8 img;
-//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
-//         Scene3d scene;
-//         Visualization::plane(scene,img,50,2);
-//        Visualization::plane(scene,img,50,1);
-//         Visualization::plane(scene,img,200,0);
-//         Visualization::lineCube(scene,img);
-//         scene.display();
-
-//    }
-//    {
-//        Mat2UI8 img;
-//        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
-//        img = Processing::threshold(img,125);
-////        img.display();
-//        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
-////        img.display();
-//    }
+    //    std::cout<<eigen_value<<std::endl;
+    //    std::cout<<v.norm()*v.norm()<<std::endl;
+    //    return 0;
+    //Mat2x<1,3,F64> m_v_transpose(v);
 
     {
-//        Mat2UI8 m(50,50);
-//        m.display();
+//        Mat3UI8 img3d(2000,1000);
+//        img3d.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
+        Mat2RGBUI8 m;
+        m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+        PDE::nonLinearAnisotropicDiffusion(m,200,200).display();
+//        img3d = GeometricalTransformation::scale(img3d,Vec3F64(4,4,4));
+
+
+//        Mat2F32 img(img3d);
+//        Mat2F32 img_temp(img.getDomain());
+
+//        //            img(2,2)=150;img(2,3)=150;img(2,4)=150;
+//        //            img(3,2)=150;img(3,3)=155;img(3,4)=150;
+//        //            img(4,2)=150;img(4,3)=150;img(4,4)=150;
+//
+//        int time1=time(NULL);
+//        int iter=500;
+//        for(unsigned int i=0;i<iter;i++){
+//            std::cout<<i<<std::endl;
+//
+//            img = img_temp;
+//        }
+//        int time2=time(NULL);
+//        std::cout<<(time2-time1)/(1.0*iter)<<std::endl;
+        return 0;
+//        img.display();
+//        //            Mat2F64::IteratorEDomain it = img.getDomain();
+//        //            std::cout<<img<<std::endl;
+//        //            while(it.next()){
+//        ////                std::cout<<img<<std::endl;
+//        //                img_temp(it.x())=img(it.x())+diff(img,it.x());
+//        //            }
+
+//        ////            img = PDE::nonLinearDiffusion(img,40,50,1);
+//        std::cout<<img_temp<<std::endl;
+        return 1;
+        //            std::cout<<Processing::dilation(img,1,1)<<std::endl;
+
+        //           Vec<KeyPoint<2> > v_harris = Feature::keyPointHarris(img);
+        //            Feature::drawKeyPointsCircle(img,v_harris,3).display();
+        //            return 1;
+    }
+    //    {
+    //        Mat3UI8 img;
+    //        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
+    //         Scene3d scene;
+    //         Visualization::plane(scene,img,50,2);
+    //        Visualization::plane(scene,img,50,1);
+    //         Visualization::plane(scene,img,200,0);
+    //         Visualization::lineCube(scene,img);
+    //         scene.display();
+
+    //    }
+    //    {
+    //        Mat2UI8 img;
+    //        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+    //        img = Processing::threshold(img,125);
+    ////        img.display();
+    //        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
+    ////        img.display();
+    //    }
+
+
+    {
+        //        Mat2UI8 m(50,50);
+        //        m.display();
         std::string path= "D:/Users/vtariel/Downloads/";
         Mat2RGBUI8 img3;
         img3.load("/home/vincent/Desktop/images.jpeg");
@@ -174,7 +215,7 @@ int main()
                 start_global = clock();
                 for(int i=0;i<10;i++){
                     //itlena.init();
-                    lena = FunctorMatN::convolutionSeperable(lena,vv,0,MatNBoundaryConditionMirror());
+                    //                    lena = FunctorMatN::convolutionSeperable(lena,vv,0,MatNBoundaryConditionMirror());
                     //ddisp.display(lena);
                 }
                 end_global = clock();
@@ -237,7 +278,7 @@ int main()
         Mat2UI8 img;
         img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
         img.display("Initial image",false);
-        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+        //        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
         double value;
         Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
         threshold.save("iexthreshold.png");

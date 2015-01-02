@@ -33,6 +33,8 @@ in the Software.
 \***************************************************************************/
 #ifndef FUNCTIONPROCEDUREFUNCTORF_HPP
 #define FUNCTIONPROCEDUREFUNCTORF_HPP
+#include"data/vec/VecN.h"
+#include"data/mat/MatNIteratorE.h"
 namespace pop
 {
 template<
@@ -86,8 +88,10 @@ typename FunctorAccumulatorF::ReturnType FunctionProcedureFunctorAccumulatorF(co
 }
 
 template<typename Function1,typename IteratorEGlobal,typename IteratorENeighborhood,typename FunctorAccumulatorF, typename Function2>
-void FunctionProcedureLocal(const Function1 & f,  IteratorEGlobal & itg,IteratorENeighborhood & itn,FunctorAccumulatorF facc, Function2 & h)
+void FunctionProcedureLocal(const Function1 & f,  IteratorEGlobal & itg,IteratorENeighborhood  itn,FunctorAccumulatorF facc, Function2 & h)
 {
+
+
     FunctionAssert(f,h,"FunctionProcedureFunctorBinaryFunctionE");
     while(itg.next()){
         itn.init(itg.x());
@@ -96,7 +100,80 @@ void FunctionProcedureLocal(const Function1 & f,  IteratorEGlobal & itg,Iterator
 }
 
 
+template<typename Function1,typename IteratorENeighborhood,typename FunctorAccumulatorF, typename Function2>
+void FunctionProcedureLocal(const Function1 & f,  MatNIteratorEDomain<Vec2I32> & ,IteratorENeighborhood  itn,FunctorAccumulatorF facc, Function2 & h)
+{
+    int i,j;
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,itn)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                itn.init(Vec2I32(i,j));
+                h(i,j)=FunctionProcedureFunctorAccumulatorF(f,facc,itn);
+            }
+        }
+    }
+}
+template<typename Function1,typename IteratorENeighborhood,typename FunctorAccumulatorF, typename Function2>
+void FunctionProcedureLocal(const Function1 & f,  MatNIteratorEDomain<Vec3I32> & ,IteratorENeighborhood  itn,FunctorAccumulatorF facc, Function2 & h)
+{
+    int i,j,k;
+#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,itn)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                for(k=0;k<f.sizeK();k++){
+                    itn.init(Vec3I32(i,j,k));
+                    h(i,j,k)=FunctionProcedureFunctorAccumulatorF(f,facc,itn);
+                }
+            }
+        }
+    }
+}
 
+
+template<typename Function1,typename FunctorUnaryE,typename IteratorE,typename Function2>
+void FunctionProcedureFunctorUnaryE(const Function1 & f,  FunctorUnaryE & func, IteratorE & it, Function2 & h)throw(pexception)
+{
+
+    while(it.next())
+    {
+        h(it.x())=func( f, it.x());
+    }
+}
+
+template<typename Function1,typename FunctorUnaryE, typename Function2>
+void FunctionProcedureFunctorUnaryE(const Function1 & f,  FunctorUnaryE func, MatNIteratorEDomain<Vec2I32> & , Function2 & h)
+{
+    int i,j;
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
+            }
+        }
+    }
+}
+template<typename Function1,typename FunctorUnaryE, typename Function2>
+void FunctionProcedureFunctorUnaryE(const Function1 & f,  FunctorUnaryE func, MatNIteratorEDomain<Vec3I32> & , Function2 & h)
+{
+    int i,j,k;
+#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                for(k=0;k<f.sizeK();k++){
+                    h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
+                }
+            }
+        }
+    }
+}
 
 }
 

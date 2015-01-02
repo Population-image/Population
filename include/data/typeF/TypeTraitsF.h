@@ -381,6 +381,27 @@ struct ArithmeticsSaturation
     }
 };
 template<>
+struct ArithmeticsSaturation<UI8,F64>
+{
+    static UI8 Range(F64 p)
+    {
+        if(p+0.5>=NumericLimits<UI8>::maximumRange())return NumericLimits<UI8>::maximumRange();
+        else if(p+0.5<NumericLimits<UI8>::minimumRange())return NumericLimits<UI8>::minimumRange();
+        else return static_cast<UI8>(p+0.5);
+    }
+};
+template<>
+struct ArithmeticsSaturation<UI8,F32>
+{
+    static UI8 Range(F32 p)
+    {
+        if(p+0.5>=NumericLimits<UI8>::maximumRange())return NumericLimits<UI8>::maximumRange();
+        else if(p+0.5<NumericLimits<UI8>::minimumRange())return NumericLimits<UI8>::minimumRange();
+        else return static_cast<UI8>(p+0.5);
+    }
+};
+
+template<>
 struct ArithmeticsSaturation< F64, F64>
 {
     static F64 Range(F64 p)
