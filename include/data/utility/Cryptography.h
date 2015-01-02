@@ -9,6 +9,7 @@ Vincent Tariel" shall be included in it.
 So, the terms of the Population License are:
 
 Copyright © 2012, Tariel Vincent
+Copyright © 2015, Aublin Pierre Louis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to

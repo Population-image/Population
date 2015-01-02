@@ -277,4 +277,13 @@ int BasicUtility::editDistance(std::string s1,std::string s2){
     return m(m.sizeI()-1,m.sizeJ()-1);
 }
 
+std::string BasicUtility::getPathSeparator() {
+#if Pop_OS==1
+    return "/";
+#elif Pop_OS==2
+    return "\\";
+#else
+    return "???";
+#endif
+}
 }
