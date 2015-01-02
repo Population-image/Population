@@ -35,13 +35,11 @@ in the Software.
 #ifndef BasicUtility_HPP
 #define BasicUtility_HPP
 
-#include <iostream>
 #include <sstream>
-#include<vector>
-#include<cmath>
-#include"data/typeF/TypeF.h"
-#include"data/utility/Exception.h"
-#include"PopulationConfig.h"
+#include <vector>
+#include "data/typeF/TypeF.h"
+#include "data/utility/Exception.h"
+#include "PopulationConfig.h"
 
 namespace pop
 {
@@ -293,11 +291,6 @@ public:
     static  std::string replaceSlashByAntiSlash(std::string filepath);
     //edit-Distance
     static int editDistance(std::string s1,std::string s2);
-
-    // (de)crypt the array input, of size size, in-place
-    static void cryptOrDecryptCharsXORKey(char *input, int size, pop::UI32 key =0xAAF588BB);
-
-    static void cryptOrDecryptFileXORKey(std::string inputfile,std::string outputfile, pop::UI32 key =0xAAF588BB);
 };
 
 template<typename T>

@@ -51,6 +51,7 @@
 #include"PopulationConfig.h"
 #include"data/utility/Exception.h"
 #include"data/utility/BasicUtility.h"
+#include"data/utility/Cryptography.h"
 #include"data/utility/XML.h"
 #include"data/vec/VecN.h"
 #include"data/vec/Vec.h"

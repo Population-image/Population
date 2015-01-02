@@ -93,6 +93,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/typeF/TypeF.h \
            $${PWD}/include/data/typeF/TypeTraitsF.h \
            $${PWD}/include/data/utility/BasicUtility.h \
+           $${PWD}/include/data/utility/Cryptography.h \
            $${PWD}/include/data/utility/BSPTree.h \
            $${PWD}/include/data/utility/CollectorExecutionInformation.h \
            $${PWD}/include/data/utility/Exception.h \
@@ -138,6 +139,7 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/ocr/OCR.cpp \
            $${PWD}/src/data/typeF/TypeTraitsF.cpp \
            $${PWD}/src/data/utility/BasicUtility.cpp \
+           $${PWD}/src/data/utility/Cryptography.cpp \
            $${PWD}/src/data/utility/CollectorExecutionInformation.cpp \
            $${PWD}/src/data/utility/Exception.cpp \
            $${PWD}/src/data/utility/XML.cpp \

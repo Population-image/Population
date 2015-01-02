@@ -10,6 +10,7 @@ using namespace pop;//Population namespace
 
 int main()
 {
+
     //    VecN<3,F64> v(2,3,4);
     //    Mat2x<F64,3,1> m_v(v.data());
     //    Mat2x<F64,3,3> J_0 = m_v*m_v.transpose();//structure tensor
@@ -83,6 +84,7 @@ int main()
     //        std::cout<<Analysis::eulerPoincare(img,POP_PROJECT_SOURCE_DIR+std::string("/file/eulertab.dat"))<<std::endl;
     ////        img.display();
     //    }
+
 
     {
         //        Mat2UI8 m(50,50);

@@ -2,11 +2,9 @@
 #include<cmath>
 #include"PopulationConfig.h"
 
-
 #include <sys/types.h>  // For stat().
 #include <sys/stat.h>   // For stat().
 #include <stdio.h>
-#include <fstream>
 #include <stdlib.h>
 #include <algorithm>
 #include "data/mat/MatN.h"
@@ -277,34 +275,6 @@ int BasicUtility::editDistance(std::string s1,std::string s2){
         k++;
     }
     return m(m.sizeI()-1,m.sizeJ()-1);
-}
-
-void BasicUtility::cryptOrDecryptCharsXORKey(char* input, int size, pop::UI32 key) {
-    pop::UI32 * ptrUI32 =reinterpret_cast<pop::UI32*>(input);
-    for(unsigned int i =0;i<std::floor(size/4.);i++){
-        *ptrUI32 = (*ptrUI32)^(key);
-        ptrUI32++;
-    }
-}
-
-void BasicUtility::cryptOrDecryptFileXORKey(std::string inputfile,std::string outputfile, pop::UI32 key ){
-    std::ifstream  infile(inputfile.c_str(), std::ios::binary);
-    infile.seekg (0,infile.end);
-    long size = infile.tellg();
-
-    char * c = new char[size];
-    infile.seekg(0, std::ios::beg);
-    infile.read(c, size);
-
-    cryptOrDecryptCharsXORKey(c, size, key);
-
-    std::ofstream outfile (outputfile.c_str(),std::ofstream::binary);
-    outfile.write (c,size);
-
-    delete[] c;
-
-    outfile.close();
-    infile.close();
 }
 
 }
