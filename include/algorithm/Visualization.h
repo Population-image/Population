@@ -301,10 +301,10 @@ struct POP_EXPORTS Visualization
 
         FunctorF::FunctorAccumulatorMin<typename MatN<DIM,TypePixel1>::F > funcmini;
         it.init();
-        I32 min = FunctionProcedureFunctorAccumulatorF(labelb,funcmini,it);
+        I32 min = forEachFunctorAccumulator(labelb,funcmini,it);
         FunctorF::FunctorAccumulatorMax<typename MatN<DIM,TypePixel1>::F > funcmaxi;
         it.init();
-        I32 max = FunctionProcedureFunctorAccumulatorF(labelb,funcmaxi,it);
+        I32 max = forEachFunctorAccumulator(labelb,funcmaxi,it);
 
 
         if(min<0){
@@ -382,10 +382,10 @@ struct POP_EXPORTS Visualization
 
         FunctorF::FunctorAccumulatorMin<typename MatN<DIM,TypePixel1>::F > funcmini;
         it.init();
-        I32 min = FunctionProcedureFunctorAccumulatorF(label,funcmini,it);
+        I32 min = forEachFunctorAccumulator(label,funcmini,it);
         FunctorF::FunctorAccumulatorMax<typename MatN<DIM,TypePixel1>::F > funcmaxi;
         it.init();
-        I32 max = FunctionProcedureFunctorAccumulatorF(label,funcmaxi,it);
+        I32 max = forEachFunctorAccumulator(label,funcmaxi,it);
 
 
         if(min<0){

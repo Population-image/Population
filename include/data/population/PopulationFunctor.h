@@ -40,7 +40,7 @@ in the Software.
 #include<cmath>
 #include"data/typeF/TypeTraitsF.h"
 #include"data/functor/FunctorF.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 namespace pop
 {
 class POP_EXPORTS FunctorZero
@@ -80,7 +80,7 @@ public:
         else{
             typename Function::IteratorEDomain it(_f.getIteratorEDomain());
             FunctorF::FunctorAccumulatorMax<typename Function::F > func;
-            typename Function::F value =  FunctionProcedureFunctorAccumulatorF(_f,func,it);
+            typename Function::F value =  forEachFunctorAccumulator(_f,func,it);
             return value+1;
         }
     }

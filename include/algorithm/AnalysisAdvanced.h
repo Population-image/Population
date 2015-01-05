@@ -252,20 +252,20 @@ struct AnalysisAdvanced
     static typename Function::F maxValue(const Function & f,  Iterator & it)
     {
         FunctorF::FunctorAccumulatorMax<typename Function::F > func;
-        return FunctionProcedureFunctorAccumulatorF(f,func,it);
+        return forEachFunctorAccumulator(f,func,it);
     }
     template<typename Function,typename Iterator>
     static typename Function::F minValue(const Function & f,  Iterator & it)
     {
         FunctorF::FunctorAccumulatorMin<typename Function::F > func;
-        return FunctionProcedureFunctorAccumulatorF(f,func,it);
+        return forEachFunctorAccumulator(f,func,it);
     }
 
     template<typename Function1,typename Iterator>
     static typename FunctionTypeTraitsSubstituteF<typename Function1::F,F64>::Result meanValue(const Function1 & f, Iterator & it)throw(pexception)
     {
         FunctorF::FunctorAccumulatorMean<typename Function1::F> func;
-        return FunctionProcedureFunctorAccumulatorF(f,func,it);
+        return forEachFunctorAccumulator(f,func,it);
     }
 
     template<typename Function1,typename Iterator>
@@ -275,7 +275,7 @@ struct AnalysisAdvanced
         F64 mean = meanValue(f,it);
         it.init();
         FunctorF::FunctorAccumulatorVariance<typename Function1::F> func(mean);
-        return std::sqrt(FunctionProcedureFunctorAccumulatorF(f,func,it));
+        return std::sqrt(forEachFunctorAccumulator(f,func,it));
     }
 
     template<typename Function,typename IteratorGlobal>

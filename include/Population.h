@@ -64,7 +64,7 @@
 #include"algorithm/Application.h"
 #include"algorithm/Convertor.h"
 #include"algorithm/Draw.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"algorithm/GeometricalTransformation.h"
 #include"algorithm/LinearAlgebra.h"
 #include"algorithm/PDEAdvanced.h"

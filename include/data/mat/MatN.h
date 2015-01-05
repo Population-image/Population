@@ -50,7 +50,7 @@ in the Software.
 #include"data/mat/MatNBoundaryCondition.h"
 #include"data/mat/MatNIteratorE.h"
 #include"data/functor/FunctorF.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"data/utility/BasicUtility.h"
 
 namespace pop
@@ -409,20 +409,16 @@ public:
     \image html lenaero.jpg
     \sa RGB getIteratorENeighborhood
     */
-    // neighborhood iteration with bounded condition
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionBounded> IteratorENeighborhood;
-    // neighborhood iteration with mirror condition
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionMirror> IteratorENeighborhoodMirror;
-    // neighborhood iteration with periodic condition
-    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionPeriodic> IteratorENeighborhoodPeriodic;
-    typedef MatNIteratorENeighborhoodAmoebas<MatN> IteratorENeighborhoodAmoebas;
 
+    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionBounded> IteratorENeighborhood;// neighborhood iteration with bounded condition
+    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionMirror> IteratorENeighborhoodMirror;// neighborhood iteration with mirror condition
+    typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionPeriodic> IteratorENeighborhoodPeriodic;// neighborhood iteration with periodic condition
+    typedef MatNIteratorENeighborhoodAmoebas<MatN> IteratorENeighborhoodAmoebas;
     typedef MatNIteratorEOrder<E> IteratorEOrder;
     typedef MatNBoundaryCondition BoundaryCondition;
 
     /*!
     \typedef IteratorERectangle
-
     Iterate in rectangle
 
      \code
@@ -453,14 +449,12 @@ public:
     typedef typename std::vector<Type>::const_pointer     const_pointer;
     typedef typename std::vector<Type>::reference         reference;
     typedef typename std::vector<Type>::const_reference   const_reference;
-
     typedef typename std::vector<Type>::const_iterator const_iterator;
     typedef typename std::vector<Type>::const_reverse_iterator  const_reverse_iterator;
     typedef typename std::vector<Type>::reverse_iterator		 reverse_iterator;
     typedef typename std::vector<Type>::size_type					 size_type;
     typedef typename std::vector<Type>::difference_type				 difference_type;
     typedef typename std::vector<Type>::allocator_type                        		 allocator_type;
-
 
 
     //-------------------------------------
@@ -472,14 +466,7 @@ public:
     \fn MatN()
     * default constructor
     */
-    MatN( )
-    {
-        _domain =0;
-
-    }
-
-    virtual ~MatN(){
-    }
+    MatN();
     /*!
     \param domain domain of definition
     \param v init pixel/voxel value
@@ -502,16 +489,7 @@ public:
     0 255 0 0
     \endcode
     */
-    explicit MatN(const VecN<Dim,int>& domain,Type v=Type())
-        :std::vector<Type>(domain.multCoordinate(),Type(v)),_domain(domain)
-    {
-    }
-
-//    explicit MatN(unsigned int sizei)
-//        :std::vector<Type>(sizei,Type(0))
-//    {
-//        _domain(0)=sizei;
-//    }
+    explicit MatN(const VecN<Dim,int>& domain,Type v=Type());
     /*!
     \param sizei number of  columns
     \param sizej number of  rows
@@ -532,12 +510,7 @@ public:
     \endcode
     */
 
-    explicit MatN(unsigned int sizei,unsigned int sizej)
-        :std::vector<Type>(sizei*sizej,Type(0))
-    {
-        POP_DbgAssertMessage(Dim==2,"In MatN::MatN(int i, int j), your matrix must be 2D");
-        _domain(0)=sizei;_domain(1)=sizej;
-    }
+    explicit MatN(unsigned int sizei,unsigned int sizej);
     /*!
     \param sizei number of  columns
     \param sizej number of  rows
@@ -545,12 +518,7 @@ public:
     *
     * construct an matrix of size i,j,k where each pixel/voxel value is set at 0\n
     */
-    explicit MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
-        :std::vector<Type>(sizei*sizej*sizek,Type(0))
-    {
-        POP_DbgAssertMessage(Dim==3,"In MatN::MatN(int sizei, int sizej,int sizek), your matrix must be 3D");
-        _domain(0)=sizei;_domain(1)=sizej;_domain(2)=sizek;
-    }
+    explicit MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek);
     /*!
     \fn MatN(const VecN<Dim,int>& x,const std::vector<Type>& data)
     \param x domain size of the matrix
@@ -574,12 +542,7 @@ public:
     3 2 1 0
     \endcode
     */
-    explicit MatN(const VecN<Dim,int> & x,const std::vector<Type>& data )
-        :std::vector<Type>(data),_domain(x)
-    {
-        POP_DbgAssertMessage((int)data.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data ), the size of input std::vector data must be equal to the number of pixel/voxel");
-    }
-
+    explicit MatN(const VecN<Dim,int> & x,const std::vector<Type>& data );
     /*!
     \fn MatN(const VecN<Dim,int> & x,const Type* v_value )
     \param x domain size of the matrix
@@ -599,12 +562,7 @@ public:
     cout<<LetterA<<endl;
     \endcode
     */
-    explicit MatN(const VecN<Dim,int> & x,const Type* v_value )
-        :std::vector<Type>(x.multCoordinate(),Type()),_domain(x)
-    {
-        std::copy(v_value,v_value + _domain.multCoordinate(),this->begin());
-    }
-
+    explicit MatN(const VecN<Dim,int> & x,const Type* v_value );
     /*!
     \param img object to copy
     *
@@ -628,14 +586,9 @@ public:
     \endcode
     */
     template<class T1>
-    MatN(const MatN<Dim, T1> & img )
-        :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
-    {
-        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,T1>::Range);
-    }
+    MatN(const MatN<Dim, T1> & img );
 
 
-#ifndef HAVE_SWIG
     /*!
     \param img object to copy
     *
@@ -658,10 +611,8 @@ public:
     3 2 1 0
     \endcode
     */
-    MatN(const MatN & img )
-        :std::vector<Type>(img),_domain(img.getDomain())
-    {
-    }
+#ifndef HAVE_SWIG
+    MatN(const MatN & img );
 #endif
     /*!
       * \param m small 2d matrix of size (2,2)
@@ -689,11 +640,7 @@ public:
     img.display();
     \endcode
     */
-    MatN(const char * filepath )
-    {
-        if(filepath!=0)
-            load(filepath);
-    }
+    MatN(const char * filepath );
     /*!
     \param img bigger matrix
     \param xmin inclusive lower bound
@@ -717,79 +664,7 @@ public:
     \endcode
 
     */
-    MatN(const MatN & img, const VecN<Dim,int>& xmin, const VecN<Dim,int> & xmax  )
-    {
-        POP_DbgAssertMessage(xmin.allSuperiorEqual(0),"xmin must be superior or equal to 0");
-        POP_DbgAssertMessage(xmax.allSuperior(xmin),"xmax must be superior to xmin");
-        POP_DbgAssertMessage(xmax.allInferior(img.getDomain()+1),"xmax must be superior or equal to xmin");
-        _domain = xmax-xmin;
-        std::vector<Type>::resize(_domain.multCoordinate(),0);
-        if(  DIM==2 ){
-            if(_domain(1)==img.getDomain()(1)){
-                if(_domain(0)==img.getDomain()(0))
-                    std::copy(img.begin(),img.end(),this->begin());
-                else
-                    std::copy(img.begin()+ xmin(0)*img._domain(1),img.begin()+xmax(0)*img._domain(1),this->begin());
-            }else{
-
-                typename std::vector<Type>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
-                typename std::vector<Type>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
-                typename std::vector<Type>::iterator it = this->begin();
-                for( int i=xmin(0);i<xmax(0);i++){
-                    std::copy(itb,ite,it);
-                    itb+=img._domain(1);
-                    ite+=img._domain(1);
-                    it+=this->_domain(1);
-                }
-            }
-        }
-        else if(DIM==3){
-
-            if(_domain(1)==img.getDomain()(1)){
-                if(_domain(0)==img.getDomain()(0))
-                    std::copy(img.begin()+xmin(2)*img._domain(1)*img._domain(0),img.begin()+xmax(2)*img._domain(1)*img._domain(0),this->begin());
-                else{
-                    int intra_slice_add                = img._domain(1)*img._domain(0);
-                    int intra_slice_add_this           = this->_domain(1)*this->_domain(0);
-                    typename std::vector<Type>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                    typename std::vector<Type>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                    typename std::vector<Type>::iterator it        = this->begin();
-
-                    for( int k=xmin(2);k<xmax(2);k++){
-                        std::copy(itb,ite,it);
-                        itb+=intra_slice_add;
-                        ite+=intra_slice_add;
-                        it +=intra_slice_add_this;
-                    }
-                }
-            }else{
-
-                unsigned int indexmini = xmin(0);
-                unsigned int indexmaxi = xmax(0);
-                int intra_slice_add      = img._domain(1)*img._domain(0);
-                int intra_slice_add_this = this->_domain(1)*this->_domain(0);
-                typename std::vector<Type>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-                typename std::vector<Type>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-                typename std::vector<Type>::iterator it        = this->begin();
-                unsigned int indexmin = xmin(2);
-                unsigned int indexmax = xmax(2);
-                for(unsigned int i=indexmin;i<indexmax;i++){
-                    typename std::vector<Type>::const_iterator itbb = itb;
-                    typename std::vector<Type>::const_iterator itee = ite;
-                    typename std::vector<Type>::iterator itt =it;
-                    for(unsigned int j=indexmini;j<indexmaxi;j++){
-                        std::copy(itbb ,itee,itt);
-                        itbb+=img._domain(1);
-                        itee+=img._domain(1);
-                        itt+=this->_domain(1);
-                    }
-                    itb+=intra_slice_add;
-                    ite+=intra_slice_add;
-                    it +=intra_slice_add_this;
-                }
-            }
-        }
-    }
+    MatN(const MatN & img, const VecN<Dim,int>& xmin, const VecN<Dim,int> & xmax  );
     //@}
     //-------------------------------------
     //
@@ -803,79 +678,51 @@ public:
     * return domain of definition of the matrix
     * \sa VecN
     */
-    Domain  getDomain()
-    const
-    {
-        return _domain;
-    }
+    Domain  getDomain()const;
 
     /*!
     \return  number of rows
     *
     * return the number of rows
     */
-    unsigned int sizeI()const{
-        return this->getDomain()[0];
-    }
+    unsigned int sizeI()const;
     /*!
     \return number of rows
     *
     * return the number of rows
     */
-    unsigned int rows()const{
-        return this->getDomain()[0];
-    }
+    unsigned int rows()const;
     /*!
     \return number of columns
     *
     * return the number of columns
     */
-    unsigned int sizeJ()const{
-        return this->getDomain()[1];
-    }
+    unsigned int sizeJ()const;
     /*!
     \return number of columns
     *
     * return the number of columns
     */
-    unsigned int columns()const{
-        return this->getDomain()[1];
-    }
+    unsigned int columns()const;
     /*!
     \return int sizek
     *
     * return the number of depths
     */
-    unsigned int sizeK()const{
-        POP_DbgAssert(Dim==3);
-
-       if(DIM>=3)
-        return this->getDomain()[2];
-        else
-            return 1;
-
-    }
+    unsigned int sizeK()const;
     /*!
     \return number of depths
     *
     * return the number of depths
     */
-    unsigned int depth()const{
-        POP_DbgAssert(Dim==3);
-        return this->getDomain()[2];
-    }
+    unsigned int depth()const;
     /*!
     \param x VecN
     \return boolean
     *
     * return true if the VecN belongs to the domain, false otherwise
     */
-    bool isValid(const E & x)const{
-        if(x.allSuperiorEqual(E(0)) && x.allInferior(this->getDomain()))
-            return true;
-        else
-            return false;
-    }
+    bool isValid(const E & x)const;
     /*!
     \param i i coordinate of the VecN
     \param j j coordinate of the VecN
@@ -883,12 +730,7 @@ public:
     *
     * return true if the VecN (i,j) belongs to the domain, false otherwise
     */
-    bool isValid(int i,int j)const{
-        if(i>=0&&j>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ()))
-            return true;
-        else
-            return false;
-    }
+    bool isValid(int i,int j)const;
     /*!
     \param i i coordinate of the VecN
     \param j j coordinate of the VecN
@@ -897,24 +739,14 @@ public:
     *
     * return true if the VecN (i,j,k) belongs to the domain, false otherwise
     */
-    bool isValid(int i,int j,int k)const{
-        if(i>=0&&j>=0&&k>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ())&&k<static_cast<int>(sizeK()))
-            return true;
-        else
-            return false;
-    }
-
+    bool isValid(int i,int j,int k)const;
     /*!
     \param sizei  row size
     \param sizej coloumn size
     *
     * resize the matrix in loosing the data information
     */
-    void resize(unsigned int sizei,unsigned int sizej){
-        _domain(0)=sizei;
-        _domain(1)=sizej;
-        std::vector<Type>::resize(_domain(0)*_domain(1));
-    }
+    void resize(unsigned int sizei,unsigned int sizej);
     /*!
     \param sizei  row size
     \param sizej  col size
@@ -922,34 +754,20 @@ public:
     *
     * resize the matrix in loosing the data information
     */
-    void resize(unsigned int sizei,unsigned int sizej,unsigned int sizek){
-        _domain(0)=sizei;
-        _domain(1)=sizej;
-        _domain(2)=sizek;
-        std::vector<Type>::resize(_domain(0)*_domain(1)*_domain(2));
-    }
+    void resize(unsigned int sizei,unsigned int sizej,unsigned int sizek);
     /*!
     \param d  domain =Vec2(i,j) in 2d  and domain =Vec3(i,j,k) in 3d
     *
     * resize the matrix in loosing the data information
     */
-    void resize(const VecN<Dim,int> & d){
-        _domain=d;
-        std::vector<Type>::resize(_domain.multCoordinate());
-    }
+    void resize(const VecN<Dim,int> & d);
     /*!
     \param sizei  row size
     \param sizej coloumn size
     *
     * resize the matrix in keeping the data information
     */
-    void resizeInformation(unsigned int sizei,unsigned int sizej){
-
-        Domain d;
-        d(0)=sizei;
-        d(1)=sizej;
-        resizeInformation(d);
-    }
+    void resizeInformation(unsigned int sizei,unsigned int sizej);
     /*!
 
     \param sizei  row size
@@ -958,52 +776,24 @@ public:
     *
     * resize the matrix in keeping the data information
     */
-    void resizeInformation(unsigned int sizei,unsigned int sizej,unsigned int sizek){
-        Domain d;
-        d(0)=sizei;
-        d(1)=sizej;
-        d(2)=sizek;
-        resizeInformation(d);
-    }
+    void resizeInformation(unsigned int sizei,unsigned int sizej,unsigned int sizek);
     /*!
     \param d  domain =Vec2(i,j) in 2d  and domain =Vec3(i,j,k) in 3d
     *
     * resize the matrix in keeping the data information
     */
-    void resizeInformation(const VecN<Dim,int>& d){
-        MatN temp(*this);
-        _domain=d;
-        std::vector<Type>::resize(_domain.multCoordinate());
-
-        IteratorEDomain it(this->getIteratorEDomain());
-        while(it.next()){
-            if(temp.isValid(it.x())){
-                this->operator ()(it.x())=temp(it.x());
-            }else{
-                this->operator ()(it.x())=0;
-            }
-        }
-    }
+    void resizeInformation(const VecN<Dim,int>& d);
     /*!
     \return true if matrix is empty
     *
     * return true if the the matrix empty
     */
-    bool isEmpty()const{
-        if(_domain.multCoordinate()==0)
-            return true;
-        else
-            return false;
-    }
+    bool isEmpty()const;
     /*!
     *
     * clear the content of the matrix
     */
-    void clear(){
-        _domain=0;
-        std::vector<Type>::clear();
-    }
-
+    void clear();
     //@}
 
     //-------------------------------------
@@ -1030,11 +820,7 @@ public:
     \endcode
     * \sa VecN
     */
-    inline F & operator ()(const VecN<Dim,int> & x)
-    {
-        POP_DbgAssert( x.allSuperiorEqual( E(0))&&x.allInferior(getDomain()));
-        return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
-    }
+    inline F & operator ()(const VecN<Dim,int> & x);
 
     /*!
     \param x pixel/voxel position
@@ -1054,13 +840,7 @@ public:
     \endcode
     * \sa VecN
     */
-    inline const F & operator ()( const VecN<Dim,int>& x)
-    const
-    {
-        POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(getDomain()));
-        return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
-    }
-
+    inline const F & operator ()( const VecN<Dim,int>& x)const;
     /*!
     \param i i coordinate (row)
     \param j j coordinate (column)
@@ -1068,11 +848,7 @@ public:
     *
     * access the reference of the pixel/voxel value at the position (i,j) for a 2D matrix
     */
-    inline Type & operator ()(unsigned int i,unsigned int j)
-    {
-        POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
-        return  this->operator[](j+i*_domain(1));
-    }
+    inline Type & operator ()(unsigned int i,unsigned int j);
     /*!
     \param i i coordinate (row)
     \param j j coordinate (column)
@@ -1080,11 +856,7 @@ public:
     *
     * access the reference of the pixel/voxel value at the position (i,j) for a 2D matrix
     */
-    inline const Type & operator ()(unsigned int i,unsigned int j)const
-    {
-        POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
-        return  this->operator[](j+i*_domain(1));
-    }
+    inline const Type & operator ()(unsigned int i,unsigned int j)const;
     /*!
     \param i i coordinate (row)
     \param j j coordinate (column)
@@ -1093,12 +865,7 @@ public:
     *
     * access the reference of the pixel/voxel value at the given position (i,j,k) for a 3D matrix
     */
-    inline Type & operator ()(unsigned int i,unsigned int j,unsigned int k)
-    {
-        POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
-        return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
-    }
-
+    inline Type & operator ()(unsigned int i,unsigned int j,unsigned int k);
     /*!
     \param i i coordinate (row)
     \param j j coordinate (column)
@@ -1107,12 +874,7 @@ public:
     *
     * access the reference of the pixel/voxel value at the given position (i,j,k) for a 3D matrix
     */
-    inline const Type & operator ()(unsigned int i,unsigned int j,unsigned int k)const
-    {
-        POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
-        return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
-    }
-
+    inline const Type & operator ()(unsigned int i,unsigned int j,unsigned int k)const;
     /*!
     \param xmin inclusive lower bound
     \param xmax exclusive upper bound
@@ -1126,158 +888,35 @@ public:
     img.display();
     \endcode
     */
-    MatN operator()(const VecN<Dim,int> & xmin, const VecN<Dim,int> & xmax) const{
-        return MatN(*this,xmin,xmax);
-    }
+    MatN operator()(const VecN<Dim,int> & xmin, const VecN<Dim,int> & xmax) const;
     /*!
     \param index vector index
     \return pixel/voxel value
     *
     * access the reference of the pixel/voxel value at the vector index (std::vector contains pixel values)
     */
-    inline Type & operator ()(unsigned int index)
-    {
-        POP_DbgAssert( index<this->size());
-        return this->operator[](index);
-    }
+    inline Type & operator ()(unsigned int index);
     /*!
     \param xf vector position in float value
     \return pixel/voxel value
     *
     * access the interpolated pixel/voxel value at the float position
     */
-    Type interpolationBilinear(const VecN<DIM,F64> xf)const
-    {
-        if(DIM==2){
-            Vec2F64 x;
-            x(0)=xf(0)+EPSILON;
-            x(1)=xf(1)+EPSILON;
-            typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
-            double sum=0;
-            Vec2I32 x1;
-            x1(0)=std::floor(x(0));
-            x1(1)=std::floor(x(1));
-            if(this->isValid(x1(0),x1(1))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
-                value+=this->operator ()(x1(0),x1(1))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::ceil(x(0));
-            if(this->isValid(x1(0),x1(1))){
-                double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
-                value+=this->operator ()(x1(0),x1(1))*norm;
-                sum+= norm;
-            }
-            x1(1)=std::ceil(x(1));
-            if(this->isValid(x1(0),x1(1))){
-                double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
-                value+=this->operator ()(x1(0),x1(1))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::floor(x(0));
-            if(this->isValid(x1(0),x1(1))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
-                value+=this->operator ()(x1(0),x1(1))*norm;
-                sum+= norm;
-            }
-            if(sum==0)
-                return 0;
-            else if(NumericLimits<Type>::is_integer==true)
-                return round(value/sum);
-            else
-                return value/sum;
-        }else if(DIM==3){
-            Vec3F64 x;
-            x(0)=xf(0)+EPSILON;
-            x(1)=xf(1)+EPSILON;
-            x(2)=xf(2)+EPSILON;
-            typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
-            double sum=0;
-            Vec3I32 x1;
-            x1(0)=std::floor(x(0));
-            x1(1)=std::floor(x(1));
-            x1(2)=std::floor(x(2));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::ceil(x(0));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(1)=std::ceil(x(1));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::floor(x(0));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::floor(x(0));
-            x1(1)=std::floor(x(1));
-            x1(2)=std::ceil(x(2));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::ceil(x(0));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(1)=std::ceil(x(1));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            x1(0)=std::floor(x(0));
-            if(this->isValid(x1(0),x1(1),x(2))){
-                double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-                value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-                sum+= norm;
-            }
-            if(sum==0)
-                return 0;
-            else if(NumericLimits<Type>::is_integer==true)
-                return round(value/sum);
-            else
-                return value/sum;
-        }
-        return 0;
-    }
-
+    Type interpolationBilinear(const VecN<DIM,F64> xf)const;
     /*!
     * Return a ptr to the first pixel value
     *
     *
     * direct access to the matrix data that can be usefull for optimized purposes
     */
-    inline Type *  data()
-    {
-        return &(*this->begin());
-    }
+    Type *  data();
     /*!
     * Return a ptr to the first pixel value
     *
     *
     * direct access to the matrix data that can be usefull for optimized purposes
     */
-    virtual inline const Type *  data()
-    const
-    {
-        return &(*this->begin());
-    }
-
+    const Type *  data()const;
     //@}
 
     //-------------------------------------
@@ -1286,9 +925,7 @@ public:
     //@{
     //-------------------------------------
 
-
     /*!
-
     * \param pathdir directory path
     * \param basefilename filename base by default "toto"
     * \param extension by default ".pgm"
@@ -1322,9 +959,7 @@ public:
     *
     * \sa MatN::load(const char * file)
     */
-    void load(const std::string file) throw(pexception){
-        this->load(file.c_str());
-    }
+    void load(const std::string file) throw(pexception);
     /*!
     \param file input file
     \param d  domain of definition of the image
@@ -1371,9 +1006,7 @@ public:
     *
     * \sa MatN::save(const char * file)
     */
-    void save(const std::string file)const throw(pexception){
-        save(file.c_str());
-    }
+    void save(const std::string file)const throw(pexception);
     /*!
     \param file input file
     \exception  pexception the input file does not exist
@@ -1425,10 +1058,7 @@ public:
     * return the total iterator of the matrix that will iterate through the domain + x\n
     *
     */
-    IteratorEDomain getIteratorEDomain()const
-    {
-        return IteratorEDomain(getDomain());
-    }
+    IteratorEDomain getIteratorEDomain()const;
     /*!
     \fn typename IteratorEROI getIteratorEROI()const
     \return ROI iterator
@@ -1438,10 +1068,7 @@ public:
     *
 
     */
-    IteratorEROI getIteratorEROI()const
-    {
-        return IteratorEROI(*this);
-    }
+    IteratorEROI getIteratorEROI()const;
     /*!
     \param radius ball radius
     \param norm ball norm
@@ -1455,10 +1082,7 @@ public:
     *
     \sa IteratorENeighborhood
     */
-    IteratorENeighborhood getIteratorENeighborhood(F64 radius=1 ,F64 norm=1 )const
-    {
-        return IteratorENeighborhood(getDomain(),radius , norm);
-    }
+    IteratorENeighborhood getIteratorENeighborhood(F64 radius=1 ,F64 norm=1 )const;
     /*!
     * \param structural_element structural element
     * \param dilate number of dilation of the structural element
@@ -1485,27 +1109,7 @@ public:
     \sa IteratorENeighborhood
     */
     template<typename Type1>
-    IteratorENeighborhood getIteratorENeighborhood(const MatN<Dim,Type1> & structural_element,int dilate=1 )const
-    {
-        Vec<E> _tab;
-        typename MatN<Dim,Type1>::IteratorEDomain it(structural_element.getDomain());
-        typename MatN<Dim,Type1>::E center = VecN<Dim,F64>(structural_element.getDomain()-1)*0.5;
-        while(it.next()){
-            if(normValue(structural_element(it.x()))!=0){
-                _tab.push_back(it.x()-center);
-            }
-        }
-        if(dilate<=1)
-            return IteratorENeighborhood(std::make_pair(getDomain(),_tab));
-        else{
-            IteratorENeighborhood itinit(std::make_pair(getDomain(),_tab));
-            IteratorENeighborhood ititerative(std::make_pair(getDomain(),_tab));
-            for(int i =1;i<dilate;i++){
-                ititerative.dilate(itinit);
-            }
-            return IteratorENeighborhood(ititerative.getDomain());
-        }
-    }
+    IteratorENeighborhood getIteratorENeighborhood(const MatN<Dim,Type1> & structural_element,int dilate=1 )const;
     /*!
     * \param coordinatelastloop coordinate of the last loop of iteratation
     * \param direction 1=0 to N , otherwise N to 0
@@ -1529,10 +1133,7 @@ public:
     *
     *
     */
-    IteratorEOrder getIteratorEOrder(int coordinatelastloop=0,int direction=1)const
-    {
-        return IteratorEOrder(getDomain(),coordinatelastloop,direction);
-    }
+    IteratorEOrder getIteratorEOrder(int coordinatelastloop=0,int direction=1)const;
     /*!
     * \param xmin top left corner
     * \param xmax buttom right corner
@@ -1557,12 +1158,7 @@ public:
     *
     *
     */
-
-
-    IteratorERectangle getIteratorERectangle(const E & xmin,const E & xmax )const
-    {
-        return IteratorERectangle(std::make_pair(xmin,xmax));
-    }
+    IteratorERectangle getIteratorERectangle(const E & xmin,const E & xmax )const;
     /*!
     * \brief Amoeabas kernel
     * \param distance_max maximum distance
@@ -1584,13 +1180,7 @@ public:
     * \image html plate_median_classic.jpg "median filter with fixed kernel"
     * \image html plate_median_amoeba.jpg "median filter with ameaba kernel"
     */
-
-
-    IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F64 distance_max=4,double lambda_param = 0.01 )const
-    {
-        return IteratorENeighborhoodAmoebas(*this,distance_max,lambda_param );
-    }
-
+    IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F64 distance_max=4,double lambda_param = 0.01 )const;
     //@}
 
     //-------------------------------------
@@ -1606,44 +1196,28 @@ public:
     * Basic assignement of this matrix by \a other
     */
     template<class T1>
-    MatN& operator =(const MatN<Dim, T1> & img ){
-        this->resize(img.getDomain());
-        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,T1>::Range);
-        return *this;
-    }
+    MatN& operator =(const MatN<Dim, T1> & img );
     /*!
     * \param img other matrix
     * \return this matrix
     *
     * Basic assignement of this matrix by \a other
     */
-    MatN& operator =(const MatN & img ){
-        this->resize(img.getDomain());
-        std::copy(img.begin(),img.end(),this->begin());
-        return *this;
-    }
+    MatN& operator =(const MatN & img );
     /*!
     * \param value value
     * \return this matrix
     *
     * Basic assignement of all pixel/voxel values by \a value
     */
-    MatN<Dim, Type>&  operator=(Type value)
-    {
-        std::fill (this->begin(),this->end(),value);
-        return *this;
-    }
+    MatN<Dim, Type>&  operator=(Type value);
     /*!
     * \param value value
     * \return this matrix
     *
     * Basic assignement of all pixel/voxel values by \a value
     */
-    MatN<Dim, Type>&  fill(Type value)
-    {
-        std::fill (this->begin(),this->end(),value);
-        return *this;
-    }
+    MatN<Dim, Type>&  fill(Type value);
     /*!
     * \param mode mode by default 0
     * \return opposite matrix
@@ -1651,32 +1225,14 @@ public:
     * opposite of the matrix  h(x)=max(f::F)-f(x) with max(f::F) is the maximum value of the range defined by the pixel/voxel type for mode =0,\n
     * or h(x)=max(f)-f(x) with max(f) is the maximum value of the field for mode =1
     */
-    MatN<Dim, Type>  opposite(int mode=0)const
-    {
-        MatN<Dim, Type> temp;
-        Type maxi;
-        if(mode==0)
-            maxi=NumericLimits<Type>::maximumRange();
-        else{
-            FunctorF::FunctorAccumulatorMax<Type > func;
-            func = std::for_each (this->begin(), this->end(), func);
-            maxi=func.getValue();
-        }
-        temp=maxi-*this;
-        return temp;
-    }
-
+    MatN<Dim, Type>  opposite(int mode=0)const;
     /*!
     \param f input matrix
     \return boolean
     *
     * Equal operator true for all x in E f(x)=(*this)(x), false otherwise
     */
-    bool operator==(const MatN<Dim, Type>& f)const
-    {
-        FunctionAssert(f,*this,"In MatN::operator==");
-        return std::equal (f.begin(), f.end(), this->begin());
-    }
+    bool operator==(const MatN<Dim, Type>& f)const;
     /*!
     \fn bool operator!=(const MatN<Dim, Type>& f)const
     \param f input matrix
@@ -1684,11 +1240,7 @@ public:
     *
     * Difference operator true for at least on x in E f(x)!=(*this)(x), false otherwise
     */
-    bool operator!=(const MatN<Dim, Type>& f)const
-    {
-        FunctionAssert(f,*this,"In MatN::operator==");
-        return !std::equal (f.begin(), f.end(), this->begin());
-    }
+    bool operator!=(const MatN<Dim, Type>& f)const;
     /*!
     \fn MatN<Dim, Type>&  operator+=(const MatN<Dim, Type>& f)
     \param f input matrix
@@ -1696,48 +1248,28 @@ public:
     *
     * Addition assignment h(x)+=f(x)
     */
-    MatN<Dim, Type>&  operator+=(const MatN<Dim, Type>& f)
-    {
-
-        FunctionAssert(f,*this,"In MatN::operator+=");
-        FunctorF::FunctorAdditionF2<Type,Type,Type> op;
-        std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
-        return *this;
-    }
+    MatN<Dim, Type>&  operator+=(const MatN<Dim, Type>& f);
     /*!
     * \param f input matrix
     * \return object
     *
     *  Addition h(x)= (*this)(x)+f(x)
     */
-    MatN<Dim, Type>  operator+(const MatN<Dim, Type>& f)const{
-        MatN<Dim, Type> h(*this);
-        h +=f;
-        return h;
-    }
+    MatN<Dim, Type>  operator+(const MatN<Dim, Type>& f)const;
     /*!
     * \param value input value
     * \return object reference
     *
     * Addition assignment h(x)+=value
     */
-    MatN<Dim, Type>& operator+=(Type value)
-    {
-        FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorAdditionF2<Type,Type,Type> > op(value);
-        std::transform (this->begin(), this->end(), this->begin(),  op);
-        return *this;
-    }
+    MatN<Dim, Type>& operator+=(Type value);
     /*!
     \param value input value
     \return object
     *
     * Addition h(x)= (*this)(x)+value
     */
-    MatN<Dim, Type>  operator+(Type value)const{
-        MatN<Dim, Type> h(*this);
-        h +=value;
-        return h;
-    }
+    MatN<Dim, Type>  operator+(Type value)const;
     /*!
     \fn MatN<Dim, Type>&  operator-=(const MatN<Dim, Type>& f)
     \param f input matrix
@@ -1745,60 +1277,34 @@ public:
     *
     * Subtraction assignment h(x)-=f(x)
     */
-    MatN<Dim, Type>&  operator-=(const MatN<Dim, Type>& f)
-    {
-
-        FunctionAssert(f,*this,"In MatN::operator-=");
-        FunctorF::FunctorSubtractionF2<Type,Type,Type> op;
-        std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
-        return *this;
-    }
+    MatN<Dim, Type>&  operator-=(const MatN<Dim, Type>& f);
     /*!
     \param value input value
     \return object reference
     *
     * Subtraction assignment h(x)-=value
     */
-    MatN<Dim, Type>&  operator-=(Type value)
-    {
-        FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorSubtractionF2<Type,Type,Type> > op(value);
-        std::transform (this->begin(), this->end(), this->begin(),  op);
-        return *this;
-    }
-
+    MatN<Dim, Type>&  operator-=(Type value);
     /*!
     * \param f input matrix
     * \return output matrix
     *
     *  Subtraction h(x)= (*this)(x)-f(x)
     */
-    MatN<Dim, Type>  operator-(const MatN<Dim, Type>& f)const{
-        MatN<Dim, Type> h(*this);
-        h -=f;
-        return h;
-    }
-
+    MatN<Dim, Type>  operator-(const MatN<Dim, Type>& f)const;
     /*!
     * \return output matrix
     *
     *  opposite   h(x)= -this(x)
     */
-    MatN<Dim, Type>  operator-()const{
-        MatN<Dim, Type> h(this->getDomain(),Type(0));
-        h -=*this;
-        return h;
-    }
+    MatN<Dim, Type>  operator-()const;
     /*!
     * \param value input value
     * \return output matrix
     *
     * Subtraction h(x)= (*this)(x)-value
     */
-    MatN<Dim, Type>  operator-(Type value)const{
-        MatN<Dim, Type> h(*this);
-        h -=value;
-        return h;
-    }
+    MatN<Dim, Type>  operator-(Type value)const;
 
     /*!
     * \param m  other matrix
@@ -1820,144 +1326,69 @@ public:
     *  \endcode
     *
     */
-    MatN  operator*(const MatN &m)const
-    {
-        POP_DbgAssertMessage(DIM==2&&this->sizeJ()==m.sizeI() ,"In Matrix::operator*, Not compatible size for the operator * of the class Matrix (A_{n,k}*B_{k,p})");
-        MatN mtrans = m.transpose();
-        MatN mout(this->sizeI(),m.sizeJ());
-        Type sum = 0;
-        for(unsigned int i=0;i<this->sizeI();i++){
-            for(unsigned int j=0;j<m.sizeJ();j++){
-                sum = 0;
-                typename MatN::const_iterator this_it  = this->begin() +  i*this->sizeJ();
-                typename MatN::const_iterator mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
-                for(unsigned int k=0;k<this->sizeJ();k++){
-                    sum+=(* this_it) * (* mtrans_it);
-                    this_it++;
-                    mtrans_it++;
-                }
-                mout(i,j)=sum;
-            }
-
-        }
-        return mout;
-
-
-    }
+    MatN  operator*(const MatN &m)const;
     /*!
     * \param m  other matrix
     * \return output matrix
     *
     *  matrix multiplication see http://en.wikipedia.org/wiki/Matrix_multiplication
     */
-    MatN & operator*=(const MatN &m)
-    {
-        *this = this->operator *(m);
-        return *this;
-    }
+    MatN & operator*=(const MatN &m);
     /*!
     \param v  vector
     \return output vector
     *
     *  matrix vector  multiplication
     */
-    Vec<Type>  operator*(const Vec<Type> & v)const{
-        POP_DbgAssertMessage(DIM==2&&this->sizeJ()==v.size() ,"In Matrix::operator*, Not compatible size for the operator *=(Vec) of the class Matrix (A_{n,k}*v_{k})");
-        Vec<Type> temp(this->sizeI());
-        for(unsigned int i=0;i<this->sizeI();i++){
-            Type sum = 0;
-            typename MatN::const_iterator this_it  = this->begin() +  i*this->sizeJ();
-            typename Vec<Type>::const_iterator mtrans_it= v.begin();
-            for(;mtrans_it!=v.end();this_it++,mtrans_it++){
-                sum+=(* this_it) * (* mtrans_it);
-            }
-            temp(i)=sum;
-        }
-        return temp;
-    }
-
+    Vec<Type>  operator*(const Vec<Type> & v)const;
     /*!
     \param f  matrix
     \return output matrix
     *
     *  multTermByTerm h(x)= (*this)(x)*f(x) (to avoid the the confusion with the matrix multiplication, we use this signature)
     */
-    MatN  multTermByTerm(const MatN& f)const{
-        FunctionAssert(f,*this,"In MatN::operator*=");
-        FunctorF::FunctorMultiplicationF2<Type,Type,Type> op;
-        MatN out(*this);
-        std::transform (out.begin(), out.end(), f.begin(),out.begin(),  op);
-        return out;
-    }
+    MatN  multTermByTerm(const MatN& f)const;
     /*!
     \param value input value
     \return object reference
     *
     * Multiplication assignment h(x)*=value
     */
-    MatN<Dim, Type>&  operator*=(Type  value)
-    {
-        FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorMultiplicationF2<Type,Type,Type> > op(value);
-        std::transform (this->begin(), this->end(), this->begin(),  op);
-        return *this;
-    }
-
+    MatN<Dim, Type>&  operator*=(Type  value);
     /*!
     \param value input value
     \return object
     *
     * Multiplication h(x)= (*this)(x)*value
     */
-    MatN<Dim, Type>  operator*(Type value)const{
-        MatN<Dim, Type> h(*this);
-        h *=value;
-        return h;
-    }
+    MatN<Dim, Type>  operator*(Type value)const;
     /*!
     \param f  matrix
     \return output matrix
     *
     *  division term by term h(x)= (*this)(x)/f(x) (to avoid the the confusion with the matrix division, we use this signature)
     */
-    MatN<Dim, Type>  divTermByTerm(const MatN& f){
-        FunctionAssert(f,*this,"In MatN::divTermByTerm");
-        FunctorF::FunctorDivisionF2<Type,Type,Type> op;
-        std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
-        return *this;
-    }
-
+    MatN<Dim, Type>  divTermByTerm(const MatN& f);
     /*!
     \param value input value
     \return object reference
     *
     * Division assignment h(x)/=value
     */
-    MatN<Dim, Type>&  operator/=(Type value)
-    {
-        FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorDivisionF2<Type,Type,Type> > op(value);
-        std::transform (this->begin(), this->end(), this->begin(),  op);
-        return *this;
-    }
+    MatN<Dim, Type>&  operator/=(Type value);
     /*!
     \param value input value
     \return object
     *
     * Division h(x)= (*this)(x)/value
     */
-
-    MatN<Dim, Type>  operator/(Type value)const{
-        MatN<Dim, Type> h(*this);
-        h /=value;
-        return h;
-    }
+    MatN<Dim, Type>  operator/(Type value)const;
     //@}
-
     //-------------------------------------
     //
     //! \name Linear algebra facilities
     //@{
     //-------------------------------------
-
     /*!
     * \param i  row entry
     *
@@ -1986,7 +1417,6 @@ public:
     * \sa Vec
     */
     Vec<F> getCol(unsigned int j)const;
-
     /*!
     * \param i  row entry
     * \param v  std::vector
@@ -1995,7 +1425,6 @@ public:
     * \sa Vec
     */
     void setRow(unsigned int i,const Vec<F>& v);
-
     /*!
     * \param j  column entry
     * \param v  std::vector
@@ -2004,7 +1433,6 @@ public:
     * \sa Vec
     */
     void setCol(unsigned int j,const Vec<F>& v);
-
     /*!
     * \param i_0  row entry
     * \param i_1  row entry
@@ -2012,7 +1440,6 @@ public:
     * swap the rows
     */
     void swapRow(unsigned int i_0,unsigned int i_1);
-
     /*!
     * \param j_0  column entry
     * \param j_1  column entry
@@ -2020,8 +1447,6 @@ public:
     * swap the columns
     */
     void swapCol(unsigned int j_0,unsigned int j_1);
-
-
     /*!
     * \param i  row entry
     * \param j  column entry
@@ -2037,16 +1462,12 @@ public:
     * \sa minorDet(int i, int j)const
     */
     F cofactor(unsigned int i,unsigned int j)const;
-
-
-
     /*!
     *
     * the matrix of cofactors  is the matrix whose (i,j) entry is the cofactor C_{i,j} of A
     * \sa cofactor(int i, int j)const
     */
     MatN cofactor()const;
-
     /*!
     *
     * the ith row, jth column element of transpose matrix is the jth row, ith column element of matrix:
@@ -2181,6 +1602,698 @@ typedef MatN<3,RGBF64> Mat3RGBF64;
 typedef MatN<3,ComplexF64> Mat3ComplexF64;
 typedef MatN<3,VecN<3,F64> >  Mat3Vec3F64;
 
+
+
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN()
+{
+    _domain=0;
+}
+
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const VecN<Dim,int>& domain,Type v)
+    :std::vector<Type>(domain.multCoordinate(),Type(v)),_domain(domain)
+{
+}
+
+
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(unsigned int sizei,unsigned int sizej)
+    :std::vector<Type>(sizei*sizej,Type(0))
+{
+    POP_DbgAssertMessage(Dim==2,"In MatN::MatN(int i, int j), your matrix must be 2D");
+    _domain(0)=sizei;_domain(1)=sizej;
+}
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
+    :std::vector<Type>(sizei*sizej*sizek,Type(0))
+{
+    POP_DbgAssertMessage(Dim==3,"In MatN::MatN(int sizei, int sizej,int sizek), your matrix must be 3D");
+    _domain(0)=sizei;_domain(1)=sizej;_domain(2)=sizek;
+}
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data )
+    :std::vector<Type>(data),_domain(x)
+{
+    POP_DbgAssertMessage((int)data.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data ), the size of input std::vector data must be equal to the number of pixel/voxel");
+}
+
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const VecN<Dim,int> & x,const Type* v_value )
+    :std::vector<Type>(x.multCoordinate(),Type()),_domain(x)
+{
+    std::copy(v_value,v_value + _domain.multCoordinate(),this->begin());
+}
+
+template<int Dim, typename Type>
+template<typename T1>
+MatN<Dim,Type>::MatN(const MatN<Dim, T1> & img )
+    :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+{
+    std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,T1>::Range);
+}
+
+
+#ifndef HAVE_SWIG
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const MatN<Dim,Type> & img )
+    :std::vector<Type>(img),_domain(img.getDomain())
+{
+}
+#endif
+
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const char * filepath )
+{
+    if(filepath!=0)
+        load(filepath);
+}
+template<int Dim, typename Type>
+MatN<Dim,Type>::MatN(const MatN<Dim,Type> & img, const VecN<Dim,int>& xmin, const VecN<Dim,int> & xmax  )
+{
+    POP_DbgAssertMessage(xmin.allSuperiorEqual(0),"xmin must be superior or equal to 0");
+    POP_DbgAssertMessage(xmax.allSuperior(xmin),"xmax must be superior to xmin");
+    POP_DbgAssertMessage(xmax.allInferior(img.getDomain()+1),"xmax must be superior or equal to xmin");
+    _domain = xmax-xmin;
+    std::vector<Type>::resize(_domain.multCoordinate(),0);
+    if(  DIM==2 ){
+        if(_domain(1)==img.getDomain()(1)){
+            if(_domain(0)==img.getDomain()(0))
+                std::copy(img.begin(),img.end(),this->begin());
+            else
+                std::copy(img.begin()+ xmin(0)*img._domain(1),img.begin()+xmax(0)*img._domain(1),this->begin());
+        }else{
+
+            typename std::vector<Type>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
+            typename std::vector<Type>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
+            typename std::vector<Type>::iterator it = this->begin();
+            for( int i=xmin(0);i<xmax(0);i++){
+                std::copy(itb,ite,it);
+                itb+=img._domain(1);
+                ite+=img._domain(1);
+                it+=this->_domain(1);
+            }
+        }
+    }
+    else if(DIM==3){
+
+        if(_domain(1)==img.getDomain()(1)){
+            if(_domain(0)==img.getDomain()(0))
+                std::copy(img.begin()+xmin(2)*img._domain(1)*img._domain(0),img.begin()+xmax(2)*img._domain(1)*img._domain(0),this->begin());
+            else{
+                int intra_slice_add                = img._domain(1)*img._domain(0);
+                int intra_slice_add_this           = this->_domain(1)*this->_domain(0);
+                typename std::vector<Type>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename std::vector<Type>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename std::vector<Type>::iterator it        = this->begin();
+
+                for( int k=xmin(2);k<xmax(2);k++){
+                    std::copy(itb,ite,it);
+                    itb+=intra_slice_add;
+                    ite+=intra_slice_add;
+                    it +=intra_slice_add_this;
+                }
+            }
+        }else{
+
+            unsigned int indexmini = xmin(0);
+            unsigned int indexmaxi = xmax(0);
+            int intra_slice_add      = img._domain(1)*img._domain(0);
+            int intra_slice_add_this = this->_domain(1)*this->_domain(0);
+            typename std::vector<Type>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename std::vector<Type>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename std::vector<Type>::iterator it        = this->begin();
+            unsigned int indexmin = xmin(2);
+            unsigned int indexmax = xmax(2);
+            for(unsigned int i=indexmin;i<indexmax;i++){
+                typename std::vector<Type>::const_iterator itbb = itb;
+                typename std::vector<Type>::const_iterator itee = ite;
+                typename std::vector<Type>::iterator itt =it;
+                for(unsigned int j=indexmini;j<indexmaxi;j++){
+                    std::copy(itbb ,itee,itt);
+                    itbb+=img._domain(1);
+                    itee+=img._domain(1);
+                    itt+=this->_domain(1);
+                }
+                itb+=intra_slice_add;
+                ite+=intra_slice_add;
+                it +=intra_slice_add_this;
+            }
+        }
+    }
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::Domain  MatN<Dim,Type>::getDomain()
+const
+{
+    return _domain;
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::sizeI()const{
+    return this->getDomain()[0];
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::rows()const{
+    return this->getDomain()[0];
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::sizeJ()const{
+    return this->getDomain()[1];
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::columns()const{
+    return this->getDomain()[1];
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::sizeK()const{
+    POP_DbgAssert(Dim==3);
+    return this->getDomain()[2];
+}
+template<int Dim, typename Type>
+unsigned int MatN<Dim,Type>::depth()const{
+    POP_DbgAssert(Dim==3);
+    return this->getDomain()[2];
+}
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::isValid(const E & x)const{
+    if(x.allSuperiorEqual(E(0)) && x.allInferior(this->getDomain()))
+        return true;
+    else
+        return false;
+}
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::isValid(int i,int j)const{
+    if(i>=0&&j>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ()))
+        return true;
+    else
+        return false;
+}
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::isValid(int i,int j,int k)const{
+    if(i>=0&&j>=0&&k>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ())&&k<static_cast<int>(sizeK()))
+        return true;
+    else
+        return false;
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resize(unsigned int sizei,unsigned int sizej){
+    _domain(0)=sizei;
+    _domain(1)=sizej;
+    std::vector<Type>::resize(_domain(0)*_domain(1));
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resize(unsigned int sizei,unsigned int sizej,unsigned int sizek){
+    _domain(0)=sizei;
+    _domain(1)=sizej;
+    _domain(2)=sizek;
+    std::vector<Type>::resize(_domain(0)*_domain(1)*_domain(2));
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resize(const VecN<Dim,int> & d){
+    _domain=d;
+    std::vector<Type>::resize(_domain.multCoordinate());
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resizeInformation(unsigned int sizei,unsigned int sizej){
+
+    Domain d;
+    d(0)=sizei;
+    d(1)=sizej;
+    resizeInformation(d);
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resizeInformation(unsigned int sizei,unsigned int sizej,unsigned int sizek){
+    Domain d;
+    d(0)=sizei;
+    d(1)=sizej;
+    d(2)=sizek;
+    resizeInformation(d);
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::resizeInformation(const VecN<Dim,int>& d){
+    MatN<Dim,Type> temp(*this);
+    _domain=d;
+    std::vector<Type>::resize(_domain.multCoordinate());
+
+    IteratorEDomain it(this->getIteratorEDomain());
+    while(it.next()){
+        if(temp.isValid(it.x())){
+            this->operator ()(it.x())=temp(it.x());
+        }else{
+            this->operator ()(it.x())=0;
+        }
+    }
+}
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::isEmpty()const{
+    if(_domain.multCoordinate()==0)
+        return true;
+    else
+        return false;
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::clear(){
+    _domain=0;
+    std::vector<Type>::clear();
+}
+
+template<int Dim, typename Type>
+Type & MatN<Dim,Type>::operator ()(const VecN<Dim,int> & x)
+{
+    POP_DbgAssert( x.allSuperiorEqual( E(0))&&x.allInferior(getDomain()));
+    return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
+}
+
+template<int Dim, typename Type>
+const Type & MatN<Dim,Type>::operator ()( const VecN<Dim,int>& x)
+const
+{
+    POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(getDomain()));
+    return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
+}
+template<int Dim, typename Type>
+Type & MatN<Dim,Type>::operator ()(unsigned int i,unsigned int j)
+{
+    POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
+    return  this->operator[](j+i*_domain(1));
+}
+template<int Dim, typename Type>
+const Type & MatN<Dim,Type>::operator ()(unsigned int i,unsigned int j)const
+{
+    POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
+    return  this->operator[](j+i*_domain(1));
+}
+template<int Dim, typename Type>
+Type & MatN<Dim,Type>::operator ()(unsigned int i,unsigned int j,unsigned int k)
+{
+    POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
+    return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
+}
+
+template<int Dim, typename Type>
+const Type & MatN<Dim,Type>::operator ()(unsigned int i,unsigned int j,unsigned int k)const
+{
+    POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
+    return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
+}
+
+template<int Dim, typename Type>
+MatN<Dim,Type> MatN<Dim,Type>::operator()(const VecN<Dim,int> & xmin, const VecN<Dim,int> & xmax) const{
+    return MatN(*this,xmin,xmax);
+}
+template<int Dim, typename Type>
+Type & MatN<Dim,Type>::operator ()(unsigned int index)
+{
+    POP_DbgAssert( index<this->size());
+    return this->operator[](index);
+}
+template<int Dim, typename Type>
+Type MatN<Dim,Type>::interpolationBilinear(const VecN<DIM,F64> xf)const
+{
+    if(DIM==2){
+        Vec2F64 x;
+        x(0)=xf(0)+EPSILON;
+        x(1)=xf(1)+EPSILON;
+        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
+        double sum=0;
+        Vec2I32 x1;
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        if(this->isValid(x1(0),x1(1))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
+            value+=this->operator ()(x1(0),x1(1))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::ceil(x(0));
+        if(this->isValid(x1(0),x1(1))){
+            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
+            value+=this->operator ()(x1(0),x1(1))*norm;
+            sum+= norm;
+        }
+        x1(1)=std::ceil(x(1));
+        if(this->isValid(x1(0),x1(1))){
+            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
+            value+=this->operator ()(x1(0),x1(1))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::floor(x(0));
+        if(this->isValid(x1(0),x1(1))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
+            value+=this->operator ()(x1(0),x1(1))*norm;
+            sum+= norm;
+        }
+        if(sum==0)
+            return 0;
+        else if(NumericLimits<Type>::is_integer==true)
+            return round(value/sum);
+        else
+            return value/sum;
+    }else if(DIM==3){
+        Vec3F64 x;
+        x(0)=xf(0)+EPSILON;
+        x(1)=xf(1)+EPSILON;
+        x(2)=xf(2)+EPSILON;
+        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
+        double sum=0;
+        Vec3I32 x1;
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        x1(2)=std::floor(x(2));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::ceil(x(0));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(1)=std::ceil(x(1));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::floor(x(0));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        x1(2)=std::ceil(x(2));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::ceil(x(0));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(1)=std::ceil(x(1));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        x1(0)=std::floor(x(0));
+        if(this->isValid(x1(0),x1(1),x(2))){
+            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+            sum+= norm;
+        }
+        if(sum==0)
+            return 0;
+        else if(NumericLimits<Type>::is_integer==true)
+            return round(value/sum);
+        else
+            return value/sum;
+    }
+    return 0;
+}
+template<int Dim, typename Type>
+Type *  MatN<Dim,Type>::data()
+{
+    return &(*this->begin());
+}
+template<int Dim, typename Type>
+const Type *  MatN<Dim,Type>::data()
+const
+{
+    return &(*this->begin());
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::load(const std::string file) throw(pexception){
+    this->load(file.c_str());
+}
+template<int Dim, typename Type>
+void MatN<Dim,Type>::save(const std::string file)const throw(pexception){
+    save(file.c_str());
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorEDomain MatN<Dim,Type>::getIteratorEDomain()const
+{
+    return IteratorEDomain(getDomain());
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorEROI MatN<Dim,Type>::getIteratorEROI()const
+{
+    return IteratorEROI(*this);
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(F64 radius ,F64 norm )const
+{
+    return IteratorENeighborhood(getDomain(),radius , norm);
+}
+template<int Dim, typename Type>
+template<typename Type1>
+typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(const MatN<Dim,Type1> & structural_element,int dilate )const
+{
+    Vec<E> _tab;
+    typename MatN<Dim,Type1>::IteratorEDomain it(structural_element.getDomain());
+    typename MatN<Dim,Type1>::E center = VecN<Dim,F64>(structural_element.getDomain()-1)*0.5;
+    while(it.next()){
+        if(normValue(structural_element(it.x()))!=0){
+            _tab.push_back(it.x()-center);
+        }
+    }
+    if(dilate<=1)
+        return IteratorENeighborhood(std::make_pair(getDomain(),_tab));
+    else{
+        IteratorENeighborhood itinit(std::make_pair(getDomain(),_tab));
+        IteratorENeighborhood ititerative(std::make_pair(getDomain(),_tab));
+        for(int i =1;i<dilate;i++){
+            ititerative.dilate(itinit);
+        }
+        return IteratorENeighborhood(ititerative.getDomain());
+    }
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorEOrder MatN<Dim,Type>::getIteratorEOrder(int coordinatelastloop,int direction)const
+{
+    return IteratorEOrder(getDomain(),coordinatelastloop,direction);
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorERectangle MatN<Dim,Type>::getIteratorERectangle(const E & xmin,const E & xmax )const
+{
+    return IteratorERectangle(std::make_pair(xmin,xmax));
+}
+template<int Dim, typename Type>
+typename MatN<Dim,Type>::IteratorENeighborhoodAmoebas MatN<Dim,Type>::getIteratorENeighborhoodAmoebas(F64 distance_max,double lambda_param )const
+{
+    return IteratorENeighborhoodAmoebas(*this,distance_max,lambda_param );
+}
+
+template<int Dim, typename Type>
+template<class T1>
+MatN<Dim,Type> & MatN<Dim,Type>::operator =(const MatN<Dim, T1> & img ){
+    this->resize(img.getDomain());
+    std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,T1>::Range);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim,Type> & MatN<Dim,Type>::operator =(const MatN<Dim,Type> & img ){
+    this->resize(img.getDomain());
+    std::copy(img.begin(),img.end(),this->begin());
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator=(Type value)
+{
+    std::fill (this->begin(),this->end(),value);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::fill(Type value)
+{
+    std::fill (this->begin(),this->end(),value);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::opposite(int mode)const
+{
+    MatN<Dim, Type> temp;
+    Type maxi;
+    if(mode==0)
+        maxi=NumericLimits<Type>::maximumRange();
+    else{
+        FunctorF::FunctorAccumulatorMax<Type > func;
+        func = std::for_each (this->begin(), this->end(), func);
+        maxi=func.getValue();
+    }
+    temp=maxi-*this;
+    return temp;
+}
+
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::operator==(const MatN<Dim, Type>& f)const
+{
+    FunctionAssert(f,*this,"In MatN::operator==");
+    return std::equal (f.begin(), f.end(), this->begin());
+}
+template<int Dim, typename Type>
+bool MatN<Dim,Type>::operator!=(const MatN<Dim, Type>& f)const
+{
+    FunctionAssert(f,*this,"In MatN::operator==");
+    return !std::equal (f.begin(), f.end(), this->begin());
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator+=(const MatN<Dim, Type>& f)
+{
+
+    FunctionAssert(f,*this,"In MatN::operator+=");
+    FunctorF::FunctorAdditionF2<Type,Type,Type> op;
+    std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator+(const MatN<Dim, Type>& f)const{
+    MatN<Dim, Type> h(*this);
+    h +=f;
+    return h;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>& MatN<Dim,Type>::operator+=(Type value)
+{
+    FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorAdditionF2<Type,Type,Type> > op(value);
+    std::transform (this->begin(), this->end(), this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator+(Type value)const{
+    MatN<Dim, Type> h(*this);
+    h +=value;
+    return h;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator-=(const MatN<Dim, Type>& f)
+{
+    FunctionAssert(f,*this,"In MatN::operator-=");
+    FunctorF::FunctorSubtractionF2<Type,Type,Type> op;
+    std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator-=(Type value)
+{
+    FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorSubtractionF2<Type,Type,Type> > op(value);
+    std::transform (this->begin(), this->end(), this->begin(),  op);
+    return *this;
+}
+
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator-(const MatN<Dim, Type>& f)const{
+    MatN<Dim, Type> h(*this);
+    h -=f;
+    return h;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator-()const{
+    MatN<Dim, Type> h(this->getDomain(),Type(0));
+    h -=*this;
+    return h;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator-(Type value)const{
+    MatN<Dim, Type> h(*this);
+    h -=value;
+    return h;
+}
+
+template<int Dim, typename Type>
+MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
+{
+    POP_DbgAssertMessage(DIM==2&&this->sizeJ()==m.sizeI() ,"In Matrix::operator*, Not compatible size for the operator * of the class Matrix (A_{n,k}*B_{k,p})");
+    MatN<Dim,Type> mtrans = m.transpose();
+    MatN<Dim,Type> mout(this->sizeI(),m.sizeJ());
+    Type sum = 0;
+    for(unsigned int i=0;i<this->sizeI();i++){
+        for(unsigned int j=0;j<m.sizeJ();j++){
+            sum = 0;
+            typename MatN::const_iterator this_it  = this->begin() +  i*this->sizeJ();
+            typename MatN::const_iterator mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
+            for(unsigned int k=0;k<this->sizeJ();k++){
+                sum+=(* this_it) * (* mtrans_it);
+                this_it++;
+                mtrans_it++;
+            }
+            mout(i,j)=sum;
+        }
+
+    }
+    return mout;
+
+
+}
+template<int Dim, typename Type>
+MatN<Dim,Type> & MatN<Dim,Type>::operator*=(const MatN<Dim,Type> &m)
+{
+    *this = this->operator *(m);
+    return *this;
+}
+template<int Dim, typename Type>
+Vec<Type>  MatN<Dim,Type>::operator*(const Vec<Type> & v)const{
+    POP_DbgAssertMessage(DIM==2&&this->sizeJ()==v.size() ,"In Matrix::operator*, Not compatible size for the operator *=(Vec) of the class Matrix (A_{n,k}*v_{k})");
+    Vec<Type> temp(this->sizeI());
+    for(unsigned int i=0;i<this->sizeI();i++){
+        Type sum = 0;
+        typename MatN::const_iterator this_it  = this->begin() +  i*this->sizeJ();
+        typename Vec<Type>::const_iterator mtrans_it= v.begin();
+        for(;mtrans_it!=v.end();this_it++,mtrans_it++){
+            sum+=(* this_it) * (* mtrans_it);
+        }
+        temp(i)=sum;
+    }
+    return temp;
+}
+
+template<int Dim, typename Type>
+MatN<Dim,Type>  MatN<Dim,Type>::multTermByTerm(const MatN& f)const{
+    FunctionAssert(f,*this,"In MatN::operator*=");
+    FunctorF::FunctorMultiplicationF2<Type,Type,Type> op;
+    MatN<Dim,Type> out(*this);
+    std::transform (out.begin(), out.end(), f.begin(),out.begin(),  op);
+    return out;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator*=(Type  value)
+{
+    FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorMultiplicationF2<Type,Type,Type> > op(value);
+    std::transform (this->begin(), this->end(), this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator*(Type value)const{
+    MatN<Dim, Type> h(*this);
+    h *=value;
+    return h;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::divTermByTerm(const MatN& f){
+    FunctionAssert(f,*this,"In MatN::divTermByTerm");
+    FunctorF::FunctorDivisionF2<Type,Type,Type> op;
+    std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>&  MatN<Dim,Type>::operator/=(Type value)
+{
+    FunctorF::FunctorArithmeticConstantValueAfter<Type,Type,Type,FunctorF::FunctorDivisionF2<Type,Type,Type> > op(value);
+    std::transform (this->begin(), this->end(), this->begin(),  op);
+    return *this;
+}
+template<int Dim, typename Type>
+MatN<Dim, Type>  MatN<Dim,Type>::operator/(Type value)const{
+    MatN<Dim, Type> h(*this);
+    h /=value;
+    return h;
+}
 
 
 
@@ -2785,6 +2898,71 @@ pop::MatN<2,T1>  productTensoriel(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
         for(unsigned int j=0;j<v1.size();j++)
             m(i,j)=productInner(v1(i),v2(j));
     return m;
+}
+
+
+
+
+
+template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
+void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<2,Type1>::IteratorEDomain ){
+    int i,j;
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,it_local)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                it_local.init(Vec2I32(i,j));
+                h(i,j)=forEachFunctorAccumulator(f,facc,it_local);
+            }
+        }
+    }
+}
+template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
+void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<3,Type1>::IteratorEDomain ){
+    int i,j,k;
+#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,it_local)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                for(k=0;k<f.sizeK();k++){
+                    it_local.init(Vec3I32(i,j,k));
+                    h(i,j,k)=forEachFunctorAccumulator(f,facc,it_local);
+                }
+            }
+        }
+    }
+}
+template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
+void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
+{
+    int i,j;
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
+            }
+        }
+    }
+}
+template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
+void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
+{
+    int i,j,k;
+#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<f.sizeI();i++){
+            for(j=0;j<f.sizeJ();j++){
+                for(k=0;k<f.sizeK();k++){
+                    h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
+                }
+            }
+        }
+    }
 }
 
 

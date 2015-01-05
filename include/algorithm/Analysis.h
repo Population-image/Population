@@ -41,7 +41,7 @@ in the Software.
 #include"data/distribution/DistributionAnalytic.h"
 #include"data/typeF/TypeTraitsF.h"
 #include"data/functor/FunctorF.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"data/mat/MatN.h"
 #include"data/utility/CollectorExecutionInformation.h"
 #include"algorithm/ProcessingAdvanced.h"
@@ -1237,11 +1237,8 @@ struct POP_EXPORTS Analysis
         FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
         MatN<DIM,UI8> bin2(bin.getDomain());
         fgranulo.resize(bin.getDomain());
-        typename MatN<DIM,UI8>::IteratorEDomain it_total(bin2.getIteratorEDomain());
-        FunctionProcedureFunctorUnaryF(bin,func,it_total,bin2);
-        it_total.init();
 
-
+        forEachFunctorUnaryF(bin,bin2,func);
         int size = bin2.getDomain().multCoordinate();
         Mat2F64 marea = Analysis::area(bin2);
         int area = size - marea(0,1);
@@ -1250,7 +1247,7 @@ struct POP_EXPORTS Analysis
         m(0,1) = area;
         m(0,2) = 0;
         int radius =1;
-
+        typename MatN<DIM,UI8>::IteratorEDomain it_total(bin2.getIteratorEDomain());
         MatN<DIM,UI8> opening(bin2.getDomain());
         while(area!=0){
 
@@ -1379,7 +1376,7 @@ struct POP_EXPORTS Analysis
             CollectorExecutionInformationSingleton::getInstance()->progression(radius,"Size of the structural element");
             it.init();
             FunctorF::FunctorThreshold<UI8,UI8,UI8> func(radius+1,NumericLimits<UI8>::maximumRange());
-            FunctionProcedureFunctorUnaryF(distance,func,it,erosion);
+            forEachFunctorUnaryF(distance,erosion,func);
 
             if(zero==erosion)
                 isempty = true;

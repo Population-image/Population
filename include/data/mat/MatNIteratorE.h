@@ -606,10 +606,5 @@ public:
         return _tab[_index];
     }
 };
-
-
-
-
-
 }
 #endif // FUNCTIONMatNITERATORE_HPP

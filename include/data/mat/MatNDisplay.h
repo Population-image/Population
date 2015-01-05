@@ -380,7 +380,8 @@ template<int Dim, typename Type>
 void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automaticresize)const throw(pexception){
 
     MatN<Dim,Type>  img(*this);
-    VecN<Dim,pop::F64> scale(1,1,1);
+    VecN<DIM,pop::F64> scale;
+    scale =1;
     if(automaticresize ==true&&Dim==2){
         scale = scale*(600./img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale,0);
@@ -436,9 +437,9 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
             if(main_disp.is_keyARROWUP())
                 index++;
             Vec3I32 xx(main_disp.mouse_y(),main_disp.mouse_x(),index);
-            t = "i="+BasicUtility::Any2String((int)(xx(0)/scale(0)))+
-                    ", j="+BasicUtility::Any2String((int)(xx(1)/scale(1)))+
-                    ", k="+BasicUtility::Any2String((int)(xx(2)/scale(2)));
+            t = "i="+BasicUtility::Any2String((int)(xx(0)))+
+                    ", j="+BasicUtility::Any2String((int)(xx(1)))+
+                    ", k="+BasicUtility::Any2String((int)(xx(2)));
             if(img.isValid(xx)){
                 t+=", f(i,j,k)="+Private::DisplayOutputPixel<Type>::print(img(xx));
             }

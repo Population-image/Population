@@ -8,8 +8,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/algorithm/Convertor.h \
            $${PWD}/include/algorithm/Draw.h \
            $${PWD}/include/algorithm/Feature.h \
-           $${PWD}/include/algorithm/FunctionProcedureFunctorF.h \
-           $${PWD}/include/algorithm/FunctionProcedureFunctorFOptimized.h \
+           $${PWD}/include/algorithm/ForEachFunctor.h \
            $${PWD}/include/algorithm/GeometricalTransformation.h \
            $${PWD}/include/algorithm/LinearAlgebra.h \
            $${PWD}/include/algorithm/PDE.h \
@@ -71,7 +70,6 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/mat/MatNBoundaryCondition.h \
            $${PWD}/include/data/mat/MatNDisplay.h \
            $${PWD}/include/data/mat/MatNInOut.h \
-           $${PWD}/include/data/mat/MatNInOutImpl.h \
            $${PWD}/include/data/mat/MatNIteratorE.h \
            $${PWD}/include/data/mat/MatNListType.h \
            $${PWD}/include/data/neuralnetwork/NeuralNetwork.h \

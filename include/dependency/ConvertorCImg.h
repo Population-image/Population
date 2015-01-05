@@ -39,7 +39,7 @@ in the Software.
 
 
 #include"data/mat/MatN.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"dependency/CImg.h"
 
 namespace pop
@@ -94,10 +94,10 @@ struct convertCImg<2,Result>
 
         FunctorF::FunctorAccumulatorMin<Result > funcmini;
         it.init();
-        typename TypeTraitsTypeScalar<Result>::Result min = normValue(FunctionProcedureFunctorAccumulatorF(img,funcmini,it));
+        typename TypeTraitsTypeScalar<Result>::Result min = normValue(forEachFunctorAccumulator(img,funcmini,it));
         FunctorF::FunctorAccumulatorMax<Result > funcmaxi;
         it.init();
-        typename TypeTraitsTypeScalar<Result>::Result max = normValue(FunctionProcedureFunctorAccumulatorF(img,funcmaxi,it));
+        typename TypeTraitsTypeScalar<Result>::Result max = normValue(forEachFunctorAccumulator(img,funcmaxi,it));
         for(int i =0;i<img.getDomain()[0];i++)
             for(int j =0;j<img.getDomain()[1];j++){
                 if(typeid(Result)==typeid(UI8))

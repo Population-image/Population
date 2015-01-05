@@ -249,7 +249,7 @@ struct POP_EXPORTS Processing
         \code
         Mat2UI8 img;//2d grey-level matrix object
         img.load("../image/iex.pgm");//replace this path by those on your computer
-        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+        img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
         Mat2UI8 threshold = Processing::thresholdKMeansVariation(img);//threshold segmentation
         Mat2RGBUI8 RGB = Visualization::labelForeground(threshold,img);//Visual validation
         RGB.display();
@@ -294,7 +294,7 @@ struct POP_EXPORTS Processing
         \code
         Mat2UI8 img;//2d grey-level matrix object
         img.load("../image/iex.png");//replace this path by those on your computer
-        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+        img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
         Mat2UI8 threshold = Processing::thresholdOtsuMethod(img);//threshold segmentation
         Mat2RGBUI8 RGB = Visualization::labelForeground(threshold,img);//Visual validation
         RGB.display();

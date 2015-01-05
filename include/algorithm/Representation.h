@@ -36,7 +36,7 @@ in the Software.
 #include"data/utility/Exception.h"
 #include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorF.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"algorithm/Visualization.h"
 #include"algorithm/GeometricalTransformation.h"
 namespace pop
@@ -207,10 +207,10 @@ struct POP_EXPORTS Representation
         }
         FunctorF::FunctorAccumulatorMin<F32 > funcmini;
         it.init();
-        F64 mini = FunctionProcedureFunctorAccumulatorF(imgf,funcmini,it);
+        F64 mini = forEachFunctorAccumulator(imgf,funcmini,it);
         FunctorF::FunctorAccumulatorMax<F64 > funcmaxi;
         it.init();
-        F64 maxi = FunctionProcedureFunctorAccumulatorF(imgf,funcmaxi,it);
+        F64 maxi = forEachFunctorAccumulator(imgf,funcmaxi,it);
         it.init();
         while(it.next())
             img(it.x()) = ((imgf(it.x())-mini)*255/(maxi-mini));

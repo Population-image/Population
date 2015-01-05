@@ -1,6 +1,6 @@
 #include"algorithm/LinearAlgebra.h"
 #include"data/functor/FunctorF.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 namespace pop{
 
 
@@ -129,7 +129,7 @@ VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,3,3> &A,EigenValueMethod method
         return eigenValue(Mat2F64(A),method,error);
     }
 }
-VecF64 LinearAlgebra::eigenValue(const Mat2F64 &m,EigenValueMethod ,F64 error)throw(pexception){
+VecF64 LinearAlgebra::eigenValue(const Mat2F64 &m,EigenValueMethod ,F64 )throw(pexception){
     Mat2F64 M_k(m);
     Mat2F64 Q_k;
     Mat2F64 R_k;

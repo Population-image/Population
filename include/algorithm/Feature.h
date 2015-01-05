@@ -77,8 +77,8 @@ public:
     * \code
     * Mat2UI8 img;
     * img.load("lena.jpg");
-    * Vec<KeyPoint<2> > v_harris = Feature::keyPointHarris(img,2,0.20);
-    * Feature::drawKeyPointsCircle(img3,v_harris,3).display();
+    * Vec<KeyPoint<2> > v_harris = Feature::keyPointHarris(img);
+    * Feature::drawKeyPointsCircle(img,v_harris,3).display();
     * \endcode
     * \image html lenaharris.jpg
     */
@@ -89,15 +89,13 @@ public:
         MatN<DIM,F64> imgf(img);
         imgf = Processing::greylevelRange(imgf,0,1);
         FunctorPDE::HessianMatrix<> func_hessian;
-        typename MatN<DIM,F64>::IteratorEDomain itdomain(imgf.getIteratorEDomain());
+
 
         MatN<DIM,Mat2x<F64,DIM,DIM> >  img_hessian(imgf.getDomain());
-        FunctionProcedureFunctorUnaryE(imgf, func_hessian, itdomain , img_hessian);
-
-
-        itdomain.init();
-
+        forEachFunctorBinaryFunctionE(imgf,img_hessian, func_hessian);
+        typename MatN<DIM,F64>::IteratorEDomain itdomain(imgf.getIteratorEDomain());
         img_hessian = FunctorMatN::convolutionGaussian(img_hessian,itdomain,sigma,2*sigma);
+
         itdomain.init();
         while(itdomain.next()){
             Mat2x22F64 & m=img_hessian(itdomain.x());

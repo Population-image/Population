@@ -34,7 +34,6 @@ in the Software.
 #ifndef PROCESSINGADVANCED_H
 #define PROCESSINGADVANCED_H
 
-
 #include"data/typeF/TypeTraitsF.h"
 #include"data/population/PopulationData.h"
 #include"data/distribution/DistributionFromDataStructure.h"
@@ -44,7 +43,7 @@ in the Software.
 #include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorPDE.h"
 #include"algorithm/Convertor.h"
-#include"algorithm/FunctionProcedureFunctorF.h"
+#include"algorithm/ForEachFunctor.h"
 #include"algorithm/AnalysisAdvanced.h"
 #include"algorithm/Statistics.h"
 namespace pop
@@ -340,10 +339,9 @@ struct ProcessingAdvanced
     static Function  fill(const Function & in,const typename Function::F & y,Iterator &it){
         Function out (in.getDomain());
         Private::FunctorConst<typename Function::F> func(y);
-        FunctionProcedureGenerator(func,it,out);
+        forEachFunctorGenerator(out,func,it);
         return out;
     }
-
 
 
     template<typename Function,typename Iterator>
@@ -351,7 +349,7 @@ struct ProcessingAdvanced
         Function out (in.getDomain());
 
         Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(d);
-        FunctionProcedureFunctorUnaryF(in,func,it,out);
+        forEachFunctorUnaryF(in,out,func,it);
         return out;
     }
     template<typename Function,typename Iterator>
@@ -359,7 +357,7 @@ struct ProcessingAdvanced
 
         typename FunctionTypeTraitsSubstituteF<Function,UI8>::Result out(in.getDomain());
         FunctorF::FunctorThreshold<unsigned char,typename Function::F,typename  Function::F> func(ymin,ymax);
-        FunctionProcedureFunctorUnaryF(in,func,it,out);
+        forEachFunctorUnaryF(in,out,func,it);
         return out;
     }
     template<typename Function,typename Iterator>
@@ -369,7 +367,7 @@ struct ProcessingAdvanced
         typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result FloatF;
         FunctorF::FunctorAccumulatorMean<typename Function::F> func;
         it.init();
-        FloatF mean = FunctionProcedureFunctorAccumulatorF(f,func,it);
+        FloatF mean = forEachFunctorAccumulator(f,func,it);
         it.init();
         while(it.next()){
             FloatF value(f(it.x()));
@@ -402,10 +400,10 @@ struct ProcessingAdvanced
     {
         Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
-        typename Function::F mini = FunctionProcedureFunctorAccumulatorF(f,funcmini,it);
+        typename Function::F mini = forEachFunctorAccumulator(f,funcmini,it);
         it.init();
         FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
-        typename Function::F maxi = FunctionProcedureFunctorAccumulatorF(f,funcmaxi,it);
+        typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
         typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result ratio;
         if(maxi!=mini)
             ratio= 1.0*(max-min)/(maxi-mini);
@@ -416,7 +414,7 @@ struct ProcessingAdvanced
         DistributionExpression dist(exp);
         Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(dist);
         it.init();
-        FunctionProcedureFunctorUnaryF(f,func,it,h);
+        forEachFunctorUnaryF(f,h,func,it);
         return h;
     }
     template<typename Function,typename Iterator>
@@ -424,17 +422,17 @@ struct ProcessingAdvanced
     {
         Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
-        typename Function::F mini = FunctionProcedureFunctorAccumulatorF(f,funcmini,it);
+        typename Function::F mini = forEachFunctorAccumulator(f,funcmini,it);
         it.init();
         FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
-        typename Function::F maxi = FunctionProcedureFunctorAccumulatorF(f,funcmaxi,it);
+        typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
         typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result ratio= 1.0*(max-min)/(maxi-mini);
 
         std::string exp =BasicUtility::Any2String(ratio)+"*(x-"+BasicUtility::Any2String(mini)+")+"+BasicUtility::Any2String(min);
         DistributionExpression dist(exp);
         Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(dist);
         it.init();
-        FunctionProcedureFunctorUnaryF(f,func,it,h);
+        forEachFunctorUnaryF(f,h,func,it);
         return h;
     }
 
@@ -549,7 +547,7 @@ struct ProcessingAdvanced
         exp.fromRegularExpression(str);
         Private::FunctorDistribution<typename Function::F,F64,false> func(exp);
         it.init();
-        FunctionProcedureFunctorUnaryF(fd,func,it,outcast);
+        forEachFunctorUnaryF(fd,outcast,func,it);
         return outcast;
     }
     template<typename Function,typename FunctionMask, typename Iterator>
@@ -586,7 +584,7 @@ struct ProcessingAdvanced
         Function h(f.getDomain());
         typedef FunctorF::FunctorAccumulatorMin<typename Function::F > FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
-        FunctionProcedureLocal(f,itglobal,itlocal,funcAccumulator, h);
+        forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
         CollectorExecutionInformationSingleton::getInstance()->endExecution("Erosion");
         return h;
     }
@@ -609,7 +607,7 @@ struct ProcessingAdvanced
         CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMax<typename Function::F > FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
-        FunctionProcedureLocal(f,itglobal,itlocal,funcAccumulator, h);
+        forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
         CollectorExecutionInformationSingleton::getInstance()->endExecution("Dilation");
         return h;
     }
@@ -681,7 +679,7 @@ struct ProcessingAdvanced
         CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMedian<typename Function::F> FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
-        FunctionProcedureLocal(f,itglobal,itlocal,funcAccumulator, h);
+        forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
         CollectorExecutionInformationSingleton::getInstance()->endExecution("Median");
         return h;
     }
@@ -706,7 +704,7 @@ struct ProcessingAdvanced
         CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMean<typename Function::F> FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
-        FunctionProcedureLocal(f,itglobal,itlocal,funcAccumulator, h);
+        forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
         CollectorExecutionInformationSingleton::getInstance()->endExecution("Mean");
         return h;
     }

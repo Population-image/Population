@@ -28,12 +28,8 @@ CONFIG += HAVE_QMAKE
 !include($${PWD}/population.pri)
 
 
-
-
-
-
-
 #### C++ compiler #####
+CONFIG += c++11
 #QMAKE_CXX = clang++
 
 

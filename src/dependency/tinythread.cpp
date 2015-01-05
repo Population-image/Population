@@ -305,11 +305,7 @@ thread::id this_thread::get_id()
 namespace pop {
 ParallelWorkers::ParallelWorkers(int nbr_thread)
 #if defined(HAVE_THREAD)
-<<<<<<< HEAD
     :_current_thread(0),_v_thread(nbr_thread)
-=======
-    :_current_thread(0), _v_thread(nbr_thread)
->>>>>>> 597dd620883746ab2e98dc6ea8a434c8416953bb
 #endif
 {
 #if defined(HAVE_THREAD)

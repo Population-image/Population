@@ -166,7 +166,7 @@ public:
         MatN<DIM,F_Float> fieldtimet(in),fieldtimet_deltat(in.getDomain());
         FunctorPDE::DiffusionMalikPerona diffusion(K);
         for(int i=0;i<Nstep;i++){
-            FunctorPDE::forEachDomain(fieldtimet, diffusion,  fieldtimet_deltat);
+            forEachFunctorBinaryFunctionE(fieldtimet, fieldtimet_deltat,diffusion);
             fieldtimet = fieldtimet_deltat;
         }
         return fieldtimet;

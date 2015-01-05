@@ -71,13 +71,6 @@ namespace pop
 class POP_EXPORTS FunctorPDE
 {
 public:
-    template<int DIM,typename TypePixel1,typename TypePixel2,typename FunctorPDE>
-    static void forEachDomain(const MatN<DIM,TypePixel1>& in,FunctorPDE func,MatN<DIM,TypePixel2>& out){
-        typename MatN<DIM,TypePixel1>::IteratorEDomain it = in.getIteratorEDomain();
-        FunctionProcedureFunctorUnaryE(in, func, it , out);
-    }
-
-
 
     /*!
      * \class pop::FunctorPDE
