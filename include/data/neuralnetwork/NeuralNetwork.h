@@ -808,8 +808,15 @@ struct POP_EXPORTS TrainingNeuralNetwork
     * - last layer is  a fully connected one with 10 neurons.
     *
     * We use the MNIST data set provided in this site  http://yann.lecun.com/exdb/mnist/. We use 90% of this data set to train the neural network and 10% to evaluate the error rate.
-   */
-    static  void neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard=0,double elastic_distortion=0);
+
+    * \code
+    *     TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(n,"/home/vincent/train-images.idx3-ubyte",
+                                                                           "/home/vincent/train-labels.idx1-ubyte",
+                                                                           "/home/vincent/t10k-images.idx3-ubyte",
+                                                                           "/home/vincent/t10k-labels.idx1-ubyte",1,5);
+    * \endcode
+    */
+    static  void neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard=1,double elastic_distortion=0);
 
 
 

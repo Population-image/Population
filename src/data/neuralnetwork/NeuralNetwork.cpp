@@ -1142,8 +1142,8 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
     Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
     Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
 
-    //    number_training.resize(2);
-    //    number_test.resize(2);
+//        number_training.resize(2);
+//        number_test.resize(2);
 
     if(lecun_or_simard==0){
         std::cout<<"LECUN"<<std::endl;

@@ -901,7 +901,7 @@ struct POP_EXPORTS Draw
             Draw::text(img,BasicUtility::Any2String(v),Vec2I32(img.getDomain()(0)-space/2-5,i-7),value);
         }
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(img.getDomain()(0)-space/2-2,img.getDomain()(1)-space-5),value);
-        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(img.getDomain()(0)-space/2-7,img.getDomain()(1)-space+5),value,0.9);
+        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(img.getDomain()(0)-space/2-7,img.getDomain()(1)-space+5),value);
 
         space=30;
 
@@ -924,7 +924,7 @@ struct POP_EXPORTS Draw
             Draw::text(img,BasicUtility::Any2String(v),Vec2I32(j-6,space-28),value,1);
         }
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,space-28),value,1);
-        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,space-18),value,0.9);
+        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,space-18),value,1);
     }
     template<int DIM,typename TypePixel>
     static void distribution( Distribution & d,double xmin,double xmax,double ymin,double ymax,typename MatN<DIM,TypePixel>::F value,MatN<DIM,TypePixel> &img)

@@ -304,42 +304,6 @@ std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getConnectedVertex(int v
     return v_vertex;
 }
 
-namespace  Private {
-struct GraphOperation
-{
-
-    //g1 and g2 must have the same vertex indexation
-    template<typename VertexType,typename EdgeType>
-    static GraphAdjencyList<VertexType,EdgeType> restriction(const GraphAdjencyList<VertexType,EdgeType> & g1,const GraphAdjencyList<VertexType,EdgeType> & g2)
-    {
-        GraphAdjencyList<VertexType,EdgeType> g(g1.sizeVertex(),0);
-        for(unsigned int index_vertex=0;index_vertex<g1.sizeVertex();index_vertex++){
-            //copy the information
-            g.vertex(index_vertex)=g1.vertex(index_vertex);
-            //
-            std::vector<int> v_vertex1 = g1.getConnectedVertex(index_vertex);
-            std::vector<int> v_vertex2 = g2.getConnectedVertex(index_vertex);
-            for(unsigned int index_vertex1=0;index_vertex1<v_vertex1.size();index_vertex1++){
-                bool hit=false;
-                if(v_vertex1[index_vertex1]>=index_vertex){
-                    for(unsigned int index_vertex2=0;index_vertex2<v_vertex2.size();index_vertex2++){
-                        if(v_vertex1[index_vertex1]==v_vertex2[index_vertex2]){
-                            hit =true;
-                            break;
-                        }
-                    }
-                    if(hit==false){
-                        int edge = g.addEdge();
-                        g.connection(edge,index_vertex,v_vertex1[index_vertex1]);
-                    }
-                }
-            }
-
-        }
-        return g;
-    }
-};
-}
 
 
 template<typename VertexType,typename EdgeType>

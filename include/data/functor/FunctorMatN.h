@@ -96,7 +96,8 @@ struct POP_EXPORTS FunctorMatN
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         int radius;
-        int i,j,k,dir;
+        unsigned int i,j,k;
+        int dir;
         Type_F64 value;
         Vec2I32 x;
 #pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
@@ -300,7 +301,7 @@ struct POP_EXPORTS FunctorMatN
         typename MatN<DIM,PixelType>::IteratorEDomain it=out.getIteratorEDomain();
         for(unsigned int i=0;i<DIM;i++){
             it.init();
-            if(i==direction)
+            if(i==(unsigned int)direction)
                 out = FunctorMatN::convolutionSeperable(out,kernel_derivate,i,it,MatNBoundaryConditionMirror());
             else
                 out = FunctorMatN::convolutionSeperable(out,kernel,i,it,MatNBoundaryConditionMirror());
@@ -314,7 +315,7 @@ struct POP_EXPORTS FunctorMatN
         MatN<DIM,PixelType> out(in);
         for(unsigned int i=0;i<DIM;i++){
             it.init();
-            if(i==direction)
+            if(i==(unsigned int)direction)
                 out = FunctorMatN::convolutionSeperable(out,kernel_derivate,i,it,MatNBoundaryConditionMirror());
             else
                 out = FunctorMatN::convolutionSeperable(out,kernel,i,it,MatNBoundaryConditionMirror());

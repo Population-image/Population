@@ -1,23 +1,13 @@
 /*! \page pagetechnicalother Other with CMake
 
-This page explains how to use Population library with any compilers and any IDE thanks to CMake
+This page explains how to use Population library with any compilers and any IDE thanks to CMake.
 
 
-The first step is to generate a project file, as a makefile or Microsoft Visual Studio project and solution files. So, you download/install CMake  http://www.cmake.org/cmake/resources/software.html. Then, you execute cmake-gui,
-- where is the source code : $${POPULATIONPATH}
-- where to build the binaries : $${POPULATIONPATH}/build
+The first step is to generate a project file, as a makefile or Microsoft Visual Studio project with solution files. So, you download/install CMake  http://www.cmake.org/cmake/resources/software.html (for debian/ubuntu sudo apt-get install cmake cmake-qt-gui). Then, you execute cmake-gui where
+-  where is the source code  : $${POPULATIONPATH}
+-  where to build the binaries : $${POPULATIONPATH}/build
 You press the button configure and you specify the generator project, for instance Visual studio 2010. Then you press the button generate. Now you open the the visual studio IDE and you open the solution  $POPULATIONPATH/population.sln. Do not forget the set the project Population as StartUpProject. 
  
 Now, you can execute the program defined in the main.cpp. If you success, you can start to code in the main.cpp file.  
 
-
-In linux, you execute this command in the population folder ($${POPULATIONPATH}):
-\code
-cmake . -G"Unix Makefiles"
-\endcode
-that generate a makefile in this directory. Now, you execute the makefile command
-\code
-make
-\endcode
-that generates the executable in the direction $${POPULATIONPATH}/bin/. That's all.
 */ 

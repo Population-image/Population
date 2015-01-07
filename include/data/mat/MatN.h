@@ -2917,7 +2917,7 @@ void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAc
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
 {
-    int i,j;
+    unsigned int i,j;
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
     {
 #pragma omp for schedule (static)
@@ -2931,7 +2931,7 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
 {
-    int i,j,k;
+    unsigned int i,j,k;
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
     {
 #pragma omp for schedule (static)
