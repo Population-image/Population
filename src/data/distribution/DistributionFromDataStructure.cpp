@@ -76,7 +76,7 @@ void DistributionRegularStep::smoothGaussian(double sigma){
     }
 }
 
-F64 DistributionRegularStep::operator ()(F64 value)const throw(pexception)
+F64 DistributionRegularStep::operator ()(F64 value)const 
 {
     int index = std::floor((value-_xmin)/_spacing);
     if(index<0||index>=(int)_table.size())
@@ -84,7 +84,7 @@ F64 DistributionRegularStep::operator ()(F64 value)const throw(pexception)
     else
         return _table[index];
 }
-DistributionRegularStep * DistributionRegularStep::clone()const throw(pexception)
+DistributionRegularStep * DistributionRegularStep::clone()const 
 {
     return new DistributionRegularStep(*this);
 }
@@ -155,7 +155,7 @@ void DistributionRegularStep::generateRepartition(){
     }
 
 }
-F64 DistributionRegularStep::randomVariable()const throw(pexception)
+F64 DistributionRegularStep::randomVariable()const 
 {
     F64 u = this->uni.randomVariable();
     std::vector<F64>::const_iterator  low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
@@ -192,7 +192,7 @@ DistributionIntegerRegularStep::DistributionIntegerRegularStep(const Distributio
 
 
 
-F64 DistributionIntegerRegularStep::operator ()(F64 value)const throw(pexception)
+F64 DistributionIntegerRegularStep::operator ()(F64 value)const 
 {
     if(value>=_xmin&&value<_xmax+1){
         if(this->isInStepIntervale(value,std::floor(value))){
@@ -207,16 +207,16 @@ F64 DistributionIntegerRegularStep::operator ()(F64 value)const throw(pexception
     }
     return 0;
 }
-DistributionIntegerRegularStep * DistributionIntegerRegularStep::clone()const throw(pexception)
+DistributionIntegerRegularStep * DistributionIntegerRegularStep::clone()const 
 {
     return new DistributionIntegerRegularStep(*this);
 }
 
 
-void DistributionIntegerRegularStep::fromMatrix(const Mat2F64 &matrix)throw(pexception)
+void DistributionIntegerRegularStep::fromMatrix(const Mat2F64 &matrix)
 {
     if(matrix.sizeI()<2|| matrix.sizeJ()<2)
-        throw(pexception("In DistributionIntegerRegularStep::fromMatrix(const Mat2F64 & matrix,F64 step), input matrix must have at least 2 columns and 2 rows"));
+        std::cerr<<"In DistributionIntegerRegularStep::fromMatrix(const Mat2F64 & matrix,F64 step), input matrix must have at least 2 columns and 2 rows";
     this->_xmin =  matrix(0,0);
     this->_xmax = matrix(matrix.sizeI()-1,0);
     this->_table.resize(matrix.sizeI());
@@ -251,7 +251,7 @@ void DistributionIntegerRegularStep::generateRepartition(){
     }
 
 }
-F64 DistributionIntegerRegularStep::randomVariable()const throw(pexception)
+F64 DistributionIntegerRegularStep::randomVariable()const 
 {
     F64 u = this->uni.randomVariable();
     std::vector<F64>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
@@ -261,15 +261,16 @@ F64 DistributionIntegerRegularStep::randomVariable()const throw(pexception)
 
 
 std::string DistributionExpression::getKey(){return "EXPRESSION";}
-F64 DistributionExpression::operator()(F64 value)const throw(pexception)
+F64 DistributionExpression::operator()(F64 value)const 
 {
     return fparser.Eval(& value);
 }
-F64 DistributionExpression::randomVariable()const throw(pexception){
-    throw(pexception("In DistributionExpression::randomVariable(),  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution"));
+F64 DistributionExpression::randomVariable()const {
+    std::cerr<<"In DistributionExpression::randomVariable(),  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
+    return 0;
 }
 
-DistributionExpression *DistributionExpression::clone()const throw(pexception)
+DistributionExpression *DistributionExpression::clone()const 
 {
     return new DistributionExpression(*this);
 }
@@ -281,7 +282,7 @@ DistributionExpression::~DistributionExpression(){
 DistributionExpression::DistributionExpression()
 {
 }
-DistributionExpression::DistributionExpression(std::string regularexpression)throw(pexception)
+DistributionExpression::DistributionExpression(std::string regularexpression)
     :Distribution()
 {
     this->fromRegularExpression(regularexpression);
@@ -292,7 +293,7 @@ DistributionExpression::DistributionExpression(const DistributionExpression & di
     this->fromRegularExpression(dist.toRegularExpression());
 }
 
-bool DistributionExpression::fromRegularExpression(std::string function)throw(pexception)
+bool DistributionExpression::fromRegularExpression(std::string function)
 {
     if(function.empty()==true)
     {
@@ -307,7 +308,7 @@ bool DistributionExpression::fromRegularExpression(std::string function)throw(pe
     if(res >= 0)
     {
         std::string str = std::string(res+7, ' ') + "^\n"+ fparser.ErrorMsg()+ "\n\n";
-        throw(pexception("In DistributionExpression::fromRegularExpression(std::string function), the expression: "+function + " is not valid "+ str));
+        std::cerr<<"In DistributionExpression::fromRegularExpression(std::string function), the expression: "+function + " is not valid "+ str;
         fparser.Parse("x", "x");
         return false;
     }
@@ -318,7 +319,7 @@ std::string DistributionExpression::toRegularExpression()const{
     return func;
 }
 //const  std::string DistributionPencil::KEY = "DistributionPencil";
-//F64 DistributionPencil::operator ()(F64 value)const throw(pexception){
+//F64 DistributionPencil::operator ()(F64 value)const {
 //    std::vector<F64>::const_iterator it = std::lower_bound (_x_values.begin(),_x_values.end(),value);
 //    I32 indice = I32(it- _x_values.begin()) ;
 //    if(  value>=*it-this->getStep()/2&&value<*it+this->getStep()/2)
@@ -329,16 +330,16 @@ std::string DistributionExpression::toRegularExpression()const{
 
 
 //}
-//F64 DistributionPencil::randomVariable()const throw(pexception){
+//F64 DistributionPencil::randomVariable()const {
 //    F64 u = this->uni.randomVariable();
 //    std::vector<F64>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
 //    I32 indice = I32(low- _repartition.begin()) ;
 //    return  _m(indice,0);
 //}
 
-//void DistributionPencil::fromMatrix(const Mat2F64 & matrix)throw(pexception){
+//void DistributionPencil::fromMatrix(const Mat2F64 & matrix){
 //    if(matrix.sizeI()<2|| matrix.sizeJ()<2)
-//        throw(pexception("In DistributionPencil::fromMatrix(const Mat2F64 & matrix), input matrix must have at least 2 columns and 2 rows"));
+//        std::cerr<<"In DistributionPencil::fromMatrix(const Mat2F64 & matrix), input matrix must have at least 2 columns and 2 rows";
 //    //tri a bulle
 //    _m = matrix;
 //    bool test = true;
@@ -417,12 +418,12 @@ std::string DistributionExpression::toRegularExpression()const{
 //    this->fromMatrix(m);
 //}
 
-//std::string DistributionPencil::toString()const throw(pexception){
+//std::string DistributionPencil::toString()const {
 //    std::ostringstream oss;
 //    oss << this->_m;
 //    return oss.str();
 //}
-//DistributionPencil * DistributionPencil::clone()const throw(pexception){
+//DistributionPencil * DistributionPencil::clone()const {
 //    return  new DistributionPencil(*this);
 //}
 //namespace

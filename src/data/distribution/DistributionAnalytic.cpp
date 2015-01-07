@@ -46,11 +46,11 @@ DistributionSign::DistributionSign(const DistributionSign & d)
     :DistributionDiscrete(d){
 }
 
-DistributionSign * DistributionSign::clone()const throw(pexception){
+DistributionSign * DistributionSign::clone()const {
     return new DistributionSign;
 }
 
-F64 DistributionSign::operator()(F64 value)const throw(pexception){
+F64 DistributionSign::operator()(F64 value)const {
     if(this->isInStepIntervale(value,-1))
         return  1/(this->getStep()*2);
     else if(this->isInStepIntervale(value,1))
@@ -59,7 +59,7 @@ F64 DistributionSign::operator()(F64 value)const throw(pexception){
         return 0;
 }
 
-F64 DistributionSign::randomVariable()const throw(pexception){
+F64 DistributionSign::randomVariable()const {
     if(irand()%2==1)
         return 1;
     else
@@ -68,7 +68,7 @@ F64 DistributionSign::randomVariable()const throw(pexception){
 std::string DistributionUniformReal::getKey(){
     return "UNIFORMREAL";
 }
-DistributionUniformReal * DistributionUniformReal::clone()const throw(pexception)
+DistributionUniformReal * DistributionUniformReal::clone()const 
 {
     return new DistributionUniformReal(_xmin,  _xmax);
 }
@@ -90,12 +90,12 @@ F64 DistributionUniformReal::getXmin()const{
 F64 DistributionUniformReal::getXmax()const{
     return _xmax;
 }
-F64 DistributionUniformReal::operator()(F64 value)const throw(pexception)
+F64 DistributionUniformReal::operator()(F64 value)const 
 {
     if(value>=_xmin&&value<_xmax)return 1/(_xmin-_xmax);
     else return 0;
 }
-F64 DistributionUniformReal::randomVariable()const throw(pexception)
+F64 DistributionUniformReal::randomVariable()const 
 {
     double value = (_xmax-_xmin)* static_cast<F64>(irand())/ static_cast<F64>(MTRand_int32::maxValue());
     return _xmin + value;
@@ -111,7 +111,7 @@ void DistributionUniformReal::reset(F64 xmin, F64 xmax){
 //Uniform Distribution
 
 std::string DistributionUniformInt::getKey(){return "UNIFORMINT";}
-DistributionUniformInt * DistributionUniformInt::clone()const throw(pexception)
+DistributionUniformInt * DistributionUniformInt::clone()const 
 {
     return new DistributionUniformInt(_xmin,  _xmax);
 }
@@ -147,11 +147,11 @@ void DistributionUniformInt::setXmax(F64 xmax){
     _xmax = xmax;
 }
 
-F64 DistributionUniformInt::randomVariable()const throw(pexception)
+F64 DistributionUniformInt::randomVariable()const 
 {
     return _xmin + irand.operator ()()%(1+_xmax-_xmin);
 }
-F64 DistributionUniformInt::operator()(F64 value)const throw(pexception)
+F64 DistributionUniformInt::operator()(F64 value)const 
 {
     if(value>=_xmin&&value<_xmax+1){
         if(this->isInStepIntervale(value,std::floor(value)))
@@ -171,7 +171,7 @@ void DistributionUniformInt::reset(int xmin, int xmax){
 
 //Normal distribtuion
 std::string DistributionNormal::getKey(){return "NORMAL";}
-DistributionNormal * DistributionNormal::clone()const throw(pexception)
+DistributionNormal * DistributionNormal::clone()const 
 {
     return new DistributionNormal(_mean, _standard_deviation);
 }
@@ -195,7 +195,7 @@ DistributionNormal::DistributionNormal(const DistributionNormal & dist)
 }
 
 
-F64 DistributionNormal::randomVariable()const throw(pexception)
+F64 DistributionNormal::randomVariable()const 
 {
     F64 x1, x2, w;
 
@@ -209,7 +209,7 @@ F64 DistributionNormal::randomVariable()const throw(pexception)
     w = std::sqrt( (-2.0 * std::log ( w ) ) / w );
     return (x1 * w)*_standard_deviation + _mean;
 }
-F64 DistributionNormal::operator()(F64 value)const throw(pexception)
+F64 DistributionNormal::operator()(F64 value)const 
 {
 
     return (1/std::sqrt((2*3.141592654*_standard_deviation*_standard_deviation)))*std::exp(-(value-_mean)*(value-_mean)/(2*_standard_deviation*_standard_deviation));
@@ -229,7 +229,7 @@ F64 DistributionNormal::getXmax()const{
 
 //Binomial
 std::string DistributionBinomial::getKey(){return "BINOMIAL";}
-DistributionBinomial * DistributionBinomial::clone()const throw(pexception)
+DistributionBinomial * DistributionBinomial::clone()const 
 {
     return new DistributionBinomial(_probability, _number_times);
 }
@@ -250,16 +250,16 @@ DistributionBinomial::DistributionBinomial(const DistributionBinomial & dist)
     :DistributionDiscrete(1),_probability(dist.getProbability()),_number_times(dist.getNumberTime()),distreal01(0,1)
 {
 }
-F64 DistributionBinomial::randomVariable()const throw(pexception)
+F64 DistributionBinomial::randomVariable()const 
 {
     int sum =0;
     for(int i=0;i<_number_times;i++)
         if(distreal01.randomVariable()<_probability)sum++;
     return sum;
 }
-F64 DistributionBinomial::operator()(F64 )const throw(pexception)
+F64 DistributionBinomial::operator()(F64 )const 
 {
-    throw(pexception("In DistributionBinomial::operator()(F64 ), not implemented"));
+    std::cerr<<"In DistributionBinomial::operator()(F64 ), not implemented";
     return 1;
 }
 void DistributionBinomial::reset(F64 probability, int number_times){
@@ -271,7 +271,7 @@ void DistributionBinomial::reset(F64 probability, int number_times){
 
 //exponentiel
 std::string DistributionExponential::getKey(){return "EXPONENTIAL";}
-DistributionExponential * DistributionExponential::clone()const throw(pexception)
+DistributionExponential * DistributionExponential::clone()const 
 {
     return new DistributionExponential(_lambda);
 }
@@ -289,11 +289,11 @@ DistributionExponential::DistributionExponential(const DistributionExponential &
     :Distribution(),_lambda(dist.getLambda()),distreal01(0,1)
 {
 }
-F64 DistributionExponential::randomVariable()const throw(pexception)
+F64 DistributionExponential::randomVariable()const 
 {
     return -std::log(distreal01.randomVariable())/_lambda;
 }
-F64 DistributionExponential::operator()(F64 value)const throw(pexception)
+F64 DistributionExponential::operator()(F64 value)const 
 {
     if(value>=0)return _lambda*std::exp(-_lambda*value);
     else return 0;
@@ -313,7 +313,7 @@ F64 DistributionExponential::getXmax()const{
 
 //Poisson
 std::string DistributionPoisson::getKey(){return "POISSON";}
-DistributionPoisson * DistributionPoisson::clone()const throw(pexception)
+DistributionPoisson * DistributionPoisson::clone()const 
 {
     return new DistributionPoisson(_lambda);
 }
@@ -370,7 +370,7 @@ void DistributionPoisson::init()
 
 
 }
-F64 DistributionPoisson::randomVariable()const throw(pexception)
+F64 DistributionPoisson::randomVariable()const 
 {
     if(_lambda==0)return 0;
 
@@ -390,7 +390,7 @@ F64 DistributionPoisson::randomVariable()const throw(pexception)
     }
 }
 
-F64 DistributionPoisson::randomVariable(F64 lambda)const throw(pexception)
+F64 DistributionPoisson::randomVariable(F64 lambda)const 
 {
 
     F64 uni=distreal01.randomVariable();
@@ -416,7 +416,7 @@ F64 DistributionPoisson::randomVariable(F64 lambda)const throw(pexception)
 }
 
 
-F64 DistributionPoisson::operator()(F64 value)const throw(pexception)
+F64 DistributionPoisson::operator()(F64 value)const 
 {
     int index=-1;
     if(value>=0)
@@ -452,7 +452,7 @@ F64 DistributionPoisson::getXmax()const{
 
 //Dirac
 std::string DistributionDirac::getKey(){return "DIRAC";}
-DistributionDirac * DistributionDirac::clone()const throw(pexception)
+DistributionDirac * DistributionDirac::clone()const 
 {
     return new DistributionDirac(this->_x);
 }
@@ -475,11 +475,11 @@ DistributionDirac::DistributionDirac(DistributionDirac &dist)
 {
 }
 
-F64 DistributionDirac::randomVariable()const throw(pexception)
+F64 DistributionDirac::randomVariable()const 
 {
     return _x ;
 }
-F64 DistributionDirac::operator()(F64 value)const throw(pexception)
+F64 DistributionDirac::operator()(F64 value)const 
 {
     if(  value>=_x-this->getStep()/2&&value<_x+this->getStep()/2)
         return 1/this->getStep();
@@ -488,7 +488,7 @@ F64 DistributionDirac::operator()(F64 value)const throw(pexception)
 
 //Triangle
 std::string DistributionTriangle::getKey(){return "TRIANGLE";}
-DistributionTriangle * DistributionTriangle::clone()const throw(pexception)
+DistributionTriangle * DistributionTriangle::clone()const 
 {
     return new DistributionTriangle(*this);
 }
@@ -503,12 +503,12 @@ DistributionTriangle::DistributionTriangle(const DistributionTriangle &dist)
 {
 }
 
-F64 DistributionTriangle::randomVariable()const throw(pexception)
+F64 DistributionTriangle::randomVariable()const 
 {
     double x = _distreal01.randomVariable();
     return (x-_x_min)*(x-_x_min)/((_x_peak-_x_min)*(_x_max-_x_min)  ) ;
 }
-F64 DistributionTriangle::operator()(F64 value)const throw(pexception)
+F64 DistributionTriangle::operator()(F64 value)const 
 {
     if(value<_x_min||value>_x_max){
         return value;

@@ -3,26 +3,26 @@
 #if defined(HAVE_OPENCV)
 #include "opencv2/imgproc/imgproc.hpp"
 namespace pop{
-MatN<2,RGBUI8> ConvertorOpenCVMat::fromCVMatRGBUI8ToPopMatRGBUI8(const cv::Mat& mat)throw(pexception)
+MatN<2,RGBUI8> ConvertorOpenCVMat::fromCVMatRGBUI8ToPopMatRGBUI8(const cv::Mat& mat)
 {
     if(mat.type()!=CV_8UC3){
-        throw(pexception("ConvertorOpenCV::fromCVMatRGBUI8ToPopMatRGBUI8, your opencv image is not a RGB image with 1 byte per channel use cv::cvtColor"));
+        std::cerr<<"ConvertorOpenCV::fromCVMatRGBUI8ToPopMatRGBUI8, your opencv image is not a RGB image with 1 byte per channel use cv::cvtColor";
     }
     MatN<2,RGBUI8> m(mat.rows,mat.cols);
     if(3*mat.cols==(int)mat.step)
-        std::copy(mat.data,mat.data+3*mat.rows*mat.cols,reinterpret_cast<uchar*>(&(*img.begin())));
+        std::copy(mat.data,mat.data+3*mat.rows*mat.cols,reinterpret_cast<uchar*>(&(*m.begin())));
     else{
         for(int j = 0;j < mat.cols;j++){
-            std::copy(mat.data+j*mat.step,mat.data+j*mat.step+j*mat.cols,reinterpret_cast<uchar*>(&(*img.begin())));
+            std::copy(mat.data+j*mat.step,mat.data+j*mat.step+j*mat.cols,reinterpret_cast<uchar*>(&(*m.begin())));
         }
     }
     return m;
 }
-MatN<2,UI8> ConvertorOpenCVMat::fromCVMatUI8ToPopMatUI8(const cv::Mat& mat)throw(pexception)
+MatN<2,UI8> ConvertorOpenCVMat::fromCVMatUI8ToPopMatUI8(const cv::Mat& mat)
 {
 
     if(mat.type()!=CV_8UC1){
-        throw(pexception("ConvertorOpenCV::fromCVMatUI8ToPopMatUI8, your opencv image is not a grey image in 1 byte use cv::cvtColor"));
+        std::cerr<<"ConvertorOpenCV::fromCVMatUI8ToPopMatUI8, your opencv image is not a grey image in 1 byte use cv::cvtColor";
     }
 
     MatN<2,UI8> m(mat.rows,mat.cols);

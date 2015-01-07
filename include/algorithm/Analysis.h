@@ -163,7 +163,7 @@ in the Software.
      * We get  1.19465 in 3 directions // see Jeulin's paper estimation of tortuosity and reconstruction of geodesic paths in 3d
      * \code
      * //############ TOPOLOGY #######################
-     * double euler = Analysis::eulerPoincare(porespace,"../file/eulertab.dat");
+     * double euler = Analysis::eulerPoincare(porespace);
      * std::ofstream out("spinodal_euler.m");
      * out<<euler;//euler
      * out.close();
@@ -174,7 +174,7 @@ in the Software.
 
 
      * Mat3UI8 porespace_hole=   pop::Processing::holeFilling(porespace);
-     * Mat3UI8 skeleton= Analysis::thinningAtConstantTopology3d(porespace_hole,"../file/topo24.dat");
+     * Mat3UI8 skeleton= Analysis::thinningAtConstantTopology(porespace_hole,"../file/topo24.dat");
      * Scene3d scene;
      * pop::Visualization::voxelSurface(scene,skeleton);
      * pop::Visualization::lineCube(scene,skeleton);
@@ -356,7 +356,7 @@ struct POP_EXPORTS Analysis
      * We get  1.19465 in 3 directions // see Jeulin's paper estimation of tortuosity and reconstruction of geodesic paths in 3d
      * \code
      * //############ TOPOLOGY #######################
-     * double euler = Analysis::eulerPoincare(porespace,"../file/eulertab.dat");
+     * double euler = Analysis::eulerPoincare(porespace);
      * std::ofstream out("spinodal_euler.m");
      * out<<euler;//euler
      * out.close();
@@ -367,7 +367,7 @@ struct POP_EXPORTS Analysis
 
 
      * Mat3UI8 porespace_hole=   pop::Processing::holeFilling(porespace);
-     * Mat3UI8 skeleton= Analysis::thinningAtConstantTopology3d(porespace_hole,"../file/topo24.dat");
+     * Mat3UI8 skeleton= Analysis::thinningAtConstantTopology(porespace_hole,"../file/topo24.dat");
      * Scene3d scene;
      * pop::Visualization::voxelSurface(scene,skeleton);
      * pop::Visualization::lineCube(scene,skeleton);
@@ -561,7 +561,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static  Mat2F64 REVHistogram(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::E x, int rmax=10000,int norm=2 )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("REVHistogram");
         typename MatN<DIM,TypePixel>::IteratorEDomain ittotal(f.getIteratorEDomain());
         int max_value = Analysis::maxValue(f);
         int maxsize = NumericLimits<int>::maximumRange();
@@ -577,9 +576,6 @@ struct POP_EXPORTS Analysis
 
         for( int r =0;r<rmax;r++){
             m.resizeInformation(m.sizeI(),m.sizeJ()+1);
-            CollectorExecutionInformationSingleton::getInstance()->progression(1.0*r/rmax);
-
-
             typename MatN<DIM,TypePixel>::E R( r*2+1);
             typename MatN<DIM,TypePixel>::IteratorEDomain it(R);
             bool inside =true;
@@ -608,7 +604,6 @@ struct POP_EXPORTS Analysis
                 m.resizeInformation(m.sizeI(),m.sizeJ()-1);
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("REVHistogram");
         return m;
 
     }
@@ -625,10 +620,9 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static  Mat2F64 REVPorosity(const MatN<DIM,UI8> & bin, typename MatN<DIM,UI8>::E x, int rmax=10000,int norm=2)throw(pexception)
+    static  Mat2F64 REVPorosity(const MatN<DIM,UI8> & bin, typename MatN<DIM,UI8>::E x, int rmax=10000,int norm=2)
     {
 
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("REVPorosity");
         Mat2F64 m;
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
@@ -640,7 +634,6 @@ struct POP_EXPORTS Analysis
 
         for(int r =1;r<rmax;r++){
             F64 rr = r*r;
-            CollectorExecutionInformationSingleton::getInstance()->progression(1.0*r/rmax);
             m.resizeInformation(m.sizeI()+1,2);
             m(r-1,0) = r;
             typename MatN<DIM,UI8>::E R( r*2+1);
@@ -669,7 +662,6 @@ struct POP_EXPORTS Analysis
             }else
                 r=rmax;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("REVPorosity");
         return m;
     }
 
@@ -740,7 +732,7 @@ struct POP_EXPORTS Analysis
     \endcode
     */
     template<int DIM,typename TypePixel>
-    static F64 meanValue(const MatN<DIM,TypePixel> & f)throw(pexception)
+    static F64 meanValue(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::meanValue( f,it);
@@ -761,7 +753,7 @@ struct POP_EXPORTS Analysis
 
     */
     template<int DIM,typename TypePixel>
-    static F64 standardDeviationValue(const MatN<DIM,TypePixel> & f)throw(pexception)
+    static F64 standardDeviationValue(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::standardDeviationValue( f,it);
@@ -850,7 +842,6 @@ struct POP_EXPORTS Analysis
     template<int DIM>
     static  Mat2F64 fractalBox(const MatN<DIM,UI8> & bin )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("FractalBox");
         int mini=NumericLimits<int>::maximumRange();
         for(int i = 0; i<DIM;i++)
             mini=minimum(mini,bin.getDomain()(i));
@@ -890,10 +881,7 @@ struct POP_EXPORTS Analysis
                 i=0;
             else
                 i/=1.25;
-
-            CollectorExecutionInformationSingleton::getInstance()->info("size="+BasicUtility::Any2String(i));
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("FractalBox");
         return m;
     }
 
@@ -913,8 +901,6 @@ struct POP_EXPORTS Analysis
     {
         if(nbrtest<100)
             nbrtest=100;
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Correlation");
-
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
             maxsize = minimum(maxsize,f.getDomain()(i));
@@ -933,8 +919,6 @@ struct POP_EXPORTS Analysis
 
         for(int i=0;i<nbrtest;i++)
         {
-            if(i%(nbrtest/100)==0)
-                CollectorExecutionInformationSingleton::getInstance()->progression(1.0*i/nbrtest);
             typename MatN<DIM,TypePixel>::E  x ;
             for(int i=0;i<DIM;i++)
                 x(i)=dist[i].randomVariable();
@@ -975,7 +959,6 @@ struct POP_EXPORTS Analysis
                     m(i,j)/=mcount(i,j);
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Correlation");
         return m;
     }
 
@@ -991,7 +974,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static  Mat2F64 autoCorrelationFunctionGreyLevel(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("CorrelationGreyLevel");
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
@@ -1009,8 +991,6 @@ struct POP_EXPORTS Analysis
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
         for(int i=0;i<nbrtest;i++)
         {
-            if(nbrtest/100==0||i%(nbrtest/100)==0)
-                CollectorExecutionInformationSingleton::getInstance()->progression(1.0*i/nbrtest);
             typename MatN<DIM,TypePixel>::E  x ;
             for(int i=0;i<DIM;i++)
                 x(i)=dist[i].randomVariable();
@@ -1040,7 +1020,6 @@ struct POP_EXPORTS Analysis
                     m(i,j)/=(mcount(i,j));
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("CorrelationGreyLevel");
         return m;
     }
     /*!
@@ -1087,7 +1066,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static Mat2F64 chord(const MatN<DIM,TypePixel> & f, int nbrchord=20000000)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Chord");
         Mat2F64 m;
         std::vector<DistributionUniformInt> dist;
         for(int i=0;i<DIM;i++)
@@ -1095,8 +1073,6 @@ struct POP_EXPORTS Analysis
         DistributionUniformInt c (0,DIM-1);
         for(int i=0;i<nbrchord;i++)
         {
-            if(nbrchord/10000==0||i%(nbrchord/10000)==0)
-                CollectorExecutionInformationSingleton::getInstance()->progression(1.0*i/nbrchord);
             int direction = c.randomVariable();
             typename MatN<DIM,TypePixel>::E  x ;
             for(int i=0;i<DIM;i++)
@@ -1166,7 +1142,6 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Chord");
         return m;
     }
 
@@ -1183,8 +1158,6 @@ struct POP_EXPORTS Analysis
 
     template<int DIM>
     static Mat2F64 ldistance(const MatN<DIM,UI8> & bin,int norm,MatN<DIM,UI8> & distance){
-
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("ldistance");
         MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin_minus.getIteratorEDomain());
         while(it.next()){
@@ -1214,7 +1187,6 @@ struct POP_EXPORTS Analysis
         for(unsigned int i=0;i<m.sizeI();i++){
             m(i,1)/=sum;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("ldistance");
         return m;
     }
     /*!
@@ -1232,9 +1204,7 @@ struct POP_EXPORTS Analysis
 
     template<int DIM>
     static Mat2F64 granulometryMatheron(const MatN<DIM,UI8> & bin, F64 norm ,MatN<DIM,UI8> & fgranulo){
-
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("MatheronGranulometry",COLLECTOR_EXECUTION_INFO);
-        FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
+      FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
         MatN<DIM,UI8> bin2(bin.getDomain());
         fgranulo.resize(bin.getDomain());
 
@@ -1250,7 +1220,7 @@ struct POP_EXPORTS Analysis
         typename MatN<DIM,UI8>::IteratorEDomain it_total(bin2.getIteratorEDomain());
         MatN<DIM,UI8> opening(bin2.getDomain());
         while(area!=0){
-
+            std::cout<<"radius Matheron "<<radius<<" and cardinality "<<area<<std::endl;
             it_total.init();
             opening =pop::ProcessingAdvanced::openingRegionGrowing(bin2,radius,norm);
             it_total.init();
@@ -1267,11 +1237,10 @@ struct POP_EXPORTS Analysis
             if(m.sizeI()>1&&m(m.sizeI()-1,1)>m(m.sizeI()-2,1))
                 m(m.sizeI()-1,1) =  m(m.sizeI()-2,1);
             m(m.sizeI()-1,2) =  m(m.sizeI()-2,1)-m(m.sizeI()-1,1);
-            CollectorExecutionInformationSingleton::getInstance()->info("RADIUS ="+BasicUtility::Any2String(radius)+" and cardinality="+BasicUtility::Any2String(area));
-            radius++;
+         radius++;
 
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("MatheronGranulometry");
+
         return m;
     }
     /*!
@@ -1287,9 +1256,6 @@ struct POP_EXPORTS Analysis
     template<int DIM>
     static Mat2F64 geometricalTortuosity( const MatN<DIM,UI8> & bin, int norm=1)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("GeometricalTortuosity",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         Mat2F64 m(DIM,2);
         for(int i=0;i<DIM;i++){
@@ -1322,8 +1288,6 @@ struct POP_EXPORTS Analysis
             m(i,0)=i;
             m(i,1)=sum*1.0/(count*(bin.getDomain()(i)-1));
         }
-
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("GeometricalTortuosity");
         return m;
     }
     /*!
@@ -1344,10 +1308,7 @@ struct POP_EXPORTS Analysis
 
     template<int DIM>
     static MatN<DIM,UI8> medialAxis(const MatN<DIM,UI8> & bin,int norm=1){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("MedialAxis",COLLECTOR_EXECUTION_INFO);
-
-
-        MatN<DIM,UI8> bin_minus(bin.getDomain());
+      MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin_minus.getIteratorEDomain());
         while(it.next()){
             if(bin(it.x())!=0)
@@ -1373,8 +1334,7 @@ struct POP_EXPORTS Analysis
         int radius=0;
         while(isempty==false)
         {
-            CollectorExecutionInformationSingleton::getInstance()->progression(radius,"Size of the structural element");
-            it.init();
+           it.init();
             FunctorF::FunctorThreshold<UI8,UI8,UI8> func(radius+1,NumericLimits<UI8>::maximumRange());
             forEachFunctorUnaryF(distance,erosion,func);
 
@@ -1386,8 +1346,7 @@ struct POP_EXPORTS Analysis
             medial= maximum(medial,erosion);
             radius++;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("MedialAxis");
-        return medial;
+      return medial;
     }
 
 
@@ -1458,8 +1417,7 @@ struct POP_EXPORTS Analysis
     */
     template<int DIM>
     static Mat2F64 percolationErosion(const  MatN<DIM,UI8>   & bin,int norm=1){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("percolationErosion",COLLECTOR_EXECUTION_INFO);
-        MatN<DIM,UI8> bin_minus(bin.getDomain());
+       MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         while(it.next()){
             if(bin(it.x())!=0)
@@ -1492,11 +1450,9 @@ struct POP_EXPORTS Analysis
                 }
             }
             radius++;
-            CollectorExecutionInformationSingleton::getInstance()->progression(radius,"Radius size to test percolation");
 
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("percolationErosion");
-        return m;
+       return m;
     }
 
     /*!
@@ -1512,7 +1468,6 @@ struct POP_EXPORTS Analysis
     */
     template<int DIM>
     static Mat2F64 percolationOpening(const MatN<DIM,UI8> & bin,int norm=1){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("percolationOpening",COLLECTOR_EXECUTION_INFO);
         MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         while(it.next()){
@@ -1549,46 +1504,29 @@ struct POP_EXPORTS Analysis
                 }
             }
             radius++;
-            CollectorExecutionInformationSingleton::getInstance()->progression(radius,"Radius size to test percolation");
-        }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("percolationErosion");
-        return m;
+         }
+         return m;
     }
     /*!
      * \param bin input binary matrix
-     * \param file_eulertab path of the lock-up table file named  eulertab.dat "Your_Directory/Population/file/eulertab.dat"
      * \return euler-poincar number
      *
-     *  compute the euler-poincare number thanks to a lock-up table named eulertab.dat that you can find in "Your_Directory/Population/file/eulertab.dat"
+     *  compute the euler-poincare number
      * \code
      * Mat2UI8 img;
      * img.load("../image/outil.bmp");
      * img = pop::Processing::threshold(img,120);
-     * double euler = Analysis::eulerPoincare(img,"../file/eulertab.dat");
+     * double euler = Analysis::eulerPoincare(img);
      * std::cout<<euler<<std::endl;
      * \endcode
     */
     template<int DIM>
-    static F64 eulerPoincare(const MatN<DIM,UI8> & bin,std::string file_eulertab )
-    {
-        if(DIM==2)
-        {
-            typename MatN<DIM+1,UI8>::E size;
-            size(0)=bin.getDomain()(0);
-            size(1)=bin.getDomain()(1);
-            size(2)=1;
-            MatN<DIM+1,UI8> Img3d(size);
-            ForEachDomain2D(x,bin){
-                Img3d(x.addCoordinate(2,0))=bin(x);
-            }
-            return AnalysisAdvanced::eulerPoincare3D(Img3d,file_eulertab);
-        }
-        else
-            return AnalysisAdvanced::eulerPoincare3D(bin,file_eulertab);
+    static F64 eulerPoincare(const MatN<DIM,UI8> & bin ){
+            return AnalysisAdvanced::eulerPoincare(bin);
     }
     /*!
      * \param bin input binary matrix
-     * \param file_topo24  path of the lock-up table file named  topo24.dat "Your_Directory/Population/file/topo24.dat"
+     * \param file_topo24  only for the 3d case, the lock-up table is saved in a file named  topo24.dat "Your_Directory/Population/file/topo24.dat"
      * \return topological skeleton
      *
      *  compute the thining at constant topology thanks to a lock-up table named topo24.dat
@@ -1596,29 +1534,25 @@ struct POP_EXPORTS Analysis
      * Mat2UI8 img;
      * img.load("../image/outil.bmp");
      * img = pop::Processing::threshold(img,120);
-     * Mat2UI8 skeleton= Analysis::thinningAtConstantTopology3d(img,"../file/topo24.dat");
+     * Mat2UI8 skeleton= Analysis::thinningAtConstantTopology(img,"../file/topo24.dat");
      * skeleton.display();
      * \endcode
     */
     template<int DIM>
-    static MatN<DIM,UI8>  thinningAtConstantTopology3d( const MatN<DIM,UI8> & bin,std::string file_topo24)
+    static MatN<DIM,UI8>  thinningAtConstantTopology( const MatN<DIM,UI8> & bin,std::string file_topo24="")
     {
         return AnalysisAdvanced::thinningAtConstantTopology(bin,file_topo24);
     }
+
     template<int DIM>
-    static MatN<DIM,UI8>  thinningAtConstantTopology2d( const MatN<DIM,UI8> & bin)
-    {
-        return AnalysisAdvanced::thinningAtConstantTopologyGrowingRegion(bin,"");
-    }
-    template<int DIM>
-    static MatN<DIM,UI8>  thinningAtConstantTopology2dWire( const MatN<DIM,UI8> & bin,double ratio_filter=0.5,int length_edge=4)
+    static MatN<DIM,UI8>  thinningAtConstantTopologyWire( const MatN<DIM,UI8> & bin,double ratio_filter=0.5,int length_edge=3)
     {
         MatN<DIM,UI8>  img(bin);
         img = img.opposite();
         MatN<DIM,UI8>  dist = pop::ProcessingAdvanced::voronoiTesselation(img,img.getIteratorENeighborhood(1,0)).second;;
         img = img.opposite();
         MatN<DIM,UI8>  granulo;
-        Mat2F64 m = Analysis::granulometryMatheron(img,0,granulo);
+        MatN<DIM,F64> m = Analysis::granulometryMatheron(img,0,granulo);
         m.deleteCol(1);
         DistributionRegularStep d(m);
         double mean = Statistics::moment(d,1,d.getXmin(),d.getXmax(),1);
@@ -1630,15 +1564,14 @@ struct POP_EXPORTS Analysis
             else
                 fixed_VecNd(it.x())=0;
         }
-        Mat2UI8 skeleton = AnalysisAdvanced::thinningAtConstantTopologyWire(img,fixed_VecNd);
+        MatN<DIM,UI8> skeleton = AnalysisAdvanced::thinningAtConstantTopologyWire(img,fixed_VecNd);
 
         std::pair<MatN<DIM,UI8>,MatN<DIM,UI8> > p_vertex_edge = Analysis::fromSkeletonToVertexAndEdge(skeleton);
         MatN<DIM,UI32> label_edge = ProcessingAdvanced::clusterToLabel(p_vertex_edge.second,img.getIteratorENeighborhood(1,0),img.getIteratorEDomain());
 
-
-        Mat2UI32 label_vertex = ProcessingAdvanced::clusterToLabel(p_vertex_edge.first,img.getIteratorENeighborhood(1,0),img.getIteratorEDomain());
-        typename Mat2UI32::IteratorEDomain itg(label_edge.getIteratorEDomain());
-        typename Mat2UI32::IteratorENeighborhood itn(label_edge.getIteratorENeighborhood(1,0));
+        MatN<DIM,UI32> label_vertex = ProcessingAdvanced::clusterToLabel(p_vertex_edge.first,img.getIteratorENeighborhood(1,0),img.getIteratorEDomain());
+        typename MatN<DIM,UI32>::IteratorEDomain itg(label_edge.getIteratorEDomain());
+        typename MatN<DIM,UI32>::IteratorENeighborhood itn(label_edge.getIteratorENeighborhood(1,0));
         VecI32 v_length;
         std::vector<int> v_neight_edge;
         while(itg.next()){
@@ -1657,12 +1590,10 @@ struct POP_EXPORTS Analysis
                         else
                             v_neight_edge[label_edge(itg.x())] =0;
                     }
-
                 }
-
             }
         }
-        pop::Private::Topology<Mat2UI8> topo("");
+        pop::Private::Topology<DIM> topo(POP_PROJECT_SOURCE_DIR+std::string("/file/topo24.dat"));
         itg.init();
         while(itg.next()){
             if(label_edge(itg.x())!=0&&v_neight_edge[label_edge(itg.x())]>0&&v_length(label_edge(itg.x()))<length_edge){
@@ -1670,18 +1601,18 @@ struct POP_EXPORTS Analysis
             }
 
         }
-        std::vector<pop::Vec2I32> v_VecNd;
+        std::vector<pop::VecN<DIM,I32> > v_VecNd;
         itg.init();
         while(itg.next()){
             if(p_vertex_edge.first(itg.x())!=0)
-                if(topo.isIrrecductibleVecN(skeleton,itg.x(),Loki::Int2Type<2>())==false)
+                if(topo.isIrrecductible(skeleton,itg.x())==false)
                     v_VecNd.push_back(itg.x());
         }
         for(unsigned int i=0;i<v_VecNd.size();i++){
-            if(topo.isIrrecductibleVecN(skeleton,v_VecNd[i],Loki::Int2Type<2>())==false)
+            if(topo.isIrrecductible(skeleton,v_VecNd[i])==false)
                 skeleton(v_VecNd[i])=0;
         }
-        return skeleton;//AnalysisAdvanced::thinningAtConstantTopologyWire(bin,f_allow_branch);
+        return skeleton;
     }
     /*!
      * \param skeleton skeleton
@@ -1689,7 +1620,7 @@ struct POP_EXPORTS Analysis
      * extract the vecteces and the edges from the topological skeleton
      *
      *  extract the vecteces and the edges from the topological skeleton
-     \sa thinningAtConstantTopology3d( const MatN<DIM,TypePixel> & bin,const char * file_topo24)
+     \sa thinningAtConstantTopology( const MatN<DIM,TypePixel> & bin,const char * file_topo24)
     */
     template<int DIM>
     static std::pair<MatN<DIM,UI8>,MatN<DIM,UI8> > fromSkeletonToVertexAndEdge(const MatN<DIM,UI8> & skeleton)
@@ -1854,8 +1785,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static VecI32 perimeterByLabel(const MatN<DIM,TypePixel> & label)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("RepartitionAreaLabel");
-
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
         VecI32 v;
@@ -1872,7 +1801,6 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("RepartitionAreaLabel");
         return v;
 
     }
@@ -1885,7 +1813,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static VecI32 perimeterContactBetweenLabel(const MatN<DIM,TypePixel> & label)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("CumulativeDistributionPerimeterContactBetweenLabel");
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
         VecI32 v;
@@ -1902,8 +1829,7 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("CumulativeDistributionPerimeterContactBetweenLabel");
-        return v;
+       return v;
 
 
     }
@@ -1918,7 +1844,6 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename TypePixel>
     static VecF64 feretDiameterByLabel(const MatN<DIM,TypePixel> & label, int norm=1)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("RepartitionAreaLabel");
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
         std::vector<typename MatN<DIM,TypePixel>::E> v_xmin;
         std::vector<typename MatN<DIM,TypePixel>::E> v_xmax;
@@ -1952,7 +1877,6 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("RepartitionAreaLabel");
         return v;
     }
 

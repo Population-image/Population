@@ -361,7 +361,7 @@ struct ProcessingAdvanced
         return out;
     }
     template<typename Function,typename Iterator>
-    static Function greylevelScaleContrast(const Function & f,F64 scale, Iterator & it)throw(pexception){
+    static Function greylevelScaleContrast(const Function & f,F64 scale, Iterator & it){
 
         Function out(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result FloatF;
@@ -377,10 +377,10 @@ struct ProcessingAdvanced
         return out;
     }
     template<typename Function,typename Iterator,int isVec>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<isVec>)throw(pexception);
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<isVec>);
 
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<true>)throw(pexception)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<true>)
     {
         typedef typename TypeTraitsTypeScalar<typename Function::F>::Result  FScalar;
         typedef typename FunctionTypeTraitsSubstituteF<Function,FScalar>::Result  FunctionScalar;
@@ -396,7 +396,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<false>)throw(pexception)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<false>)
     {
         Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
@@ -418,7 +418,7 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min=NumericLimits<typename Function::F>::minimumRange(), typename Function::F max=NumericLimits<typename Function::F>::maximumRange())throw(pexception)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min=NumericLimits<typename Function::F>::minimumRange(), typename Function::F max=NumericLimits<typename Function::F>::maximumRange())
     {
         Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
@@ -437,7 +437,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function,typename Iterator>
-    static Function greylevelRemoveEmptyValue(const Function & f,  Iterator & it)throw(pexception)
+    static Function greylevelRemoveEmptyValue(const Function & f,  Iterator & it)
     {
         Function h(f.getDomain());
         std::vector<typename Function::F> valueinf;
@@ -460,12 +460,12 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function,typename Type>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<Type> )throw(pexception)
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<Type> )
     {
         return  greylevelTranslateMeanValueScalar(f,mean);
     }
     template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBUI8> )throw(pexception)
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBUI8> )
     {
         typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBUI8>::Result>::Result r,g,b;
         Convertor::toRGB(f,r,g,b);
@@ -481,7 +481,7 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBF64> )throw(pexception)
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBF64> )
     {
         typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBF64>::Result>::Result r,g,b;
         Convertor::toRGB(f,r,g,b);
@@ -497,7 +497,7 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function>
-    static Function greylevelTranslateMeanValueScalar(const Function& f, typename Function::F mean )throw(pexception)
+    static Function greylevelTranslateMeanValueScalar(const Function& f, typename Function::F mean )
     {
         typename Function::IteratorEDomain it(f.getIteratorEDomain());
         Mat2F64 m = AnalysisAdvanced::histogram(f,it);
@@ -551,7 +551,7 @@ struct ProcessingAdvanced
         return outcast;
     }
     template<typename Function,typename FunctionMask, typename Iterator>
-    static Function mask(const Function & f,const FunctionMask & mask,  Iterator & it)throw(pexception)
+    static Function mask(const Function & f,const FunctionMask & mask,  Iterator & it)
     {
         Function h(f.getDomain());
         it.init();
@@ -565,7 +565,7 @@ struct ProcessingAdvanced
         return h;
     }
 
-    /*! \fn Function erosion(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    /*! \fn Function erosion(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
      *  \brief Erosion of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -577,18 +577,15 @@ struct ProcessingAdvanced
      * and the iteration trough  \f$\forall x'\in N(x)\f$  is done by the local  IteratorE
     */
     template< typename Function,typename IteratorGlobal, typename IteratorLocal >
-    static Function erosion(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    static Function erosion(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Erosion",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         Function h(f.getDomain());
         typedef FunctorF::FunctorAccumulatorMin<typename Function::F > FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
         forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Erosion");
         return h;
     }
-    /*! \fn Function dilation(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )throw(pexception)
+    /*! \fn Function dilation(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )
      *  \brief Dilation of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -600,18 +597,15 @@ struct ProcessingAdvanced
      * and the iteration trough  \f$\forall x'\in N(x)\f$  is done by the local  IteratorE
     */
     template< typename Function, typename IteratorGlobal,typename IteratorLocal>
-    static Function dilation(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )throw(pexception)
+    static Function dilation(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Dilation",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMax<typename Function::F > FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
         forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Dilation");
         return h;
     }
-    /*! \fn Function closing(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )throw(pexception)
+    /*! \fn Function closing(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )
      *  \brief Closing of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -623,19 +617,16 @@ struct ProcessingAdvanced
      * and the iteration trough \f$N(x)\f$  is done by the local  IteratorE
     */
     template<typename Function,typename IteratorGlobal,typename IteratorLocal>
-    static Function closing(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )throw(pexception)
+    static Function closing(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal )
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Closing",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         Function temp =ProcessingAdvanced::dilation(f,itglobal,itlocal);
         itglobal.init();
         h = ProcessingAdvanced::erosion(temp,itglobal,itlocal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Closing");
         return h;
     }
 
-    /*! \fn Function opening(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    /*! \fn Function opening(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
      *  \brief Opening of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -647,19 +638,16 @@ struct ProcessingAdvanced
      * and the iteration trough \f$N(x)\f$  is done by the local  IteratorE
     */
     template<typename Function, typename IteratorGlobal,typename IteratorLocal >
-    static Function opening(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    static Function opening(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Opening",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         Function temp =ProcessingAdvanced::erosion(f,itglobal,itlocal);
         itglobal.init();
         h = ProcessingAdvanced::dilation(temp,itglobal,itlocal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Opening");
         return h;
     }
 
-    /*! \fn Function median(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    /*! \fn Function median(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
      *  \brief Median filter of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -672,19 +660,16 @@ struct ProcessingAdvanced
      * and the iteration trough  \f$\forall x'\in N(x)\f$  is done by the local  IteratorE
     */
     template<typename Function,typename IteratorGlobal,typename IteratorLocal>
-    static Function median(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    static Function median(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Median",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMedian<typename Function::F> FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
         forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Median");
         return h;
     }
 
-    /*! \fn Function mean(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    /*! \fn Function mean(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
      *  \brief Median filter of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -697,20 +682,17 @@ struct ProcessingAdvanced
      * and the iteration trough  \f$\forall x'\in N(x)\f$  is done by the local  IteratorE
     */
     template<typename Function,typename IteratorGlobal,typename IteratorLocal>
-    static Function mean(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)throw(pexception)
+    static Function mean(const Function & f,IteratorGlobal & itglobal, IteratorLocal & itlocal)
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Mean",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         typedef FunctorF::FunctorAccumulatorMean<typename Function::F> FunctorAccumulator;
         FunctorAccumulator funcAccumulator;
         forEachGlobalToLocal(f, h, funcAccumulator, itlocal, itglobal);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Mean");
         return h;
     }
 
 
-    /*! \fn Function alternateSequentialCOStructuralElement(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)throw(pexception)
+    /*! \fn Function alternateSequentialCOStructuralElement(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)
      *  \brief Sequential Alternate filter of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -721,28 +703,23 @@ struct ProcessingAdvanced
      *  Successive application of Closing and opening by increasing the scale factor of structure element until max radius
     */
     template<typename Function,typename IteratorGlobal,typename IteratorLocal >
-    static Function alternateSequentialCO(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)throw(pexception)
+    static Function alternateSequentialCO(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("AlternateSequentialCOStructuralElement",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
-
         IteratorLocal  itlocalsuccessive(itlocal);
         Function temp(f);
         h=f;
         for(int radius=1;radius<=maxradius;radius++){
-            CollectorExecutionInformationSingleton::getInstance()->info("Radius : "+BasicUtility::Any2String(radius));
             itglobal.init();
             temp = ProcessingAdvanced::closing(h,itglobal,itlocalsuccessive);
             itglobal.init();
             h = ProcessingAdvanced::opening(temp,itglobal,itlocalsuccessive);
             itlocalsuccessive.dilate(itlocal);
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("AlternateSequentialCOStructuralElement");
         return h;
 
     }
-    /*! \fn Function alternateSequentialOCStructuralElement(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)throw(pexception)
+    /*! \fn Function alternateSequentialOCStructuralElement(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)
      *  \brief Sequential Alternate filter of the input matrix
      * \param f input function
      * \param itglobal Global IteratorE
@@ -753,10 +730,8 @@ struct ProcessingAdvanced
      *  Successive application of opening and closing by increasing the scale factor of structure element until max radius
     */
     template< typename Function,typename IteratorGlobal,typename IteratorLocal>
-    static Function alternateSequentialOC(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)throw(pexception)
+    static Function alternateSequentialOC(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itlocal, int maxradius)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("AlternateSequentialOCStructuralElement",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
         Function h(f.getDomain());
 
         IteratorLocal  itlocalsuccessive(itlocal);
@@ -769,12 +744,11 @@ struct ProcessingAdvanced
             h = ProcessingAdvanced::closing(temp,itglobal,itlocalsuccessive);
             itlocalsuccessive.dilate(itlocal);
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("AlternateSequentialOCStructuralElement");
         return h;
 
     }
 
-    /*! \fn static Function hitOrMiss(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itC, IteratorLocal & itD)throw(pexception)
+    /*! \fn static Function hitOrMiss(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itC, IteratorLocal & itD)
      *  \brief Hit or miss filter
      * \param f input function
      * \param itglobal Global IteratorE
@@ -826,50 +800,34 @@ struct ProcessingAdvanced
     */
 
     template< typename Function, typename IteratorGlobal,typename IteratorLocal >
-    static Function hitOrMiss(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itC, IteratorLocal & itD)throw(pexception)
+    static Function hitOrMiss(const Function & f,IteratorGlobal & itglobal,IteratorLocal & itC, IteratorLocal & itD)
     {
         Function h(f.getDomain());
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("HitOrMiss",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Slow algorithm for large structural element");
-
         Function erosion1(f.getDomain());
         itglobal.init();
-        //        std::cout<<f<<std::endl;
         erosion1 =ProcessingAdvanced::erosion(f,itglobal,itC);
-        //        std::cout<<erosion1<<std::endl;
-        //        getchar();
         Function temp(f.getDomain(),NumericLimits<typename Function::F>::maximumRange());
         temp =   temp-f;
-        //        std::cout<<"TEMP"<<std::endl;
-        //        std::cout<<temp<<std::endl;
         Function erosion2(f.getDomain());
         itglobal.init();
         erosion2 = ProcessingAdvanced::erosion(temp,itglobal,itD);
-        //        std::cout<<erosion2<<std::endl;
-        //        getchar();
         h=minimum(erosion1,erosion2);
-        //        std::cout<<h<<std::endl;
-        //        getchar();
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("HitOrMiss");
         return h;
     }
 
     template<int DIM, typename Type,typename IteratorE>
     static MatN<DIM,Type> gradSobel(const MatN<DIM,Type> & f, I32 direction, IteratorE it)
     {
-
         pop::Vec<F64> der (3),smooth(3);
         der(0)=1; der(1)=0; der(2)=-1;
         smooth(0)=1;smooth(1)=2;smooth(2)=1;
-
         MatN<DIM,Type> fout(f);
-
         for(I32 i=0;i <DIM;i++)
         {
             it.init();
 
             if(i==direction)
-               fout = FunctorMatN::convolutionSeperable(fout,der,direction,it,MatNBoundaryConditionMirror());
+                fout = FunctorMatN::convolutionSeperable(fout,der,direction,it,MatNBoundaryConditionMirror());
             else
                 fout = FunctorMatN::convolutionSeperable(fout,smooth,direction,it,MatNBoundaryConditionMirror());
         }
@@ -942,7 +900,7 @@ struct ProcessingAdvanced
         return f_grad;
     }
 
-    /*! \fn static Function labelMerge(const Function & label1, const Function &label2, Iterator & it)throw(pexception)
+    /*! \fn static Function labelMerge(const Function & label1, const Function &label2, Iterator & it)
      *  \brief merge of the labelled matrix
      * \param label1 labelled matrix1
      * \param label1 labelled matrix2
@@ -966,7 +924,7 @@ struct ProcessingAdvanced
      *  \endcode
     */
     template<typename Function,typename Iterator>
-    static Function labelMerge(const Function & label1, const Function & label2, Iterator & it)throw(pexception)
+    static Function labelMerge(const Function & label1, const Function & label2, Iterator & it)
     {
         FunctionAssert(label1,label2,"pop::Processing::labelMerge");
         Function h(label1.getDomain());
@@ -989,7 +947,7 @@ struct ProcessingAdvanced
         std::sort (vg.begin(), vg.end());
         if(vf.size()+vg.size()>=NumericLimits<typename Function::F>::maximumRange())
         {
-            throw(pexception("In pop::Processing::labelMerge, we have more labels than the grey-level range. Convert your labels images with the type Mat2UI32 before to call this algorithm (Mat2UI32 label=your_image_label"));
+            std::cerr<<"In pop::Processing::labelMerge, we have more labels than the grey-level range. Convert your labels images with the type Mat2UI32 before to call this algorithm (Mat2UI32 label=your_image_label";
         }
         typename std::vector<typename Function::F>::iterator  itvalue;
         it.init();
@@ -1012,7 +970,7 @@ struct ProcessingAdvanced
         }
         return h;
     }
-    /*! \fn static Function2 labelFromSingleSeed(const Function1 & label,const Function2& seed, Iterator & it)throw(pexception)
+    /*! \fn static Function2 labelFromSingleSeed(const Function1 & label,const Function2& seed, Iterator & it)
      *  \brief extract the label including the binary seed
      * \param label multi-labelled matrix
      * \param seed binary seed
@@ -1051,7 +1009,7 @@ struct ProcessingAdvanced
     */
 
     template<typename Function1,typename Iterator,typename Function2>
-    static typename FunctionTypeTraitsSubstituteF<Function1,UI8>::Result  labelFromSingleSeed(const Function1 & label,const Function2& seed, Iterator & it)throw(pexception)
+    static typename FunctionTypeTraitsSubstituteF<Function1,UI8>::Result  labelFromSingleSeed(const Function1 & label,const Function2& seed, Iterator & it)
     {
         FunctionAssert(label,seed,"pop::Processing::labelFromSingleSeed");
         typename FunctionTypeTraitsSubstituteF<Function1,UI8>::Result h(seed.getDomain());
@@ -1081,8 +1039,6 @@ struct ProcessingAdvanced
     template<typename FunctionBinary>
     static FunctionBinary holeFilling( const FunctionBinary& bin,typename FunctionBinary::IteratorENeighborhood itneigh)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("HoleFilling",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
         FunctorZero f;
         Population<FunctionBinary,FunctorZero> pop(bin.getDomain(),f,itneigh);
         typename FunctionBinary::IteratorEDomain it(bin.getIteratorEDomain());
@@ -1109,7 +1065,6 @@ struct ProcessingAdvanced
             else
                 hole(it.x())=255;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("HoleFilling");
         return hole;
     }
 
@@ -1147,8 +1102,6 @@ struct ProcessingAdvanced
     template<typename FunctionTopo,typename FunctionLabel >
     static FunctionLabel regionGrowingAdamsBischofMeanOverStandardDeviation(const FunctionLabel & seed,const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("AdamsBischof",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
         FunctorMeanStandardDeviation<FunctionTopo> functopo(topo);
         Population<FunctionLabel,FunctorMeanStandardDeviation<FunctionTopo>, RestrictedSetWithoutALL,SQFIFONextSmallestLevel,Growth> pop(seed.getDomain(),functopo,itneigh);
         typename FunctionLabel::IteratorEDomain it(seed.getDomain());
@@ -1169,11 +1122,10 @@ struct ProcessingAdvanced
             pop.growth(pop.x().first,pop.x().second);
 
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("AdamsBischof");
         return pop.getRegion();
     }
 
-/*! \fn FunctionLabel regionGrowingAdamsBischofMean(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh )
+    /*! \fn FunctionLabel regionGrowingAdamsBischofMean(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh )
 
      * \param seed input seeds
      * \param topo topographic surface
@@ -1204,90 +1156,86 @@ struct ProcessingAdvanced
      * RGB.display();
      * \endcode
     */
-template< typename FunctionTopo,typename FunctionLabel>
-static FunctionLabel regionGrowingAdamsBischofMean(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh )
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("AdamsBischofMean",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorMean<FunctionTopo> functopo(topo);
-    Population<FunctionLabel,FunctorMean<FunctionTopo>, RestrictedSetWithoutALL,SQFIFONextSmallestLevel,Growth> pop(seed.getDomain(),functopo,itneigh);
-    typename FunctionLabel::IteratorEDomain it(seed.getDomain());
-    while(it.next()){
-        if(seed(it.x())!=0){
-            functopo.addPoint(seed(it.x()),it.x());
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-        }
-    }
-    while(pop.next()){
-        functopo.addPoint(pop.x().first,pop.x().second);
-        pop.growth(pop.x().first,pop.x().second);
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("AdamsBischofMean");
-    return pop.getRegion();
-}
-template<typename FunctionTopo,typename FunctionLabel >
-static FunctionLabel regionGrowingMergingLevel(const FunctionLabel & seed,const FunctionTopo & topo,int diff, typename FunctionTopo::IteratorENeighborhood  it_local )
-{
-    FunctorMeanMerge<FunctionTopo> functopo(topo);
-    Population<FunctionLabel,FunctorMeanMerge<FunctionTopo>, RestrictedSetWithMySelf,SQFIFONextSmallestLevel,Growth> pop(seed.getDomain(),functopo,it_local);
-    typename FunctionLabel::IteratorEDomain it(seed.getDomain());
-    while(it.next()){
-        if(seed(it.x())!=0){
-            functopo.addPoint(seed(it.x()),it.x());
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    int maxi=0;
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-            maxi =std::max(maxi,(int)seed(it.x()));
-        }
-    }
-    std::vector<MasterSlave> v_individu(maxi+1);
-    for(unsigned int i=0;i<v_individu.size();i++){
-        v_individu[i]._my_label=i;
-    }
-
-    while(pop.next()){
-        int label1=v_individu[pop.x().first].getLabelMaster();
-        if(pop.getRegion()(pop.x().second)==RestrictedSetWithMySelf<typename FunctionLabel::F>::NoRegion){
-            functopo.addPoint(label1,pop.x().second);
-            pop.growth(label1,pop.x().second);
-        }else{
-            int label2=v_individu[pop.getRegion()(pop.x().second)].getLabelMaster();
-            if(label1!=label2){
-                if(functopo.diff(label1,label2 )<diff){
-                    if(v_individu[label1]._my_slaves.size()<v_individu[label2]._my_slaves.size())
-                        std::swap(label1,label2);
-                    v_individu[label1].addSlave(v_individu[label2]);
-                    functopo.merge(label1,label2);
-                }
+    template< typename FunctionTopo,typename FunctionLabel>
+    static FunctionLabel regionGrowingAdamsBischofMean(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh )
+    {
+        FunctorMean<FunctionTopo> functopo(topo);
+        Population<FunctionLabel,FunctorMean<FunctionTopo>, RestrictedSetWithoutALL,SQFIFONextSmallestLevel,Growth> pop(seed.getDomain(),functopo,itneigh);
+        typename FunctionLabel::IteratorEDomain it(seed.getDomain());
+        while(it.next()){
+            if(seed(it.x())!=0){
+                functopo.addPoint(seed(it.x()),it.x());
+                pop.setRegion(seed(it.x()),it.x());
             }
-            pop.pop();
-
         }
-    }
-    it.init();
-    while(it.next()){
-        if(pop.getRegion()(it.x())< v_individu.size()){
-            int label1=v_individu[pop.getRegion()(it.x())].getLabelMaster();
-            pop.setRegion(label1,it.x());
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
         }
+        while(pop.next()){
+            functopo.addPoint(pop.x().first,pop.x().second);
+            pop.growth(pop.x().first,pop.x().second);
+        }
+        return pop.getRegion();
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("regionGrowing");
-    return pop.getRegion();
-}
+    template<typename FunctionTopo,typename FunctionLabel >
+    static FunctionLabel regionGrowingMergingLevel(const FunctionLabel & seed,const FunctionTopo & topo,int diff, typename FunctionTopo::IteratorENeighborhood  it_local )
+    {
+        FunctorMeanMerge<FunctionTopo> functopo(topo);
+        Population<FunctionLabel,FunctorMeanMerge<FunctionTopo>, RestrictedSetWithMySelf,SQFIFONextSmallestLevel,Growth> pop(seed.getDomain(),functopo,it_local);
+        typename FunctionLabel::IteratorEDomain it(seed.getDomain());
+        while(it.next()){
+            if(seed(it.x())!=0){
+                functopo.addPoint(seed(it.x()),it.x());
+                pop.setRegion(seed(it.x()),it.x());
+            }
+        }
+        int maxi=0;
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+                maxi =std::max(maxi,(int)seed(it.x()));
+            }
+        }
+        std::vector<MasterSlave> v_individu(maxi+1);
+        for(unsigned int i=0;i<v_individu.size();i++){
+            v_individu[i]._my_label=i;
+        }
+
+        while(pop.next()){
+            int label1=v_individu[pop.x().first].getLabelMaster();
+            if(pop.getRegion()(pop.x().second)==RestrictedSetWithMySelf<typename FunctionLabel::F>::NoRegion){
+                functopo.addPoint(label1,pop.x().second);
+                pop.growth(label1,pop.x().second);
+            }else{
+                int label2=v_individu[pop.getRegion()(pop.x().second)].getLabelMaster();
+                if(label1!=label2){
+                    if(functopo.diff(label1,label2 )<diff){
+                        if(v_individu[label1]._my_slaves.size()<v_individu[label2]._my_slaves.size())
+                            std::swap(label1,label2);
+                        v_individu[label1].addSlave(v_individu[label2]);
+                        functopo.merge(label1,label2);
+                    }
+                }
+                pop.pop();
+
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(pop.getRegion()(it.x())< v_individu.size()){
+                int label1=v_individu[pop.getRegion()(it.x())].getLabelMaster();
+                pop.setRegion(label1,it.x());
+            }
+        }
+        return pop.getRegion();
+    }
 
 
-/*!
+    /*!
 
      * \param cluster input binary matrix
      * \param itneigh neighborhood IteratorE
@@ -1302,84 +1250,78 @@ static FunctionLabel regionGrowingMergingLevel(const FunctionLabel & seed,const 
      *  Mat2RGBUI8 RGB = pop::Visualization::label2RGB(label);
      *  RGB.display();
     */
-template<typename FunctionBinary,typename IteratorE>
-static typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32>::Result clusterToLabel(const FunctionBinary & cluster, typename FunctionBinary::IteratorENeighborhood  itneigh,IteratorE it)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("clusterToLabel",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    typedef typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32>::Result FunctionLabel;
-    FunctorZero f;
-    Population<FunctionLabel,FunctorZero> pop(cluster.getDomain(),f,itneigh);
-    it.init();
-    while(it.next()){
-        if(cluster(it.x())==0)
-            pop.setRegion(0,it.x());
-    }
-    typename FunctionLabel::F i=0;
-    pop.setLevel(0);
+    template<typename FunctionBinary,typename IteratorE>
+    static typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32>::Result clusterToLabel(const FunctionBinary & cluster, typename FunctionBinary::IteratorENeighborhood  itneigh,IteratorE it)
+    {
+        typedef typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32>::Result FunctionLabel;
+        FunctorZero f;
+        Population<FunctionLabel,FunctorZero> pop(cluster.getDomain(),f,itneigh);
+        it.init();
+        while(it.next()){
+            if(cluster(it.x())==0)
+                pop.setRegion(0,it.x());
+        }
+        typename FunctionLabel::F i=0;
+        pop.setLevel(0);
 
-    it.init();
-    while(it.next()){
-        if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
-            i++;
+        it.init();
+        while(it.next()){
+            if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
+                i++;
 
-            pop.growth(i,it.x());
-            while(pop.next()){
-                pop.growth(i,pop.x().second);
+                pop.growth(i,it.x());
+                while(pop.next()){
+                    pop.growth(i,pop.x().second);
+                }
             }
         }
+        return pop.getRegion();
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("clusterToLabel");
-    return pop.getRegion();
-}
-/*! \fn FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
+    /*! \fn FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
      * \param bin input binary matrix
      * \param itneigh neighborhood IteratorE domain
       *\return  max cluster
      *
      *  The ouput matrix is the max cluster of the input binary matrix
     */
-template<typename FunctionBinary>
-static FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("ClusterMax",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32 >::Result label(bin.getDomain());
-    label = ProcessingAdvanced::clusterToLabel(bin,itneigh,bin.getIteratorEDomain());
-    typename FunctionBinary::IteratorEDomain it(bin.getIteratorEDomain());
-    std::vector<UI32> occurence;
-    while(it.next())
+    template<typename FunctionBinary>
+    static FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
     {
-
-        if(label(it.x())>=(UI32)occurence.size())occurence.resize(label(it.x())+1,0);
-        if(label(it.x())!=0)
-            occurence[label(it.x())]++;
-    }
-
-    UI32 maxoccurence=0;
-    UI32 maxlabel=0;
-    for(I32 i=1;i<(I32)occurence.size();i++)
-    {
-        if(maxoccurence<occurence[i])
+        typename FunctionTypeTraitsSubstituteF<FunctionBinary,UI32 >::Result label(bin.getDomain());
+        label = ProcessingAdvanced::clusterToLabel(bin,itneigh,bin.getIteratorEDomain());
+        typename FunctionBinary::IteratorEDomain it(bin.getIteratorEDomain());
+        std::vector<UI32> occurence;
+        while(it.next())
         {
-            maxlabel=i;
-            maxoccurence=occurence[i];
-        }
-    }
-    FunctionBinary clustermax(bin.getDomain());
-    it.init();
-    while(it.next())
-    {
-        if(label(it.x())==maxlabel)
-            clustermax(it.x())=NumericLimits<UI8>::maximumRange();
-        else
-            clustermax(it.x())=0;
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("ClusterMax");
-    return clustermax;
-}
 
-/*! \fn void FunctionProcedureMinimaRegional(const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh , FunctionLabel & minima)
+            if(label(it.x())>=(UI32)occurence.size())occurence.resize(label(it.x())+1,0);
+            if(label(it.x())!=0)
+                occurence[label(it.x())]++;
+        }
+
+        UI32 maxoccurence=0;
+        UI32 maxlabel=0;
+        for(I32 i=1;i<(I32)occurence.size();i++)
+        {
+            if(maxoccurence<occurence[i])
+            {
+                maxlabel=i;
+                maxoccurence=occurence[i];
+            }
+        }
+        FunctionBinary clustermax(bin.getDomain());
+        it.init();
+        while(it.next())
+        {
+            if(label(it.x())==maxlabel)
+                clustermax(it.x())=NumericLimits<UI8>::maximumRange();
+            else
+                clustermax(it.x())=0;
+        }
+        return clustermax;
+    }
+
+    /*! \fn void FunctionProcedureMinimaRegional(const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh , FunctionLabel & minima)
      * \param topo input topographic surface
      * \param itneigh neighborhood IteratorE domain
       *\param  minima labelled minima
@@ -1387,50 +1329,45 @@ static FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBi
      *  The labelled minima is the minima of the input binary matrix such that each minumum has a specific label
     */
 
-template< typename FunctionTopo>
-static typename FunctionTypeTraitsSubstituteF<FunctionTopo,UI32>::Result minimaRegional(const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("MinimaRegional",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-
-    FunctorZero functortopo;
-    typedef typename FunctionTypeTraitsSubstituteF<FunctionTopo,UI32>::Result FunctionLabel;
-    Population<FunctionLabel,FunctorZero, RestrictedSetWithMySelf> pop(topo.getDomain(),functortopo,itneigh);
-    typename FunctionLabel::F labelminima=0;
-    std::vector<bool> globalminima(1,true);//the label 0 is for the blank region
-    pop.setLevel(0);
-    typename FunctionTopo::IteratorEDomain it(topo.getIteratorEDomain());
-    while(it.next()){
-        if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
-            labelminima++;
-            pop.growth(labelminima,it.x());
-            globalminima.push_back(true);
-            typename FunctionTopo::F value = topo(it.x());
-            while(pop.next()){
-                typename FunctionTopo::F temp = topo(pop.x().second);
-                if(temp==value)
-                    pop.growth(pop.x().first,pop.x().second);
-                else
-                {
-                    pop.pop();
-                    if(temp<value)
-                        *(globalminima.rbegin())=false;
+    template< typename FunctionTopo>
+    static typename FunctionTypeTraitsSubstituteF<FunctionTopo,UI32>::Result minimaRegional(const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood  itneigh)
+    {
+        FunctorZero functortopo;
+        typedef typename FunctionTypeTraitsSubstituteF<FunctionTopo,UI32>::Result FunctionLabel;
+        Population<FunctionLabel,FunctorZero, RestrictedSetWithMySelf> pop(topo.getDomain(),functortopo,itneigh);
+        typename FunctionLabel::F labelminima=0;
+        std::vector<bool> globalminima(1,true);//the label 0 is for the blank region
+        pop.setLevel(0);
+        typename FunctionTopo::IteratorEDomain it(topo.getIteratorEDomain());
+        while(it.next()){
+            if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
+                labelminima++;
+                pop.growth(labelminima,it.x());
+                globalminima.push_back(true);
+                typename FunctionTopo::F value = topo(it.x());
+                while(pop.next()){
+                    typename FunctionTopo::F temp = topo(pop.x().second);
+                    if(temp==value)
+                        pop.growth(pop.x().first,pop.x().second);
+                    else
+                    {
+                        pop.pop();
+                        if(temp<value)
+                            *(globalminima.rbegin())=false;
+                    }
                 }
             }
         }
-    }
-    it.init();
-    while(it.next()){
-        if(globalminima[pop.getRegion()(it.x())]==false  )
-            pop.setRegion(0,it.x());//set blank region
+        it.init();
+        while(it.next()){
+            if(globalminima[pop.getRegion()(it.x())]==false  )
+                pop.setRegion(0,it.x());//set blank region
+        }
+        it.init();
+        return ProcessingAdvanced::greylevelRemoveEmptyValue(pop.getRegion(),  it);
     }
 
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("MinimaRegional");
-    it.init();
-    return ProcessingAdvanced::greylevelRemoveEmptyValue(pop.getRegion(),  it);
-}
-
-/*! \fn FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
+    /*! \fn FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
       * \param seed input seed
      * \param topo input topographic surface
      * \param itneigh neighborhood IteratorE domain
@@ -1439,38 +1376,35 @@ static typename FunctionTypeTraitsSubstituteF<FunctionTopo,UI32>::Result minimaR
      *  Watershed transformation on the topographic surface initialiased by the seeds withoutboundary
     */
 
-template< typename FunctionLabel,typename FunctionTopo>
-static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("Watershed",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorTopography<FunctionTopo  > functortopo(topo);
-    Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL,SQFIFO,Growth> pop(topo.getDomain(),functortopo,itneigh);
-    typename FunctionTopo::IteratorEDomain it(topo.getDomain());
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-        }
-    }
-    for(I32 i=0;i<functortopo.nbrLevel();i++)
+    template< typename FunctionLabel,typename FunctionTopo>
+    static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
     {
-        pop.setLevel(i);
-        functortopo.setLevel(i);
-        while(pop.next())
-        {
-            pop.growth(pop.x().first,pop.x().second);
+        FunctorTopography<FunctionTopo  > functortopo(topo);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL,SQFIFO,Growth> pop(topo.getDomain(),functortopo,itneigh);
+        typename FunctionTopo::IteratorEDomain it(topo.getDomain());
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.setRegion(seed(it.x()),it.x());
+            }
         }
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
+        }
+        for(I32 i=0;i<functortopo.nbrLevel();i++)
+        {
+            pop.setLevel(i);
+            functortopo.setLevel(i);
+            while(pop.next())
+            {
+                pop.growth(pop.x().first,pop.x().second);
+            }
+        }
+        return pop.getRegion();
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("Watershed");
-    return pop.getRegion();
-}
-/*! \fn FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, const FunctionMask & mask , typename FunctionTopo::IteratorENeighborhood itneigh )
+    /*! \fn FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, const FunctionMask & mask , typename FunctionTopo::IteratorENeighborhood itneigh )
 
       * \param seed input seed matrix
      * \param topo input topographic surface
@@ -1482,51 +1416,48 @@ static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & 
     */
 
 
-template<
-        typename FunctionLabel,
-        typename FunctionTopo,
-        typename FunctionMask
-        >
-static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, const FunctionMask & mask , typename FunctionTopo::IteratorENeighborhood itneigh )
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("Watershed",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorTopography<FunctionTopo  > functortopo(topo);
-    Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL,SQFIFO,Growth> pop(topo.getDomain(),functortopo,itneigh);
-    typename FunctionTopo::IteratorEDomain it(topo.getDomain());
-    while(it.next()){
-        if(mask(it.x())==0){
-            pop.setRegion(0,it.x());
-        }
-        else if(seed(it.x())!=0){
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0&&mask(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-        }
-    }
-    for(I32 i=0;i<functortopo.nbrLevel();i++)
+    template<
+            typename FunctionLabel,
+            typename FunctionTopo,
+            typename FunctionMask
+            >
+    static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & topo, const FunctionMask & mask , typename FunctionTopo::IteratorENeighborhood itneigh )
     {
-        pop.setLevel(i);
-        functortopo.setLevel(i);
-        while(pop.next())
+        FunctorTopography<FunctionTopo  > functortopo(topo);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL,SQFIFO,Growth> pop(topo.getDomain(),functortopo,itneigh);
+        typename FunctionTopo::IteratorEDomain it(topo.getDomain());
+        while(it.next()){
+            if(mask(it.x())==0){
+                pop.setRegion(0,it.x());
+            }
+            else if(seed(it.x())!=0){
+                pop.setRegion(seed(it.x()),it.x());
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0&&mask(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
+        }
+        for(I32 i=0;i<functortopo.nbrLevel();i++)
         {
-            pop.growth(pop.x().first,pop.x().second);
+            pop.setLevel(i);
+            functortopo.setLevel(i);
+            while(pop.next())
+            {
+                pop.growth(pop.x().first,pop.x().second);
+            }
         }
-    }
-    it.init();
-    while(it.next()){
-        if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
-            pop.setRegion(0,it.x());
+        it.init();
+        while(it.next()){
+            if(pop.getRegion()(it.x())==pop.getLabelNoRegion()){
+                pop.setRegion(0,it.x());
+            }
         }
+        return pop.getRegion();
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("Watershed");
-    return pop.getRegion();
-}
-/*! \fn FunctionLabel watershedBoundary(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
+    /*! \fn FunctionLabel watershedBoundary(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
       * \param seed input seed
      * \param topo input topographic surface
      * \param itneigh neighborhood IteratorE domain
@@ -1535,50 +1466,47 @@ static FunctionLabel watershed(const FunctionLabel & seed, const FunctionTopo & 
      *  Watershed transformation on the topographic surface initialiased by the seeds with a boundary region to separate the basins
     */
 
-template<
-        typename FunctionTopo,
-        typename FunctionLabel
-        >
-static FunctionLabel watershedBoundary(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("WatershedBoundary",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorTopography<FunctionTopo  > functortopo(topo);
-    Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
-
-    typename FunctionTopo::IteratorEDomain it(topo.getDomain());
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-        }
-    }
-
-    for(I32 i=0;i<functortopo.nbrLevel();i++)
+    template<
+            typename FunctionTopo,
+            typename FunctionLabel
+            >
+    static FunctionLabel watershedBoundary(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
     {
-        pop.setLevel(i);
-        functortopo.setLevel(i);
-        while(pop.next())
-        {
-            if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
-            {
-                pop.growth(pop.x().first,pop.x().second);
-            }
-            else{
-                pop.setRegion(0,pop.x().second);
+        FunctorTopography<FunctionTopo  > functortopo(topo);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
+
+        typename FunctionTopo::IteratorEDomain it(topo.getDomain());
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.setRegion(seed(it.x()),it.x());
             }
         }
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("WatershedBoundary");
-    return pop.getRegion();
-}
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
+        }
 
-/*! \fn FunctionLabel watershedBoundary(const FunctionLabel & seed,const FunctionTopo & topo,const FunctionMask & mask, typename FunctionTopo::IteratorENeighborhood itneigh )
+        for(I32 i=0;i<functortopo.nbrLevel();i++)
+        {
+            pop.setLevel(i);
+            functortopo.setLevel(i);
+            while(pop.next())
+            {
+                if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
+                {
+                    pop.growth(pop.x().first,pop.x().second);
+                }
+                else{
+                    pop.setRegion(0,pop.x().second);
+                }
+            }
+        }
+        return pop.getRegion();
+    }
+
+    /*! \fn FunctionLabel watershedBoundary(const FunctionLabel & seed,const FunctionTopo & topo,const FunctionMask & mask, typename FunctionTopo::IteratorENeighborhood itneigh )
       * \param seed input seed matrix
      * \param topo input topographic surface
      * \param mask mask restricted the region growing
@@ -1588,49 +1516,46 @@ static FunctionLabel watershedBoundary(const FunctionLabel & seed, const Functio
      *  Watershed transformation on the topographic surface initialiased by the seeds restricted by the mask with a boundary region to separate the basins
     */
 
-template<
-        typename FunctionTopo,
-        typename FunctionLabel,
-        typename FunctionMask
-        >
-static FunctionLabel watershedBoundary(const FunctionLabel & seed,const FunctionTopo & topo,const FunctionMask & mask, typename FunctionTopo::IteratorENeighborhood itneigh )
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("WatershedBoundary",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorTopography<FunctionTopo  > functortopo(topo);
-    Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
-    typename FunctionTopo::IteratorEDomain it(topo.getIteratorEDomain());
-    while(it.next()){
-        if(mask(it.x())==0){
-            pop.setRegion(0,it.x());
-        }
-        else if(seed(it.x())!=0){
-            pop.setRegion(seed(it.x())+1,it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0&&mask(it.x())!=0){
-            pop.growth(seed(it.x())+1,it.x());
-        }
-    }
-
-    for(I32 i=0;i<functortopo.nbrLevel();i++)
+    template<
+            typename FunctionTopo,
+            typename FunctionLabel,
+            typename FunctionMask
+            >
+    static FunctionLabel watershedBoundary(const FunctionLabel & seed,const FunctionTopo & topo,const FunctionMask & mask, typename FunctionTopo::IteratorENeighborhood itneigh )
     {
-        pop.setLevel(i);
-        functortopo.setLevel(i);
-        while(pop.next())
-        {
-            if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
-                pop.growth(pop.x().first,pop.x().second);
-            else
-                pop.setRegion(1,pop.x().second);
+        FunctorTopography<FunctionTopo  > functortopo(topo);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
+        typename FunctionTopo::IteratorEDomain it(topo.getIteratorEDomain());
+        while(it.next()){
+            if(mask(it.x())==0){
+                pop.setRegion(0,it.x());
+            }
+            else if(seed(it.x())!=0){
+                pop.setRegion(seed(it.x())+1,it.x());
+            }
         }
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0&&mask(it.x())!=0){
+                pop.growth(seed(it.x())+1,it.x());
+            }
+        }
+
+        for(I32 i=0;i<functortopo.nbrLevel();i++)
+        {
+            pop.setLevel(i);
+            functortopo.setLevel(i);
+            while(pop.next())
+            {
+                if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
+                    pop.growth(pop.x().first,pop.x().second);
+                else
+                    pop.setRegion(1,pop.x().second);
+            }
+        }
+        return pop.getRegion();
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("WatershedBoundary");
-    return pop.getRegion();
-}
-/*! \fn Function1 geodesicReconstruction(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
+    /*! \fn Function1 geodesicReconstruction(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
       * \param f input matrix
      * \param g input matrix
      * \param itneigh neighborhood IteratorE domain
@@ -1640,49 +1565,46 @@ static FunctionLabel watershedBoundary(const FunctionLabel & seed,const Function
      * \sa dynamic
     */
 
-template<typename Function1,typename Function2>
-static Function1 geodesicReconstruction(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("GeodesicReconstruction",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorZero zero;
-    Population<Function1,FunctorZero,RestrictedSetWithoutSuperiorLabel,SQFIFO> pop(f.getDomain(),zero,itneigh) ;
-    typename Function1::IteratorEDomain it(f.getIteratorEDomain());
-
-    while(it.next()){
-
-        pop.setRegion(f(it.x()),it.x());
-    }
-    it.init();
-    while(it.next()){
-        pop.growth(f(it.x()),it.x());
-
-    }
-    pop.setLevel(0);
-    while(pop.next())
+    template<typename Function1,typename Function2>
+    static Function1 geodesicReconstruction(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
     {
-        if( g(pop.x().second)<pop.x().first)
-            pop.growth(pop.x().first,pop.x().second);
-        else
-            pop.pop();
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("GeodesicReconstruction");
-    return pop.getRegion();
-}
-template<typename Function1,typename Function2>
-static Function1 dynamicNoRegionGrowing(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
-{
-    Function1 fi;
-    Function1 fiplusun(f);
-    do{
-        fi = fiplusun;
-        typename Function1::IteratorEDomain it(fi.getIteratorEDomain());
-        fiplusun =maximum(erosion(fi,it,itneigh),g);
-    }while(!(fi==fiplusun));
-    return fiplusun;
-}
+        FunctorZero zero;
+        Population<Function1,FunctorZero,RestrictedSetWithoutSuperiorLabel,SQFIFO> pop(f.getDomain(),zero,itneigh) ;
+        typename Function1::IteratorEDomain it(f.getIteratorEDomain());
 
-/*! \fn static Function1 dynamic(const Function1 & f, typename Function1::F value, typename Function1::IteratorENeighborhood  itneigh)
+        while(it.next()){
+
+            pop.setRegion(f(it.x()),it.x());
+        }
+        it.init();
+        while(it.next()){
+            pop.growth(f(it.x()),it.x());
+
+        }
+        pop.setLevel(0);
+        while(pop.next())
+        {
+            if( g(pop.x().second)<pop.x().first)
+                pop.growth(pop.x().first,pop.x().second);
+            else
+                pop.pop();
+        }
+        return pop.getRegion();
+    }
+    template<typename Function1,typename Function2>
+    static Function1 dynamicNoRegionGrowing(const Function1 & f,const Function2 & g, typename Function1::IteratorENeighborhood  itneigh)
+    {
+        Function1 fi;
+        Function1 fiplusun(f);
+        do{
+            fi = fiplusun;
+            typename Function1::IteratorEDomain it(fi.getIteratorEDomain());
+            fiplusun =maximum(erosion(fi,it,itneigh),g);
+        }while(!(fi==fiplusun));
+        return fiplusun;
+    }
+
+    /*! \fn static Function1 dynamic(const Function1 & f, typename Function1::F value, typename Function1::IteratorENeighborhood  itneigh)
       * \param f input matrix
      * \param value dynamic value
       * \param itneigh neighborhood IteratorE domain
@@ -1692,14 +1614,14 @@ static Function1 dynamicNoRegionGrowing(const Function1 & f,const Function2 & g,
      * \sa FunctionProcedureGeodesicReconstruction
     */
 
-template<typename Function1>
-static Function1 dynamic(const Function1 & f, typename Function1::F value, typename Function1::IteratorENeighborhood  itneigh)
-{
-    Function1 h(f);
-    h+=value;
-    return geodesicReconstruction(h, f,itneigh);
-}
-/*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,plabel>::Result > voronoiTesselation(const FunctionRegion & seed, typename FunctionRegion::IteratorENeighborhood  itneigh)
+    template<typename Function1>
+    static Function1 dynamic(const Function1 & f, typename Function1::F value, typename Function1::IteratorENeighborhood  itneigh)
+    {
+        Function1 h(f);
+        h+=value;
+        return geodesicReconstruction(h, f,itneigh);
+    }
+    /*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,plabel>::Result > voronoiTesselation(const FunctionRegion & seed, typename FunctionRegion::IteratorENeighborhood  itneigh)
 
       * \param seed input seed
       * \param itneigh neighborhood IteratorE domain
@@ -1707,108 +1629,96 @@ static Function1 dynamic(const Function1 & f, typename Function1::F value, typen
       *
       *  Voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ (work only for 1-norm and \f$\infty-norm\f$)
     */
-template<typename FunctionRegion>
-static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result > voronoiTesselation(const FunctionRegion & seed, typename FunctionRegion::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("VoronoiTesselation",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorSwitch f;
-    Population<FunctionRegion,FunctorSwitch> pop(seed.getDomain(),f,itneigh);
-    typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result dist(seed.getDomain());
-    typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
-
-    while(it.next()){
-        if(seed(it.x())!=0){
-            dist(it.x())=0;
-            pop.setRegion(seed(it.x()),it.x());
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
-        }
-    }
-    UI16 distancevalue=0;
-    bool atleastonegrowth=false;
-    do
+    template<typename FunctionRegion>
+    static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result > voronoiTesselation(const FunctionRegion & seed, typename FunctionRegion::IteratorENeighborhood  itneigh)
     {
-        pop.setLevel(f.getFlipFlop());
-        f.switchFlipFlop();
-        distancevalue++;
-        atleastonegrowth=false;
+        FunctorSwitch f;
+        Population<FunctionRegion,FunctorSwitch> pop(seed.getDomain(),f,itneigh);
+        typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result dist(seed.getDomain());
+        typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
+
+        while(it.next()){
+            if(seed(it.x())!=0){
+                dist(it.x())=0;
+                pop.setRegion(seed(it.x()),it.x());
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
+        }
+        UI16 distancevalue=0;
+        bool atleastonegrowth=false;
+        do
+        {
+            pop.setLevel(f.getFlipFlop());
+            f.switchFlipFlop();
+            distancevalue++;
+            atleastonegrowth=false;
+            while(pop.next()){
+                atleastonegrowth=true;
+                pop.growth(pop.x().first,pop.x().second);
+                dist(pop.x().second)=distancevalue;
+            }
+        }while(atleastonegrowth==true);
+        return std::make_pair(pop.getRegion(),dist);
+    }
+    template<typename FunctionRegion,typename FunctionMask>
+    static FunctionRegion voronoiTesselationWithoutDistanceFunction(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
+    {
+        FunctorZero f;
+        Population<FunctionRegion,FunctorZero> pop(seed.getDomain(),f,itneigh);
+        typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
+        while(it.next()){
+            if(mask(it.x())==0){
+                pop.setRegion(0,it.x());
+            }
+            else   if(seed(it.x())!=0){
+                pop.setRegion(seed(it.x()),it.x());
+
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(mask(it.x())!=0 && seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
+        }
         while(pop.next()){
-            atleastonegrowth=true;
             pop.growth(pop.x().first,pop.x().second);
-            dist(pop.x().second)=distancevalue;
         }
-    }while(atleastonegrowth==true);
-
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("VoronoiTesselation");
-    return std::make_pair(pop.getRegion(),dist);
-}
-template<typename FunctionRegion,typename FunctionMask>
-static FunctionRegion voronoiTesselationWithoutDistanceFunction(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("VoronoiTesselation",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorZero f;
-    Population<FunctionRegion,FunctorZero> pop(seed.getDomain(),f,itneigh);
-    typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
-    while(it.next()){
-        if(mask(it.x())==0){
-            pop.setRegion(0,it.x());
+        it.init();
+        while(it.next()){
+            if(pop.getRegion()(it.x())==pop.getLabelNoRegion())
+                pop.getRegion()(it.x())=0;
         }
-        else   if(seed(it.x())!=0){
-            pop.setRegion(seed(it.x()),it.x());
+        return pop.getRegion();
+    }
+    template<typename FunctionRegion>
+    static FunctionRegion voronoiTesselationWithoutDistanceFunction(const FunctionRegion & seed,  typename FunctionRegion::IteratorENeighborhood  itneigh)
+    {
+        FunctorZero f;
+        Population<FunctionRegion,FunctorZero> pop(seed.getDomain(),f,itneigh);
+        typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
 
+        while(it.next()){
+            if(seed(it.x())!=0)
+                pop.setRegion(seed(it.x()),it.x());
         }
-    }
-    it.init();
-    while(it.next()){
-        if(mask(it.x())!=0 && seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
+        it.init();
+        while(it.next()){
+
+            if(seed(it.x())!=0)
+                pop.growth(seed(it.x()),it.x());
         }
+        while(pop.next()){
+            pop.growth(pop.x().first,pop.x().second);
+        }
+        return pop.getRegion();
     }
-    while(pop.next()){
-        pop.growth(pop.x().first,pop.x().second);
-    }
-    it.init();
-    while(it.next()){
-        if(pop.getRegion()(it.x())==pop.getLabelNoRegion())
-            pop.getRegion()(it.x())=0;
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("VoronoiTesselation");
-    return pop.getRegion();
-}
-template<typename FunctionRegion>
-static FunctionRegion voronoiTesselationWithoutDistanceFunction(const FunctionRegion & seed,  typename FunctionRegion::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("VoronoiTesselation",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorZero f;
-    Population<FunctionRegion,FunctorZero> pop(seed.getDomain(),f,itneigh);
-    typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
-
-    while(it.next()){
-        if(seed(it.x())!=0)
-            pop.setRegion(seed(it.x()),it.x());
-    }
-    it.init();
-    while(it.next()){
-
-        if(seed(it.x())!=0)
-            pop.growth(seed(it.x()),it.x());
-    }
-    while(pop.next()){
-        pop.growth(pop.x().first,pop.x().second);
-    }
-
-
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("VoronoiTesselation");
-    return pop.getRegion();
-}
-/*! \fn     std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,plabel>::Result > voronoiTesselation(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
+    /*! \fn     std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,plabel>::Result > voronoiTesselation(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
       * \param seed input seed
       * \param mask mask restricted the region growing
       * \param itneigh neighborhood IteratorE domain
@@ -1817,53 +1727,50 @@ static FunctionRegion voronoiTesselationWithoutDistanceFunction(const FunctionRe
       *  Voronoi tesselation based on the seeds\f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ such that the distunce function
       * is restricted by the mask (work only for 1-norm and \f$\infty-norm\f$)
     */
-template<typename FunctionRegion,typename FunctionMask>
-static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result > voronoiTesselation(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("VoronoiTesselation",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorSwitch f;
-    Population<FunctionRegion,FunctorSwitch> pop(seed.getDomain(),f,itneigh);
-    typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result dist(seed.getDomain());
-    typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
+    template<typename FunctionRegion,typename FunctionMask>
+    static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result > voronoiTesselation(const FunctionRegion & seed, const FunctionMask & mask, typename FunctionRegion::IteratorENeighborhood  itneigh)
+    {
+        FunctorSwitch f;
+        Population<FunctionRegion,FunctorSwitch> pop(seed.getDomain(),f,itneigh);
+        typename FunctionTypeTraitsSubstituteF<FunctionRegion,UI16>::Result dist(seed.getDomain());
+        typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
 
-    while(it.next()){
-        if(mask(it.x())==0){
-            pop.setRegion(0,it.x());
-        }
-        else
-        {
-            if(seed(it.x())!=0){
-                dist(it.x())=0;
-                pop.setRegion(seed(it.x()),it.x());
+        while(it.next()){
+            if(mask(it.x())==0){
+                pop.setRegion(0,it.x());
+            }
+            else
+            {
+                if(seed(it.x())!=0){
+                    dist(it.x())=0;
+                    pop.setRegion(seed(it.x()),it.x());
+                }
             }
         }
-    }
 
-    it.init();
-    while(it.next()){
-        if(mask(it.x())!=0 && seed(it.x())!=0){
-            pop.growth(seed(it.x()),it.x());
+        it.init();
+        while(it.next()){
+            if(mask(it.x())!=0 && seed(it.x())!=0){
+                pop.growth(seed(it.x()),it.x());
+            }
         }
+        int distancevalue=0;
+        bool atleastonegrowth=false;
+        do
+        {
+            pop.setLevel(f.getFlipFlop());
+            f.switchFlipFlop();
+            distancevalue++;
+            atleastonegrowth=false;
+            while(pop.next()){
+                atleastonegrowth=true;
+                pop.growth(pop.x().first,pop.x().second);
+                dist(pop.x().second)=distancevalue;
+            }
+        }while(atleastonegrowth==true);
+        return std::make_pair(pop.getRegion(),dist);
     }
-    int distancevalue=0;
-    bool atleastonegrowth=false;
-    do
-    {
-        pop.setLevel(f.getFlipFlop());
-        f.switchFlipFlop();
-        distancevalue++;
-        atleastonegrowth=false;
-        while(pop.next()){
-            atleastonegrowth=true;
-            pop.growth(pop.x().first,pop.x().second);
-            dist(pop.x().second)=distancevalue;
-        }
-    }while(atleastonegrowth==true);
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("VoronoiTesselation");
-    return std::make_pair(pop.getRegion(),dist);
-}
-/*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
+    /*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
       * \param seed input seed
       * \param region ouput region
       * \param dist distunce function
@@ -1872,83 +1779,80 @@ static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionR
       *  Quasi-voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ calculated with the euclidean norm
     */
 
-template<typename FunctionRegion>
-static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
-{
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("VoronoiTesselationEuclidean",COLLECTOR_EXECUTION_INFO);
-    typename FunctionRegion::IteratorENeighborhood itn(seed.getIteratorENeighborhood(1,0));
-    FunctorZero f;
-    typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion ,UI32 >::Result FunctionLabel;
-    Population<FunctionLabel,FunctorZero,RestrictedSetWithMySelf> pop(seed.getDomain(),f,seed.getIteratorENeighborhood(1,0));
-
-
-    FunctionRegion region(seed.getDomain());
-    typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result FunctionDistance;
-    FunctionDistance dist(seed.getDomain());
-    std::vector<typename FunctionRegion::E > vrand;
-    typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
-
-    FunctionRegion  seedinner(seed.getDomain());
-    seedinner = ProcessingAdvanced::erosion(seed,it,itn);
-    seedinner = seed-seedinner;
-
-    it.init();
-    while(it.next()){
-        if(seed(it.x())==0){
-            dist(it.x())=NumericLimits<typename FunctionDistance::F>::maximumRange();
-        }else{
-            dist(it.x())=0;
-        }
-        if(seedinner(it.x())!=0){
-            vrand.push_back(it.x());
-        }
-        region(it.x())=seed(it.x());
-    }
-    /* initialize random seed: */
-    srand ( time(NULL) );
-    pop.setLevel(0);
-    int index =0;
-    int display_step=1;
-    while(vrand.empty()==false)
+    template<typename FunctionRegion>
+    static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
     {
-        if(index>=display_step-1){
-            display_step*=2;
-            CollectorExecutionInformationSingleton::getInstance()->info("Random seed number="+BasicUtility::Any2String(index));
-        }
-        I32 i = rand()%((I32)vrand.size());
-        typename FunctionRegion::E x = vrand[i];
-        vrand[i]= *(vrand.rbegin());
-        vrand.pop_back();
-        int label = seed(x);
-        pop.growth(index,x);
-        region(it.x())=label;
-        index++;
-        while(pop.next())
-        {
-            typename FunctionRegion::E diff = pop.x().second-x;
-            F64 disttemp = diff.normPower();
-            if(disttemp<= dist(pop.x().second))
-            {
-                pop.growth(pop.x().first,pop.x().second);
-                region(pop.x().second)=label;
-                dist(pop.x().second)=disttemp;
-            }
-            else
-                pop.pop();
-        }
-    }
-    it.init();
-    while(it.next()){
-        if(dist(it.x())==NumericLimits<typename FunctionDistance::F>::maximumRange())
-            dist(it.x()) =0;
-        else
-            dist(it.x()) =std::sqrt(static_cast<double>(dist(it.x())));
-    }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("VoronoiTesselationEuclidean");
-    return std::make_pair(region,dist);
-}
+        typename FunctionRegion::IteratorENeighborhood itn(seed.getIteratorENeighborhood(1,0));
+        FunctorZero f;
+        typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion ,UI32 >::Result FunctionLabel;
+        Population<FunctionLabel,FunctorZero,RestrictedSetWithMySelf> pop(seed.getDomain(),f,seed.getIteratorENeighborhood(1,0));
 
-/*! \fn static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
+
+        FunctionRegion region(seed.getDomain());
+        typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result FunctionDistance;
+        FunctionDistance dist(seed.getDomain());
+        std::vector<typename FunctionRegion::E > vrand;
+        typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
+
+        FunctionRegion  seedinner(seed.getDomain());
+        seedinner = ProcessingAdvanced::erosion(seed,it,itn);
+        seedinner = seed-seedinner;
+
+        it.init();
+        while(it.next()){
+            if(seed(it.x())==0){
+                dist(it.x())=NumericLimits<typename FunctionDistance::F>::maximumRange();
+            }else{
+                dist(it.x())=0;
+            }
+            if(seedinner(it.x())!=0){
+                vrand.push_back(it.x());
+            }
+            region(it.x())=seed(it.x());
+        }
+        /* initialize random seed: */
+        srand ( time(NULL) );
+        pop.setLevel(0);
+        int index =0;
+        int display_step=1;
+        while(vrand.empty()==false)
+        {
+            if(index>=display_step-1){
+                display_step*=2;
+            }
+            I32 i = rand()%((I32)vrand.size());
+            typename FunctionRegion::E x = vrand[i];
+            vrand[i]= *(vrand.rbegin());
+            vrand.pop_back();
+            int label = seed(x);
+            pop.growth(index,x);
+            region(it.x())=label;
+            index++;
+            while(pop.next())
+            {
+                typename FunctionRegion::E diff = pop.x().second-x;
+                F64 disttemp = diff.normPower();
+                if(disttemp<= dist(pop.x().second))
+                {
+                    pop.growth(pop.x().first,pop.x().second);
+                    region(pop.x().second)=label;
+                    dist(pop.x().second)=disttemp;
+                }
+                else
+                    pop.pop();
+            }
+        }
+        it.init();
+        while(it.next()){
+            if(dist(it.x())==NumericLimits<typename FunctionDistance::F>::maximumRange())
+                dist(it.x()) =0;
+            else
+                dist(it.x()) =std::sqrt(static_cast<double>(dist(it.x())));
+        }
+        return std::make_pair(region,dist);
+    }
+
+    /*! \fn static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
           * \param bin input binary matrix
           * \param radius radius
           * \param norm norm
@@ -1956,101 +1860,95 @@ static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionR
           *
           *  erosion(x) =  \min_{x'\in B(x,r,n)}f(x') \f$, where \f$B(x,norm)=\{x':|x'-x|_n\leq r\}\f$ the ball centered in 0 of radius r and the norm n
         */
-template<typename Function>
-static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
-{
-    return erosionRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
-}
-template<typename Function>
-static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
-{
-    typedef typename Identity<typename Function::F>::Result::F TypeScalar;
-    VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
-    Convertor::toVecN(f,V);
-    for(int i=0;i<Function::DIM;i++){
-        V(i) = erosionRegionGrowing(V(i),radius,norm);
+    template<typename Function>
+    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
+    {
+        return erosionRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
     }
-    Function exit;
-    Convertor::fromVecN(V,exit);
-    return exit;
-}
-
-template<typename Function>
-static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
-{
-    if(norm<=1){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("erosionRegionGrowing",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-        FunctorSwitch func;
-        Population<Function,FunctorSwitch,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,norm));
-
-        typename Function::IteratorEDomain it(f.getIteratorEDomain());
-
-        while(it.next()){
-            pop.setRegion(f(it.x()),it.x());
+    template<typename Function>
+    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
+    {
+        typedef typename Identity<typename Function::F>::Result::F TypeScalar;
+        VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
+        Convertor::toVecN(f,V);
+        for(int i=0;i<Function::DIM;i++){
+            V(i) = erosionRegionGrowing(V(i),radius,norm);
         }
-        it.init();
-        while(it.next()){
-            pop.growth(f(it.x()),it.x());
-        }
-        int distancevalue=0;
-        bool atleastonegrowth=true;
-        while(atleastonegrowth==true&&distancevalue<radius)
-        {
-            pop.setLevel(func.getFlipFlop());
-            func.switchFlipFlop();
-            distancevalue++;
-            atleastonegrowth=false;
-            while(pop.next()){
-                atleastonegrowth=true;
-                pop.growth(pop.x().first,pop.x().second);
+        Function exit;
+        Convertor::fromVecN(V,exit);
+        return exit;
+    }
+
+    template<typename Function>
+    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
+    {
+        if(norm<=1){
+            FunctorSwitch func;
+            Population<Function,FunctorSwitch,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,norm));
+
+            typename Function::IteratorEDomain it(f.getIteratorEDomain());
+
+            while(it.next()){
+                pop.setRegion(f(it.x()),it.x());
             }
-        }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("erosionRegionGrowing");
-        return pop.getRegion();
-    }else{
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("erosionRegionGrowing",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-        FunctorSwitch func;
-        PopulationInformation<Function,FunctorSwitch,typename Function::E,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,0));
-
-        typename Function::IteratorEDomain it(f.getIteratorEDomain());
-
-        while(it.next()){
-            pop.setRegion(f(it.x()),it.x());
-        }
-        it.init();
-        while(it.next()){
-            pop.growth(f(it.x()),it.x(),it.x());
-        }
-        double radiuspower2= radius*radius;
-        int distancevalue=0;
-        bool atleastonegrowth=true;
-        while(atleastonegrowth==true&&distancevalue<radius)
-        {
-            pop.setLevel(func.getFlipFlop());
-            func.switchFlipFlop();
-            distancevalue++;
-            atleastonegrowth=false;
-            while(pop.next()){
-                typename Function::E diff = pop.x().first.second-pop.x().second;
-                F64 disttemp = diff.normPower();
-                if(disttemp<= radiuspower2)
-                {
+            it.init();
+            while(it.next()){
+                pop.growth(f(it.x()),it.x());
+            }
+            int distancevalue=0;
+            bool atleastonegrowth=true;
+            while(atleastonegrowth==true&&distancevalue<radius)
+            {
+                pop.setLevel(func.getFlipFlop());
+                func.switchFlipFlop();
+                distancevalue++;
+                atleastonegrowth=false;
+                while(pop.next()){
                     atleastonegrowth=true;
-                    pop.growth(pop.x().first.first,pop.x().first.second,pop.x().second);
-                }
-                else{
-                    pop.pop();
+                    pop.growth(pop.x().first,pop.x().second);
                 }
             }
+            return pop.getRegion();
+        }else{
+            FunctorSwitch func;
+            PopulationInformation<Function,FunctorSwitch,typename Function::E,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,0));
 
+            typename Function::IteratorEDomain it(f.getIteratorEDomain());
+
+            while(it.next()){
+                pop.setRegion(f(it.x()),it.x());
+            }
+            it.init();
+            while(it.next()){
+                pop.growth(f(it.x()),it.x(),it.x());
+            }
+            double radiuspower2= radius*radius;
+            int distancevalue=0;
+            bool atleastonegrowth=true;
+            while(atleastonegrowth==true&&distancevalue<radius)
+            {
+                pop.setLevel(func.getFlipFlop());
+                func.switchFlipFlop();
+                distancevalue++;
+                atleastonegrowth=false;
+                while(pop.next()){
+                    typename Function::E diff = pop.x().first.second-pop.x().second;
+                    F64 disttemp = diff.normPower();
+                    if(disttemp<= radiuspower2)
+                    {
+                        atleastonegrowth=true;
+                        pop.growth(pop.x().first.first,pop.x().first.second,pop.x().second);
+                    }
+                    else{
+                        pop.pop();
+                    }
+                }
+
+            }
+            return pop.getRegion();
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("erosionRegionGrowing");
-        return pop.getRegion();
     }
-}
-/*! \fn static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
+    /*! \fn static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
           * \param bin input binary matrix
           * \param radius radius
           * \param norm norm
@@ -2058,33 +1956,99 @@ static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Lo
           *
           *  dilation(x) =  \max_{x'\in B(x,r,n)}f(x') \f$, where \f$B(x,norm)=\{x':|x'-x|_n\leq r\}\f$ the ball centered in 0 of radius r and the norm n
         */
-template<typename Function>
-static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
-{
-    return dilationRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
-}
-template<typename Function>
-static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
-{
-    typedef typename Identity<typename Function::F>::Result::F TypeScalar;
-    VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
-    Convertor::toVecN(f,V);
-    for(int i=0;i<Function::DIM;i++){
-        V(i) = dilationRegionGrowing(V(i),radius,norm);
+    template<typename Function>
+    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
+    {
+        return dilationRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
     }
-    Function exit;
-    Convertor::fromVecN(V,exit);
-    return exit;
-}
+    template<typename Function>
+    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
+    {
+        typedef typename Identity<typename Function::F>::Result::F TypeScalar;
+        VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
+        Convertor::toVecN(f,V);
+        for(int i=0;i<Function::DIM;i++){
+            V(i) = dilationRegionGrowing(V(i),radius,norm);
+        }
+        Function exit;
+        Convertor::fromVecN(V,exit);
+        return exit;
+    }
 
-template<typename Function>
-static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
-{
-    if(norm<=1){
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("dilationRegionGrowing",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
+    template<typename Function>
+    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
+    {
+        if(norm<=1){
+            FunctorSwitch func;
+            Population<Function,FunctorSwitch,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,norm));
+
+            typename Function::IteratorEDomain it(f.getIteratorEDomain());
+
+            while(it.next()){
+                pop.setRegion(f(it.x()),it.x());
+            }
+            it.init();
+            while(it.next()){
+                pop.growth(f(it.x()),it.x());
+            }
+            int distancevalue=0;
+            bool atleastonegrowth=true;
+            while(atleastonegrowth==true&&distancevalue<radius)
+            {
+                pop.setLevel(func.getFlipFlop());
+                func.switchFlipFlop();
+                distancevalue++;
+                atleastonegrowth=false;
+                while(pop.next()){
+                    atleastonegrowth=true;
+                    pop.growth(pop.x().first,pop.x().second);
+                }
+            }
+            return pop.getRegion();
+        }else{
+            FunctorSwitch func;
+            PopulationInformation<Function,FunctorSwitch,typename Function::E,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,0));
+
+            typename Function::IteratorEDomain it(f.getIteratorEDomain());
+
+            while(it.next()){
+                pop.setRegion(f(it.x()),it.x());
+            }
+            it.init();
+            while(it.next()){
+                pop.growth(f(it.x()),it.x(),it.x());
+            }
+            double radiuspower2= radius*radius;
+            int distancevalue=0;
+            bool atleastonegrowth=true;
+            while(atleastonegrowth==true&&distancevalue<radius)
+            {
+                pop.setLevel(func.getFlipFlop());
+                func.switchFlipFlop();
+                distancevalue++;
+                atleastonegrowth=false;
+                while(pop.next()){
+                    typename Function::E diff = pop.x().first.second-pop.x().second;
+                    F64 disttemp = diff.normPower();
+                    if(disttemp<= radiuspower2)
+                    {
+                        atleastonegrowth=true;
+                        pop.growth(pop.x().first.first,pop.x().first.second,pop.x().second);
+                    }
+                    else{
+                        pop.pop();
+                    }
+                }
+            }
+            return pop.getRegion();
+
+        }
+    }
+    template<typename Function>
+    static Function  erosionRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
+    {
         FunctorSwitch func;
-        Population<Function,FunctorSwitch,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,norm));
+        Population<Function,FunctorSwitch,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,itneigh);
 
         typename Function::IteratorEDomain it(f.getIteratorEDomain());
 
@@ -2108,13 +2072,13 @@ static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,L
                 pop.growth(pop.x().first,pop.x().second);
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("dilationRegionGrowing");
         return pop.getRegion();
-    }else{
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("dilationRegionGrowing",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
+    }
+    template<typename Function>
+    static Function  dilationRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
+    {
         FunctorSwitch func;
-        PopulationInformation<Function,FunctorSwitch,typename Function::E,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,f.getIteratorENeighborhood(1,0));
+        Population<Function,FunctorSwitch,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,itneigh);
 
         typename Function::IteratorEDomain it(f.getIteratorEDomain());
 
@@ -2123,9 +2087,8 @@ static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,L
         }
         it.init();
         while(it.next()){
-            pop.growth(f(it.x()),it.x(),it.x());
+            pop.growth(f(it.x()),it.x());
         }
-        double radiuspower2= radius*radius;
         int distancevalue=0;
         bool atleastonegrowth=true;
         while(atleastonegrowth==true&&distancevalue<radius)
@@ -2135,102 +2098,26 @@ static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,L
             distancevalue++;
             atleastonegrowth=false;
             while(pop.next()){
-                typename Function::E diff = pop.x().first.second-pop.x().second;
-                F64 disttemp = diff.normPower();
-                if(disttemp<= radiuspower2)
-                {
-                    atleastonegrowth=true;
-                    pop.growth(pop.x().first.first,pop.x().first.second,pop.x().second);
-                }
-                else{
-                    pop.pop();
-                }
+                atleastonegrowth=true;
+                pop.growth(pop.x().first,pop.x().second);
             }
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("dilationRegionGrowing");
         return pop.getRegion();
-
     }
-}
-template<typename Function>
-static Function  erosionRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
-{
-
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("erosionRegionGrowing",COLLECTOR_EXECUTION_NOINFO);
-    CollectorExecutionInformationSingleton::getInstance()->info("Fast algorithm");
-    FunctorSwitch func;
-    Population<Function,FunctorSwitch,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,itneigh);
-
-    typename Function::IteratorEDomain it(f.getIteratorEDomain());
-
-    while(it.next()){
-        pop.setRegion(f(it.x()),it.x());
-    }
-    it.init();
-    while(it.next()){
-        pop.growth(f(it.x()),it.x());
-    }
-    int distancevalue=0;
-    bool atleastonegrowth=true;
-    while(atleastonegrowth==true&&distancevalue<radius)
+    template<typename Function>
+    static Function  closingRegionGrowing(const Function & f,F64 radius, int norm=1)
     {
-        pop.setLevel(func.getFlipFlop());
-        func.switchFlipFlop();
-        distancevalue++;
-        atleastonegrowth=false;
-        while(pop.next()){
-            atleastonegrowth=true;
-            pop.growth(pop.x().first,pop.x().second);
-        }
+        Function temp(f.getDomain());
+        temp = dilationRegionGrowing(f,radius,norm);
+        return erosionRegionGrowing(temp,radius,norm);
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("erosionRegionGrowing");
-    return pop.getRegion();
-}
-template<typename Function>
-static Function  dilationRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
-{
-    FunctorSwitch func;
-    Population<Function,FunctorSwitch,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,itneigh);
-
-    typename Function::IteratorEDomain it(f.getIteratorEDomain());
-
-    while(it.next()){
-        pop.setRegion(f(it.x()),it.x());
-    }
-    it.init();
-    while(it.next()){
-        pop.growth(f(it.x()),it.x());
-    }
-    int distancevalue=0;
-    bool atleastonegrowth=true;
-    while(atleastonegrowth==true&&distancevalue<radius)
+    template<typename Function>
+    static Function  openingRegionGrowing(const Function & f,F64 radius, int norm=1)
     {
-        pop.setLevel(func.getFlipFlop());
-        func.switchFlipFlop();
-        distancevalue++;
-        atleastonegrowth=false;
-        while(pop.next()){
-            atleastonegrowth=true;
-            pop.growth(pop.x().first,pop.x().second);
-        }
+        Function temp(f.getDomain());
+        temp = erosionRegionGrowing(f,radius,norm);
+        return dilationRegionGrowing(temp,radius,norm);
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("dilationRegionGrowing");
-    return pop.getRegion();
-}
-template<typename Function>
-static Function  closingRegionGrowing(const Function & f,F64 radius, int norm=1)
-{
-    Function temp(f.getDomain());
-    temp = dilationRegionGrowing(f,radius,norm);
-    return erosionRegionGrowing(temp,radius,norm);
-}
-template<typename Function>
-static Function  openingRegionGrowing(const Function & f,F64 radius, int norm=1)
-{
-    Function temp(f.getDomain());
-    temp = erosionRegionGrowing(f,radius,norm);
-    return dilationRegionGrowing(temp,radius,norm);
-}
 };
 }
 #endif // PROCESSINGADVANCED_H

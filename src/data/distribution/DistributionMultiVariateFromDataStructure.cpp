@@ -59,15 +59,16 @@ F64 DistributionMultiVariateRegularStep::operator ()(const VecF64&  v)const{
 
     }
     else
-                throw(pexception("work only for two variates"));
+        std::cerr<<"work only for two variates";
+    return 0;
 }
 
 
-DistributionMultiVariateRegularStep * DistributionMultiVariateRegularStep::clone()const throw(pexception){
+DistributionMultiVariateRegularStep * DistributionMultiVariateRegularStep::clone()const {
     return new DistributionMultiVariateRegularStep(*this);
 }
 
-VecF64 DistributionMultiVariateRegularStep::randomVariable()const throw(pexception){
+VecF64 DistributionMultiVariateRegularStep::randomVariable()const {
     F64 u = this->uni.randomVariable();
     std::vector<F64>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
     I32 indice = I32(low- _repartition.begin()) ;
@@ -77,8 +78,11 @@ VecF64 DistributionMultiVariateRegularStep::randomVariable()const throw(pexcepti
         vv(0)=v(0)*_step+_xmin(0);vv(1)=v(1)*_step+_xmin(1);
         return vv;
     }
-    else
-        throw(pexception("work only for two variates"));
+    else{
+        std::cerr<<"work only for two variates";
+        return VecF64();
+    }
+
 }
 
 
@@ -95,7 +99,7 @@ DistributionMultiVariateFromDistribution::DistributionMultiVariateFromDistributi
     fromDistribution( dist.toDistribution());
 }
 
-DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribution::clone()const throw(pexception){
+DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribution::clone()const {
     return new DistributionMultiVariateFromDistribution(*this);
 }
 
@@ -103,7 +107,7 @@ F64 DistributionMultiVariateFromDistribution::operator ()(const VecF64&  value)c
     return _f.operator ()(value(0));
 }
 
-VecF64 DistributionMultiVariateFromDistribution::randomVariable()const throw(pexception){
+VecF64 DistributionMultiVariateFromDistribution::randomVariable()const {
     VecF64 v(1);
     v(0)=_f.randomVariable();
     return v;
@@ -146,7 +150,7 @@ int DistributionMultiVariateNormal::getNbrVariable()const{
     return _mean.size();
 }
 
-VecF64 DistributionMultiVariateNormal::randomVariable()const throw(pexception){
+VecF64 DistributionMultiVariateNormal::randomVariable()const {
     VecF64 V(this->getNbrVariable());
     for(int i = 0;i<this->getNbrVariable();i++){
         V(i)=_standard_normal.randomVariable();
@@ -154,7 +158,7 @@ VecF64 DistributionMultiVariateNormal::randomVariable()const throw(pexception){
     return _mean + _a*V;
 }
 
-DistributionMultiVariateNormal * DistributionMultiVariateNormal::clone()const throw(pexception){
+DistributionMultiVariateNormal * DistributionMultiVariateNormal::clone()const {
     return new DistributionMultiVariateNormal(*this);
 }
 
@@ -179,8 +183,9 @@ F64 DistributionMultiVariateExpression::operator()( const VecF64&  value)const
 {
     return fparser.Eval(static_cast<const F64*>( &(*(value.begin()))));
 }
-VecF64 DistributionMultiVariateExpression::randomVariable()const throw(pexception){
-    throw(pexception("In distributionMultiVariateArithmetic::randomVariable(), no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution"));
+VecF64 DistributionMultiVariateExpression::randomVariable()const {
+    std::cerr<<"In distributionMultiVariateArithmetic::randomVariable(), no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
+    return VecF64();
 }
 
 int DistributionMultiVariateExpression::getNbrVariable()const{
@@ -189,7 +194,7 @@ int DistributionMultiVariateExpression::getNbrVariable()const{
 
 
 
-DistributionMultiVariateExpression *DistributionMultiVariateExpression::clone() const throw(pexception)
+DistributionMultiVariateExpression *DistributionMultiVariateExpression::clone() const 
 {
     return new DistributionMultiVariateExpression(*this);
 }
@@ -269,7 +274,7 @@ DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(const Dis
     _dim = dist.getDIM();
 }
 
-VecF64 DistributionMultiVariateUnitSphere::randomVariable()const throw(pexception){
+VecF64 DistributionMultiVariateUnitSphere::randomVariable()const {
     VecF64 v(_dim);
     if(_dim==3){
         // Marsaglia 3d method
@@ -292,7 +297,7 @@ VecF64 DistributionMultiVariateUnitSphere::randomVariable()const throw(pexceptio
     return v;
 }
 
-DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()const throw(pexception){
+DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()const {
     return new DistributionMultiVariateUnitSphere(_dim);
 }
 
@@ -311,7 +316,7 @@ DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const Dis
 
 }
 
-VecF64 DistributionMultiVariateUniformInt::randomVariable()const throw(pexception){
+VecF64 DistributionMultiVariateUniformInt::randomVariable()const {
     VecF64 v(_xmin.size());
 
     for(unsigned int i =0;i<v.size();i++){
@@ -320,7 +325,7 @@ VecF64 DistributionMultiVariateUniformInt::randomVariable()const throw(pexceptio
     return v;
 }
 
-DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()const throw(pexception){
+DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()const {
     return new DistributionMultiVariateUniformInt(*this);
 }
 }

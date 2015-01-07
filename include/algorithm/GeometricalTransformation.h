@@ -60,7 +60,7 @@ struct POP_EXPORTS GeometricalTransformation
 
     /*!
      * \brief get a 2d matrix from a 3d matrix (e.g. a slice in a core sample)
-     * \param in input 3d matrix
+     * \param m input 3d matrix
      * \param index_plane plane index
      * \param fixed_coordinate coordinate fixed
      *
@@ -137,7 +137,7 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lenarotpi2.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> rotateMultPi_2(const MatN<DIM,TypePixel> & f,int plus_minus=1)throw(pexception)
+    static MatN<DIM,TypePixel> rotateMultPi_2(const MatN<DIM,TypePixel> & f,int plus_minus=1)
     {
         MatN<DIM,TypePixel> g(f.getDomain()(1),f.getDomain()(0));
         typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();

@@ -32,75 +32,76 @@ from, out of or in connection with the software or the use or other dealings
 in the Software.
 \***************************************************************************/
 
+
 #ifndef COLLECTOREXECUTIONINFORMATION_H
 #define COLLECTOREXECUTIONINFORMATION_H
 
-#include <iostream>
-#include <string>
-#include"data/GP/Singleton.h"
-#include"data/typeF/TypeF.h"
+//#include <iostream>
+//#include <string>
+//#include"data/GP/Singleton.h"
+//#include"data/typeF/TypeF.h"
 
-namespace pop
-{
-
-enum  CollectorExecutionType{
-    COLLECTOR_EXECUTION_RATIO,
-    COLLECTOR_EXECUTION_INFO,
-    COLLECTOR_EXECUTION_NOINFO
-};
-
-//class POP_EXPORTS CollectorExecutionInformationImplementationInFile
+//namespace pop
 //{
+
+//enum  CollectorExecutionType{
+//    COLLECTOR_EXECUTION_RATIO,
+//    COLLECTOR_EXECUTION_INFO,
+//    COLLECTOR_EXECUTION_NOINFO
+//};
+
+////class POP_EXPORTS CollectorExecutionInformationImplementationInFile
+////{
+////protected:
+////    std::string _function;
+////    F64 _ratio;
+////    CollectorExecutionType _mode;
+
+////public:
+////    CollectorExecutionInformationImplementationInFile();
+////    virtual ~CollectorExecutionInformationImplementationInFile();
+////    virtual void startExecution(std::string function,CollectorExecutionType mode);
+////    virtual  void info(std::string msg);
+////    virtual void endExecution(std::string function);
+////    virtual void progression(F64 ratio,std::string msg="");
+////};
+
+
+//class POP_EXPORTS CollectorExecutionInformationImplementation
+//{
+//public:
+//    CollectorExecutionInformationImplementation();
+//    virtual ~CollectorExecutionInformationImplementation();
+//    virtual void startExecution(std::string function,CollectorExecutionType mode);
+//    virtual  void info(std::string msg);
+//    virtual void endExecution(std::string function);
+//    virtual void progression(F64 ratio,std::string msg="");
 //protected:
 //    std::string _function;
 //    F64 _ratio;
 //    CollectorExecutionType _mode;
 
-//public:
-//    CollectorExecutionInformationImplementationInFile();
-//    virtual ~CollectorExecutionInformationImplementationInFile();
-//    virtual void startExecution(std::string function,CollectorExecutionType mode);
-//    virtual  void info(std::string msg);
-//    virtual void endExecution(std::string function);
-//    virtual void progression(F64 ratio,std::string msg="");
 //};
 
-
-class POP_EXPORTS CollectorExecutionInformationImplementation
-{
-public:
-    CollectorExecutionInformationImplementation();
-    virtual ~CollectorExecutionInformationImplementation();
-    virtual void startExecution(std::string function,CollectorExecutionType mode);
-    virtual  void info(std::string msg);
-    virtual void endExecution(std::string function);
-    virtual void progression(F64 ratio,std::string msg="");
-protected:
-    std::string _function;
-    F64 _ratio;
-    CollectorExecutionType _mode;
-
-};
-
-namespace Private{
-class POP_EXPORTS CollectorExecutionInformation
-{
-public:
-    ~CollectorExecutionInformation();
-    CollectorExecutionInformation();
-    void setCollector(CollectorExecutionInformationImplementation* collector);
-    void startExecution(std::string function,CollectorExecutionType mode = COLLECTOR_EXECUTION_RATIO);
-    void endExecution(std::string function);
-    void info(std::string msg);
-    void progression(F64 ratio,std::string msg="");
-    void setActivate(bool activate);
-protected:
-    CollectorExecutionInformationImplementation* _impl;
-    bool _activate;
-};
-}
+//namespace Private{
+//class POP_EXPORTS CollectorExecutionInformation
+//{
+//public:
+//    ~CollectorExecutionInformation();
+//    CollectorExecutionInformation();
+//    void setCollector(CollectorExecutionInformationImplementation* collector);
+//    void startExecution(std::string function,CollectorExecutionType mode = COLLECTOR_EXECUTION_RATIO);
+//    void endExecution(std::string function);
+//    void info(std::string msg);
+//    void progression(F64 ratio,std::string msg="");
+//    void setActivate(bool activate);
+//protected:
+//    CollectorExecutionInformationImplementation* _impl;
+//    bool _activate;
+//};
+//}
 
 
-typedef Singleton<Private::CollectorExecutionInformation> CollectorExecutionInformationSingleton;
-}
+//typedef Singleton<Private::CollectorExecutionInformation> CollectorExecutionInformationSingleton;
+//}
 #endif // COLLECTOREXECUTIONINFORMATION_H

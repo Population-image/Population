@@ -108,7 +108,7 @@ public:
     DistributionMultiVariate(const DistributionMultiVariate & d);
 
     /*!
-    \fn DistributionMultiVariate(const Distribution & d,int nbr_variable_coupled)throw(pexception);
+    \fn DistributionMultiVariate(const Distribution & d,int nbr_variable_coupled);
    * \param d single  distribution
    * \param nbr_variable_coupled number of coupled random variables
     *
@@ -230,7 +230,7 @@ public:
     *
     *  clone pattern used in the factory
     */
-    virtual DistributionMultiVariate * clone()const throw(pexception);
+    virtual DistributionMultiVariate * clone()const ;
 
 
     /*!

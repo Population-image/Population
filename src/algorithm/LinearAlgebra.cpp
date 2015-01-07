@@ -33,10 +33,10 @@ Mat2F64 LinearAlgebra::inverseGaussianElimination(const Mat2F64 &m){
     return Mout;
 }
 
-Mat2F64 LinearAlgebra::orthogonalGramSchmidt(const Mat2F64& m)throw(pexception)
+Mat2F64 LinearAlgebra::orthogonalGramSchmidt(const Mat2F64& m)
 {
     if(m.sizeI()!=m.sizeI())
-        throw(pexception("In linearAlgebra::orthogonalGramSchmidt, Mat2F64 must be square"));
+        std::cerr<<"In linearAlgebra::orthogonalGramSchmidt, Mat2F64 must be square";
     Vec<VecF64> u(m.sizeI(),VecF64(m.sizeI()));
     for(unsigned int k=0;k<m.sizeI();k++){
         VecF64 v_k = m.getCol(k);
@@ -54,7 +54,7 @@ Mat2F64 LinearAlgebra::orthogonalGramSchmidt(const Mat2F64& m)throw(pexception)
     return out;
 
 }
-void LinearAlgebra::QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R)throw(pexception){
+void LinearAlgebra::QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R){
     Q = LinearAlgebra::orthogonalGramSchmidt(m);
     R.clear();
     R.resize(m.sizeI(),m.sizeJ());
@@ -71,7 +71,7 @@ void LinearAlgebra::QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R)thr
         }
     }
 }
-VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,2,2> &m)throw(pexception){
+VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,2,2> &m){
     double T = m.trace();
     double D = m.determinant();
     double sum = T*T/4 -D;
@@ -87,7 +87,7 @@ VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,2,2> &m)throw(pexception){
     }
 
 }
-VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,3,3> &A,EigenValueMethod method ,F64 error)throw(pexception){
+VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,3,3> &A,EigenValueMethod method ,F64 error){
 
 
     if(method==Symmetric){
@@ -129,7 +129,7 @@ VecF64 LinearAlgebra::eigenValue(const Mat2x<F64,3,3> &A,EigenValueMethod method
         return eigenValue(Mat2F64(A),method,error);
     }
 }
-VecF64 LinearAlgebra::eigenValue(const Mat2F64 &m,EigenValueMethod ,F64 )throw(pexception){
+VecF64 LinearAlgebra::eigenValue(const Mat2F64 &m,EigenValueMethod ,F64 ){
     Mat2F64 M_k(m);
     Mat2F64 Q_k;
     Mat2F64 R_k;
@@ -181,7 +181,7 @@ Mat2F64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &m){
     }
     return M;
 }
-VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2x22F64 &A,const VecF64 & b)throw(pexception){
+VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2x22F64 &A,const VecF64 & b){
     VecF64 v(2);
     double div = 1/(A(0,0)*A(1,1)-A(1,0)*A(0,1));
     v(0)= (b(0)*A(1,1)-b(1)*A(0,1))*div;
@@ -189,14 +189,14 @@ VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2x22F64 &A
     return v;
 }
 
-VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &A,const VecF64 & b)throw(pexception)
+VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &A,const VecF64 & b)
 {
     Mat2F64 M(A);
     VecF64 x(b);
     for(unsigned int k =0;k<M.sizeI();k++){
         F64 temp = M(k,k);
         if(temp==0)
-            throw(pexception("Cannot solve this system"));
+            std::cerr<<"Cannot solve this system";
         for(unsigned int j=0;j<M.sizeJ();j++){
             M(k,j)/=temp;
         }
@@ -215,7 +215,7 @@ VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &A,co
     return x;
 }
 
-void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M)throw(pexception){
+void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M){
     for(unsigned int k =0;k<M.sizeI()-1;k++){
 
         double valuemax=0;
@@ -247,7 +247,7 @@ void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M)throw(pexcep
         }
     }
 }
-Mat2F64 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value)throw(pexception){
+Mat2F64 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value){
     Mat2F64 I = m.identity(m.sizeI());
     Mat2F64 EigenVec(m.sizeI(),m.sizeI());
 
@@ -266,10 +266,9 @@ Mat2F64 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_
 }
 
 
-void LinearAlgebra::LUDecomposition(const Mat2F64 &m,Mat2F64 & L,  Mat2F64 & U)throw(pexception){
-    if (m.sizeI() != m.sizeJ())
-    {
-        throw(pexception("In linearAlgebra::LUDecomposition, input Mat2F64 must be a square Mat2F64"));
+void LinearAlgebra::LUDecomposition(const Mat2F64 &m,Mat2F64 & L,  Mat2F64 & U){
+    if (m.sizeI() != m.sizeJ()){
+        std::cerr<<"In linearAlgebra::LUDecomposition, input Mat2F64 must be a square Mat2F64";
     }
     L.clear();
     U.clear();
@@ -294,7 +293,7 @@ void LinearAlgebra::LUDecomposition(const Mat2F64 &m,Mat2F64 & L,  Mat2F64 & U)t
         }
     }
 }
-Mat2F64 LinearAlgebra::AATransposeEqualMDecomposition(const Mat2F64 &M)throw(pexception){
+Mat2F64 LinearAlgebra::AATransposeEqualMDecomposition(const Mat2F64 &M){
     Mat2F64 A,U;
     LinearAlgebra::LUDecomposition(M,A, U);
     for(unsigned int j =0;j<M.sizeI();j++)

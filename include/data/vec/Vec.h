@@ -41,7 +41,7 @@ in the Software.
 #include <numeric>
 #include<cmath>
 #include"data/typeF/TypeF.h"
-#include"data/utility/Exception.h"
+
 #include"data/mat/MatNBoundaryCondition.h"
 #include"data/utility/BasicUtility.h"
 #include"data/typeF/Complex.h"
@@ -440,14 +440,14 @@ public:
     *
     * The loader attempts to read the Vec using the specified format v
     */
-    void load(std::string file)throw(pexception);
+    void load(std::string file);
     /*!
     \param file input file
     \exception  std::string the input file does not exist or it is not .v format
     *
     * The save attempts to save the vector using the specified format v
     */
-    void save(std::string file)const throw(pexception);
+    void save(std::string file)const ;
     /*!
     * \return  clone
     *
@@ -522,11 +522,11 @@ Type & Vec<Type>::operator ()(unsigned int  i){
 }
 
 template<typename Type>
-void Vec<Type>::load(std::string file)throw(pexception){
+void Vec<Type>::load(std::string file){
     std::ifstream  in(file.c_str());
     if (in.fail())
     {
-        throw(pexception("In Matrix::load, Matrix: cannot open file: "+file));
+        std::cerr<<"In Matrix::load, Matrix: cannot open file: "+file;
     }
     else
     {
@@ -534,11 +534,11 @@ void Vec<Type>::load(std::string file)throw(pexception){
     }
 }
 template<typename Type>
-void Vec<Type>::save(std::string file)const throw(pexception){
+void Vec<Type>::save(std::string file)const {
     std::ofstream  out(file.c_str());
     if (out.fail())
     {
-        throw(pexception("In Matrix::save, cannot open file: "+file));
+        std::cerr<<"In Matrix::save, cannot open file: "+file;
     }
     else
     {

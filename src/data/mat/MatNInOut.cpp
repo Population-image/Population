@@ -163,20 +163,20 @@ void  MatNInOut::_savePNG(const MatN<2, RGBUI8 > &img, const char * filename){
 }
 
 
-void  MatNInOut::_loadPNG( MatN<2, UI8 > &img, const char * filename)throw(pexception)
+void  MatNInOut::_loadPNG( MatN<2, UI8 > &img, const char * filename)
 {
     MatN<2, RGBUI8 > img_color;
     _loadPNG(img_color,filename);
     img = img_color;
 }
-void  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception)
+void  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)
 {
     unsigned width, height;
 
     std::vector<unsigned char> byte_array;
     lodepng::decode(byte_array, width, height, filename,LCT_RGB,8);
     if(byte_array.size()==0)
-        throw(pexception("In MatN::load, cannot open file: "+std::string(filename)));
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
     img._domain(1)=width;
     img._domain(0)=height;
     img.std::vector<RGBUI8>::resize(width*height);
@@ -192,11 +192,11 @@ void  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)throw(pe
         itout++;
     }
 }
-void  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename)throw(pexception){
+void  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename){
     BIPMAP::CBitmap bimg;
     bimg.Load(filename);
     if(bimg.GetWidth()==0||bimg.GetHeight()==0)
-        throw(pexception("In MatN::load, cannot open file: "+std::string(filename)));
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
     img._domain(1)=bimg.GetWidth();
     img._domain(0)=bimg.GetHeight();
     img.std::vector<UI8>::resize(bimg.GetWidth()*bimg.GetHeight());
@@ -206,11 +206,11 @@ void  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename)throw(pexce
         }
 }
 
-void  MatNInOut::_loadBMP( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception){
+void  MatNInOut::_loadBMP( MatN<2, RGBUI8 > &img, const char * filename){
     BIPMAP::CBitmap bimg;
     bimg.Load(filename);
     if(bimg.GetWidth()==0||bimg.GetHeight()==0)
-        throw(pexception("In MatN::load, cannot open file: "+std::string(filename)));
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
     img._domain(1)=bimg.GetWidth();
     img._domain(0)=bimg.GetHeight();
     img.std::vector<RGBUI8>::resize(bimg.GetWidth()*bimg.GetHeight());
@@ -265,13 +265,13 @@ void  MatNInOut::_saveBMP(const MatN<2, UI8 > &img, const char * filename){
 }
 
 
-void  MatNInOut::_loadJPG( MatN<2, UI8 > &img, const char * filename)throw(pexception){
+void  MatNInOut::_loadJPG( MatN<2, UI8 > &img, const char * filename){
     int width;
     int height;
     int actual_comps;
     unsigned char * dat = jpgd::decompress_jpeg_image_from_file(filename, &width, &height, &actual_comps, 1);
     if(dat==0)
-        throw(pexception("In MatN::load, cannot open file: "+std::string(filename)));
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
     img._domain(1)=width;
     img._domain(0)=height;
     img.std::vector<UI8>::resize(img._domain[1]*img._domain[0]);
@@ -280,13 +280,13 @@ void  MatNInOut::_loadJPG( MatN<2, UI8 > &img, const char * filename)throw(pexce
     free(dat);
 }
 
-void  MatNInOut::_loadJPG( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception){
+void  MatNInOut::_loadJPG( MatN<2, RGBUI8 > &img, const char * filename){
     int width;
     int height;
     int actual_comps;
     unsigned char * dat = jpgd::decompress_jpeg_image_from_file(filename, &width, &height, &actual_comps, 3);
     if(dat==0)
-        throw(pexception("In MatN::load, cannot open file: "+std::string(filename)));
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
     img._domain(1)=width;
     img._domain(0)=height;
     img.std::vector<RGBUI8>::resize(img._domain[0]*img._domain[1]);
@@ -322,7 +322,7 @@ void  MatNInOut::_saveJPG(const MatN<2, UI8 > &img, const char * filename){
 //    err+="*: pgm for a pgm format, you must add the extension .pgm in the suffix name file\n";
 //    for(it = list.begin();it!=list.end();it++)
 //        err+="*: "+*it+"\n";
-//    throw(pexception(err.toStdString()));
+//    std::cerr<<err.toStdString();
 //}
 //#endif
 
@@ -346,7 +346,7 @@ void  MatNInOut::_saveJPG(const MatN<2, UI8 > &img, const char * filename){
 //err+="*: pgm for a pgm format, you must add the extension .pgm in the suffix name file\n";
 //for(it = list.begin();it!=list.end();it++)
 //err+="*: "+*it+"\n";
-//throw(pexception(err.toStdString()));
+//std::cerr<<err.toStdString();
 //}
 //#endif
 }

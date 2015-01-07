@@ -621,7 +621,7 @@ struct POP_EXPORTS Processing
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())throw(pexception)
+    static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return ProcessingAdvanced::greylevelRange(f,it,min,max,Loki::Int2Type<isVectoriel<TypePixel>::value >());
@@ -643,7 +643,7 @@ struct POP_EXPORTS Processing
         produces the RGB red (200,10,10) if you look far away.
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> greylevelTranslateMeanValue(const MatN<DIM,TypePixel>& f, typename MatN<DIM,TypePixel>::F mean )throw(pexception)
+    static MatN<DIM,TypePixel> greylevelTranslateMeanValue(const MatN<DIM,TypePixel>& f, typename MatN<DIM,TypePixel>::F mean )
     {
         return ProcessingAdvanced::greylevelTranslateMeanValueCast(f,mean,Loki::Type2Type<TypePixel >() );
     }
@@ -673,7 +673,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 255	0.68\n
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> greylevelRemoveEmptyValue(const MatN<DIM,TypePixel> & f)throw(pexception)
+    static MatN<DIM,TypePixel> greylevelRemoveEmptyValue(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return ProcessingAdvanced::greylevelRemoveEmptyValue(f,it);
@@ -699,7 +699,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> integral(const MatN<DIM,TypePixel> & f)throw(pexception)
+    static MatN<DIM,TypePixel> integral(const MatN<DIM,TypePixel> & f)
     {
         return ProcessingAdvanced::integral(f,Loki::Int2Type<DIM>());
     }
@@ -723,7 +723,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> integralPower2(const MatN<DIM,TypePixel> & f)throw(pexception)
+    static MatN<DIM,TypePixel> integralPower2(const MatN<DIM,TypePixel> & f)
     {
         return ProcessingAdvanced::integral(f.multTermByTerm(f),Loki::Int2Type<DIM>());
     }
@@ -738,7 +738,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mask(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & mask)throw(pexception)
+    static MatN<DIM,TypePixel> mask(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & mask)
     {
         FunctionAssert(f,mask,"In processing::mask");
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
@@ -774,7 +774,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -797,7 +797,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -825,7 +825,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -846,7 +846,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -873,7 +873,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -894,7 +894,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)throw(pexception)
+    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -920,7 +920,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -929,7 +929,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     /*!
      *  \brief erosion of the input matrix
      * \param f input function
-     * \param struct input structural element
+     * \param structural_element input structural element
      * \param dilate number of dilation of the structural element
      * \return h output function
      *
@@ -950,7 +950,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosionStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> erosionStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -982,7 +982,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -991,7 +991,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     /*!
      *  \brief dilation of the input matrix
      * \param f input function
-     * \param struct input structural element
+     * \param structural_element input structural element
      * \param dilate number of dilation of the structural element
      * \return h output function
      *
@@ -1012,7 +1012,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilationStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> dilationStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1043,7 +1043,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1052,7 +1052,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     /*!
      *  \brief median of the input matrix
      * \param f input function
-     * \param struct input structural element
+     * \param structural_element input structural element
      * \param dilate number of dilation of the structural element
      * \return h output function
      *
@@ -1074,7 +1074,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> medianStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> medianStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1104,7 +1104,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1113,7 +1113,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     /*!
      *  \brief mean of the input matrix
      * \param f input function
-     * \param struct input structural element
+     * \param structural_element input structural element
      * \param dilate number of dilation of the structural element
      * \return h output function
      *
@@ -1134,7 +1134,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> meanStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> meanStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1165,7 +1165,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1195,7 +1195,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> closingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> closingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1227,7 +1227,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> opening(const MatN<DIM,TypePixel> & f,double radius,double norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> opening(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1236,7 +1236,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     /*!
      *  \brief opening of the input matrix
      * \param f input function
-     * \param struct input structural element
+     * \param structural_element input structural element
      * \param dilate number of opening of the structural element
      * \return h output function
      *
@@ -1257,7 +1257,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> openingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)throw(pexception)
+    static MatN<DIM,TypePixel> openingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,int dilate=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1290,7 +1290,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> alternateSequentialCO(const MatN<DIM,TypePixel> & f,int maxradius, int norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> alternateSequentialCO(const MatN<DIM,TypePixel> & f,int maxradius, int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(1,norm));
@@ -1308,7 +1308,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> alternateSequentialCOStructuralElement(const MatN<DIM,TypePixel> & f,int maxradius, const MatN<DIM,UI8> & structural_element)throw(pexception)
+    static MatN<DIM,TypePixel> alternateSequentialCOStructuralElement(const MatN<DIM,TypePixel> & f,int maxradius, const MatN<DIM,UI8> & structural_element)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1332,7 +1332,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> alternateSequentialOC(const MatN<DIM,TypePixel> & f,int maxradius, int norm=2)throw(pexception)
+    static MatN<DIM,TypePixel> alternateSequentialOC(const MatN<DIM,TypePixel> & f,int maxradius, int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(1,norm));
@@ -1348,7 +1348,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Successive application of opening and opening by increasing the radius of the initial structural element until max radius
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> alternateSequentialOCStructuralElement(const MatN<DIM,TypePixel> & f,int maxradius, const MatN<DIM,UI8> & structural_element)throw(pexception)
+    static MatN<DIM,TypePixel> alternateSequentialOCStructuralElement(const MatN<DIM,TypePixel> & f,int maxradius, const MatN<DIM,UI8> & structural_element)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(structural_element));
@@ -1406,7 +1406,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> hitOrMiss(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & C,const  MatN<DIM,UI8> & D)throw(pexception)
+    static MatN<DIM,TypePixel> hitOrMiss(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & C,const  MatN<DIM,UI8> & D)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itC (f.getIteratorENeighborhood(C));
@@ -1804,7 +1804,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \endcode
      */
     template<int DIM, typename TypePixel>
-    static MatN<DIM,TypePixel> gradientMagnitudeDeriche(const MatN<DIM,TypePixel> & f, F64 alpha=1)throw(pexception)
+    static MatN<DIM,TypePixel> gradientMagnitudeDeriche(const MatN<DIM,TypePixel> & f, F64 alpha=1)
     {
 
         MatN<DIM,F64> fdir(f.getDomain());
@@ -1854,7 +1854,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> labelMerge(const MatN<DIM,TypePixel> & label1, const MatN<DIM,TypePixel> & label2)throw(pexception)
+    static MatN<DIM,TypePixel> labelMerge(const MatN<DIM,TypePixel> & label1, const MatN<DIM,TypePixel> & label2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(label1.getIteratorEDomain());
         return ProcessingAdvanced::labelMerge(label1,label2,it);
@@ -1896,7 +1896,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     * \endcode
     */
     template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,UI8>  labelFromSingleSeed(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2>& seed)throw(pexception)
+    static MatN<DIM,UI8>  labelFromSingleSeed(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2>& seed)
     {
         typename MatN<DIM,TypePixel1>::IteratorEDomain it(label.getIteratorEDomain());
         return ProcessingAdvanced::labelFromSingleSeed(label,seed,it);
@@ -2571,7 +2571,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosionRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)throw(pexception)
+    static MatN<DIM,TypePixel> erosionRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
     {
         return ProcessingAdvanced::erosionRegionGrowing(f,f.getIteratorENeighborhood(structural_element),radius);
     }
@@ -2585,7 +2585,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilationRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)throw(pexception)
+    static MatN<DIM,TypePixel> dilationRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
     {
         return ProcessingAdvanced::dilationRegionGrowing(f,f.getIteratorENeighborhood(structural_element),radius);
     }

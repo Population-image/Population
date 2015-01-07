@@ -536,7 +536,7 @@ Mat2F64 Statistics::toMatrix(const Distribution &f,F64 xmin, F64 xmax,F64 step)
 
 
 
-DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v)throw(pexception){
+DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v){
     VecI32 vv(v);
     std::sort (vv.begin(), vv.end());
     Mat2F64 m(vv(vv.size()-1)-vv(0)+1,2);
@@ -548,12 +548,8 @@ DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizat
         m(i,0)=vv(0)+i;
         m(i,1)/=vv.size();
     }
-    try{
-        DistributionIntegerRegularStep dd(m);
-        return dd;
-    }catch(const pexception & ){
-        throw(pexception("In Statistics::computedStaticticsFromRealRealizations, not enough realization in your collection"));
-    }
+    DistributionIntegerRegularStep dd(m);
+    return dd;
 
 }
 DistributionRegularStep Statistics::computedStaticticsFromRealRealizationsWithWeight( const VecF64 & v,const VecF64 & weight,F64 step,F64 min,F64 max)
@@ -707,10 +703,10 @@ F64 Statistics::maxValue( const DistributionMultiVariate &f,VecF64 xmin, VecF64 
     }
     return max;
 }
-DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step)throw(pexception)
+DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step)
 {
     if(f.getNbrVariable()!=2)
-        throw(pexception("Only for two variate distribution"));
+        std::cerr<<"Only for two variate distribution";
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
     Mat2F64 m( Vec2I32(it._domain(0),it._domain(1)));
     double steppower2 = step*step;

@@ -54,7 +54,6 @@ in the Software.
 #include <algorithm>
 #include "data/typeF/TypeF.h"
 #include "data/typeF/RGB.h"
-#include "data/utility/Exception.h"
 #include "data/utility/CollectorExecutionInformation.h"
 #include "data/mat/MatN.h"
 #include "data/mat/MatNListType.h"
@@ -70,11 +69,11 @@ class POP_EXPORTS MatNInOutPgm
 public:
 
     /*!
-    \fn static I32 read(std::istream &File,MatN<D,T> *in )throw(pexception)
+    \fn static I32 read(std::istream &File,MatN<D,T> *in )
     * default destructor
     */
     template<I32 D,typename T>
-    static void read(MatN<D,T> &in,std::istream &File )throw(pexception);
+    static void read(MatN<D,T> &in,std::istream &File );
     template<I32 D,typename T>
     static void writeAscii(const MatN<D,T>&in,std::ostream & out );
     template<I32 D,typename T>
@@ -98,9 +97,9 @@ private:
     class impl;
     impl *_pImpl;
     template<int DIM,typename Type>
-    static void  _save(const MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _save(const MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
-    static void  _load(const MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _load(const MatN<DIM, Type > &, const char * );
 
     static void  _save(const MatN<2, UI8 > &img, const char * filename);
     static void  _save(const MatN<2, UI16 > &img, const char * filename);
@@ -123,44 +122,44 @@ private:
 
 
     template<int DIM,typename Type>
-    static void  _savePNG(const MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _savePNG(const MatN<DIM, Type > &, const char * );
 
     template<int DIM,typename Type>
-    static void  _loadPNG(const MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _loadPNG(const MatN<DIM, Type > &, const char * );
     static void  _savePNG(const MatN<2, UI8 > &img, const char * filename);
     static void  _savePNG(const MatN<2, RGBUI8 > &img, const char * filename);
-    static void  _loadPNG( MatN<2, UI8 > &img, const char * filename)throw(pexception);
-    static void  _loadPNG( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception);
+    static void  _loadPNG( MatN<2, UI8 > &img, const char * filename);
+    static void  _loadPNG( MatN<2, RGBUI8 > &img, const char * filename);
 
     template<int DIM,typename Type>
-    static void  _loadBMP( MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _loadBMP( MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
-    static void  _saveBMP(const MatN<DIM, Type > &, const char * )throw(pexception);
-    static void  _loadBMP( MatN<2, UI8 > &img, const char * filename)throw(pexception);
-    static void  _loadBMP( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception);
+    static void  _saveBMP(const MatN<DIM, Type > &, const char * );
+    static void  _loadBMP( MatN<2, UI8 > &img, const char * filename);
+    static void  _loadBMP( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, UI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, RGBUI8 > &img, const char * filename);
 
 
     template<int DIM,typename Type>
-    static void  _loadJPG( MatN<DIM, Type > &, const char * )throw(pexception);
+    static void  _loadJPG( MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
-    static void  _saveJPG(const MatN<DIM, Type > &, const char * )throw(pexception);
-    static void  _loadJPG( MatN<2, UI8 > &img, const char * filename)throw(pexception);
-    static void  _loadJPG( MatN<2, RGBUI8 > &img, const char * filename)throw(pexception);
+    static void  _saveJPG(const MatN<DIM, Type > &, const char * );
+    static void  _loadJPG( MatN<2, UI8 > &img, const char * filename);
+    static void  _loadJPG( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveJPG(const MatN<2, UI8 > &img, const char * filename);
     static void  _saveJPG(const MatN<2, RGBUI8 > &img, const char * filename);
 
 
 public:
     template<I32 D,typename T>
-    static void save(const MatN<D,T> &in,const char * file )throw(pexception);
+    static void save(const MatN<D,T> &in,const char * file );
     template<I32 D,typename T>
-    static void saveRaw(const MatN<D,T> &in,const char * file )throw(pexception);
+    static void saveRaw(const MatN<D,T> &in,const char * file );
     template<I32 DIM,typename Result>
-    static void load(MatN<DIM,Result> &in,const char * file  )throw(pexception);
+    static void load(MatN<DIM,Result> &in,const char * file  );
     template<I32 DIM,typename Result>
-    static void loadRaw(MatN<DIM,Result> &in,const char * file  )throw(pexception);
+    static void loadRaw(MatN<DIM,Result> &in,const char * file  );
 
     template<int DIM,typename Type>
     static void loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
@@ -168,42 +167,42 @@ public:
     static void saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
 };
 template<int Dim, typename Type>
-void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)throw(pexception)
+void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)
 {
     MatNInOut::loadFromDirectory(*this,pathdir,basefilename,extension);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::load(const char * file)throw(pexception)
+void MatN<Dim,Type>::load(const char * file)
 {
     MatNInOut::load(*this,file);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::loadRaw(const char * file,const Domain & d)throw(pexception)
+void MatN<Dim,Type>::loadRaw(const char * file,const Domain & d)
 {
     this->resize(d);
     MatNInOut::loadRaw(*this,file);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::saveFromDirectory(const char * pathdir,const char * basefilename,const char * extension)const throw(pexception)
+void MatN<Dim,Type>::saveFromDirectory(const char * pathdir,const char * basefilename,const char * extension)const 
 {
     MatNInOut::saveFromDirectory(*this,pathdir,basefilename,extension);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::save(const char * file)const throw(pexception)
+void MatN<Dim,Type>::save(const char * file)const 
 {
     MatNInOut::save(*this,file);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::saveRaw(const char * file)const throw(pexception)
+void MatN<Dim,Type>::saveRaw(const char * file)const 
 {
     MatNInOut::saveRaw(*this,file);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const throw(pexception)
+void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const 
 {
     std::ofstream  out(file);
     if (out.fail())
-        throw(pexception("In MatN::save, cannot open file: "+std::string(file)));
+        std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
     else{
         if(header!="")
             out<<header<<std::endl;
@@ -211,10 +210,10 @@ void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const throw(
     }
 }
 template<I32 D,typename T>
-void MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )throw(pexception)
+void MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )
 {
     if (File.fail()){
-        throw(pexception("In MatN::read, cannot open the file" ));
+        std::cerr<<"In MatN::read, cannot open the file";
     }
     Type2Id<MatN<D,T> > type;
     std::string idascii = type.id[0];
@@ -350,102 +349,102 @@ void MatNInOutPgm::writeAsciiData(const MatN<D,T>&in,std::ostream &File )
 
 
 template<int DIM,typename Type>
-void  MatNInOut::_save(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_save(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::save, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::save, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_load(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_load(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::load, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::load, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
 
 }
 
 template<int DIM,typename Type>
-void  MatNInOut::_savePNG(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_savePNG(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::save, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::save, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::load, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::load, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
 
 }
 template<int DIM,typename Type>
-void  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::load, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::load, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::save, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::save, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 
 }
 
 
 
 template<int DIM,typename Type>
-void  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::load, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::load, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_saveJPG(const MatN<DIM, Type > &, const char * )throw(pexception)
+void  MatNInOut::_saveJPG(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
-        throw(pexception("In MatN::save, cannot save 3d matrix if the matrix format is not pgm"));
+        std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
-        throw(pexception("In MatN::save, cannot save this matrix pixel voxel type"));
+        std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 
 }
 template<I32 D,typename T>
-void MatNInOut::saveRaw(const MatN<D,T> &in ,const char * file)throw(pexception){
+void MatNInOut::saveRaw(const MatN<D,T> &in ,const char * file){
     std::ofstream  out(file);
     if (out.fail())
-        throw(pexception("In MatN::save, cannot open file: "+std::string(file)));
+        std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
     else
         MatNInOutPgm::writeRawData(in ,out);
 }
 template<I32 D,typename T>
-void MatNInOut::save(const MatN<D,T> &in ,const char * file)throw(pexception){
+void MatNInOut::save(const MatN<D,T> &in ,const char * file){
     std::string ext( BasicUtility::getExtension(file));
     if(ext==".pgm")
     {
         if(in.getDomain().multCoordinate()<20){
             std::ofstream  out(file);
             if (out.fail()){
-                throw(pexception("In MatN::save, cannot open file: "+std::string(file)));
+                std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
             }
             else{
                 MatNInOutPgm::writeAscii(in,out);
@@ -455,7 +454,7 @@ void MatNInOut::save(const MatN<D,T> &in ,const char * file)throw(pexception){
         else{
             std::ofstream  out(file,std::ios::binary);
             if (out.fail()){
-                throw(pexception("In MatN::save, Cannot open file: "+std::string(file)));
+                std::cerr<<"In MatN::save, Cannot open file: "+std::string(file);
             }
             else{
                 MatNInOutPgm::writeRaw(in,out);
@@ -476,11 +475,11 @@ void MatNInOut::save(const MatN<D,T> &in ,const char * file)throw(pexception){
     }
 }
 template<I32 DIM,typename Result>
-void MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  )throw(pexception){
+void MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
 
     std::ifstream  is(file,std::iostream::binary);
     if (is.fail()){
-        throw(pexception("In MatN::load, Cannot open file: "+std::string(file)));
+        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
     }
     else{
         is.seekg (0, is.end);
@@ -489,17 +488,17 @@ void MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  )throw(pexcepti
         if(length>=sizeof(Result)*in.getDomain().multCoordinate())
             MatNInOutPgm::readRaw(in,is);
         else
-            throw(pexception("In MatN::loadRaw, the file should be equal or superior to sizeof(Type)*in.getDomain().multCoordinate()"));
+            std::cerr<<"In MatN::loadRaw, the file should be equal or superior to sizeof(Type)*in.getDomain().multCoordinate()";
     }
 }
 
 template<I32 DIM,typename Result>
-void MatNInOut::load(MatN<DIM,Result> &in,const char * file  )throw(pexception)
+void MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
 {
     std::ifstream  is2(file,std::iostream::binary);
     if (is2.fail())
     {
-        throw(pexception("In MatN::load, Cannot open file: "+std::string(file)));
+        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
     }
     is2.close();
 
@@ -509,7 +508,7 @@ void MatNInOut::load(MatN<DIM,Result> &in,const char * file  )throw(pexception)
         std::ifstream  is(file,std::iostream::binary);
         if (is.fail())
         {
-            throw(pexception("In MatN::load, Cannot open file: "+std::string(file)));
+            std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
         }
         else
         {
@@ -552,7 +551,7 @@ void MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
     }
     std::sort (vec.begin(), vec.end());
     if(vec.size()==0)
-        throw(pexception("In MatN::loadFromDirectory, the directory is empty"+std::string(pathdir) ));
+        std::cerr<<"In MatN::loadFromDirectory, the directory is empty"+std::string(pathdir);
 
     MatN<2,Type> img;
     MatNInOut::load(img,vec[0].c_str());
@@ -561,19 +560,16 @@ void MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
     d(1)=img.getDomain()(1);
     d(2)=vec.size();
     in1cast.resize(d);
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("loadFromDirectory",COLLECTOR_EXECUTION_INFO);
     for(int i = 0;i<(int)vec.size();i++){
-        CollectorExecutionInformationSingleton::getInstance()->progression(1.0*i/vec.size(),"File name:"+vec[i]);
         if(i!=0)
             MatNInOut::load(img,vec[i].c_str());
         if(img.sizeI()!=in1cast.sizeI()||img.sizeJ()!=in1cast.sizeJ()){
-            throw(pexception(std::string("In MatN::loadFromDirectory, all matrix must have the same domain")));
+            std::cerr<<std::string("In MatN::loadFromDirectory, all matrix must have the same domain");
         }
         typename MatN<2,Type>::IteratorEDomain it(img.getIteratorEDomain());
         while(it.next())
             in1cast.operator ()(it.x()(0),it.x()(1),i)=img(it.x()(0),it.x()(1));;
     }
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("loadFromDirectory",COLLECTOR_EXECUTION_INFO);
 }
 template<int DIM,typename Result>
 void MatNInOut::saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension)

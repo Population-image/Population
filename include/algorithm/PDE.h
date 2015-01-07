@@ -54,39 +54,8 @@ private:
     double sigma;
     int radius_kernel;
 public:
-    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel=1)
-        :itn(f.getIteratorENeighborhood(radius_kernel,0)),sigma(sigma),radius_kernel(radius_kernel){
-        F64 sum=0;
-        itn.init(0);
-        while(itn.next()){
-            double dist = itn.xreal().normPower();
-            if(dist!=0){
-                F64  value = std::exp(-0.5*dist/(sigma*sigma));
-                v_value.push_back(value);
-                sum+=value;
-            }
-            else
-                v_value.push_back(-2*DIM);
-
-        }
-        //normalisation
-        for(int i=0;i<(int)v_value.size();i++){
-            if(v_value[i]>0)
-                v_value[i]*=(2*DIM/sum);
-
-        }
-    }
-    TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
-        F64 sum=0;
-        FunctorF::FunctorMultiplicationF2<TypePixel,F64,F64> op;
-        itn.init( x);
-        std::vector<F64>::iterator it = v_value.begin();
-        while(itn.next()){
-            sum += op((*it),f(itn.x()));
-            it ++;
-        }
-        return sum;
-    }
+    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel=1);
+    TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x);
 };
 }
 /*!
@@ -123,7 +92,6 @@ For a more flexible implementation,  I define a collection of functors  pop::Fun
 
 class POP_EXPORTS PDE
 {
-
     /*!
         \class pop::PDE
         \ingroup PDE
@@ -136,16 +104,12 @@ public:
     //! \name Filter
     //@{
     //-------------------------------------
-
-
-
     /*!
       * \param in input matrix
       * \param Nstep number of time-steps
       * \param K kappa
       * \return filter matrix
       *
-
       * \code
       * Mat3UI8 img;
       * img.load("../image/rock3d.pgm");
@@ -317,32 +281,27 @@ In this simulation, the numerical permeability is estimated with \f$\mu\f$and \f
 
 As example, this code produces
  \code
-#include"data/utility/CollectorExecutionInformation.h"
-#include"algorithm/Processing.h"
-#include"algorithm/Visualization.h"
-#include"algorithm/PDE.h"
-#include"algorithm/RandomGeometry.h"
-#include"data/mat/MatNDisplay.h"
-using namespace pop;
-int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
     Mat2UI8 img;
-    img.load("../image/outil.bmp");
+    img = Processing::fill(img,(UI8)255);
+    img.load(POP_PROJECT_SOURCE_DIR+(std::string)"/image/outil.bmp");
     img = img.opposite();
     Mat2Vec2F64 vel;
     int dir=0;
     VecF64 kx = PDE::permeability(img,vel,dir,0.01);
     vel= GeometricalTransformation::scale(vel,Vec2F64(8));
     Mat2RGBUI8 c = Visualization::vectorField2DToArrows(vel);
-    c.display("velocity",true,false);
+    c.display("velocity",false,false);
     dir=1;
     VecF64 ky = PDE::permeability(img,vel,dir,0.01);
-//    pop::Visualization::labelToRGBGradation(vel.toVecScalar()[dir]).display();
     Mat2F64 K(2,2);
     K.setCol(0,kx);
     K.setCol(1,ky);
     std::cout<<K<<std::endl;
-}
+    Mat2F64 img_norm(img.getDomain());
+    ForEachDomain2D(x,img){
+        img_norm(x)= vel(x).norm();
+    }
+    img_norm.display();
  \endcode
  the final matrix of this animation:
 \image html outilvelocity.gif "Velocity field"
@@ -387,8 +346,6 @@ int main(){
     template<int DIM>
     static Mat2F64   randomWalk(const MatN<DIM,UI8> &  bulk, int nbrwalkers=50000, F64 standard_deviation=0.5 ,  F64 time_max=2000,F64 delta_time_write=10)
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("RandomWalk");
-
         VecN<DIM,F64> x_current,x_start;
         DistributionNormal distnorm(0,standard_deviation);
 
@@ -400,8 +357,6 @@ int main(){
         Mat2F64  t(static_cast<int>(std::floor(time_max/delta_time_write))+2,2+DIM);
 
         for(int j =0;j<nbrwalkers;j++){
-            if(nbrwalkers/100==0||j%(nbrwalkers/100)==0)
-                CollectorExecutionInformationSingleton::getInstance()->progression(1.0*j/nbrwalkers);
             int timestepwrite= 0;
             VecN<DIM,F64> v_sum  = 0;
             F64 timecurrent=0;
@@ -437,7 +392,6 @@ int main(){
             t(i,0)/=nbrwalkers;
         }
         t = t.deleteRow(t.sizeI()-1);
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("RandomWalk");
         return t;
     }
     //@}
@@ -490,7 +444,7 @@ int main(){
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield, int nbrsteps)throw(pexception)
+    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield, int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
@@ -535,7 +489,7 @@ int main(){
       * \image html allencahn.gif
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)throw(pexception)
+    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
@@ -561,7 +515,7 @@ int main(){
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> getField(const MatN<DIM,TypePixel> & labelfield,const MatN<DIM,F64> & scalarfield, typename MatN<DIM,TypePixel>::F label,int width=3)throw(pexception)
+    static MatN<DIM,F64> getField(const MatN<DIM,TypePixel> & labelfield,const MatN<DIM,F64> & scalarfield, typename MatN<DIM,TypePixel>::F label,int width=3)
     {
 
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(labelfield.getIteratorEDomain()) ;
@@ -789,5 +743,43 @@ private:
         }
     }
 };
+
+
+
+template<int DIM,typename TypePixel>
+Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel)
+    :itn(f.getIteratorENeighborhood(radius_kernel,0)),sigma(sigma),radius_kernel(radius_kernel){
+    F64 sum=0;
+    itn.init(0);
+    while(itn.next()){
+        double dist = itn.xreal().normPower();
+        if(dist!=0){
+            F64  value = std::exp(-0.5*dist/(sigma*sigma));
+            v_value.push_back(value);
+            sum+=value;
+        }
+        else
+            v_value.push_back(-2*DIM);
+
+    }
+    //normalisation
+    for(int i=0;i<(int)v_value.size();i++){
+        if(v_value[i]>0)
+            v_value[i]*=(2*DIM/sum);
+
+    }
+}
+template<int DIM,typename TypePixel>
+TypePixel Private::LaplacienSmooth<DIM,TypePixel>::operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
+    F64 sum=0;
+    FunctorF::FunctorMultiplicationF2<TypePixel,F64,F64> op;
+    itn.init( x);
+    std::vector<F64>::iterator it = v_value.begin();
+    while(itn.next()){
+        sum += op((*it),f(itn.x()));
+        it ++;
+    }
+    return sum;
+}
 }
 #endif // PDE_H

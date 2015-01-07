@@ -2,7 +2,7 @@
 #include"PopulationConfig.h"
 #if defined(HAVE_QT)
 namespace pop{
-MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<pop::UI8>)throw(pexception)
+MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<pop::UI8>)
 {
 
     if(qimg.isNull()==false){
@@ -24,10 +24,11 @@ MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconv
             return img;
         }
     }else{
-        throw(pexception("In Convertor::fromQImage, QIMage is null"));
+        std::cerr<<"In Convertor::fromQImage, QIMage is null";
+        return MatN<2,pop::UI8>();
     }
 }
-MatN<2,RGBUI8> ConvertorQImage::fromQImage(const QImage & temp,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<RGBUI8>)throw(pexception)
+MatN<2,RGBUI8> ConvertorQImage::fromQImage(const QImage & temp,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<RGBUI8>)
 {
     if(temp.isNull()==false){
         if(isfastconversion==true){
@@ -47,7 +48,8 @@ MatN<2,RGBUI8> ConvertorQImage::fromQImage(const QImage & temp,bool isfastconver
             return img;
         }
     }else{
-        throw(pexception("In Convertor::fromQImage, QIMage is null"));
+        std::cerr<<"In Convertor::fromQImage, QIMage is null";
+        return MatN<2,RGBUI8>();
     }
 }
 

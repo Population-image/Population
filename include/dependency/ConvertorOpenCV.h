@@ -58,8 +58,8 @@ int main()
 
 
     */
-    static pop::MatN<2,RGBUI8> fromCVMatRGBUI8ToPopMatRGBUI8(const cv::Mat& mat)throw(pexception);
-    static MatN<2,UI8> fromCVMatUI8ToPopMatUI8(const cv::Mat& mat)throw(pexception);
+    static pop::MatN<2,RGBUI8> fromCVMatRGBUI8ToPopMatRGBUI8(const cv::Mat& mat);
+    static MatN<2,UI8> fromCVMatUI8ToPopMatUI8(const cv::Mat& mat);
 
     static cv::Mat fromPopMatToCVMat(const pop::MatN<2,RGBUI8>& mat);
 

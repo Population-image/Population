@@ -91,7 +91,7 @@ struct POP_EXPORTS Visualization
      * \image html outilcluster.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> labelToRandomRGB(const MatN<DIM,TypePixel> & f )throw(pexception)
+    static MatN<DIM,RGBUI8> labelToRandomRGB(const MatN<DIM,TypePixel> & f )
     {
         MatN<DIM,RGBUI8> fRGB(f.getDomain());
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
@@ -149,7 +149,7 @@ struct POP_EXPORTS Visualization
      * \image html outdistance.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> labelToRGBGradation (const MatN<DIM,TypePixel> & f,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0)  )throw(pexception)
+    static MatN<DIM,RGBUI8> labelToRGBGradation (const MatN<DIM,TypePixel> & f,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0)  )
     {
         MatN<DIM,RGBUI8> fRGB(f.getDomain());
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
@@ -214,7 +214,7 @@ struct POP_EXPORTS Visualization
      * \image html average.png
     */
     template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,TypePixel2> labelAverageRGB(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img)throw(pexception)
+    static MatN<DIM,TypePixel2> labelAverageRGB(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img)
     {
         FunctionAssert(label,img,"Visualization::labelAverageRGB");
         typename MatN<DIM,TypePixel1>::IteratorEDomain it (img.getIteratorEDomain());
@@ -279,7 +279,7 @@ struct POP_EXPORTS Visualization
      * \image html foregroundboundary.png
     */
     template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,RGBUI8> labelForegroundBoundary(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,int width=1,int norm=1)throw(pexception)
+    static MatN<DIM,RGBUI8> labelForegroundBoundary(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,int width=1,int norm=1)
     {
         MatN<DIM,TypePixel1>  labelb(label.getDomain());
         typename MatN<DIM,TypePixel1>::IteratorEDomain it (label.getIteratorEDomain());
@@ -308,7 +308,7 @@ struct POP_EXPORTS Visualization
 
 
         if(min<0){
-            throw(pexception("In Vizualization::labelForegroundBoundary,the label matrix must be possitive"));
+            std::cerr<<"In Vizualization::labelForegroundBoundary,the label matrix must be possitive";
         }
         std::vector<RGB<F64> > v(max+1);
 
@@ -375,7 +375,7 @@ struct POP_EXPORTS Visualization
     */
 
     template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,F64 ratio=0.5)throw(pexception)
+    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,F64 ratio=0.5)
     {
         FunctionAssert(label,img,"Visualization::labelForeground");
         typename MatN<DIM,TypePixel1>::IteratorEDomain it (label.getIteratorEDomain());
@@ -389,7 +389,7 @@ struct POP_EXPORTS Visualization
 
 
         if(min<0){
-            throw(pexception("In Vizualization::labelForeground, the label matrix must be possitive"));
+            std::cerr<<"In Vizualization::labelForeground, the label matrix must be possitive";
         }
         std::vector<RGB<F64> > v(max+1);
 
@@ -449,7 +449,7 @@ struct POP_EXPORTS Visualization
      * \image html cube.png
     */
     template<typename TypePixel>
-    static void cube(Scene3d& scene,const MatN<3,TypePixel> & m)throw(pexception)
+    static void cube(Scene3d& scene,const MatN<3,TypePixel> & m)
     {
 
 
@@ -480,7 +480,7 @@ struct POP_EXPORTS Visualization
      * \image html cubeline.png
     */
     template<typename TypePixel>
-    static void lineCube(Scene3d& scene,const MatN<3,TypePixel> & img,double width=2,RGBUI8 RGB=RGBUI8(255,0,0))throw(pexception)
+    static void lineCube(Scene3d& scene,const MatN<3,TypePixel> & img,double width=2,RGBUI8 RGB=RGBUI8(255,0,0))
     {
 
         int d0 = img.getDomain()(0);
@@ -668,7 +668,7 @@ struct POP_EXPORTS Visualization
      * \image html marchingcube.png
     */
     template<typename TypePixel>
-    static void marchingCube(Scene3d& scene,const MatN<3,TypePixel> & img )throw(pexception)
+    static void marchingCube(Scene3d& scene,const MatN<3,TypePixel> & img )
     {
 
         MatN<3,RGBUI8 >   binc;
@@ -730,7 +730,7 @@ struct POP_EXPORTS Visualization
      * \image html spinodal.png
     */
 
-    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied)throw(pexception)
+    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied)
     {
 
 
@@ -789,7 +789,7 @@ struct POP_EXPORTS Visualization
      * \image html graindecomposition.png
     */
 
-    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied,const MatN<3,RGBUI8>  & RGBfield)throw(pexception)
+    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied,const MatN<3,RGBUI8>  & RGBfield)
     {
         std::vector<vertex> vertices = runMarchingCubes2(phasefied,0);
         while(vertices.empty()==false)
@@ -834,7 +834,7 @@ struct POP_EXPORTS Visualization
         Mat3UI8 imgfilter= Processing::median(img,2);
         Mat3UI8 pore_space = Processing::threshold(imgfilter,0,155);
         pore_space=   pop::Processing::holeFilling(pore_space);
-        Mat3UI8 skeleton= Analysis::thinningAtConstantTopology3d(pore_space,"../file/topo24.dat");
+        Mat3UI8 skeleton= Analysis::thinningAtConstantTopology(pore_space,"../file/topo24.dat");
         Scene3d scene;
         pop::Visualization::voxelSurface(scene,skeleton);
         pop::Visualization::lineCube(scene,skeleton);
@@ -844,7 +844,7 @@ struct POP_EXPORTS Visualization
      * \image html spinodal_skeleton.png "Topological skeleton"
     */
     template<typename TypePixel>
-    static void voxelSurface(Scene3d & scene , const MatN<3,TypePixel> & img)throw(pexception)
+    static void voxelSurface(Scene3d & scene , const MatN<3,TypePixel> & img)
     {
         MatN<3,TypePixel> f(img.getDomain()+2);
         typename MatN<3,TypePixel>::IteratorEDomain it (img.getIteratorEDomain());
@@ -978,7 +978,7 @@ struct POP_EXPORTS Visualization
     */
 
     template<typename TypePixel>
-    static void  plane(Scene3d &scene, const MatN<3,TypePixel> & img,int slice=0, int direction=2,int normal_way=1,Vec3F64 trans = Vec3F64())throw(pexception)
+    static void  plane(Scene3d &scene, const MatN<3,TypePixel> & img,int slice=0, int direction=2,int normal_way=1,Vec3F64 trans = Vec3F64())
     {
 
 
@@ -1054,7 +1054,7 @@ struct POP_EXPORTS Visualization
     grain = pop::Processing::greylevelRemoveEmptyValue(grain);//the grain label is now 1 (before 255)
     //TOLOGICAL GRAPH
     Mat3UI8 grain_hole=   pop::Processing::holeFilling(grain);
-    Mat3UI8 skeleton= Analysis::thinningAtConstantTopology3d(grain_hole,"../file/topo24.dat");
+    Mat3UI8 skeleton= Analysis::thinningAtConstantTopology(grain_hole,"../file/topo24.dat");
     std::pair<Mat3UI8,Mat3UI8> vertex_edge = Analysis::fromSkeletonToVertexAndEdge (skeleton);
     Mat3UI32 verteces = pop::Processing::clusterToLabel(vertex_edge.first,0);
     Mat3UI32 edges = pop::Processing::clusterToLabel(vertex_edge.second,0);
@@ -1221,7 +1221,7 @@ struct POP_EXPORTS Visualization
      * \param cmin min RGB
      * \param cmax max RGB
      * \param step step between two arrows
-     * \param ratio ratio size of the arrow between the fixed one and the variable given but the norm of the vector
+     * \param length size of the arrow between the fixed one and the variable given but the norm of the vector
      *
      *
     \code

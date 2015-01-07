@@ -377,7 +377,7 @@ template<>
 struct DisplayOutputPixel<RGBUI8>{ inline static std::string   print( RGBUI8 v){ return BasicUtility::Any2String((int)v(0))+","+BasicUtility::Any2String((int)v(1))+","+BasicUtility::Any2String((int)v(2)); }};
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automaticresize)const throw(pexception){
+void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automaticresize)const {
 
     MatN<Dim,Type>  img(*this);
     VecN<DIM,pop::F64> scale;

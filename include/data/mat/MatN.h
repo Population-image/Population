@@ -42,7 +42,7 @@ in the Software.
 #include <string>
 #include <algorithm>
 #include <numeric>
-#include"data/utility/Exception.h"
+
 #include"PopulationConfig.h"
 #include"data/typeF/TypeTraitsF.h"
 #include"data/typeF/RGB.h"
@@ -262,22 +262,6 @@ public:
     can use MatN::loadFromDirectory or MatN::saveFromDirectory.
     However, I extend the pgm format to directly save a 3D matrix in a single file.
 
-    \section Exception Exception and execution information
-
-    To handle the error message pexception, a good pratice is to include your code in try-catch statement. Also, many algorithms can give
-    information about their execution on the standard output stream. You have the possibility to (des)activate this stream. To manage error and
-    execution information, the code can bMatNe like that:
-    \code
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
-    try{
-    Mat2RGBUI8 img;
-    img.load("../image/Lena.bmp");
-    img = PDE::nonLinearAnisotropicDiffusion(img,10,50);
-    img.display();
-    }catch(const pexception & e){
-    std::cerr<<e.what()<<std::endl;
-    }
-    \endcode
 
     \section Display Display
 
@@ -906,7 +890,7 @@ public:
     /*!
     * Return a ptr to the first pixel value
     *
-    *
+    *Exception
     * direct access to the matrix data that can be usefull for optimized purposes
     */
     Type *  data();
@@ -929,14 +913,12 @@ public:
     * \param pathdir directory path
     * \param basefilename filename base by default "toto"
     * \param extension by default ".pgm"
-    * \exception the path dir does not exist or the matrix is not 3D
     *
     *
     * The loadFromDirectory attempts to load all files as 2d slices of the  3D matrix in the  directory pathdir. If the extension is set,
     * we filter all filter all files with the extension. It is the same for basename.\n
     * For instance, this code produces:
     \code
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
     Mat3UI8 img;
     img.loadFromDirectory("/home/vincent/Desktop/WorkSegmentation/lavoux/","in","tiff");
     img.display();
@@ -944,26 +926,23 @@ public:
     \endcode
 
     */
-    void loadFromDirectory(const char * pathdir,const char * basefilename="",const char * extension="")throw(pexception);
+    void loadFromDirectory(const char * pathdir,const char * basefilename="",const char * extension="");
     /*!
-    \param file input file
-    \exception  pexception the input file does not exist
+    * \param file input file
     *
     * The loader attempts to read the matrix using the specified format. Natively, this library support the pgm, png, jpg, bmp formats. However thanks to the CImg library, this library can
     read various matrix formats http://cimg.sourceforge.net/reference/group__cimg__files__io.html if you install Image Magick http://www.imagemagick.org/script/binary-releases.php.
     */
-    void load(const char * file)throw(pexception);
+    void load(const char * file);
     /*!
     * \param file input file
-    * \exception  pexception the input file does not exist
     *
     * \sa MatN::load(const char * file)
     */
-    void load(const std::string file) throw(pexception);
+    void load(const std::string file) ;
     /*!
-    \param file input file
-    \param d  domain of definition of the image
-    \exception  pexception  the file should be equal to sizeof(T)*in.getDomain().multCoordinate()
+    * \param file input file
+    * \param d  domain of definition of the image
     *
     * The loader attempts to read the 3d raw matrix. The voxel type of the matrix must be the same as in raw file and, in more, you need to
     * give the domain (size) of the image in the raw file. \n
@@ -975,12 +954,11 @@ public:
     * \endcode
     *
     */
-    void loadRaw(const char * file,const Domain & d)throw(pexception);
+    void loadRaw(const char * file,const Domain & d);
     /*!
-    \param pathdir directory path
-    \param basefilename filename base by default "toto"
-    \param extension by default ".pgm"
-    \exception the path dir does not exist or the matrix is not 3D
+    * \param pathdir directory path
+    * \param basefilename filename base by default "toto"
+    * \param extension by default ".pgm"
     *
     * The saveFromdirectory attempts to save Save all slices of the  3D matrix f in the  directory pathdir with the given basefilename and the extenion,\n
     * for instance pathdir="/home/vincent/Project/ENPC/ROCK/Seg/"  basefilename="seg" and extension=".bmp", will save the slices as follows \n
@@ -989,39 +967,35 @@ public:
     * "/home/vincent/Project/ENPC/ROCK/Seg/seg0002.bmp"\n
     *  "and so one.
     */
-    void saveFromDirectory(const char * pathdir,const char * basefilename="toto",const char * extension=".pgm")const throw(pexception);
+    void saveFromDirectory(const char * pathdir,const char * basefilename="toto",const char * extension=".pgm")const ;
 
     /*!
-    \param file input file
-    \exception  the input file does not exist or it is not pgm format
+    * \param file input file
     *
     * The saver attempts to write the matrix using the specified format.  Natively, this library support the pgm, png, jpg, bmp format. However thanks to the CImg library, this library can
     save various matrix formats http://cimg.sourceforge.net/reference/group__cimg__files__io.html .
     */
-    void save(const char * file)const throw(pexception);
+    void save(const char * file)const ;
 
     /*!
-    \param file input file
-    \exception  pexception the input file does not exist
+    * \param file input file
     *
     * \sa MatN::save(const char * file)
     */
-    void save(const std::string file)const throw(pexception);
+    void save(const std::string file)const ;
     /*!
-    \param file input file
-    \exception  pexception the input file does not exist
+    * \param file input file
     *
     * save the data in raw format without header
     */
-    void saveRaw(const char * file)const throw(pexception);
+    void saveRaw(const char * file)const ;
     /*!
-    \param file input file
-    \param header header of the file
-    \exception  pexception the input file does not exist
+    * \param file input file
+    * \param header header of the file
     *
     * save the data in ascii format without header
     */
-    void saveAscii(const char * file,std::string header="")const throw(pexception);
+    void saveAscii(const char * file,std::string header="")const ;
     /*!
     * \param title windows title
     * \param stoprocess for stoprocess=true, stop the process until the windows is closed, otherwise the process is still running
@@ -1041,7 +1015,7 @@ public:
     * display the matrix
     */
 
-    void display(const char * title="",bool stoprocess=true, bool automaticresize=true)const throw(pexception);
+    void display(const char * title="",bool stoprocess=true, bool automaticresize=true)const ;
 
     //@}
 
@@ -2029,11 +2003,11 @@ const
     return &(*this->begin());
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::load(const std::string file) throw(pexception){
+void MatN<Dim,Type>::load(const std::string file) {
     this->load(file.c_str());
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::save(const std::string file)const throw(pexception){
+void MatN<Dim,Type>::save(const std::string file)const {
     save(file.c_str());
 }
 template<int Dim, typename Type>
@@ -2213,19 +2187,25 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
     MatN<Dim,Type> mtrans = m.transpose();
     MatN<Dim,Type> mout(this->sizeI(),m.sizeJ());
     Type sum = 0;
-    for(unsigned int i=0;i<this->sizeI();i++){
-        for(unsigned int j=0;j<m.sizeJ();j++){
-            sum = 0;
-            typename MatN::const_iterator this_it  = this->begin() +  i*this->sizeJ();
-            typename MatN::const_iterator mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
-            for(unsigned int k=0;k<this->sizeJ();k++){
-                sum+=(* this_it) * (* mtrans_it);
-                this_it++;
-                mtrans_it++;
+    unsigned int i,j;
+    typename MatN::const_iterator this_it,mtrans_it;
+#pragma omp parallel shared(m,mtrans,mout) private(i,j,sum,this_it,mtrans_it)
+    {
+#pragma omp for schedule (static)
+        for(i=0;i<this->sizeI();i++){
+            for(j=0;j<m.sizeJ();j++){
+                sum = 0;
+                this_it  = this->begin() +  i*this->sizeJ();
+                mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
+                for(unsigned int k=0;k<this->sizeJ();k++){
+                    sum+=(* this_it) * (* mtrans_it);
+                    this_it++;
+                    mtrans_it++;
+                }
+                mout(i,j)=sum;
             }
-            mout(i,j)=sum;
-        }
 
+        }
     }
     return mout;
 
@@ -2600,7 +2580,7 @@ struct NumericLimits<MatN<DIM,Type> >
 *
 */
 template<int Dim, typename Type>
-pop::MatN<Dim, Type>  minimum(const pop::MatN<Dim, Type>& f,const pop::MatN<Dim, Type>& g)throw(pop::pexception)
+pop::MatN<Dim, Type>  minimum(const pop::MatN<Dim, Type>& f,const pop::MatN<Dim, Type>& g)
 {
     pop::FunctionAssert(f,g,"In min");
     pop::MatN<Dim, Type> h(f);
@@ -2618,7 +2598,7 @@ pop::MatN<Dim, Type>  minimum(const pop::MatN<Dim, Type>& f,const pop::MatN<Dim,
 *
 */
 template<int Dim, typename Type>
-pop::MatN<Dim, Type>  maximum(const pop::MatN<Dim, Type>& f,const pop::MatN<Dim, Type>& g)throw(pop::pexception)
+pop::MatN<Dim, Type>  maximum(const pop::MatN<Dim, Type>& f,const pop::MatN<Dim, Type>& g)
 {
     pop::FunctionAssert(f,g,"In max");
     pop::MatN<Dim, Type> h(f);
@@ -2768,39 +2748,39 @@ double  normPowerValue(const pop::MatN<Dim, Type>& f,int p=2)
 }
 
 namespace Private {
-    template<int DIM,typename PixelType>
-    struct ConsoleOutputPixel
-    {
-        void  print(std::ostream& out,  PixelType v){
-            out<<v;
-        }
-    };
+template<int DIM,typename PixelType>
+struct ConsoleOutputPixel
+{
+    void  print(std::ostream& out,  PixelType v){
+        out<<v;
+    }
+};
 
-    template<int DIM>
-    struct ConsoleOutputPixel<DIM,unsigned char>
-    {
-        void  print(std::ostream& out,  unsigned char v){
-            out<<(int)v;
-        }
-    };
+template<int DIM>
+struct ConsoleOutputPixel<DIM,unsigned char>
+{
+    void  print(std::ostream& out,  unsigned char v){
+        out<<(int)v;
+    }
+};
 
-    template<int DIM,typename PixelType>
-    struct ConsoleInputPixel
-    {
-        void  print(std::istream& in,  PixelType &v){
-            in>>v;
-        }
-    };
+template<int DIM,typename PixelType>
+struct ConsoleInputPixel
+{
+    void  print(std::istream& in,  PixelType &v){
+        in>>v;
+    }
+};
 
-    template<int DIM>
-    struct ConsoleInputPixel<DIM,unsigned char>
-    {
-        void  print(std::istream& in,  unsigned char& v){
-            int value;
-            in>>value;
-            v= static_cast<unsigned char>(value);
-        }
-    };
+template<int DIM>
+struct ConsoleInputPixel<DIM,unsigned char>
+{
+    void  print(std::istream& in,  unsigned char& v){
+        int value;
+        in>>value;
+        v= static_cast<unsigned char>(value);
+    }
+};
 }
 
 

@@ -40,7 +40,7 @@ in the Software.
 #include <sstream>
 #include <vector>
 #include <limits>
-#include"data/utility/Exception.h"
+
 #include"data/distribution/Distribution.h"
 #include"data/distribution/DistributionAnalytic.h"
 #include"data/mat/MatN.h"
@@ -103,9 +103,9 @@ public:
 
 
 
-    virtual F64 operator ()(F64 value)const throw(pexception);
-    virtual DistributionRegularStep * clone()const throw(pexception);
-    virtual F64 randomVariable()const throw(pexception);
+    virtual F64 operator ()(F64 value)const ;
+    virtual DistributionRegularStep * clone()const ;
+    virtual F64 randomVariable()const ;
 
 
     /*!
@@ -189,13 +189,13 @@ public:
 
 
 
-    virtual F64 operator ()(F64 value)const throw(pexception);
-    virtual DistributionIntegerRegularStep * clone()const throw(pexception);
-    virtual F64 randomVariable()const throw(pexception);
+    virtual F64 operator ()(F64 value)const ;
+    virtual DistributionIntegerRegularStep * clone()const ;
+    virtual F64 randomVariable()const ;
 
 
     /*!
-    \fn void fromMatrix(const Mat2F64 & matrix)throw(pexception)
+    \fn void fromMatrix(const Mat2F64 & matrix)
     *
     *  set the distribution from a matrix such that the first column contained the X-values with a regular spacing between successive
     *  values equal to 1 and the second colum Y-values.\n
@@ -203,7 +203,7 @@ public:
     * as half of the minumum value of the difference of successive X-values.  X-values width you can define the sampling
     * of the step function with the argument step. Of course,you can define it!
     */
-    void fromMatrix(const Mat2F64 & matrix)throw(pexception);
+    void fromMatrix(const Mat2F64 & matrix);
 
     /*!
     \fn Mat2F64 toMatrix()const;
@@ -246,12 +246,12 @@ public:
         static std::string getKey();
     ~DistributionExpression();
     DistributionExpression();
-    DistributionExpression(std::string regularexpression)throw(pexception);
+    DistributionExpression(std::string regularexpression);
     DistributionExpression(const DistributionExpression & dist);
-    virtual F64 operator ()(F64 value)const throw(pexception);
-    F64 randomVariable()const throw(pexception);
-    virtual DistributionExpression * clone()const throw(pexception);
-    bool fromRegularExpression(std::string expression)throw(pexception);
+    virtual F64 operator ()(F64 value)const ;
+    F64 randomVariable()const ;
+    virtual DistributionExpression * clone()const ;
+    bool fromRegularExpression(std::string expression);
      std::string toRegularExpression()const;
 };
 /// @endcond

@@ -33,7 +33,7 @@ in the Software.
 \***************************************************************************/
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
-#include"data/utility/Exception.h"
+
 #include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorF.h"
 #include"algorithm/ForEachFunctor.h"
@@ -100,7 +100,7 @@ struct POP_EXPORTS Representation
     //-------------------------------------
 
     /*!
-         * \param in input matrix with ComplexF64 as pixel/voxel type
+         * \param f input matrix with ComplexF64 as pixel/voxel type
          * \param direction for direction =1 direct FFT, otherwise inverse FFT
          * \return return the fft
         * \brief Apply the FFT on the input matrix
@@ -125,7 +125,7 @@ struct POP_EXPORTS Representation
          *
         */
     template<int DIM>
-    static MatN<DIM,ComplexF64>  FFT(const MatN<DIM,ComplexF64> & f ,int direction=1) throw(pexception)
+    static MatN<DIM,ComplexF64>  FFT(const MatN<DIM,ComplexF64> & f ,int direction=1)
     {
         MatN<DIM,ComplexF64> in;
         if(isPowerOfTwo(f.getDomain()(0))==false||isPowerOfTwo(f.getDomain()(1))==false){
@@ -133,16 +133,11 @@ struct POP_EXPORTS Representation
         }else{
             in =f;
         }
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("FunctionProcedureFFT",COLLECTOR_EXECUTION_RATIO);
 
         typename MatN<DIM-1,ComplexF64>::E x;
         MatN<DIM,ComplexF64>  F (in);
 
         for(int fixed_coordinate=0;fixed_coordinate<DIM;fixed_coordinate++){
-            //        for(int fixed_coordinate=Function::DIM-;fixed_coordinate>=0;fixed_coordinate--)
-            //        int fixed_coordinate=2;
-            //        {
-            CollectorExecutionInformationSingleton::getInstance()->info("Direction"+BasicUtility::Any2String(fixed_coordinate));
             x = in.getDomain().removeCoordinate(fixed_coordinate);
             typename MatN<DIM-1,ComplexF64>::IteratorEDomain it(x);
             MatN<1,ComplexF64> lign(in.getDomain()(fixed_coordinate));
@@ -155,7 +150,6 @@ struct POP_EXPORTS Representation
                     else if(i>fixed_coordinate)
                         x(i) =it.x()(i-1);
                 }
-                //                std::cout<<x<<std::endl;
                 for(x(fixed_coordinate)=0;x(fixed_coordinate)<in.getDomain()(fixed_coordinate);x(fixed_coordinate)++){
                     lign(x(fixed_coordinate))=F(x);
                 }
@@ -216,7 +210,7 @@ struct POP_EXPORTS Representation
             img(it.x()) = ((imgf(it.x())-mini)*255/(maxi-mini));
 
         MatN<DIM,UI8> out(fft.getDomain());
-		it.init();
+        it.init();
         while(it.next()){
             typename MatN<DIM,UI8>::E xtran = it.x()+ img.getDomain()/2;
             MatNBoundaryConditionPeriodic::apply(img.getDomain(),xtran);
@@ -371,7 +365,7 @@ private:
     template<typename T>
     static bool isPowerOfTwo (T v)
     {
-    	return ((v & -v)) == v;
+        return ((v & -v)) == v;
     }
 };
 }

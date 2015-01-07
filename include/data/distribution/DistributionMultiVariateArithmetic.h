@@ -56,7 +56,7 @@ private:
 public:
     void setDistributionMultiVariateLeft(const DistributionMultiVariate & f_left);
     void setDistributionMultiVariateRight(const DistributionMultiVariate &f_right);
-    VecF64 randomVariable()const throw(pexception);
+    VecF64 randomVariable()const ;
     void setStep(F64 step)const;
 
 
@@ -75,7 +75,7 @@ public:
  public:
     DistributionMultiVariateArithmeticAddition();
     DistributionMultiVariateArithmeticAddition(const DistributionMultiVariateArithmeticAddition & dist);
-    virtual DistributionMultiVariateArithmeticAddition * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticAddition * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
  };
  class DistributionMultiVariateArithmeticSubtraction : public DistributionMultiVariateArithmetic
@@ -84,7 +84,7 @@ public:
  public:
     DistributionMultiVariateArithmeticSubtraction();
     DistributionMultiVariateArithmeticSubtraction(const DistributionMultiVariateArithmeticSubtraction & dist);
-    virtual DistributionMultiVariateArithmeticSubtraction * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticSubtraction * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -94,7 +94,7 @@ public:
  public:
     DistributionMultiVariateArithmeticMultiplication();
     DistributionMultiVariateArithmeticMultiplication(const DistributionMultiVariateArithmeticMultiplication & dist);
-    virtual DistributionMultiVariateArithmeticMultiplication * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticMultiplication * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -104,7 +104,7 @@ public:
  public:
     DistributionMultiVariateArithmeticDivision();
     DistributionMultiVariateArithmeticDivision(const DistributionMultiVariateArithmeticDivision & dist);
-    virtual DistributionMultiVariateArithmeticDivision * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticDivision * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -114,7 +114,7 @@ public:
  public:
     DistributionMultiVariateArithmeticComposition();
     DistributionMultiVariateArithmeticComposition(const DistributionMultiVariateArithmeticComposition & dist);
-    virtual DistributionMultiVariateArithmeticComposition * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticComposition * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -124,7 +124,7 @@ public:
  public:
     DistributionMultiVariateArithmeticMax();
     DistributionMultiVariateArithmeticMax(const DistributionMultiVariateArithmeticMax & dist);
-    virtual DistributionMultiVariateArithmeticMax * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticMax * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -134,7 +134,7 @@ public:
  public:
     DistributionMultiVariateArithmeticMin();
     DistributionMultiVariateArithmeticMin(const DistributionMultiVariateArithmeticMin & dist);
-    virtual DistributionMultiVariateArithmeticMin * clone()const throw(pexception);
+    virtual DistributionMultiVariateArithmeticMin * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
 
  };
@@ -151,9 +151,9 @@ public:
  public:
     DistributionMultiVariateSeparationProduct();
     DistributionMultiVariateSeparationProduct(const DistributionMultiVariateSeparationProduct & dist);
-    virtual DistributionMultiVariateSeparationProduct * clone()const throw(pexception);
+    virtual DistributionMultiVariateSeparationProduct * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
-    VecF64 randomVariable()const throw(pexception);
+    VecF64 randomVariable()const ;
     virtual int getNbrVariable()const;
  };
 
@@ -184,9 +184,9 @@ public:
     void setSingleDistribution(const Distribution &distsingle);
     Distribution getSingleDistribution() const;
 
-    virtual DistributionMultiVariateCoupled * clone()const throw(pexception);
+    virtual DistributionMultiVariateCoupled * clone()const ;
     virtual F64 operator()(const VecF64&  value)const;
-    VecF64 randomVariable()const throw(pexception);
+    VecF64 randomVariable()const ;
     virtual int getNbrVariable()const;
  };
 /// @endcond

@@ -80,7 +80,7 @@ public:
     \brief open the file or the network stream
     *
     */
-    virtual bool open(const std::string & filename)throw(pexception)=0;
+    virtual bool open(const std::string & filename)=0;
     /*!
     \return false  no  frame anymore
     \brief  grab the next frame

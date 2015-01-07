@@ -669,7 +669,7 @@ struct POP_EXPORTS Draw
      * \image html lenaiterate.jpg
     */
     template<int DIM, typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,TypePixel1> insertMatrix(const MatN<DIM,TypePixel1> & f,const MatN<DIM,TypePixel2> & postit, typename MatN<DIM,TypePixel1>::E trans)throw(pexception)
+    static MatN<DIM,TypePixel1> insertMatrix(const MatN<DIM,TypePixel1> & f,const MatN<DIM,TypePixel2> & postit, typename MatN<DIM,TypePixel1>::E trans)
     {
         MatN<DIM,TypePixel1> h(f);
         typename MatN<DIM,TypePixel1>::E  transs;
@@ -717,7 +717,7 @@ struct POP_EXPORTS Draw
     * \image html euteldist.jpg "distance function used to estimate the geometrical tortuosity"
     */
     template<int DIM,typename TypePixel>
-    static void setFace( MatN<DIM,TypePixel> & h,int coordinate,int leftorright,typename MatN<DIM,TypePixel>::F value=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())throw(pexception)
+    static void setFace( MatN<DIM,TypePixel> & h,int coordinate,int leftorright,typename MatN<DIM,TypePixel>::F value=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::E d = h.getDomain();
         d(coordinate)=1;

@@ -6,6 +6,6 @@ The process of acquisition leads to image hampered by noise and artefacts. In or
 \image html EstailleMNLAD.jpg‎ "non-linear anisotropic diffusion filter"
 For this purpose, Population library includes:
 - a toolbox of morphological filters, in \ref pop::Processing::median , \ref pop::Processing::closing and so one
-- an extension of non-linear anisotropic diffusion combining efficient noise reduction with excellent signal conservation, structural features preservation and easy calibration, \ref pop::PDE::nonLinearAnisotropicDiffusionDeriche ,
+- an extension of non-linear anisotropic diffusion combining efficient noise reduction with excellent signal conservation, structural features preservation and easy calibration, \ref pop::PDE::nonLinearAnisotropicDiffusion ,
 - a convolution algorithm, \ref pop::Processing::convolution
  */ 

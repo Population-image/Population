@@ -117,7 +117,7 @@ std::string BasicUtility::getExtension(std::string file){
         return file.assign(file.begin()+index,file.end());
     else
         return "";
-    //throw(pexception("BasicUtility::getExtension, no extension in your file :" +file));
+    //std::cerr<<"BasicUtility::getExtension, no extension in your file :" +file));
 }
 std::string BasicUtility::getBasefilename(std::string file){
     int slash, dot;
@@ -153,8 +153,8 @@ std::vector<std::string> BasicUtility::getFilesInDirectory(std::string dir)
     DIR *dp;
     struct dirent *dirp;
     if((dp  = opendir(dir.c_str())) == NULL) {
+        std::cerr<<"BasicUtility::getFilesInDirectory, Cannot open this directory"+std::string(dir);
         return std::vector<std::string>();
-        //        pexception("BasicUtility::getFilesInDirectory, Cannot open this directory"+dir);
     }
     std::vector<std::string> files;
     while ((dirp = readdir(dp)) != NULL) {

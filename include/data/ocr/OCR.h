@@ -15,13 +15,13 @@ class POP_EXPORTS OCR
 public:
     virtual ~OCR();
 
-    std::string parseText(const Mat2UI8 & binary,int nbr_pixels_width_caracter)throw(pop::pexception);
+    std::string parseText(const Mat2UI8 & binary,int nbr_pixels_width_caracter);
     /*!
     \brief apply the OCR on a binary matrix containing a single caracter
     \param binary binary input matrix
     \return OCR single character
     !*/
-    virtual char parseMatrix(const Mat2UI8 & binary)throw(pop::pexception)=0;
+    virtual char parseMatrix(const Mat2UI8 & binary)=0;
     virtual bool isRecognitionCharacter()=0;
 
     /*!
@@ -34,7 +34,7 @@ public:
     virtual bool setDictionnaryByteArray(const char *  byte_array)=0;
 
 private:
-    std::string _parseTextByContrast(const Mat2UI8 & binary,int nbr_pixels_width_caracter)throw(pop::pexception);
+    std::string _parseTextByContrast(const Mat2UI8 & binary,int nbr_pixels_width_caracter);
 };
 
 class POP_EXPORTS OCRNeuralNetwork : public OCR
@@ -46,7 +46,7 @@ private:
 public:
     NeuralNetworkFeedForward &   neuralNetworkFeedForward();
     const NeuralNetworkFeedForward &   neuralNetworkFeedForward()const;
-    char parseMatrix(const Mat2UI8 & binary)throw(pop::pexception);
+    char parseMatrix(const Mat2UI8 & binary);
     bool isRecognitionCharacter();
     int characterConfidence();
     bool setDictionnary(std::string path_dic);

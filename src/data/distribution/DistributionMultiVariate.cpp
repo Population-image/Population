@@ -95,7 +95,8 @@ F64 DistributionMultiVariate::operator()(const VecF64& value)const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
     else
-        throw(pexception("In DistributionMultiVariate::operator()(const VecF64& value), empty distribution"));
+        std::cerr<<"In DistributionMultiVariate::operator()(const VecF64& value), empty distribution";
+    return 0;
 }
 
 
@@ -103,7 +104,8 @@ VecF64 DistributionMultiVariate::randomVariable()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->randomVariable();
     else
-        throw(pexception("In DistributionMultiVariate:randomVariable(), empty distribution"));
+        std::cerr<<"In DistributionMultiVariate:randomVariable(), empty distribution";
+    return VecF64();
 }
 
 
@@ -174,11 +176,12 @@ DistributionMultiVariate  DistributionMultiVariate::operator -()const
 
 
 
-DistributionMultiVariate * DistributionMultiVariate::clone()const throw(pexception){
+DistributionMultiVariate * DistributionMultiVariate::clone()const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->clone();
     else
-        throw(pexception("In DistributionMultiVariate::clone(), empty distribution"));
+        std::cerr<<"In DistributionMultiVariate::clone(), empty distribution";
+    return NULL;
 }
 
 void DistributionMultiVariate::setStep(F64 step)const{
@@ -192,7 +195,8 @@ int DistributionMultiVariate::getNbrVariable()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->getNbrVariable();
     else
-        throw(pexception("In DistributionMultiVariate::getNbrVariable, undefined DistributionMultiVariate"));
+        std::cerr<<"In DistributionMultiVariate::getNbrVariable, undefined DistributionMultiVariate";
+    return 0;
 }
 pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2){
     pop::DistributionMultiVariateArithmeticMax *dist = new pop::DistributionMultiVariateArithmeticMax;

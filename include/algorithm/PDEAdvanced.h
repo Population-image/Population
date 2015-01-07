@@ -41,61 +41,10 @@ in the Software.
 
 namespace pop
 {
-
-
-namespace Private
-{
-
-template<int DIM>
-void createVelocityFieldMAKGrid(MatN<DIM,UI8 > porespace, int direction, F64 velocityboundary,MatN<DIM,VecN<DIM,F64> > & velocity)
-{
-    VecN<DIM,int> domain;
-    domain= porespace.getDomain()+1;
-
-    velocity.resize(domain);
-
-    typename MatN<DIM,VecN<DIM,F64> >::IteratorEDomain it (velocity.getIteratorEDomain());
-    while(it.next()){
-        velocity(it.x())=velocityboundary;
-        VecN<DIM,int> x=it.x();
-        for(int i = 0;i<DIM;i++){
-            x(i)--;
-            if(porespace.isValid(it.x())==true&&porespace.isValid(x)==true)
-            {
-                if(porespace(it.x())!=0&&porespace(x)!=0 ){
-                    velocity(it.x())(i)=0;
-                }
-            }else if(porespace.isValid(it.x())==true){
-                if(porespace(it.x())!=0&&i==direction){
-                    velocity(it.x())(i)=0;
-                }
-            }else if(porespace.isValid(x)==true){
-                if(porespace(x)!=0&&i==direction){
-                    velocity(it.x())(i)=0;
-                }
-            }
-            x(i)++;
-
-        }
-    }
-
-}
-}
-
-
-
-
-
-
-
-
 struct PDEAdvanced
 {
 
-
-
-    /*! \fn void timeDerivateInMultiPhaseFieldModelWithTarielFormalism( Function & field,FunctionMultiPhase & multiphase,int nbrstep,typename Function::F deltat, Iterator & it,FunctorMultiPhase& f )
-        \brief Solve the phase field equation by iterating over the range of time \f$\frac{\partial_i\phi(x,t)}{\partial t}= F(\phi_i(x,t),1_{\max\phi)}(x,t) ,x)\f$
+    /*! \brief Solve the phase field equation by iterating over the range of time \f$\frac{\partial_i\phi(x,t)}{\partial t}= F(\phi_i(x,t),1_{\max\phi)}(x,t) ,x)\f$
         \brief The optimisation comes from the evolution on a single phase field and a second field  to localize the different fields
         \param field is the input function phi at time t=0 and return the function phi  at time t=deltat*nbrstep
         \param multiphase localize the phase in the space
@@ -109,7 +58,6 @@ struct PDEAdvanced
     template<typename FunctionScalar,typename FunctionLabel,typename Iterator,typename FunctorLaplacien>
     static void allenCahnInMutliPhaseField( FunctionScalar & field,FunctionLabel & labelfield,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,double width=2 )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("allenCahnInMutliPhaseField");
         FunctionScalar fieldtimetdelatt(field);
         typename FunctionLabel::IteratorENeighborhood itn(labelfield.getIteratorENeighborhood());
 
@@ -119,7 +67,6 @@ struct PDEAdvanced
 
         for(int i=0;i<nbrstep;i++)
         {
-            CollectorExecutionInformationSingleton::getInstance()->progression(i/(1.0*nbrstep));
             it.init();
             while(it.next()){
                 fieldtimetdelatt(it.x()) = field(it.x())+ 0.5/(2.*FunctionScalar::DIM)*(free(field(it.x()))*witdhpowerminus1+laplacien(field,it.x()));
@@ -144,34 +91,28 @@ struct PDEAdvanced
             }
             field = fieldtimetdelatt;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("allenCahnInMutliPhaseField");
     }
     template<typename FunctionScalar,typename Iterator,typename FunctorLaplacien>
     static void allenCahnInSinglePhaseField( FunctionScalar & field,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,double width=2 )
     {
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("allenCahnInSinglePhaseField");
         FunctionScalar fieldtimetdelatt(field);
         FunctorPDE::FreeEnergy free;
         double witdhpowerminus1=1/(width*width);
 
         for(int i=0;i<nbrstep;i++)
         {
-            CollectorExecutionInformationSingleton::getInstance()->progression(i/(1.0*nbrstep));
             it.init();
             while(it.next()){
                 fieldtimetdelatt(it.x()) = field(it.x())+ 0.5/(2.*FunctionScalar::DIM)*(free(field(it.x()))*witdhpowerminus1+laplacien(field,it.x()));
             }
-//            std::cout<<fieldtimetdelatt<<std::endl;
             field = fieldtimetdelatt;
         }
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("allenCahnInSinglePhaseField");
     }
 
     //typical value errorpressuremax=0.001, relaxationSOR=0.9,   relaxationpressure=1
 
 
-    /*! \fn void timeDerivateInMultiPhaseFieldModelWithTarielFormalism( Function & field,FunctionMultiPhase & multiphase,int nbrstep,typename Function::F deltat, Iterator & it,FunctorMultiPhase& f )
-        \brief Solve the phase field equation by iterating over the range of time \f$\frac{\partial_i\phi(x,t)}{\partial t}= F(\phi_i(x,t),1_{\max\phi)}(x,t) ,x)\f$
+    /*! \brief Solve the phase field equation by iterating over the range of time \f$\frac{\partial_i\phi(x,t)}{\partial t}= F(\phi_i(x,t),1_{\max\phi)}(x,t) ,x)\f$
         \brief The optimisation comes from the evolution on a single phase field and a second field  to localize the different fields
         \param field is the input function phi at time t=0 and return the function phi  at time t=deltat*nbrstep
         \param multiphase localize the phase in the space
@@ -186,10 +127,6 @@ struct PDEAdvanced
     template<int DIM>
     static void permeability(const  MatN<DIM,UI8> & pore,int direction, F64 errorpressuremax,F64 relaxationSOR, F64 relaxationpressure, MatN<DIM,VecN<DIM,F64> > & velocity, VecN<DIM,F64> & permeability )
     {
-
-        CollectorExecutionInformationSingleton::getInstance()->startExecution("Permeability",COLLECTOR_EXECUTION_NOINFO);
-        CollectorExecutionInformationSingleton::getInstance()->info("Very slow algorithm");
-
         F64 BOUNDARYVALUE = -10;
         velocity = createVelocityFieldMAKGrid(pore,direction,BOUNDARYVALUE);
 
@@ -209,28 +146,20 @@ struct PDEAdvanced
 
         FunctorGaussSeidelSOR<FunctorGausss > ff(relaxationSOR,func);
         FunctorRelaxationPressure<MatN<DIM,F64>,MatN<DIM,VecN<DIM,F64> > > div(pressure,velocity,BOUNDARYVALUE);
-
-        F64 errorpressurecurrent=0;
+        FunctorEvolution<FunctorRelaxationPressure<MatN<DIM,F64>,MatN<DIM,VecN<DIM,F64> > > > func_evol(div);
+        func_evol.relaxationpressure = relaxationpressure;
+//        double errorpressurecurrent;
         int tour =0;
-        do
-        {
-            it.init();
-            while(it.next()){
-                velocity(it.x()) = ff(velocity,it.x());
-            }
-            errorpressurecurrent=0;
-            itp.init();
-            while(itp.next()){
-                F64 temp = pressure(itp.x());
-                pressure(itp.x())= pressure(itp.x())-relaxationpressure*div(itp.x());
-                errorpressurecurrent = maximum(errorpressurecurrent, absolute(pressure(itp.x())-temp));
-            }
+        do{
+            forEachFunctorBinaryFunctionE(velocity, velocity,ff);
+            func_evol.error=0;
+            forEachFunctorBinaryFunctionE(pressure, pressure,func_evol);
             if(tour%10==0){
-                 std::string str = "At iteration "+BasicUtility::Any2String(tour)+ ", the ratio error_pressure_current/error_pressure_convergence is equal to "+BasicUtility::Any2String(errorpressurecurrent/errorpressuremax);
-                CollectorExecutionInformationSingleton::getInstance()->info(str);
+                std::string str = "At iteration "+BasicUtility::Any2String(tour)+ ", the ratio error_pressure_current/error_pressure_convergence is equal to "+BasicUtility::Any2String(func_evol.error/errorpressuremax);
+                std::cout<<str<<std::endl;
             }
             tour++;
-        }while(errorpressurecurrent>errorpressuremax);
+        }while(func_evol.error>errorpressuremax);
 
 
         it.init();
@@ -249,16 +178,32 @@ struct PDEAdvanced
                 }
             }
         }
-        for(int i=0;i<DIM;i++)
-        {
+        for(int i=0;i<DIM;i++){
             permeability(i)/=occurence;
         }
-
-        CollectorExecutionInformationSingleton::getInstance()->endExecution("Permeability");
-
     }
 
 private:
+    template<typename Functor>
+    struct FunctorEvolution
+    {
+        Functor & div;
+        FunctorEvolution(Functor & ddiv)
+            :div(ddiv){
+
+        }
+
+        static double error;
+        double relaxationpressure;
+        template<int DIM,typename PixelType>
+        PixelType operator()(const MatN<DIM,PixelType> & pressure, const VecN<DIM,int> & x){
+            PixelType temp = pressure(x);
+            PixelType next= pressure(x)-relaxationpressure*div(x);
+            error = maximum(error, absolute(next-temp));
+            return next;
+        }
+    };
+
     template<typename Function1,typename Function2>
     class FunctorGaussSeidelStockes
     {
@@ -272,7 +217,7 @@ private:
         FunctorGaussSeidelStockes(Function1 & pressure, Function2 & velocity,int direction,F64 pressureboundary, F64 velocityboundary)
             :_pressure(pressure),_velocity(velocity),_direction(direction),_pressureboundary(pressureboundary),_velocityboundary(velocityboundary)
         {}
-        VecN<Function1::DIM, typename Function1::F> operator()( typename Function1::E & x){
+        VecN<Function1::DIM, typename Function1::F> operator()( typename Function1::E x){
 
             VecN<Function1::DIM, typename Function1::F> coefficient(0);
             //cout<<"x: "<<x<<std::endl;
@@ -364,7 +309,7 @@ private:
         FunctorRelaxationPressure(Function1 & pressure, Function2 & velocity, F64 velocityboundary)
             :_pressure(pressure),_velocity(velocity),_velocityboundary(velocityboundary)
         {}
-        typename Function1::F operator()( typename Function1::E & x){
+        typename Function1::F operator()( typename Function1::E  x){
             typename Function1::F divergence(0);
             //cout<<"x:"<<x<<std::endl;
             for(int i=0;i<Function1::DIM;i++)
@@ -398,7 +343,7 @@ private:
             :_ratio(ratio),_func(func)
         {}
         template<typename Function>
-        typename Function::F operator()(const Function & f,  typename Function::E & x)
+        typename Function::F operator()(const Function & f,const  typename Function::E & x)
         {
             return (1-_ratio)*f(x)+_ratio*_func(x);
         }
@@ -440,5 +385,7 @@ private:
 
     }
 };
+template<typename Functor>
+double PDEAdvanced::FunctorEvolution<Functor>::error=0;
 }
 #endif // PDEADVANCED_H

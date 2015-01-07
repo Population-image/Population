@@ -44,7 +44,6 @@ in the Software.
 #include <limits>
 
 #include"dependency/MTRand.h"
-#include"data/utility/Exception.h"
 #include"data/mat/MatNBoundaryCondition.h"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
@@ -200,7 +199,7 @@ public:
     *
     * \sa DistributionRegularStep
     */
-    Distribution(const Mat2F64& param,std::string type="STEP")throw(pexception);
+    Distribution(const Mat2F64& param,std::string type="STEP");
 
 
     /*!
@@ -219,7 +218,7 @@ public:
     * For developper, because the licence is under LGPL licence,  you cannot modify the code of the file fparser.hh, fpconfig.hh and fptypes.hh.
     * \sa DistributionExpression
     */
-    Distribution(const char* param,std::string type="EXPRESSION")throw(pexception);
+    Distribution(const char* param,std::string type="EXPRESSION");
 
 
 
@@ -249,7 +248,7 @@ public:
     * \sa DistributionPoisson DistributionExponential DistributionDirac
     * \sa http://en.wikipedia.org/wiki/Poisson_distribution http://en.wikipedia.org/wiki/Exponential_distribution http://en.wikipedia.org/wiki/Dirac_delta_function
     */
-    Distribution(double param,std::string type="POISSON")throw(pexception);
+    Distribution(double param,std::string type="POISSON");
 
 
     /*!
@@ -277,7 +276,7 @@ public:
     * \endcode
     * \sa  DistributionUniformReal, DistributionUniformInt, DistributionNormal, DistributionBinomial
     */
-    Distribution(double param1,double param2,std::string type="NORMAL")throw(pexception);
+    Distribution(double param1,double param2,std::string type="NORMAL");
 
 
 
@@ -306,7 +305,7 @@ public:
         std::cout<<f(i)<<" ";
         \endcode
     */
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual F64 operator()(F64 value)const ;
     /*!
     * \return X random variable
     *
@@ -337,14 +336,14 @@ public:
     \endcode
     *
     */
-    virtual F64 randomVariable()const throw(pexception);
+    virtual F64 randomVariable()const ;
     /*!
     * \return X random variable
     *
     *  Generate random variable, X, following the probability distribution f.\n
     *
     */
-    virtual F64 operator()()const throw(pexception);
+    virtual F64 operator()()const ;
 
 
     //@}
@@ -564,11 +563,11 @@ public:
     *
     *  clone pattern
     */
-    virtual Distribution * clone()const throw(pexception);
+    virtual Distribution * clone()const ;
     //@}
 
 
-    virtual F64 randomVariable(F64 param)const throw(pexception);
+    virtual F64 randomVariable(F64 param)const ;
     Distribution * ___getPointerImplementation();
     const Distribution * ___getPointerImplementation()const ;
     void ___setPointererImplementation(Distribution * d);

@@ -34,7 +34,7 @@ in the Software.
 #ifndef DISTRIBUTIONARITHMETIC_H
 #define DISTRIBUTIONARITHMETIC_H
 #include"data/distribution/Distribution.h"
-#include"data/utility/Exception.h"
+
 namespace pop
 {
 /// @cond DEV
@@ -56,7 +56,7 @@ protected:
 public:
     void setDistributionLeft(const Distribution & f_left);
     void setDistributionRight(const Distribution & f_right);
-    F64 randomVariable()const throw(pexception);
+    F64 randomVariable()const ;
     void setStep(F64 step)const;
 
     Distribution & getDistributionLeft();
@@ -73,8 +73,8 @@ public:
  public:
     DistributionArithmeticAddition();
     DistributionArithmeticAddition(const DistributionArithmeticAddition & dist);
-    virtual DistributionArithmeticAddition * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticAddition * clone()const ;
+    virtual F64 operator()(F64 value)const ;
     ;
  };
  class DistributionArithmeticSubtraction : public DistributionArithmetic
@@ -83,8 +83,8 @@ public:
  public:
     DistributionArithmeticSubtraction();
     DistributionArithmeticSubtraction(const DistributionArithmeticSubtraction & dist);
-    virtual DistributionArithmeticSubtraction * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticSubtraction * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
  class DistributionArithmeticMultiplication : public DistributionArithmetic
@@ -93,8 +93,8 @@ public:
  public:
     DistributionArithmeticMultiplication();
     DistributionArithmeticMultiplication(const DistributionArithmeticMultiplication & dist);
-    virtual DistributionArithmeticMultiplication * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticMultiplication * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
  class DistributionArithmeticDivision : public DistributionArithmetic
@@ -103,8 +103,8 @@ public:
  public:
     DistributionArithmeticDivision();
     DistributionArithmeticDivision(const DistributionArithmeticDivision & dist);
-    virtual DistributionArithmeticDivision * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticDivision * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
  class DistributionArithmeticComposition : public DistributionArithmetic
@@ -113,8 +113,8 @@ public:
  public:
     DistributionArithmeticComposition();
     DistributionArithmeticComposition(const DistributionArithmeticComposition & dist);
-    virtual DistributionArithmeticComposition * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticComposition * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
  class DistributionArithmeticMax : public DistributionArithmetic
@@ -123,8 +123,8 @@ public:
  public:
     DistributionArithmeticMax();
     DistributionArithmeticMax(const DistributionArithmeticMax & dist);
-    virtual DistributionArithmeticMax * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticMax * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
  class DistributionArithmeticMin : public DistributionArithmetic
@@ -133,8 +133,8 @@ public:
  public:
     DistributionArithmeticMin();
     DistributionArithmeticMin(const DistributionArithmeticMin & dist);
-    virtual DistributionArithmeticMin * clone()const throw(pexception);
-    virtual F64 operator()(F64 value)const throw(pexception);
+    virtual DistributionArithmeticMin * clone()const ;
+    virtual F64 operator()(F64 value)const ;
 
  };
 /// @endcond

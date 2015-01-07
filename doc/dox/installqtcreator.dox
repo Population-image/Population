@@ -4,23 +4,27 @@ This page explains how to use Population library with QtCreator.
 
 \section PopulationQtCompilation Compilation
 
-You open the project $${POPULATIONPATH}/populationapp.pro. You compile this project and start to code in the main.cpp file (see \ref pagefirststep).
+You open the project $${POPULATIONPATH}/population.pro. You compile this project and start to code in the main.cpp file (see \ref pagefirststep).
 
 \section PopulationCPractitioner Shared library
 
-You create the shared library by compiling this project $${POPULATIONPATH}/other/C++/population.pro. After the compilation, the population.dll (.so) is created in the directory  $${POPULATIONPATH}/bin .
-Then to load this library in your program,  you create a project file (.pro) containing these following lines (or open this project other/C++/populationsharedlibrarytest.pro).
+To create the shared population library, you open the project $${POPULATIONPATH}/population.pro then you comment this line
 \code
-POPULATIONPATH=D:/Users/vtariel/Desktop/Population #replace by yours 
+#CONFIG += MAKE_EXE
+\endcode
+and you compile generating the file population.dll (.so for linux) in the directory  $${POPULATIONPATH}/bin .
+
+To load this library in your program,  you create a project file (.pro) containing these following lines:
+\code
+POPULATIONPATH=/home/vincent/DEV2/Population #replace by yours
 TEMPLATE = app
-SOURCES +=  $${POPULATIONPATH}/main.cpp # simple segmentation routine 
-INCLUDEPATH +=$${POPULATIONPATH} # header path
+!include($${POPULATIONPATH}/populationconfig.pri)
+SOURCES += $${POPULATIONPATH}/main.cpp # the main file of my project (you can replace by yours)
 DESTDIR = $${POPULATIONPATH}/bin # directory target
-DEPENDPATH=$${POPULATIONPATH}/bin # the path where the dynamic shared library is located for the execution
-LIBS+=-L$${POPULATIONPATH}/bin # the path where the dynamic shared library is located for the linking
-LIBS += -lpopulation 
+DEPENDPATH=$${POPULATIONPATH}/lib
+LIBS+=-L$${POPULATIONPATH}/lib # the path where the dynamic shared library is located for the linking
+LIBS += -lpopulation
 \endcode
 You build and run this project. Now you can start to code in the main.cpp file (see \ref pagefirststep).
-
 */
 

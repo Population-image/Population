@@ -57,7 +57,7 @@ VideoFFMPEG::VideoFFMPEG(const VideoFFMPEG & video)
     }
 }
 
-bool VideoFFMPEG::open(const std::string & str)throw(pexception)
+bool VideoFFMPEG::open(const std::string & str)
 {
     if(init_local==true)
         release();
@@ -66,10 +66,10 @@ bool VideoFFMPEG::open(const std::string & str)throw(pexception)
     ccontext = avcodec_alloc_context3(NULL);
     //TODO multithreading if no god rtsp infinite loop
     if(avformat_open_input(&context,str.c_str() ,NULL,NULL) != 0){
-        throw  pop::pexception("Open failure: "+str);
+        std::cerr<<"Open failure: "+str;
     }
     if(avformat_find_stream_info(context,NULL) < 0){
-        throw pexception("Open failure: "+str);
+        std::cerr<<"Open failure: "+str;
 
     }
     //search video stream
@@ -93,7 +93,7 @@ bool VideoFFMPEG::open(const std::string & str)throw(pexception)
 
     codec = avcodec_find_decoder(pCodecCtx->codec_id);
     if (!codec) {
-        throw(pexception("No codec"));
+        std::cerr<<"No codec";
         return false;
     }
 
@@ -104,7 +104,7 @@ bool VideoFFMPEG::open(const std::string & str)throw(pexception)
         ccontext->flags|= CODEC_FLAG_TRUNCATED; /* we do not send complete frames */
 
     if (avcodec_open2(ccontext, codec,NULL) < 0) {
-        throw(pexception("Cannot find the codec"));
+        std::cerr<<"Cannot find the codec";
         return false;
     }
 

@@ -167,7 +167,7 @@ VideoVLC::~VideoVLC()
     libvlc_release(instance);
 }
 
-bool VideoVLC::open(const std::string & path)throw(pexception){
+bool VideoVLC::open(const std::string & path){
     release();
     if(path=="") {
         return false;

@@ -39,7 +39,6 @@ in the Software.
 #include <sstream>
 #include <vector>
 #include "data/typeF/TypeF.h"
-#include "data/utility/Exception.h"
 #include "PopulationConfig.h"
 
 namespace pop

@@ -49,7 +49,7 @@ public:
     VideoFFMPEG();
     VideoFFMPEG(const VideoFFMPEG& vlc);
     virtual ~VideoFFMPEG();
-    bool open(const std::string & filename)throw(pexception);
+    bool open(const std::string & filename);
     bool grabMatrixGrey();
     Mat2UI8 &retrieveMatrixGrey();
     bool grabMatrixRGB();

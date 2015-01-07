@@ -30,9 +30,10 @@ Distribution & DistributionArithmetic::getDistributionRight(){
 const Distribution & DistributionArithmetic::getDistributionRight()const{
     return  _fright;
 }
-F64 DistributionArithmetic::randomVariable()const throw(pexception)
+F64 DistributionArithmetic::randomVariable()const 
 {
-        throw(pexception("In DistributionArithmetic::randomVariable()const ,  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution"));
+    std::cerr<<"In DistributionArithmetic::randomVariable()const ,  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
+    return 0;
 }
 
 
@@ -48,10 +49,10 @@ DistributionArithmeticAddition::DistributionArithmeticAddition(const Distributio
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticAddition * DistributionArithmeticAddition::clone()const throw(pexception){
+DistributionArithmeticAddition * DistributionArithmeticAddition::clone()const {
     return new DistributionArithmeticAddition(*this);
 }
-F64 DistributionArithmeticAddition::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticAddition::operator ()( F64  value)const {
     return this->getDistributionLeft().operator ()(value)+ this->getDistributionRight().operator ()(value);
 }
 
@@ -70,10 +71,10 @@ DistributionArithmeticSubtraction::DistributionArithmeticSubtraction(const Distr
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticSubtraction * DistributionArithmeticSubtraction::clone()const throw(pexception){
+DistributionArithmeticSubtraction * DistributionArithmeticSubtraction::clone()const {
     return new DistributionArithmeticSubtraction(*this);
 }
-F64 DistributionArithmeticSubtraction::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticSubtraction::operator ()( F64  value)const {
     return this->getDistributionLeft().operator ()(value)- this->getDistributionRight().operator ()(value);
 }
 
@@ -91,10 +92,10 @@ DistributionArithmeticMultiplication::DistributionArithmeticMultiplication(const
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticMultiplication * DistributionArithmeticMultiplication::clone()const throw(pexception){
+DistributionArithmeticMultiplication * DistributionArithmeticMultiplication::clone()const {
     return new DistributionArithmeticMultiplication(*this);
 }
-F64 DistributionArithmeticMultiplication::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticMultiplication::operator ()( F64  value)const {
     return this->getDistributionLeft().operator ()(value)* this->getDistributionRight().operator ()(value);
 }
 
@@ -111,10 +112,10 @@ DistributionArithmeticDivision::DistributionArithmeticDivision(const Distributio
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticDivision * DistributionArithmeticDivision::clone()const throw(pexception){
+DistributionArithmeticDivision * DistributionArithmeticDivision::clone()const {
     return new DistributionArithmeticDivision(*this);
 }
-F64 DistributionArithmeticDivision::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticDivision::operator ()( F64  value)const {
     return this->getDistributionLeft().operator ()(value)/this->getDistributionRight().operator ()(value);
 }
 
@@ -133,10 +134,10 @@ DistributionArithmeticComposition::DistributionArithmeticComposition(const Distr
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticComposition * DistributionArithmeticComposition::clone()const throw(pexception){
+DistributionArithmeticComposition * DistributionArithmeticComposition::clone()const {
     return new DistributionArithmeticComposition(*this);
 }
-F64 DistributionArithmeticComposition::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticComposition::operator ()( F64  value)const {
     return this->getDistributionLeft().operator ()(this->getDistributionRight().operator ()(value));
 }
 
@@ -153,10 +154,10 @@ DistributionArithmeticMax::DistributionArithmeticMax(const DistributionArithmeti
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticMax * DistributionArithmeticMax::clone()const throw(pexception){
+DistributionArithmeticMax * DistributionArithmeticMax::clone()const {
     return new DistributionArithmeticMax(*this);
 }
-F64 DistributionArithmeticMax::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticMax::operator ()( F64  value)const {
     return maximum(this->getDistributionLeft().operator ()(value),this->getDistributionRight().operator ()(value));
 }
 
@@ -173,10 +174,10 @@ DistributionArithmeticMin::DistributionArithmeticMin( const DistributionArithmet
     this->setDistributionRight(dist.getDistributionRight());
 }
 
-DistributionArithmeticMin * DistributionArithmeticMin::clone()const throw(pexception){
+DistributionArithmeticMin * DistributionArithmeticMin::clone()const {
     return new DistributionArithmeticMin(*this);
 }
-F64 DistributionArithmeticMin::operator ()( F64  value)const throw(pexception){
+F64 DistributionArithmeticMin::operator ()( F64  value)const {
     return minimum(this->getDistributionLeft().operator ()(value),this->getDistributionRight().operator ()(value));
 }
 }

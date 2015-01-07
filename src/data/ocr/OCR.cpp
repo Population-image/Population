@@ -1,6 +1,6 @@
 #include"PopulationConfig.h"
 #include "data/ocr/OCR.h"
-#include"data/utility/Exception.h"
+
 #include "data/vec/VecN.h"
 #include "algorithm/GeometricalTransformation.h"
 #include "algorithm/Processing.h"
@@ -22,14 +22,14 @@ const NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward()c
 
 
 
-std::string OCR::parseText(const Mat2UI8 & m,int nbr_pixels_width_caracter)throw(pop::pexception){
+std::string OCR::parseText(const Mat2UI8 & m,int nbr_pixels_width_caracter){
 
     std::string str1 = _parseTextByContrast(m,nbr_pixels_width_caracter);
     Mat2UI8 m_contrast = m.opposite();
     std::string str2 =  _parseTextByContrast(m_contrast,nbr_pixels_width_caracter);
     return str1+"\n"+str2;
 }
-std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_caracter)throw(pop::pexception){
+std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_caracter){
     Mat2UI8 threhold =        Processing::thresholdNiblackMethod(m,0.2,3*nbr_pixels_width_caracter,-20);
 
     Mat2UI32 label = Processing::clusterToLabel(threhold,0);
@@ -87,10 +87,10 @@ std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_car
     return str;
 }
 
-char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m)throw(pop::pexception){
+char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
     if(_n.layers().size()==0)
     {
-        throw(pop::pexception("Neural network is empty. Used setDictionnary to construct it. I give one for digit number.  the folder $${PopulationPath}/file/handwrittendigitneuralnetwork.xml, you can find the handwritten dictionnary. So the code is ocr.setDictionnary($${PopulationPath}/file/neuralnetwork.xml) "));
+        std::cerr<<"Neural network is empty. Used setDictionnary to construct it. I give one for digit number.  the folder $${PopulationPath}/file/handwrittendigitneuralnetwork.xml, you can find the handwritten dictionnary. So the code is ocr.setDictionnary($${PopulationPath}/file/neuralnetwork.xml) ";
     }
     else{
 

@@ -36,7 +36,7 @@ in the Software.
 #include<map>
 #include<string>
 #include<vector>
-#include"data/utility/Exception.h"
+
 #include"data/GP/NullType.h"
 #include"data/GP/Typelist.h"
 #include"data/GP/TypelistMacros.h"
@@ -97,7 +97,7 @@ public:
         _map.erase (key);
     }
 
-    Product * createObject(Key key) throw(pexception)
+    Product * createObject(Key key)
     {
         if(_map.find(key)!=_map.end()){
             Product * p =    _map[key];
@@ -105,29 +105,29 @@ public:
         }
         else
         {
-            throw(pexception("Factory: Unknown key\n"));
+            std::cerr<<"Factory: Unknown key\n";
         }
         return CreatorMemberPolicy<Product>::createObject((_map.begin())->second);
     }
     template<typename Parm1>
-    Product * createObject(Key key,Parm1 parm1) throw(pexception)
+    Product * createObject(Key key,Parm1 parm1)
     {
         if(_map.find(key)!=_map.end())
             return CreatorMemberPolicy<Product>::createObject(_map[key],parm1);
         else
         {
-            throw(pexception("Factory: Unknown key\n"));
+            std::cerr<<"Factory: Unknown key\n";
         }
         return CreatorMemberPolicy<Product>::createObject((_map.begin())->second,parm1);
     }
     template<typename Parm1, typename Parm2>
-    Product * createObject(Key key, Parm1 parm1, Parm2 parm2) throw(pexception)
+    Product * createObject(Key key, Parm1 parm1, Parm2 parm2)
     {
         if(_map.find(key)!=_map.end())
             return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2);
         else
         {
-            throw(pexception("Factory: Unknown key\n"));
+            std::cerr<<"Factory: Unknown key\n";
         }
         return CreatorMemberPolicy<Product>::createObject((_map.begin())->second,parm1,parm2);
     }
@@ -137,7 +137,7 @@ public:
     //        if(_map.find(key)!=_map.end())
     //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3);
     //        else
-    //           throw(pexception("Factory: Unknown key\n"));
+    //           std::cerr<<"Factory: Unknown key\n"));
     //    }
     //    template<typename Parm1, typename Parm2, typename Parm3, typename Parm4>
     //    virtual Product * createObject(Key key, Parm1 parm1, Parm2 parm2, Parm3 parm3, Parm4 parm4)
@@ -145,7 +145,7 @@ public:
     //        if(_map.find(key)!=_map.end())
     //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3,parm4);
     //        else
-    //           throw(pexception("Factory: Unknown key\n"));
+    //           std::cerr<<"Factory: Unknown key\n"));
     //    }
     //    template<typename Parm1, typename Parm2, typename Parm3, typename Parm4, typename Parm5>
     //    virtual Product * createObject(Key key, Parm1 parm1, Parm2 parm2, Parm3 parm3, Parm4 parm4, Parm5 parm5)
@@ -153,7 +153,7 @@ public:
     //        if(_map.find(key)!=_map.end())
     //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3,parm4,parm5);
     //        else
-    //           throw(pexception("Factory: Unknown key\n"));
+    //           std::cerr<<"Factory: Unknown key\n"));
     //    }
 };
 

@@ -3,11 +3,11 @@
 namespace pop{
 
 
-void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution &distradius,const Distribution &distangle, const DistributionMultiVariate &distorientation )throw(pexception)
+void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution &distradius,const Distribution &distangle, const DistributionMultiVariate &distorientation )
 {
     if(distorientation.getNbrVariable() !=3)
     {
-        throw(pexception("In RandomGeometry::rhombohedron, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::rhombohedron, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }
     for( std::vector<Germ<3> * >::iterator it= grain.grains().begin();it!=grain.grains().end();it++ )
     {
@@ -23,12 +23,12 @@ void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution 
         delete g;
     }
 }
-void RandomGeometry::cylinder( ModelGermGrain3  & grain,Distribution  distradius,Distribution distheight, const DistributionMultiVariate & distorientation )throw(pexception)
+void RandomGeometry::cylinder( ModelGermGrain3  & grain,Distribution  distradius,Distribution distheight, const DistributionMultiVariate & distorientation )
 {
 
     if(distorientation.getNbrVariable()!=3)
     {
-        throw(pexception("In RandomGeometry::cylinder, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::cylinder, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }
     for( std::vector<Germ<3> * >::iterator it= grain.grains().begin();it!=grain.grains().end();it++ )
     {

@@ -403,7 +403,7 @@ public:
         return x;
     }
     /*!
-    * \param u  VecN
+    * \param v  VecN
     * \param value factor
     * \return output VecN
     *
@@ -720,18 +720,18 @@ public:
     }
 
     /*!
-    \fn  void load(const char * file)throw(pexception)
+    \fn  void load(const char * file)
     * \param file input file
     *
     * load the values elements from the input file
     */
-    void load(const char * file)throw(pexception)
+    void load(const char * file)
     {
         std::ifstream fs(file);
         if (!fs.fail())
             fs>>*this;
         else
-            throw(pexception("In VecN::load, cannot open this file"+std::string(file)));
+            std::cerr<<"In VecN::load, cannot open this file"+std::string(file);
         fs.close();
     }
     /*!

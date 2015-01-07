@@ -159,7 +159,7 @@ struct POP_EXPORTS LinearAlgebra
     \endcode
     */
 
-    static Mat2F64 orthogonalGramSchmidt(const Mat2F64 &m)throw(pexception);
+    static Mat2F64 orthogonalGramSchmidt(const Mat2F64 &m);
 
 
     /*! \brief M=Q*R with Q is an orthogonal matrix and R is an upper triangular matrix
@@ -187,7 +187,7 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<Q*Qt<<std::endl;
      * \endcode
     */
-    static void QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R)throw(pexception);
+    static void QRDecomposition(const Mat2F64 &m, Mat2F64 &Q, Mat2F64 &R);
 
 
     /*! \brief eigen values with QR algorithm
@@ -218,9 +218,9 @@ struct POP_EXPORTS LinearAlgebra
         Symmetric
     };
 
-    static VecF64 eigenValue(const Mat2F64 &m,EigenValueMethod method = QR,F64 error=0.01)throw(pexception);
-    static VecF64 eigenValue(const Mat2x<F64,3,3> &m,EigenValueMethod method = QR,F64 error=0.01)throw(pexception);
-    static VecF64 eigenValue(const Mat2x<F64,2,2> &m)throw(pexception);
+    static VecF64 eigenValue(const Mat2F64 &m,EigenValueMethod method = QR,F64 error=0.01);
+    static VecF64 eigenValue(const Mat2x<F64,3,3> &m,EigenValueMethod method = QR,F64 error=0.01);
+    static VecF64 eigenValue(const Mat2x<F64,2,2> &m);
 
 
     /*! \brief  gaussian elimination algorithm
@@ -276,8 +276,8 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<"The result is:"<<X<<std::endl;
      * \endcode
     */
-    static VecF64 solvingLinearSystemGaussianElimination(const Mat2F64 &A,const VecF64 & b)throw(pexception);
-    static VecF64 solvingLinearSystemGaussianElimination(const pop::Mat2x22F64 &A,const VecF64 & b)throw(pexception);
+    static VecF64 solvingLinearSystemGaussianElimination(const Mat2F64 &A,const VecF64 & b);
+    static VecF64 solvingLinearSystemGaussianElimination(const pop::Mat2x22F64 &A,const VecF64 & b);
     /*!
      * \brief eigen vectors
      * \param m input Mat2F64
@@ -302,7 +302,7 @@ struct POP_EXPORTS LinearAlgebra
      *  * \endcode
      \sa eigenValue
     */
-    static Mat2F64 eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value)throw(pexception);
+    static Mat2F64 eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_eigen_value);
 
 
     /*!
@@ -325,10 +325,10 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<L*U<<std::endl;
      * \endcode
     */
-    static void LUDecomposition(const Mat2F64 &M,Mat2F64 & L,  Mat2F64 & U)throw(pexception);
+    static void LUDecomposition(const Mat2F64 &M,Mat2F64 & L,  Mat2F64 & U);
 
 
-    /*! \fn Mat2F64 AATransposeEqualMDecomposition(const Mat2F64 &M)throw(pexception);
+    /*! \fn Mat2F64 AATransposeEqualMDecomposition(const Mat2F64 &M);
      * \param M input Mat2F64
      * \return upper triangular Mat2F64
      * \brief AA^t=M for a symmetric, positive-definite Mat2F64
@@ -347,7 +347,7 @@ struct POP_EXPORTS LinearAlgebra
      * std::cout<<A*At<<std::endl;
      * \endcode
     */
-    static Mat2F64 AATransposeEqualMDecomposition(const Mat2F64 &M)throw(pexception);
+    static Mat2F64 AATransposeEqualMDecomposition(const Mat2F64 &M);
 
     /*!
      * \brief find beta such that \f$\hat{\boldsymbol{\beta}} = \underset{\boldsymbol{\beta}}{\operatorname{arg\,min}}\, \bigl\|\mathbf y - \mathbf X \boldsymbol \beta \bigr\|^2\f$

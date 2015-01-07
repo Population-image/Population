@@ -84,8 +84,8 @@ public:
     *  copy constructor
     */
     DistributionMultiVariateUniformInt(const DistributionMultiVariateUniformInt & dist);
-    VecF64 randomVariable()const throw(pexception);
-    DistributionMultiVariateUniformInt * clone()const throw(pexception);
+    VecF64 randomVariable()const ;
+    DistributionMultiVariateUniformInt * clone()const ;
 };
 
 
@@ -124,8 +124,8 @@ public:
     *  copy constructor
     */
     DistributionMultiVariateUnitSphere(const DistributionMultiVariateUnitSphere & dist);
-    VecF64 randomVariable()const throw(pexception);
-    DistributionMultiVariateUnitSphere * clone()const throw(pexception);
+    VecF64 randomVariable()const ;
+    DistributionMultiVariateUnitSphere * clone()const ;
 
 };
 
@@ -168,8 +168,8 @@ public:
 //    DistributionMultiVariateRegularStep(const MatN<3,F64> data_x_y_z, VecF64& xmin,F64 step);
 //    DistributionMultiVariateRegularStep(const MatN<4,F64> data_x_y_z_w, VecF64& xmin,F64 step);
     virtual F64 operator ()(const VecF64&  value)const;
-    virtual DistributionMultiVariateRegularStep * clone()const throw(pexception);
-    virtual VecF64 randomVariable()const throw(pexception);
+    virtual DistributionMultiVariateRegularStep * clone()const ;
+    virtual VecF64 randomVariable()const ;
 
     virtual int getNbrVariable()const;
 };
@@ -204,9 +204,9 @@ public:
     DistributionMultiVariateFromDistribution();
     DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution & dist);
 
-    virtual DistributionMultiVariateFromDistribution * clone()const throw(pexception);
+    virtual DistributionMultiVariateFromDistribution * clone()const ;
     virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const throw(pexception);
+    VecF64 randomVariable()const ;
     void setStep(F64 step)const;
     void fromDistribution(const Distribution &d);
     Distribution  toDistribution()const;
@@ -263,8 +263,8 @@ public:
     DistributionMultiVariateNormal();
     DistributionMultiVariateNormal(const DistributionMultiVariateNormal & dist);
     virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const throw(pexception);
-    virtual DistributionMultiVariateNormal * clone()const throw(pexception);
+    VecF64 randomVariable()const ;
+    virtual DistributionMultiVariateNormal * clone()const ;
     void fromMeanVecAndCovarianceMatrix(VecF64 mean, Mat2F64 covariance);
     void fromMeanVecAndCovarianceMatrix(std::pair<VecF64, Mat2F64> meanvectorAndcovariancematrix);
     std::pair<VecF64,Mat2F64> toMeanVecAndCovarianceMatrix()const;
@@ -307,8 +307,8 @@ public:
     DistributionMultiVariateExpression();
     DistributionMultiVariateExpression(const DistributionMultiVariateExpression & dist);
     virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const throw(pexception);
-    virtual DistributionMultiVariateExpression * clone()const throw(pexception);
+    VecF64 randomVariable()const ;
+    virtual DistributionMultiVariateExpression * clone()const ;
 
     bool fromRegularExpression(std::string expression,std::string var1);
     bool fromRegularExpression(std::string expression,std::string var1,std::string var2);

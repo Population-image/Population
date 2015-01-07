@@ -49,7 +49,7 @@
 #include"data/typeF/TypeTraitsF.h"
 #include"data/utility/CollectorExecutionInformation.h"
 #include"PopulationConfig.h"
-#include"data/utility/Exception.h"
+
 #include"data/utility/BasicUtility.h"
 #include"data/utility/Cryptography.h"
 #include"data/utility/XML.h"

@@ -31,7 +31,7 @@ Distribution & Distribution::operator =(const Distribution& d){
     return *this;
 }
 
-Distribution::Distribution(double param , std::string type)throw(pexception)
+Distribution::Distribution(double param , std::string type)
 {
     if(type==DistributionPoisson::getKey() ){
         _deriveddistribution= new DistributionPoisson(param);
@@ -40,9 +40,9 @@ Distribution::Distribution(double param , std::string type)throw(pexception)
     }else if(type==DistributionDirac::getKey())
         _deriveddistribution= new DistributionDirac(param);
     else
-        throw(pexception(std::string("In Distribution::Distribution(double param , const char* type), type must be equal to one accepted distribution: ") +DistributionPoisson::getKey()+" "+DistributionExponential::getKey()+" "+DistributionDirac::getKey() ));
+        std::cerr<<std::string("In Distribution::Distribution(double param , const char* type), type must be equal to one accepted distribution: ") +DistributionPoisson::getKey()+" "+DistributionExponential::getKey()+" "+DistributionDirac::getKey();
 }
-Distribution::Distribution(double param1,double param2, std::string type)throw(pexception)
+Distribution::Distribution(double param1,double param2, std::string type)
 {
     if(type==DistributionBinomial::getKey()){
         _deriveddistribution= new DistributionBinomial(param1,param2);
@@ -51,27 +51,27 @@ Distribution::Distribution(double param1,double param2, std::string type)throw(p
     }else if(type==DistributionUniformInt::getKey()){
         _deriveddistribution= new DistributionUniformInt(param1,param2);
     }
-   else if(type==DistributionUniformReal::getKey())
+    else if(type==DistributionUniformReal::getKey())
         _deriveddistribution= new DistributionUniformReal(param1,param2);
     else
-        throw(pexception(std::string("In Distribution::Distribution(double param1,double param2 , const char* type), type must be equal to one accepted distribution: ")+DistributionBinomial::getKey()+" "+DistributionNormal::getKey()+" "+DistributionUniformInt::getKey()+" "+DistributionUniformReal::getKey() ));
+        std::cerr<<std::string("In Distribution::Distribution(double param1,double param2 , const char* type), type must be equal to one accepted distribution: ")+DistributionBinomial::getKey()+" "+DistributionNormal::getKey()+" "+DistributionUniformInt::getKey()+" "+DistributionUniformReal::getKey();
 }
 
-Distribution::Distribution(const Mat2F64& param,std::string type)throw(pexception){
+Distribution::Distribution(const Mat2F64& param,std::string type){
     if(type==std::string(DistributionRegularStep::getKey()) ){
         _deriveddistribution= new DistributionRegularStep(param);
     }else if(type==DistributionIntegerRegularStep::getKey()){
         _deriveddistribution= new DistributionIntegerRegularStep(param);
     }
     else
-        throw(pexception(std::string("In Distribution::Distribution(Mat2F64 param,const char* type), type must be equal to one accepted distribution: ")+DistributionRegularStep::getKey()+" "+DistributionIntegerRegularStep::getKey()));
+        std::cerr<<std::string("In Distribution::Distribution(Mat2F64 param,const char* type), type must be equal to one accepted distribution: ")+DistributionRegularStep::getKey()+" "+DistributionIntegerRegularStep::getKey();
 }
 
-Distribution::Distribution(const char* param,std::string type)throw(pexception){
+Distribution::Distribution(const char* param,std::string type){
     if(type==DistributionExpression::getKey() ){
         _deriveddistribution= new DistributionExpression(param);
     }else
-        throw(pexception(std::string("In Distribution::Distribution(const char* param, const char* type), type must be equal to one accepted distribution: ")+DistributionExpression::getKey()));
+        std::cerr<<std::string("In Distribution::Distribution(const char* param, const char* type), type must be equal to one accepted distribution: ")+DistributionExpression::getKey();
 }
 
 
@@ -105,38 +105,45 @@ F64 Distribution::getXmax()const{
     else
         return NumericLimits<F64>::maximumRange();
 }
-F64 Distribution::randomVariable(F64 value)const throw(pexception)
+F64 Distribution::randomVariable(F64 value)const 
 {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
-    else
-        throw(pexception("In Distribution::randomVariable(F64 value), empty distributio"));
+    else{
+        std::cerr<<"In Distribution::randomVariable(F64 value), empty distributio";
+        return 0;
+    }
 }
 
 
 
-F64 Distribution::operator()(F64 value)const throw(pexception){
+F64 Distribution::operator()(F64 value)const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
-    else
-        throw(pexception("In Distribution::operator()(F64 value), empty distribution"));
+    else{
+        std::cerr<<"In Distribution::operator()(F64 value), empty distribution";
+        return 0;
+    }
 }
 
-F64 Distribution::randomVariable()const throw(pexception){
+F64 Distribution::randomVariable()const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->randomVariable();
-    else
-        throw(pexception("In Distribution::randomVariable(), empty distribution"));
+    else{
+        std::cerr<<"In Distribution::randomVariable(), empty distribution";
+        return 0;
+    }
 }
-F64 Distribution::operator()()const throw(pexception){
+F64 Distribution::operator()()const {
     return this->randomVariable();
 }
 
-Distribution * Distribution::clone()const throw(pexception){
+Distribution * Distribution::clone()const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->clone();
     else
-        throw(pexception("In Distribution::clone(), empty distribution"));
+        std::cerr<<"In Distribution::clone(), empty distribution";
+    return NULL;
 }
 
 const Distribution * Distribution::___getPointerImplementation()const{

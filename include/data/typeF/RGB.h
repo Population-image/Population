@@ -602,13 +602,13 @@ public:
     *
     * load the RGB from the input file
     */
-    void load(const char * file)throw(pexception)
+    void load(const char * file)
     {
         std::ifstream fs(file);
         if (!fs.fail())
             fs>>*this;
         else
-            throw(pexception("In RGB::load, cannot open this file"+std::string(file)));
+            std::cerr<<"In RGB::load, cannot open this file"+std::string(file);
         fs.close();
     }
     /*!
@@ -1514,13 +1514,13 @@ public:
     *
     * load the RGBA from the input file
     */
-    void load(const char * file)throw(pexception)
+    void load(const char * file)
     {
         std::ifstream fs(file);
         if (!fs.fail())
             fs>>*this;
         else
-            throw(pexception("In RGBA::load, cannot open this file"+std::string(file)));
+            std::cerr<<"In RGBA::load, cannot open this file"+std::string(file);
         fs.close();
     }
     /*!

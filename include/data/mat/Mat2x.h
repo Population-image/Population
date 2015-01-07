@@ -77,8 +77,8 @@ public:
     template<int SIZEK>
     Mat2x<Type,SIZEI,SIZEK> operator*(const  Mat2x<Type,SIZEJ,SIZEK>& m)const ;
     Mat2x  mult(const  Mat2x& m)const ;
-    void load(const char * file)throw(pexception);
-    void save(const char * file)const throw(pexception);
+    void load(const char * file);
+    void save(const char * file)const ;
     Domain getDomain()const;
     void display() const;
 
@@ -231,12 +231,12 @@ Type & Mat2x<Type, SIZEI, SIZEJ>::operator ()(unsigned int  i,unsigned int j)
     return  this->_dat[j+ i*SIZEJ];
 }
 template<typename Type, int SIZEI, int SIZEJ>
-void Mat2x<Type, SIZEI, SIZEJ>::load(const char *file)throw(pexception)
+void Mat2x<Type, SIZEI, SIZEJ>::load(const char *file)
 {
     std::ifstream  in(file);
     if (in.fail())
     {
-        throw(pexception("In Matrix::load, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
     }
     else
     {
@@ -244,11 +244,11 @@ void Mat2x<Type, SIZEI, SIZEJ>::load(const char *file)throw(pexception)
     }
 }
 template<typename Type, int SIZEI, int SIZEJ>
-void Mat2x<Type, SIZEI, SIZEJ>::save(const char * file)const throw(pexception){
+void Mat2x<Type, SIZEI, SIZEJ>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        throw(pexception("In Matrix::save, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
     }
     else
     {
@@ -577,7 +577,7 @@ std::istream& operator >> (std::istream& in, pop::Mat2x<Type, SIZEI, SIZEJ>& m)
     return in;
 }
 template<typename Type, int SIZEI, int SIZEJ>
-pop::Mat2x<Type, SIZEI, SIZEJ>  maximum(const pop::Mat2x<Type, SIZEI, SIZEJ>& f,const pop::Mat2x<Type, SIZEI, SIZEJ> & g)throw(pop::pexception)
+pop::Mat2x<Type, SIZEI, SIZEJ>  maximum(const pop::Mat2x<Type, SIZEI, SIZEJ>& f,const pop::Mat2x<Type, SIZEI, SIZEJ> & g)
 {
     pop::Mat2x<Type, SIZEI, SIZEJ> h;
     for( int i=0;i<SIZEI*SIZEJ;i++)
@@ -586,7 +586,7 @@ pop::Mat2x<Type, SIZEI, SIZEJ>  maximum(const pop::Mat2x<Type, SIZEI, SIZEJ>& f,
     return h;
 }
 template<typename Type, int SIZEI, int SIZEJ>
-pop::Mat2x<Type, SIZEI, SIZEJ>  minimum(const pop::Mat2x<Type, SIZEI, SIZEJ>& f,const pop::Mat2x<Type, SIZEI, SIZEJ> & g)throw(pop::pexception)
+pop::Mat2x<Type, SIZEI, SIZEJ>  minimum(const pop::Mat2x<Type, SIZEI, SIZEJ>& f,const pop::Mat2x<Type, SIZEI, SIZEJ> & g)
 {
     pop::Mat2x<Type, SIZEI, SIZEJ> h;
     for( int i=0;i<SIZEI*SIZEJ;i++)
@@ -643,8 +643,8 @@ public:
     VecN<2,Type>  operator*(const VecN<2,Type>& v)const ;
     Mat2x<Type,2,2>  operator*(const  Mat2x<Type,2,2>& m)const ;
     Mat2x  mult(const  Mat2x& m)const ;
-    void load(const char * file)throw(pexception);
-    void save(const char * file)const throw(pexception);
+    void load(const char * file);
+    void save(const char * file)const ;
     Domain getDomain()const;
     void display() const;
 
@@ -807,12 +807,12 @@ Type & Mat2x<Type,2,2>::operator ()(unsigned int  i,unsigned int j)
     return  this->_dat[j+ (i<<1)];
 }
 template<typename Type>
-void Mat2x<Type,2,2>::load(const char *file)throw(pexception)
+void Mat2x<Type,2,2>::load(const char *file)
 {
     std::ifstream  in(file);
     if (in.fail())
     {
-        throw(pexception("In Matrix::load, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
     }
     else
     {
@@ -820,11 +820,11 @@ void Mat2x<Type,2,2>::load(const char *file)throw(pexception)
     }
 }
 template<typename Type>
-void Mat2x<Type,2,2>::save(const char * file)const throw(pexception){
+void Mat2x<Type,2,2>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        throw(pexception("In Matrix::save, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
     }
     else
     {
@@ -1112,7 +1112,7 @@ std::istream& operator >> (std::istream& in, pop::Mat2x<Type,2,2>& m)
     return in;
 }
 template<typename Type>
-pop::Mat2x<Type,2,2>  maximum(const pop::Mat2x<Type,2,2>& f,const pop::Mat2x<Type,2,2> & g)throw(pop::pexception){
+pop::Mat2x<Type,2,2>  maximum(const pop::Mat2x<Type,2,2>& f,const pop::Mat2x<Type,2,2> & g){
     pop::Mat2x<Type,2,2> h;
     h._dat[0]=maximum(f._dat[0],g._dat[0]);
     h._dat[1]=maximum(f._dat[1],g._dat[1]);
@@ -1121,7 +1121,7 @@ pop::Mat2x<Type,2,2>  maximum(const pop::Mat2x<Type,2,2>& f,const pop::Mat2x<Typ
     return h;
 }
 template<typename Type>
-pop::Mat2x<Type,2,2>  minimum(const pop::Mat2x<Type,2,2>& f,const pop::Mat2x<Type,2,2> & g)throw(pop::pexception){
+pop::Mat2x<Type,2,2>  minimum(const pop::Mat2x<Type,2,2>& f,const pop::Mat2x<Type,2,2> & g){
     pop::Mat2x<Type,2,2> h;
     h._dat[0]=minimum(f._dat[0],g._dat[0]);
     h._dat[1]=minimum(f._dat[1],g._dat[1]);
@@ -1178,8 +1178,8 @@ public:
     VecN<3,Type>  operator*(const VecN<3,Type>& v)const ;
     Mat2x<Type,3,3>  operator*(const  Mat2x<Type,3,3>& m)const ;
     Mat2x<Type,3,3>  mult(const  Mat2x<Type,3,3>& m)const ;
-    void load(const char * file)throw(pexception);
-    void save(const char * file)const throw(pexception);
+    void load(const char * file);
+    void save(const char * file)const ;
     Domain getDomain()const;
     void display() const;
 
@@ -1419,12 +1419,12 @@ Type & Mat2x<Type,3,3>::operator ()(unsigned int  i,unsigned int j)
     return  this->_dat[j+ (i*3)];
 }
 template<typename Type>
-void Mat2x<Type,3,3>::load(const char *file)throw(pexception)
+void Mat2x<Type,3,3>::load(const char *file)
 {
     std::ifstream  in(file);
     if (in.fail())
     {
-        throw(pexception("In Matrix::load, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
     }
     else
     {
@@ -1432,11 +1432,11 @@ void Mat2x<Type,3,3>::load(const char *file)throw(pexception)
     }
 }
 template<typename Type>
-void Mat2x<Type,3,3>::save(const char * file)const throw(pexception){
+void Mat2x<Type,3,3>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        throw(pexception("In Matrix::save, cannot open file: "+std::string(file)));
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
     }
     else
     {
@@ -1861,7 +1861,7 @@ Mat2x<Type,Dim1,Dim2>  operator*(Type value, const Mat2x<Type,Dim1,Dim2>&f)
 }
 
 template<typename Type>
-pop::Mat2x<Type,3,3>  maximum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Type,3,3> & g)throw(pop::pexception)
+pop::Mat2x<Type,3,3>  maximum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Type,3,3> & g)
 {
     pop::Mat2x<Type,3,3> h;
     h._dat[0]=maximum(f._dat[0],g._dat[0]);
@@ -1876,7 +1876,7 @@ pop::Mat2x<Type,3,3>  maximum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Typ
     return h;
 }
 template<typename Type>
-pop::Mat2x<Type,3,3>  minimum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Type,3,3> & g)throw(pop::pexception)
+pop::Mat2x<Type,3,3>  minimum(const pop::Mat2x<Type,3,3>& f,const pop::Mat2x<Type,3,3> & g)
 {
     pop::Mat2x<Type,3,3> h;
     h._dat[0]=minimum(f._dat[0],g._dat[0]);

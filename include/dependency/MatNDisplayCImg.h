@@ -167,8 +167,9 @@ public:
     MatNDisplayCImg & display(const MatN<2, F64 > &img);
 
    template<int DIM,typename Type>
-    MatNDisplayCImg & display(const MatN<DIM,Type >&  )throw(pexception){
-        throw(pexception("Cannot display this image with this pixel type. For 2D, you have to convert it in UI8 or F64 pixel type before to display it"));
+    MatNDisplayCImg & display(const MatN<DIM,Type >&  ){
+        std::cerr<<"Cannot display this image with this pixel type. For 2D, you have to convert it in UI8 or F64 pixel type before to display it";
+        return *this;
     }
 
     MatNDisplayCImg & 	show ();

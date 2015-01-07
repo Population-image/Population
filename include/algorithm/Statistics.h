@@ -408,7 +408,7 @@ struct POP_EXPORTS Statistics
      * std::cout<<"variance "<<variance<<std::endl;//100
      * \endcode
      */
-    static DistributionIntegerRegularStep computedStaticticsFromIntegerRealizations( const VecI32 & v)throw(pexception);
+    static DistributionIntegerRegularStep computedStaticticsFromIntegerRealizations( const VecI32 & v);
 
 
 
@@ -507,7 +507,7 @@ struct POP_EXPORTS Statistics
     */
     static F64 maxValue(const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step=0.01);
 
-    /*! \fn  static Distribution  integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step=0.01)throw(pexception);
+    /*! \fn  static Distribution  integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step=0.01);
      * \param f input distribution
      * \param xmin lower bound
      * \param xmax upper bound
@@ -530,7 +530,7 @@ struct POP_EXPORTS Statistics
      * cout<<dinter(x)<<endl;
      * \endcode
     */
-    static DistributionMultiVariateRegularStep  integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step=0.01)throw(pexception);
+    static DistributionMultiVariateRegularStep  integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step=0.01);
     /*! \fn DistributionMultiVariate toProbabilityDistribution(const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step);
      * \param f input distribution
      * \param xmin lower bound

@@ -115,9 +115,9 @@ class POP_EXPORTS DistributionSign:public DistributionDiscrete
 public:
     DistributionSign();
     DistributionSign(const DistributionSign & dist);
-    virtual DistributionSign * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
-    virtual F64 randomVariable()const throw(pexception);
+    virtual DistributionSign * clone()const ;
+    F64 operator()(F64 value)const ;
+    virtual F64 randomVariable()const ;
 
 };
 
@@ -176,9 +176,9 @@ public:
     */
     DistributionUniformReal(const DistributionUniformReal & dist);
 
-    virtual DistributionUniformReal * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
-    virtual F64 randomVariable()const throw(pexception);
+    virtual DistributionUniformReal * clone()const ;
+    F64 operator()(F64 value)const ;
+    virtual F64 randomVariable()const ;
 };
 class POP_EXPORTS DistributionUniformInt:public DistributionDiscrete
 {
@@ -231,9 +231,9 @@ public:
     */
     void reset(int xmin, int xmax);
 
-    F64 randomVariable()const throw(pexception);
-    DistributionUniformInt * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    DistributionUniformInt * clone()const ;
+    F64 operator()(F64 value)const ;
 
 
 };
@@ -282,9 +282,9 @@ public:
     */
     void reset(F64 mean, F64 standard_deviation);
 
-    F64 randomVariable()const throw(pexception);
-    DistributionNormal * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    DistributionNormal * clone()const ;
+    F64 operator()(F64 value)const ;
     virtual F64 getXmin()const;
     virtual F64 getXmax()const;
 
@@ -329,9 +329,9 @@ public:
 
     F64 getProbability()const;
     int getNumberTime()const;
-    F64 randomVariable()const throw(pexception);
-    DistributionBinomial * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    DistributionBinomial * clone()const ;
+    F64 operator()(F64 value)const ;
 };
 
 class POP_EXPORTS DistributionExponential:public Distribution
@@ -378,9 +378,9 @@ public:
     *   set the exponentiel parameter
     */
     void reset(F64 lambda);
-    F64 randomVariable()const throw(pexception);
-    DistributionExponential * clone()const throw(pexception);
-    F64 operator()(F64 value)const  throw(pexception);
+    F64 randomVariable()const ;
+    DistributionExponential * clone()const ;
+    F64 operator()(F64 value)const  ;
     virtual F64 getXmin()const;
     virtual F64 getXmax()const;
 };
@@ -432,10 +432,10 @@ public:
     */
     void reset(F64 lambda);
     void init();
-    F64 randomVariable()const throw(pexception);
-    F64 randomVariable(F64 lambda)const throw(pexception);
-    DistributionPoisson * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    F64 randomVariable(F64 lambda)const ;
+    DistributionPoisson * clone()const ;
+    F64 operator()(F64 value)const ;
     virtual F64 getXmin()const;
     virtual F64 getXmax()const;
 };
@@ -486,9 +486,9 @@ public:
     *   set dirac parameter intervalle
     */
     void reset(F64 x);
-    F64 randomVariable()const throw(pexception);
-    DistributionDirac * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    DistributionDirac * clone()const ;
+    F64 operator()(F64 value)const ;
 
 
 };
@@ -522,9 +522,9 @@ public:
 
     DistributionTriangle(const DistributionTriangle &dist);
 
-    F64 randomVariable()const throw(pexception);
-    DistributionTriangle * clone()const throw(pexception);
-    F64 operator()(F64 value)const throw(pexception);
+    F64 randomVariable()const ;
+    DistributionTriangle * clone()const ;
+    F64 operator()(F64 value)const ;
 };
 
 

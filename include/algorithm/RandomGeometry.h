@@ -84,64 +84,64 @@ std::cout<<"Realization porosity"<<mhisto(0,1)<<std::endl;
 \endcode
 \image html  boolean.jpg
 */
-    namespace Private{
-        template<int DIM>
-        class IntersectionRectangle
-        {
-        public:
-            VecN<DIM,F64> x;
-            VecN<DIM,F64> size;
-            bool perhapsIntersection(Germ<DIM> * grain,const VecN<DIM,F64> & domain,MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
-            {
-                if(boundary_condition==MATN_BOUNDARY_CONDITION_BOUNDED){
-                    VecN<DIM,F64> xx =grain->x-x;
-                    double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
-                    if( xx.norm(0)< width )
-                        return true;
-                    else
-                        return false;
-                }else{
-                    double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
-                    VecN<DIM,F64> xx =grain->x-x;
-                    if( xx.norm(0)< width )
-                        return true;
-                    for(unsigned int i=0;i<DIM;i++){
-                        xx(i)-=domain(i);
-                        if( xx.norm(0)< width )
-                            return true;
-                        xx(i)+=2*domain(i);
-                        if( xx.norm(0)< width )
-                            return true;
-                        xx(i)-=domain(i);
-                    }
-                    return false;
-                }
-            }
-        };
-        template<int DIM>
-        static VecN<DIM,F64> smallestDistanceTore(const VecN<DIM,F64> xtore,const VecN<DIM,F64> xfixed, const VecN<DIM,F64> domain){
-            VecN<DIM,F64> x(xtore);
-            VecN<DIM,F64> xtemp(xtore);
-            double dist = (xtemp-xfixed).normPower(2);
-            double distemp;
+namespace Private{
+template<int DIM>
+class IntersectionRectangle
+{
+public:
+    VecN<DIM,F64> x;
+    VecN<DIM,F64> size;
+    bool perhapsIntersection(Germ<DIM> * grain,const VecN<DIM,F64> & domain,MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
+    {
+        if(boundary_condition==MATN_BOUNDARY_CONDITION_BOUNDED){
+            VecN<DIM,F64> xx =grain->x-x;
+            double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
+            if( xx.norm(0)< width )
+                return true;
+            else
+                return false;
+        }else{
+            double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
+            VecN<DIM,F64> xx =grain->x-x;
+            if( xx.norm(0)< width )
+                return true;
             for(unsigned int i=0;i<DIM;i++){
-                xtemp(i)-=domain(i);
-                distemp = (xtemp-xfixed).normPower(2);
-                if(distemp<dist){
-                    dist=distemp;
-                    x = xtemp;
-                }
-                xtemp(i)+=2*domain(i);
-                distemp = (xtemp-xfixed).normPower(2);
-                if(distemp<dist){
-                    dist=distemp;
-                    x = xtemp;
-                }
-                xtemp(i)-=domain(i);
+                xx(i)-=domain(i);
+                if( xx.norm(0)< width )
+                    return true;
+                xx(i)+=2*domain(i);
+                if( xx.norm(0)< width )
+                    return true;
+                xx(i)-=domain(i);
             }
-            return x;
+            return false;
         }
     }
+};
+template<int DIM>
+static VecN<DIM,F64> smallestDistanceTore(const VecN<DIM,F64> xtore,const VecN<DIM,F64> xfixed, const VecN<DIM,F64> domain){
+    VecN<DIM,F64> x(xtore);
+    VecN<DIM,F64> xtemp(xtore);
+    double dist = (xtemp-xfixed).normPower(2);
+    double distemp;
+    for(unsigned int i=0;i<DIM;i++){
+        xtemp(i)-=domain(i);
+        distemp = (xtemp-xfixed).normPower(2);
+        if(distemp<dist){
+            dist=distemp;
+            x = xtemp;
+        }
+        xtemp(i)+=2*domain(i);
+        distemp = (xtemp-xfixed).normPower(2);
+        if(distemp<dist){
+            dist=distemp;
+            x = xtemp;
+        }
+        xtemp(i)-=domain(i);
+    }
+    return x;
+}
+}
 
 class POP_EXPORTS RandomGeometry
 {
@@ -167,7 +167,6 @@ public:
     //------------- ------------------------
 
     /*!
-    \fn  static ModelGermGrain<DIM>    poissonPointProcess(VecN<DIM,F64> domain,double lambda);
     * \brief Uniform Poisson point process
     * \param domain domain of definition [0,domain(0)]*[1,domain(1)]...
     * \param lambda intensity of the homogenous field
@@ -205,11 +204,9 @@ public:
 
 
     /*!
-    \fn  static void  hardCoreFilter( ModelGermGrain<DIM>  & grain, F64 radius,bool btore=true)throw(pexception);
     * \brief Matern filter (Hard Core)
     * \param grain input/output grain
     * \param radius R
-    * \param btore boundary condition (true=periodic, false=bounded)
     *
     * The resulting point process is a hard-core point process with minimal inter-VecN distance R. The following code presents an art application
     *  \code
@@ -240,14 +237,12 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static void  hardCoreFilter( ModelGermGrain<DIM>  & grain, F64 radius,bool btore=true)throw(pexception);
+    static void  hardCoreFilter( ModelGermGrain<DIM>  & grain, F64 radius);
 
     /*!
-    \fn  static void  minOverlapFilter( ModelGermGrain<DIM>  & grain, F64 radius,bool btore=true)throw(pexception);
     * \brief Min-overlap filter
     * \param grain input/output grain
     * \param radius R
-    * \param btore boundary condition (true=periodic, false=bounded)
     *
     * The resulting point process is the min-overlap point process where each VecN has at least one neighborhood VecN at distance smaller than R.
     *  \code
@@ -260,12 +255,13 @@ public:
     * domain= img.getDomain();
 
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
-    * RandomGeometry::minOverlapFilter(grain,radius*2,false);
+    * grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    * RandomGeometry::minOverlapFilter(grain,radius*2);
     * Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
     * RandomGeometry::sphere(grain,d);
     * RandomGeometry::RGBFromMatrix(grain,img);
     * grain.setModel( DeadLeave);
-    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain,false);
+    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
     * RGBUI8 mean = Analysis::meanValue(img);
     * Mat2RGBUI8::IteratorEDomain it(img.getIteratorEDomain());
@@ -279,10 +275,9 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static void  minOverlapFilter( ModelGermGrain<DIM>  & grain, F64 radius,bool btore=true)throw(pexception);
+    static void  minOverlapFilter( ModelGermGrain<DIM>  & grain, F64 radius);
 
     /*!
-    \fn static void  intersectionGrainToMask( ModelGermGrain<DIM>  & grain, const MatN<DIM,UI8> & img)throw(pexception);
     * \brief Keep the VecN if intersection
     * \param grain input/output grain
     * \param img input binary matrix
@@ -304,14 +299,15 @@ public:
     * RandomGeometry::sphere(grain,d);
     * RandomGeometry::RGBFromMatrix(grain,img);
     * grain.setModel( DeadLeave);
-    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain,false);
+    * grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
     * aborigenart.display();
     * \endcode
     * \image html AborigenLenaGradient.png
     */
     template<int DIM>
-    static void  intersectionGrainToMask( ModelGermGrain<DIM>  & grain, const MatN<DIM,UI8> & img)throw(pexception);
+    static void  intersectionGrainToMask( ModelGermGrain<DIM>  & grain, const MatN<DIM,UI8> & img);
     //@}
 
 
@@ -322,7 +318,6 @@ public:
     //-------------------------------------
 
     /*!
-    \fn   static void sphere( ModelGermGrain<DIM> &  grain,Distribution &dist);
     * \brief dress the VecNs with sphere with a random radius following the probability distribution dist
     * \param grain input/output grain
     * \param dist radius probability distribution
@@ -357,7 +352,6 @@ public:
 
 
     /*!
-    \fn   static void box( ModelGermGrain<DIM> &  grain,const  DistributionMultiVariate & distradius,const DistributionMultiVariate& distangle )throw(pexception);
     * \brief dress the VecNs with box with a random radius and random distribution
     * \param grain input/output grain
     * \param distradius multivariate probability distribution for radius
@@ -382,17 +376,17 @@ public:
     RandomGeometry::box(grain,d_radius,d_angle);
     RandomGeometry::RGBFromMatrix(grain,img);
     grain.setModel( DeadLeave);
-    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain,false);
+    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
     aborigenart.display();
     * \endcode
     * \image html AborigenLenaBox.png
     */
     template<int DIM>
-    static void box( ModelGermGrain<DIM> &  grain,const  DistributionMultiVariate & distradius,const DistributionMultiVariate& distangle )throw(pexception);
+    static void box( ModelGermGrain<DIM> &  grain,const  DistributionMultiVariate & distradius,const DistributionMultiVariate& distangle );
 
     /*!
-    \fn   static void polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution>& distradius,Vec<Distribution>& distnormal,Vec<Distribution>& distangle )throw(pexception);
     * \brief dress the VecNs with polyhedra
     * \param grain input/output grain
     * \param distradius Vec of radius probability distribution
@@ -463,10 +457,9 @@ public:
     * \image html tetrahedron.png
     */
     template<int DIM>
-    static void polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution>& distradius,Vec<Distribution>& distnormal,Vec<Distribution>& distangle )throw(pexception);
+    static void polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution>& distradius,Vec<Distribution>& distnormal,Vec<Distribution>& distangle );
 
     /*!
-    \fn   static void ellipsoid( ModelGermGrain<DIM> &  grain,Vec<Distribution>& distradius,Vec<Distribution>& distangle )throw(pexception);
     * \brief dress the VecNs with polyhedra
     * \param grain input/output grain
     * \param distradius Vec of radius probability distribution
@@ -511,10 +504,9 @@ public:
     * \image html ellipsoid.png
     */
     template<int DIM>
-    static void ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle)throw(pexception);
+    static void ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle);
 
     /*!
-    \fn   static static void  rhombohedron( ModelGermGrain3 & grain,Distribution distradius,Distribution distangle, Vec<Distribution>& distorientation )throw(pexception);
     * \brief dress the VecNs with polyhedra
     * \param grain input/output grain
     * \param distradius  radius probability distribution
@@ -558,10 +550,9 @@ public:
     * \endcode
     * \image html rhombohedron.png
     */
-    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution& distradius,const Distribution& distangle, const DistributionMultiVariate& distorientation )throw(pexception);
+    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution& distradius,const Distribution& distangle, const DistributionMultiVariate& distorientation );
 
     /*!
-    \fn   static void  cylinder( ModelGermGrain3  & grain,Distribution  distradius,Distribution  distheight, Vec<Distribution>& distorientation )throw(pexception);
     * \brief dress the VecNs with cylinder
     * \param grain input/output grain
     * \param distradius  radius probability distribution
@@ -609,12 +600,11 @@ public:
     * \endcode
     * \image html cylinder.png
     */
-    static void  cylinder( pop::ModelGermGrain3  & grain,Distribution  distradius,Distribution  distheight,const DistributionMultiVariate & distorientation )throw(pexception);
+    static void  cylinder( pop::ModelGermGrain3  & grain,Distribution  distradius,Distribution  distheight,const DistributionMultiVariate & distorientation );
     template<int DIM>
-    static void matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle )throw(pexception);
+    static void matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle );
 
     /*!
-    \fn static void   addition(const ModelGermGrain<DIM> &  grain1, ModelGermGrain<DIM>& grain2);
     * \brief addition of the grains
     * \param grain1 input/output grain
     * \param grain2  radius probability distribution
@@ -671,7 +661,6 @@ public:
     //@{
     //-------------------------------------
     /*!
-    \fn static void RGBRandomBlackOrWhite( ModelGermGrain<DIM> &  grain);
     * \brief affect a black and white RGB randomly
     * \param grain input/output grain
     *
@@ -692,7 +681,8 @@ public:
     RandomGeometry::box(grain,v_radius,v_angle);
     RandomGeometry::RGBRandomBlackOrWhite(grain);
     grain.setModel( DeadLeave);
-    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain,false);
+    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
     deadleave_blackwhite.display();
     * \endcode
     * \image html deadleave_blackwhite.png
@@ -701,7 +691,6 @@ public:
     static void  RGBRandomBlackOrWhite( ModelGermGrain<DIM> &  grain);
 
     /*!
-    \fn     static void  RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate distRGB_RGB)throw(pexception);
     * \brief affect a RGB randomly
     * \param grain input/output grain
     * \param distRGB_RGB multi variate probability distribution
@@ -725,16 +714,16 @@ public:
     DistributionMultiVariate dcoupled(dmulti,3);
     RandomGeometry::RGBRandom(grain,dcoupled);
     grain.setModel( DeadLeave);
-    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain,false);
+    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
     deadleave_blackwhite.display();
     * \endcode
     * \image html deadleave_random.png
     */
     template<int DIM>
-    static void  RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate distRGB_RGB)throw(pexception);
+    static void  RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate distRGB_RGB);
 
     /*!
-    \fn  static void  RGBFromMatrix( ModelGermGrain<DIM> &  grain,const MatN<DIM,RGBUI8 > & in);
     * \brief dress the grains with a RGB coming from the input image
     * \param grain input/output grain
     * \param in input matrix
@@ -758,7 +747,8 @@ public:
     RandomGeometry::box(grain,v_radius,v_angle);
     RandomGeometry::RGBFromMatrix(grain,img);
     grain.setModel( DeadLeave);
-    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain,false);
+    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
     aborigenart.display();
     * \endcode
@@ -768,7 +758,6 @@ public:
     static void  RGBFromMatrix( ModelGermGrain<DIM> &  grain,const MatN<DIM,RGBUI8 > & in);
 
     /*!
-    \fn static void  randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)throw(pexception);
     * \brief move the grains with a random walk
     * \param grain input/output grain
     * \param radius standard deviation
@@ -793,7 +782,8 @@ public:
     int i=0;
     MatNDisplay windows;
     do{
-        Mat2RGBUI8 art = RandomGeometry::continuousToDiscrete(grain,false);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        Mat2RGBUI8 art = RandomGeometry::continuousToDiscrete(grain);
         windows.display(art);
         RandomGeometry::randomWalk(grain,4);
         art.save(std::string("art"+BasicUtility::IntFixedDigit2String(i,4)+".bmp").c_str());
@@ -803,7 +793,7 @@ public:
     * \image html art.gif
     */
     template<int DIM>
-    static void  randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)throw(pexception);
+    static void  randomWalk( ModelGermGrain<DIM> &  grain, F64 radius);
 
     //@}
     //-------------------------------------
@@ -839,7 +829,6 @@ public:
 
 
     /*!
-    \fn static MatN<DIM,pop::RGBUI8> continuousToDiscrete(const ModelGermGrain<DIM> &grain,bool btore=true);
     * \brief transform the continuous model to the lattice model
     * \param grain input grain
     * \return lattice model
@@ -858,7 +847,6 @@ public:
 
 
     /*!
-    \fn static MatN<DIM,UI8> gaussianThesholdedRandomField(const Mat2F64 &mcorre,const VecN<DIM,int> &domain);
     * \brief Diffusion limited aggregation
     * \param mcorre correlation function
     * \param domain domain of the model
@@ -874,7 +862,6 @@ public:
 
 
     /*!
-    \fn static MatN<DIM,UI8> randomStructure(const VecN<DIM,int> &domainmodel,const Mat2F64 & volume_fraction);
     * \brief generate a random structure at the given volume fraction
     * \param domainmodel domain of the model
     * \param volume_fraction volume fraction
@@ -918,7 +905,6 @@ public:
 
 
     /*!
-    \fn MatN<2,UI8 > diffusionLimitedAggregation2D(int size,int nbrwalkers);
     * \brief Diffusion limited aggregation
     * \param size size of the lattice
     * \param nbrwalkers number of walkers
@@ -930,7 +916,6 @@ public:
     static MatN<2,UI8 > diffusionLimitedAggregation2D(int size=256,int nbrwalkers=10000);
 
     /*!
-    \fn static MatN<3,UI8 > diffusionLimitedAggregation3D(int size,int nbrwalkers);
     * \brief Diffusion limited aggregation
     * \param size size of the lattice
     * \param nbrwalkers number of walkers
@@ -943,7 +928,7 @@ public:
     //@}
 private:
     template <int DIM>
-            static void divideTilling(const Vec<int> & v,Private::IntersectionRectangle<DIM> &rec,const  ModelGermGrain<DIM> & grainlist, MatN<DIM,RGBUI8> &img);
+    static void divideTilling(const Vec<int> & v,Private::IntersectionRectangle<DIM> &rec,const  ModelGermGrain<DIM> & grainlist, MatN<DIM,RGBUI8> &img);
     static Distribution generateProbabilitySpectralDensity(const Mat2F64& correlation,double beta);
 
     inline static bool annealingSimutatedLaw(double energynext,double energycurrent,double temperature_inverse){
@@ -1161,11 +1146,11 @@ void  RandomGeometry::RGBRandomBlackOrWhite( ModelGermGrain<DIM> &  grain)
 }
 
 template<int DIM>
-void  RandomGeometry::RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate distRGB_RGB)throw(pexception)
+void  RandomGeometry::RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate distRGB_RGB)
 {
 
     if(distRGB_RGB.getNbrVariable()!=3){
-        throw(pexception("In RandomGeometry::RGBRandom, the distRGB_RGB distribution must generate a 3d multuvate random variable"));
+        std::cerr<<"In RandomGeometry::RGBRandom, the distRGB_RGB distribution must generate a 3d multuvate random variable";
     }
     for(typename Vec<Germ<DIM> * >::iterator it= grain.grains().begin();it!=grain.grains().end();it++ ){
         VecF64 v = distRGB_RGB.randomVariable();
@@ -1181,7 +1166,7 @@ void RandomGeometry::RGBFromMatrix( ModelGermGrain<DIM> &  grain,const MatN<DIM,
 }
 
 template<int DIM>
-void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius,bool btore)throw(pexception)
+void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius)
 {
     KDTree<DIM,F64> kptree;
     Vec<bool> v_in;
@@ -1194,7 +1179,7 @@ void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius,b
         if(dist>radius){
             v_in.push_back(true);
             kptree.addItem(x);
-            if(btore==true){
+            if(grain.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_PERIODIC){
                 for(int i=0;i<DIM;i++){
                     VecN<DIM,F64> xtore(x);
                     xtore(i)-=grain.getDomain()(i);
@@ -1220,7 +1205,7 @@ void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius,b
     grain.grains() = vlist_temp;
 }
 template<int DIM>
-void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)throw(pexception)
+void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)
 {
     Vec<F64> v;
     v= grain.getDomain();
@@ -1242,7 +1227,7 @@ void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)throw(
 }
 
 template<int DIM>
-void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius,bool btore)throw(pexception)
+void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius)
 {
 
     Vec<VecN<DIM,F64> > v_x;
@@ -1250,7 +1235,7 @@ void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius,
     for(int i =0; i<(int)grain.grains().size();i++){
         VecN<DIM,F64> x = grain.grains()[i]->x;
         v_x.push_back(x);
-        if(btore==true){
+        if(grain.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_BOUNDED){
             for(int i=0;i<DIM;i++){
                 VecN<DIM,F64> xtore(x);
                 xtore(i)-=grain.getDomain()(i);
@@ -1287,7 +1272,7 @@ void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius,
 }
 
 template<int DIM>
-void  RandomGeometry::intersectionGrainToMask( ModelGermGrain<DIM> &  grain, const MatN<DIM,UI8> & img)throw(pexception)
+void  RandomGeometry::intersectionGrainToMask( ModelGermGrain<DIM> &  grain, const MatN<DIM,UI8> & img)
 {
     for(int i =0; i<(int)grain.grains().size();i++)
     {
@@ -1382,20 +1367,20 @@ void RandomGeometry::sphere( ModelGermGrain<DIM> &  grain, Distribution & dist)
 }
 
 template<int DIM>
-void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle )throw(pexception)
+void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle )
 {
 
     if((int)distradius.getNbrVariable()!=DIM )
     {
-        throw(pexception("In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension"));//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
+        std::cerr<<"In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension";//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
     }
     if(DIM==2 && distangle.getNbrVariable()!=1)
     {
-        throw(pexception("In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
     if(DIM==3 && distangle.getNbrVariable()!=3)
     {
-        throw(pexception("In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
 
     for(typename Vec<Germ<DIM> * >::iterator it = grain.grains().begin();it!=grain.grains().end();it++ )
@@ -1424,20 +1409,20 @@ void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVa
 }
 
 template<int DIM>
-void RandomGeometry::polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution >& distradius,Vec<Distribution >& distnormal,Vec<Distribution >& distangle )throw(pexception)
+void RandomGeometry::polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution >& distradius,Vec<Distribution >& distnormal,Vec<Distribution >& distangle )
 {
 
     if((int)distnormal.size()*1.0/distradius.size()!=DIM )
     {
-        throw(pexception("In RandomGeometry::polyhedra, we associate at each radius a normal Vec with d components (distradius.size()/distnormal.size()=d) "));
+        std::cerr<<"In RandomGeometry::polyhedra, we associate at each radius a normal Vec with d components (distradius.size()/distnormal.size()=d) ";
     }
     if(DIM==2 && distangle.size()!=1)
     {
-        throw(pexception("In RandomGeometry::polyhedra, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension"));
+        std::cerr<<"In RandomGeometry::polyhedra, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
     if(DIM==3 && distangle.size()!=3)
     {
-        throw(pexception("In RandomGeometry::polyhedra, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::polyhedra, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
 
 
@@ -1471,20 +1456,20 @@ void RandomGeometry::polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution >&
 }
 
 template<int DIM>
-void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate & distradius,const DistributionMultiVariate & distangle )throw(pexception)
+void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate & distradius,const DistributionMultiVariate & distangle )
 {
 
     if((int)distradius.getNbrVariable()!=DIM )
     {
-        throw(pexception("In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension"));//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
+        std::cerr<<"In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension";//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
     }
     if(DIM==2 && distangle.getNbrVariable()!=1)
     {
-        throw(pexception("In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
     if(DIM==3 && distangle.getNbrVariable()!=3)
     {
-        throw(pexception("In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
 
     for(typename Vec<Germ<DIM> * >::iterator it = grain.grains().begin();it!=grain.grains().end();it++ )
@@ -1645,7 +1630,6 @@ pop::MatN<DIM,pop::RGBUI8> RandomGeometry::continuousToDiscrete(const ModelGermG
 template<int DIM>
 MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F64> & gaussianfield )
 {
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("gaussianThesholdedRandomField");
     double porosity = mcorre(0,1);
     Distribution f("1/(2*pi)^(1./2)*exp(-(x^2)/2)");
     double beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);
@@ -1662,21 +1646,11 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
         phase[i] = p;
         module[i] = Pmagnitude.randomVariable();
         direction[i]= dpshere.randomVariable();
-        //        std::cout<<phase[i]<<std::endl;
-        //        std::cout<<module[i]<<std::endl;
-        //        std::cout<<direction[i]<<std::endl;
-        //        sleep(1);
-
-
     }
     gaussianfield.resize(domain);
     typename MatN<DIM,double>::IteratorEDomain b(gaussianfield.getIteratorEDomain());
     while(b.next())
     {
-        if(DIM==3&&b.x()(0)==0&&b.x()(1)==0)
-            CollectorExecutionInformationSingleton::getInstance()->progression(1.0*b.x()(2)/domain(2));
-        if(DIM==2&&b.x()(0)==0)
-            CollectorExecutionInformationSingleton::getInstance()->progression(1.0*b.x()(1)/domain(1));
         double sum=0;
         VecN<DIM, double> x = b.x();
         for(int i=0;i<number_cosinus;i++)
@@ -1686,8 +1660,6 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
         sum= sum*std::pow(2./number_cosinus,1./2.);
         gaussianfield(b.x())=sum;
     }
-    //    Mat2UI8 mm =Processing::greylevelRange(gaussianfield,0,255);
-    //    mm.display();
     MatN<DIM,unsigned char> gaussianfieldthresolded(domain);
 
     double betamin= beta -1;
@@ -1710,7 +1682,6 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
             beta = betamin  + (betamax-betamin)/2;
         }
     }while(test==true);
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("gaussianThesholdedRandomField");
     return gaussianfieldthresolded;
 }
 template<int DIM>
@@ -1742,8 +1713,6 @@ MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const
 
 template<int DIM1,int DIM2>
 void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference,F64 nbr_permutation_by_pixel, int lengthcorrelation,double temperature_inverse){
-
-    CollectorExecutionInformationSingleton::getInstance()->startExecution("annealingSimutated");
     if(temperature_inverse==-1)
         temperature_inverse=model.getDomain().multCoordinate();
     if(lengthcorrelation==-1){
@@ -1830,25 +1799,22 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
         }
 
         if(count%(model.getDomain().multCoordinate()/10)==0){
-            CollectorExecutionInformationSingleton::getInstance()->progression(1.0*count/model.getDomain().multCoordinate(),"Number of permutation per pixels/voxels");
-            CollectorExecutionInformationSingleton::getInstance()->progression(energy_current,"Energy");
             d.display(Visualization::labelToRandomRGB(model));
         }
         count++;
 
     }
-    CollectorExecutionInformationSingleton::getInstance()->endExecution("annealingSimutated");
 }
 
 template<int DIM>
-void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle )throw(pexception){
+void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle ){
     if(DIM==2 && distangle.getNbrVariable()!=1)
     {
-        throw(pexception("In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
     if(DIM==3 && distangle.getNbrVariable()!=3)
     {
-        throw(pexception("In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension"));
+        std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
     for(typename Vec<Germ<DIM> * >::iterator it = grain.grains().begin();it!=grain.grains().end();it++ )
     {
