@@ -26,6 +26,7 @@ public:
 
 
 struct POP_EXPORTS CharacteristicClusterDistance{
+    virtual ~CharacteristicClusterDistance();
     virtual double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b)=0;
 };
 struct POP_EXPORTS CharacteristicClusterDistanceMass : public CharacteristicClusterDistance{

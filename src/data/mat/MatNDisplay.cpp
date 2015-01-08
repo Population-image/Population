@@ -46,10 +46,10 @@ MatNDisplay & MatNDisplay::display(const MatN<2, RGBUI8 > & m){
     return *this;
 }
 
-MatNDisplay & MatNDisplay::display(const MatN<2, RGBAUI8 > &m){
-    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
-    return *this;
-}
+//MatNDisplay & MatNDisplay::display(const MatN<2, RGBAUI8 > &m){
+//    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
+//    return *this;
+//}
 
 MatNDisplay & MatNDisplay::display(const MatN<2, UI8 > &m){
     if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);

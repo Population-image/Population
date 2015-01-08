@@ -1,5 +1,15 @@
 /*! \page pagetechnicalpython Python
 
+\section CompilationPython Compilation
+
+You do as in this page \ref pagecmake but this time you quote the BUILD_PYTHON_SWIG before to generate.  You need 
+
+In windows, you need to configure the PATH environment variable based on the location of SWIG and Python (download here https://www.python.org/downloads/windows/, and http://www.swig.org/download.html).
+
+In linux, swig
+
+
+
 You can start to execute this file other/tutorial/firststep.py with python 2.7 and your favourite
 IDE (PyDev plugging for eclipse is nice http://www.vogella.com/articles/Python/article.html)
 \include firststep.py

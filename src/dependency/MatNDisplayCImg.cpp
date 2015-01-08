@@ -45,19 +45,19 @@ MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, UI32 > &img){
     return display(temp);
 }
 
-MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, RGBAUI8 > &img){
-    cimg_library::CImg<UI8> temp(img.getDomain()(1),img.getDomain()(0),1,4);
-    for(int i =0;i<img.getDomain()[0];i++)
-        for(int j =0;j<img.getDomain()[1];j++){
-            temp.operator ()(j,i,0,0)=img.operator ()(i,j).r();
-            temp.operator ()(j,i,0,1)=img.operator ()(i,j).g();
-            temp.operator ()(j,i,0,2)=img.operator ()(i,j).b();
-            temp.operator ()(j,i,0,3)=img.operator ()(i,j).a();
-        }
+//MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, RGBAUI8 > &img){
+//    cimg_library::CImg<UI8> temp(img.getDomain()(1),img.getDomain()(0),1,4);
+//    for(int i =0;i<img.getDomain()[0];i++)
+//        for(int j =0;j<img.getDomain()[1];j++){
+//            temp.operator ()(j,i,0,0)=img.operator ()(i,j).r();
+//            temp.operator ()(j,i,0,1)=img.operator ()(i,j).g();
+//            temp.operator ()(j,i,0,2)=img.operator ()(i,j).b();
+//            temp.operator ()(j,i,0,3)=img.operator ()(i,j).a();
+//        }
 
-    _pImpl->display->display(temp);
-    return *this;
-}
+//    _pImpl->display->display(temp);
+//    return *this;
+//}
 MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, UI8 > &img){
     cimg_library::CImg<UI8> temp(img.getDomain()(1),img.getDomain()(0));
     for(int i =0;i<img.getDomain()[0];i++)

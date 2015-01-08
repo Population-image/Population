@@ -10,6 +10,7 @@
 #include"algorithm/GeometricalTransformation.h"
 #include"PopulationConfig.h"
 #if defined(HAVE_OPENGL)
+#include<typeinfo>
 #if Pop_OS==1
 #include <GL/gl.h>
 #include <GL/glu.h>

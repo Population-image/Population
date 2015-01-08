@@ -507,14 +507,11 @@ struct POP_EXPORTS Processing
     Visualization::labelAverageRGB(label2,img2).display();
       \endcode
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,double dynamic=0.001){
 
-        if(typeid(TypePixel)!=typeid(UI8))
-            return thresholdMultiValley(MatN<DIM,UI8>(Processing::greylevelRange(f,TypePixel(0),TypePixel(255))),dynamic);
+
+    template<int DIM>
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,UI8>& f,double dynamic=0.001){
         MatN<DIM,UI8>  ff(f);
-
-
         Mat2F64 mm =Analysis::histogram(ff);
         Mat2F64 mmm(mm);
         mmm.deleteCol(0);
@@ -531,14 +528,14 @@ struct POP_EXPORTS Processing
         }
         ff=0;
         for( int i =(static_cast<int>(vmin.size())-1);i>=0;i--){
-            typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+            typename MatN<DIM,UI8>::IteratorEDomain it(f.getIteratorEDomain());
             if(i==(static_cast<int>(vmin.size())-1)){
-                FunctorF::FunctorThreshold<UI8,double,TypePixel> func(vmin[i],255,255);
+                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],255,255);
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
             }else{
-                FunctorF::FunctorThreshold<UI8,double,TypePixel> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
+                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
@@ -547,7 +544,10 @@ struct POP_EXPORTS Processing
         return ff;
 
     }
-
+    template<int DIM,typename TypePixel>
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,double dynamic=0.001){
+        return thresholdMultiValley(MatN<DIM,UI8>(Processing::greylevelRange(f,TypePixel(0),TypePixel(255))),dynamic);
+    }
     /*!
      * \brief apply at pixel value, f(x), the distribution : h(x)=d(f(x))
      * \param f input function

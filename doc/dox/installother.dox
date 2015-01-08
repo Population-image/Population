@@ -1,7 +1,5 @@
-/*! \page pagetechnicalother Other with CMake
-
-This page explains how to use Population library with any compilers and any IDE thanks to CMake.
-
+/*!
+\page pagecmake CMake (cross-platform)
 
 The first step is to generate a project file, as a makefile or Microsoft Visual Studio project with solution files. So, you download/install CMake  http://www.cmake.org/cmake/resources/software.html (for debian/ubuntu sudo apt-get install cmake cmake-qt-gui). Then, you execute cmake-gui where
 -  where is the source code  : $${POPULATIONPATH}

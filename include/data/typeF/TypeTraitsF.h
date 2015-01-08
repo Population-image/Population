@@ -88,46 +88,6 @@ public:
     static const int digits10 = std::numeric_limits<T>::digits10;
     static const bool is_integer = std::numeric_limits<T>::is_integer;
 };
-////////////////////////////////////////////////////////////////
-// The identifiant is define by using a enum
-// Note: If you add your own identifiant, add it at the end of the list
-////////////////////////////////////////////////////////////////
-
-
-
-
-template<>
-struct POP_EXPORTS Type2Id<UI8>
-{
-    Type2Id();
-    std::vector<std::string> id;
-
-};
-
-
-template<>
-struct POP_EXPORTS Type2Id<UI16>
-{
-    Type2Id();
-    std::vector<std::string> id;
-};
-
-template<>
-struct POP_EXPORTS Type2Id<I32>
-{
-    Type2Id();
-    std::vector<std::string> id;
-};
-
-
-template<>
-struct POP_EXPORTS Type2Id<F64>
-{
-    Type2Id();
-    std::vector<std::string> id;
-};
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

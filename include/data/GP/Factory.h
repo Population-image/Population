@@ -131,59 +131,35 @@ public:
         }
         return CreatorMemberPolicy<Product>::createObject((_map.begin())->second,parm1,parm2);
     }
-    //    template<typename Parm1, typename Parm2, typename Parm3>
-    //    virtual Product * createObject(Key key, Parm1 parm1, Parm2 parm2, Parm3 parm3)
-    //    {
-    //        if(_map.find(key)!=_map.end())
-    //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3);
-    //        else
-    //           std::cerr<<"Factory: Unknown key\n"));
-    //    }
-    //    template<typename Parm1, typename Parm2, typename Parm3, typename Parm4>
-    //    virtual Product * createObject(Key key, Parm1 parm1, Parm2 parm2, Parm3 parm3, Parm4 parm4)
-    //    {
-    //        if(_map.find(key)!=_map.end())
-    //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3,parm4);
-    //        else
-    //           std::cerr<<"Factory: Unknown key\n"));
-    //    }
-    //    template<typename Parm1, typename Parm2, typename Parm3, typename Parm4, typename Parm5>
-    //    virtual Product * createObject(Key key, Parm1 parm1, Parm2 parm2, Parm3 parm3, Parm4 parm4, Parm5 parm5)
-    //    {
-    //        if(_map.find(key)!=_map.end())
-    //            return CreatorMemberPolicy<Product>::createObject(_map[key],parm1,parm2,parm3,parm4,parm5);
-    //        else
-    //           std::cerr<<"Factory: Unknown key\n"));
-    //    }
 };
 
-template<typename T>
-struct GPFactoryRegister;
-template <>
-struct GPFactoryRegister<Loki::NullType>
-{
+//template<typename T>
+//struct GPFactoryRegister;
+//template <>
+//struct GPFactoryRegister<Loki::NullType>
+//{
 
-    template<typename Factory, typename SubClassBlank>
-    static bool Register( Factory & , Loki::Type2Type<SubClassBlank>)
-    {
-        return true;
-    }
-};
-template <class Head, class Tail>
-struct GPFactoryRegister<Loki::Typelist< Head, Tail> >
-{
-    template<typename Factory, typename SubClassBlank>
-    static bool  Register(Factory & factory, Loki::Type2Type<SubClassBlank> t)
-    {
-        typedef typename SubstituteTemplateParameter<Head,SubClassBlank>::Result SubClass;
-        Type2Id<SubClass> type;
-        for(unsigned int i=0;i<type.id.size();i++)
-        {
-            SubClass * c = new SubClass();
-            factory.Register( type.id[i],c);
-        }
-        return GPFactoryRegister<Tail>::Register(factory,t);
-    }
-};
+//    template<typename Factory, typename SubClassBlank>
+//    static bool Register( Factory & , Loki::Type2Type<SubClassBlank>)
+//    {
+//        return true;
+//    }
+//};
+//template <class Head, class Tail>
+//struct GPFactoryRegister<Loki::Typelist< Head, Tail> >
+//{
+//    template<typename Factory, typename SubClassBlank>
+//    static bool  Register(Factory & factory, Loki::Type2Type<SubClassBlank> t)
+//    {
+//        typedef typename SubstituteTemplateParameter<Head,SubClassBlank>::Result SubClass;
+//        Type2Id<SubClass> type;
+//        for(unsigned int i=0;i<type.id.size();i++)
+//        {
+//            SubClass * c = new SubClass();
+//            factory.Register( type.id[i],c);
+//        }
+//        return GPFactoryRegister<Tail>::Register(factory,t);
+//    }
+//};
 }
 #endif // FACTORY_H

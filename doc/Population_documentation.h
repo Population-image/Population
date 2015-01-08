@@ -36,8 +36,8 @@ In sourceforge https://sourceforge.net/projects/population/ , you download  popu
 
 \section pageC  Install C++
 Select your integrated development environment: 
-- \ref pagetechnicalqt 
-- \ref pagetechnicalother
+- \ref pageqmake 
+- \ref pagecmake
 
 \section Python  Install Python 
 - \ref pagetechnicalpython

@@ -51,7 +51,7 @@ public:
 
     virtual ~MatNDisplayInterface ();
     virtual MatNDisplayInterface & display(const MatN<2, RGBUI8 > &img)=0;
-    virtual MatNDisplayInterface & display(const MatN<2, RGBAUI8 > &img)=0;
+//    virtual MatNDisplayInterface & display(const MatN<2, RGBAUI8 > &img)=0;
     virtual MatNDisplayInterface & display(const MatN<2, UI8 > &img)=0;
     virtual operator  bool () const=0;
     virtual bool 	is_empty () const=0;
@@ -205,7 +205,7 @@ public:
     MatNDisplay & 	operator= (const MatNDisplay &disp);
     virtual ~MatNDisplay ();
     virtual MatNDisplay & display(const MatN<2, RGBUI8 > &img);
-    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
+//    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
     virtual MatNDisplay & display(const MatN<2, UI8 > &img);
     template<int DIM,typename Type>
     MatNDisplay & display(const MatN<DIM, Type > &){return *this;}

@@ -1,12 +1,11 @@
 import sys
 import os
-PathPop= os.getcwd()+"/../../"
-
-sys.path.append(PathPop+"/lib")
-if (sys.platform == "win32" or sys.platform == "win64"):
-    from populationpythonwin32 import * #uncomment this line for windoww
-else:
-    from population import * #uncomment this line for linux
+PathPop= ""
+if os.path.isfile(PathPop+"population.py")==0:
+    print "set the variable PathPop to the path where you compile population, for instance D:\Users/vtariel/Desktop/ANV/Population-build/. This folder must contain population.py"
+    sys.exit(-1)
+sys.path.append(PathPop)
+from population import * 
 
 #### class member ###
 def classmember() :
@@ -56,9 +55,8 @@ def visualizealgorithm() :
 	visu.labelToRandomRGB(field).display()
 	
 	
-try:	
-	classmember()
-	classdisplay()
-	visualizealgorithm()
-except pexception, e:
-	e.display()
+
+classmember()
+classdisplay()
+visualizealgorithm()
+

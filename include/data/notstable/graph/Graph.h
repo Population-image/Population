@@ -38,7 +38,6 @@ in the Software.
 #include<fstream>
 #include<string>
 #include"PopulationConfig.h"
-#include"data/GP/Type2Id.h"
 #include"data/GP/NullType.h"
 namespace pop
 {

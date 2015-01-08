@@ -8,7 +8,7 @@ if(UNIX)
     find_package(OpenGL REQUIRED)
     find_package(GLUT REQUIRED)
     if(NOT GLUT_FOUND)
-        message(ERROR " GLUT not found! Install GLUT")
+        message(ERROR " GLUT not found! Install GLUT. In ubuntu sudo apt-get install freeglut3-dev")
         return()
     endif()
     if(NOTOPENGL_FOUND)
@@ -32,5 +32,3 @@ if(WIN32)
   set(HAVE_OPENGL YES)
 endif()
 
-
-#sudo apt-get install libxmu-dev libxi-dev

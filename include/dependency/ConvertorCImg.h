@@ -37,7 +37,7 @@ in the Software.
 #if defined(HAVE_CIMG)
 #define UNICODE 1
 
-
+#include<typeinfo>
 #include"data/mat/MatN.h"
 #include"algorithm/ForEachFunctor.h"
 #include"dependency/CImg.h"

@@ -32,27 +32,27 @@ from, out of or in connection with the software or the use or other dealings
 in the Software.
 \***************************************************************************/
 
-#ifndef TYPE2ID_H
-#define TYPE2ID_H
-#include<string>
-#include<vector>
-#include<typeinfo>
-#include"data/typeF/TypeF.h"
-#include"PopulationConfig.h"
-namespace pop
-{
+//#ifndef TYPE2ID_H
+//#define TYPE2ID_H
+//#include<string>
+//#include<vector>
+//#include<typeinfo>
+//#include"data/typeF/TypeF.h"
+//#include"PopulationConfig.h"
+//namespace pop
+//{
 
-////////////////////////////////////////////////////////////////////////////////
-// identifiant for a class
-// Most of the time, you need to specialise this class for your propose
-////////////////////////////////////////////////////////////////////////////////
-template<typename T>
-struct POP_EXPORTS Type2Id
-{
-    Type2Id(){
-        id.push_back(typeid(T).name());
-    }
-    std::vector<std::string> id;
-};
-}
-#endif // TYPE2ID_H
+//////////////////////////////////////////////////////////////////////////////////
+//// identifiant for a class
+//// Most of the time, you need to specialise this class for your propose
+//////////////////////////////////////////////////////////////////////////////////
+//template<typename T>
+//struct POP_EXPORTS Type2Id
+//{
+//    Type2Id(){
+//        id.push_back(typeid(T).name());
+//    }
+//    std::vector<std::string> id;
+//};
+//}
+//#endif // TYPE2ID_H

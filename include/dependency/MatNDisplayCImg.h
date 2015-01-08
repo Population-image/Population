@@ -160,7 +160,7 @@ public:
     unsigned int 	keycode (const char *const keycode);
 
     MatNDisplayCImg & display(const MatN<2, RGBUI8 > &img);
-    MatNDisplayCImg & display(const MatN<2, RGBAUI8 > &img);
+//    MatNDisplayCImg & display(const MatN<2, RGBAUI8 > &img);
     MatNDisplayCImg & display(const MatN<2, UI8 > &img);
     MatNDisplayCImg & display(const MatN<2, UI16 > &img);
     MatNDisplayCImg & display(const MatN<2, UI32 > &img);

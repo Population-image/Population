@@ -563,11 +563,11 @@ public:
     MatNIteratorENeighborhoodAmoebas(const Function& in,double threshold, double lambda);
 
 
-    void init(const typename Function::E & x){
+    void init(const typename Function::E & x_init){
         _tab.clear();
         _label++;
         std::queue<std::pair<typename Function::E,std::pair<F64,typename Function::E >  >  > _queue;
-        _queue.push(std::make_pair(x, std::make_pair(0,x)));
+        _queue.push(std::make_pair(x_init, std::make_pair(0,x_init)));
         while(_queue.empty()==false){
             typename Function::E & x_origin= _queue.front().first;
             F64  value              = _queue.front().second.first;

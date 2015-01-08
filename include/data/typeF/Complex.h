@@ -623,14 +623,14 @@ struct ArithmeticsSaturation<RGB<Scalar>,Complex<F64> >
         return RGB<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
     }
 };
-template<typename Scalar>
-struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F64> >
-{
-    static RGBA<Scalar>  Range(const Complex<F64>& p)
-    {
-        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
-    }
-};
+//template<typename Scalar>
+//struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F64> >
+//{
+//    static RGBA<Scalar>  Range(const Complex<F64>& p)
+//    {
+//        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
+//    }
+//};
 template<typename Scalar>
 struct ArithmeticsSaturation<Complex<F64> , RGB<Scalar> >
 {

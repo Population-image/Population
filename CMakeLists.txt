@@ -23,19 +23,19 @@ include(cmake/popUtils.cmake)
 
 # Optional 3rd party components
 # ===================================================
-POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON   IF (NOT ANDROID))
+POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
+POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
+POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
-POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
-POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" ON )
+POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
+POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )

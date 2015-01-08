@@ -134,6 +134,7 @@ public:
         pop::Vec2F64 _src;
         pop::Vec2F64 _dst;
     };
+    virtual ~GeometricalTransformationRANSACModel();
     GeometricalTransformationRANSACModel();
     double getError();
     double getError(const Data & p);

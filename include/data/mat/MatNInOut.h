@@ -59,6 +59,8 @@ in the Software.
 #include "data/mat/MatNListType.h"
 namespace pop
 {
+
+
 class POP_EXPORTS MatNInOutPgm
 {    /*!
         \class pop::MatNInOut
@@ -166,6 +168,36 @@ public:
     template<int DIM,typename Result>
     static void saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
 };
+
+namespace Private{
+inline void  headerPNG(std::ostream & out,Loki::Type2Type<pop::UI8>){
+      out<<"255"<<std::endl;
+}
+inline void  headerPNG(std::ostream & out,Loki::Type2Type<pop::RGBUI8>){
+      out<<"255"<<std::endl;
+}
+template<typename PixelType>
+inline void  headerPNG(std::ostream & out,Loki::Type2Type<PixelType>){
+      out<<NumericLimits<typename TypeTraitsTypeScalar<PixelType>::Result >::maximumRange()<<std::endl;
+}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,UI8> >){return std::make_pair("P2","P5");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,UI16> >){return std::make_pair("P3","PA");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,UI32> >){return std::make_pair("P4","PB");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,F64> >){return std::make_pair("P7","PC");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,RGBUI8 > >){return std::make_pair("P8","P6");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,RGBF64 > >){return std::make_pair("PE","PF");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,ComplexF64 > >){return std::make_pair("PI","PJ");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<2,Vec2F64 > >){return std::make_pair("Pa","Pb");}
+
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,UI8> >){return std::make_pair("PK","PL");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,UI16> >){return std::make_pair("PM","PN");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,UI32> >){return std::make_pair("PO","PP");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,F64> >){return std::make_pair("PQ","PR");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,RGBUI8 > >){return std::make_pair("PS","PT");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,RGBF64 > >){return std::make_pair("PU","PV");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,ComplexF64 > >){return std::make_pair("PZ","P1");}
+inline std::pair<std::string,std::string>  header2PNG(Loki::Type2Type<pop::MatN<3,Vec3F64 > >){return std::make_pair("Pc","Pd");}
+}
 template<int Dim, typename Type>
 void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)
 {
@@ -215,8 +247,8 @@ void MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )
     if (File.fail()){
         std::cerr<<"In MatN::read, cannot open the file";
     }
-    Type2Id<MatN<D,T> > type;
-    std::string idascii = type.id[0];
+    std::pair<std::string,std::string> type=Private::header2PNG(Loki::Type2Type<MatN<D,T> >());
+    std::string idascii = type.first;
     std::string buffer ;
     std::getline( File, buffer, '\n');
     bool _ascii;
@@ -284,14 +316,14 @@ void MatNInOutPgm::writeHeader(const MatN<D,T> &in,std::ostream & out,bool ascii
 {
 
     std::string idascii;
-    Type2Id<MatN<D,T> > type;
+    std::pair<std::string,std::string> type = Private::header2PNG(Loki::Type2Type<MatN<D,T> >());
     if(ascii==true)
     {
-        idascii = type.id[0];
+        idascii = type.first;
     }
     else
     {
-        idascii = type.id[1];
+        idascii = type.second;
     }
     out<<idascii<<std::endl;
     std::stringstream ss("");
@@ -311,11 +343,7 @@ void MatNInOutPgm::writeHeader(const MatN<D,T> &in,std::ostream & out,bool ascii
     }
     out<<std::endl;
 
-    if(typeid(T)==typeid(UI8) || typeid(T)==typeid(RGBUI8 ) )
-        out<<"255"<<std::endl;
-    //        if(typeid(T)==typeid(ComplexF64 ))
-    //            out<<NumericLimits<F64>::maximumRange()<<std::endl;
-    else out<<NumericLimits<typename TypeTraitsTypeScalar<T>::Result >::maximumRange()<<std::endl;
+   Private::headerPNG(out,Loki::Type2Type<T>());
 
 }
 template<I32 D,typename T>

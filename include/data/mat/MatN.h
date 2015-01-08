@@ -2189,9 +2189,13 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
     Type sum = 0;
     unsigned int i,j;
     typename MatN::const_iterator this_it,mtrans_it;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(m,mtrans,mout) private(i,j,sum,this_it,mtrans_it)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<this->sizeI();i++){
             for(j=0;j<m.sizeJ();j++){
                 sum = 0;
@@ -2887,9 +2891,13 @@ pop::MatN<2,T1>  productTensoriel(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<2,Type1>::IteratorEDomain ){
     int i,j;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,it_local)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 it_local.init(Vec2I32(i,j));
@@ -2901,9 +2909,13 @@ void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAc
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<3,Type1>::IteratorEDomain ){
     int i,j,k;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,it_local)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 for(k=0;k<f.sizeK();k++){
@@ -2918,9 +2930,13 @@ template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
 {
     unsigned int i,j;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
@@ -2932,9 +2948,13 @@ template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
 {
     unsigned int i,j,k;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 for(k=0;k<f.sizeK();k++){

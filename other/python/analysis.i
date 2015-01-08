@@ -39,9 +39,9 @@ ALL_IMAGE2_UINT_TYPE(Analysis,chord)
 %template(eulerPoincare) pop::Analysis::eulerPoincare<2>;
 %template(eulerPoincare) pop::Analysis::eulerPoincare<3>;
 
-%template(thinningAtConstantTopology3d) pop::Analysis::thinningAtConstantTopology3d<3>;
-%template(thinningAtConstantTopology2d) pop::Analysis::thinningAtConstantTopology2d<2>;
-%template(thinningAtConstantTopology2dWire) pop::Analysis::thinningAtConstantTopology2dWire<2>;
+%template(thinningAtConstantTopology) pop::Analysis::thinningAtConstantTopology<3>;
+%template(thinningAtConstantTopology) pop::Analysis::thinningAtConstantTopology<2>;
+%template(thinningAtConstantTopologyWire) pop::Analysis::thinningAtConstantTopologyWire<2>;
 
 
 ALL_IMAGE2_UINT_TYPE(Analysis,areaByLabel)

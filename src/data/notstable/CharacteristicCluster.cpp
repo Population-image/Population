@@ -3,7 +3,9 @@
 #include "algorithm/Processing.h"
 #include "data/notstable/CharacteristicCluster.h"
 namespace pop {
+CharacteristicClusterDistance::~CharacteristicClusterDistance(){
 
+}
 
 CharacteristicCluster::CharacteristicCluster()
     :_mass(0),_min(std::numeric_limits<int>::max(),std::numeric_limits<int>::max()),_max(std::numeric_limits<int>::min(),std::numeric_limits<int>::min())//,_barycentre(0,0)

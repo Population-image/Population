@@ -5,6 +5,11 @@
 #if !defined(HAVE_QMAKE)
 #include"popconfig.h"
 #endif
+
+#ifndef POP_PROJECT_SOURCE_DIR
+#define POP_PROJECT_SOURCE_DIR ""
+#endif
+
 namespace pop{
 // Disable silly warnings on some Microsoft VC++ compilers.
 #ifdef _MSC_VER
