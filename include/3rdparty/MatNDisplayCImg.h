@@ -3,7 +3,7 @@
 #include"data/mat/MatNDisplay.h"
 #include"PopulationConfig.h"
 #if defined(HAVE_CIMG)
-#include"dependency/CImg.h"
+#include"3rdparty/CImg.h"
 namespace pop{
 /*! \ingroup Matrix
 * \defgroup MatNDisplayCImg  MatNDisplayCImg

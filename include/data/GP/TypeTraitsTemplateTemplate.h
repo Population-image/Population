@@ -35,9 +35,9 @@ in the Software.
 #define TYPETRAITSTEMPLATETEMPLATE_H
 namespace pop
 {
-#include"data/GP/NullType.h"
-#include"data/GP/Typelist.h"
-#include"data/GP/TypelistMacros.h"
+#include"modules/GP/NullType.h"
+#include"modules/GP/Typelist.h"
+#include"modules/GP/TypelistMacros.h"
 
 
 

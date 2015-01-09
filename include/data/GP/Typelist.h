@@ -19,9 +19,9 @@
 // $Id: Typelist.h 749 2006-10-17 19:49:26Z syntheticpp $
 
 
-#include"data/GP/NullType.h"
-#include"data/GP/TypeManip.h"
-#include"data/GP/TypelistMacros.h"
+#include"modules/GP/NullType.h"
+#include"modules/GP/TypeManip.h"
+#include"modules/GP/TypelistMacros.h"
 
 
 namespace Loki

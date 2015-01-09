@@ -1,4 +1,4 @@
-#include "dependency/ConvertorOpenCV.h"
+#include "3rdparty/ConvertorOpenCV.h"
 #include"PopulationConfig.h"
 #if defined(HAVE_OPENCV)
 #include "opencv2/imgproc/imgproc.hpp"

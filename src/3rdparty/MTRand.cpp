@@ -3,7 +3,7 @@
 
 // mtrand.cpp, see include file mtrand.h for information
 
-#include"dependency/MTRand.h"
+#include"3rdparty/MTRand.h"
 // non-inline function definitions and static member definitions cannot
 // reside in header file because of the risk of multiple declarations
 

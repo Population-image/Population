@@ -40,7 +40,6 @@ in the Software.
 #include"data/utility/BasicUtility.h"
 #include"data/functor/FunctorF.h"
 #include"data/population/PopulationFunctor.h"
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorPDE.h"
 #include"algorithm/Convertor.h"
 #include"algorithm/ForEachFunctor.h"
@@ -86,9 +85,9 @@ public:
 struct ProcessingAdvanced
 {
     template<typename Function,int DIM>
-    static Function  integral(const Function & f,Loki::Int2Type<DIM>);
+    static Function  integral(const Function & f,Int2Type<DIM>);
     template<typename Function>
-    static Function  integral(const Function & f,Loki::Int2Type<2>)
+    static Function  integral(const Function & f,Int2Type<2>)
     {
         Function s (f.getDomain());
         Function out(f.getDomain());
@@ -116,7 +115,7 @@ struct ProcessingAdvanced
         return out;
     }
     template<typename Function>
-    static Function  integral(const Function & f,Loki::Int2Type<3>)
+    static Function  integral(const Function & f,Int2Type<3>)
     {
         Function s (f.getDomain());
         Function integral2d (f.getDomain());
@@ -377,10 +376,10 @@ struct ProcessingAdvanced
         return out;
     }
     template<typename Function,typename Iterator,int isVec>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<isVec>);
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<isVec>);
 
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<true>)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<true>)
     {
         typedef typename TypeTraitsTypeScalar<typename Function::F>::Result  FScalar;
         typedef typename FunctionTypeTraitsSubstituteF<Function,FScalar>::Result  FunctionScalar;
@@ -388,7 +387,7 @@ struct ProcessingAdvanced
         pop::Convertor::toVecN(f,v);
         for(int i=0;i<Function::F::DIM;i++){
             it.init();
-            v[i] = ProcessingAdvanced::greylevelRange(v[i],it,min(i),max(i),Loki::Int2Type< isVectoriel<FScalar>::value>());
+            v[i] = ProcessingAdvanced::greylevelRange(v[i],it,min(i),max(i),Int2Type< isVectoriel<FScalar>::value>());
         }
         Function dilat;
         Convertor::fromVecN(v,dilat);
@@ -396,7 +395,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Loki::Int2Type<false>)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<false>)
     {
         Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
@@ -460,12 +459,12 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function,typename Type>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<Type> )
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<Type> )
     {
         return  greylevelTranslateMeanValueScalar(f,mean);
     }
     template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBUI8> )
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<RGBUI8> )
     {
         typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBUI8>::Result>::Result r,g,b;
         Convertor::toRGB(f,r,g,b);
@@ -481,7 +480,7 @@ struct ProcessingAdvanced
         return h;
     }
     template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Loki::Type2Type<RGBF64> )
+    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<RGBF64> )
     {
         typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBF64>::Result>::Result r,g,b;
         Convertor::toRGB(f,r,g,b);
@@ -1863,10 +1862,10 @@ struct ProcessingAdvanced
     template<typename Function>
     static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
     {
-        return erosionRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
+        return erosionRegionGrowing(f,radius,  norm, Int2Type<isVectoriel<typename Function::F>::value > ());
     }
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
+    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<true>)
     {
         typedef typename Identity<typename Function::F>::Result::F TypeScalar;
         VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
@@ -1880,7 +1879,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
+    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<false>)
     {
         if(norm<=1){
             FunctorSwitch func;
@@ -1959,10 +1958,10 @@ struct ProcessingAdvanced
     template<typename Function>
     static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
     {
-        return dilationRegionGrowing(f,radius,  norm, Loki::Int2Type<isVectoriel<typename Function::F>::value > ());
+        return dilationRegionGrowing(f,radius,  norm, Int2Type<isVectoriel<typename Function::F>::value > ());
     }
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<true>)
+    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<true>)
     {
         typedef typename Identity<typename Function::F>::Result::F TypeScalar;
         VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
@@ -1976,7 +1975,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Loki::Int2Type<false>)
+    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<false>)
     {
         if(norm<=1){
             FunctorSwitch func;

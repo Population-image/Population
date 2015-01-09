@@ -47,7 +47,7 @@
 #include"data/typeF/TypeF.h"
 #include"PopulationConfig.h"
 #include"vector"
-#include"dependency/tinythread.h"
+#include"3rdparty/tinythread.h"
 
 class POP_EXPORTS MTRand_int32 { // Mersenne Twister random number generator
 public:

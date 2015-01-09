@@ -35,9 +35,9 @@ in the Software.
 
 #ifndef CARTESIANPRODUCT_H
 #define CARTESIANPRODUCT_H
-#include"data/GP/NullType.h"
-#include"data/GP/Typelist.h"
-#include"data/GP/TypelistMacros.h"
+#include"modules/GP/NullType.h"
+#include"modules/GP/Typelist.h"
+#include"modules/GP/TypelistMacros.h"
 namespace pop
 {
 ////////////////////////////////////////////////////////////////////////////////

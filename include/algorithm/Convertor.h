@@ -1,9 +1,8 @@
 #ifndef CONVERTOR_H
 #define CONVERTOR_H
-
+#include"data/utility/BasicUtility.h"
 #include"data/functor/FunctorF.h"
 #include"data/vec/VecN.h"
-#include"data/GP/TypeManip.h"
 #include"data/mat/MatN.h"
 namespace pop
 {
@@ -225,7 +224,7 @@ struct POP_EXPORTS Convertor
 
     template<typename FunctionVec, typename FunctionScalar>
     static void fromVecN( const VecN<FunctionVec::F::DIM,FunctionScalar >& vecf,FunctionVec& f){
-        fromVecN(vecf,f,Loki::Int2Type<FunctionVec::F::DIM>());
+        fromVecN(vecf,f,Int2Type<FunctionVec::F::DIM>());
     }
     /*!
      * \param vecf vector of field
@@ -250,7 +249,7 @@ struct POP_EXPORTS Convertor
 
     template<typename FunctionVec, typename FunctionScalar>
     static void toVecN( const FunctionVec& f, VecN<FunctionVec::F::DIM,FunctionScalar >& vecf){
-        toVecN(f,vecf,Loki::Int2Type<FunctionVec::F::DIM>());
+        toVecN(f,vecf,Int2Type<FunctionVec::F::DIM>());
     }
 
 
@@ -273,7 +272,7 @@ private:
         return out;
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void fromVecN( const VecN<1,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<1>)
+    static void fromVecN( const VecN<1,FunctionScalar >& vecf,FunctionVec& f,Int2Type<1>)
     {
         const FunctionScalar & f0= vecf(0);
         f.resize(f0.getDomain());
@@ -281,7 +280,7 @@ private:
         std::transform(f0.begin(),f0.end(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void fromVecN( const VecN<2,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<2>)
+    static void fromVecN( const VecN<2,FunctionScalar >& vecf,FunctionVec& f,Int2Type<2>)
     {
         const FunctionScalar & f0= vecf(0);
         const FunctionScalar & f1= vecf(1);
@@ -290,7 +289,7 @@ private:
         std::transform(f0.begin(),f0.end(),f1.begin(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void fromVecN( const VecN<3,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<3>)
+    static void fromVecN( const VecN<3,FunctionScalar >& vecf,FunctionVec& f,Int2Type<3>)
     {
         const FunctionScalar & f0= vecf(0);
         const FunctionScalar & f1= vecf(1);
@@ -300,7 +299,7 @@ private:
         transform3(f0.begin(),f0.end(),f1.begin(),f2.begin(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void fromVecN( const VecN<4,FunctionScalar >& vecf,FunctionVec& f,Loki::Int2Type<4>)
+    static void fromVecN( const VecN<4,FunctionScalar >& vecf,FunctionVec& f,Int2Type<4>)
     {
         const FunctionScalar & f0= vecf(0);
         const FunctionScalar & f1= vecf(1);
@@ -311,7 +310,7 @@ private:
         transform4(f0.begin(),f0.end(),f1.begin(),f2.begin(),f3.begin(),f.begin(),func);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void toVecN(const FunctionVec& f, VecN<1,FunctionScalar >& vecf,Loki::Int2Type<1>)
+    static void toVecN(const FunctionVec& f, VecN<1,FunctionScalar >& vecf,Int2Type<1>)
     {
         FunctionScalar & f0= vecf(0);
         f0.resize(f.getDomain());
@@ -319,7 +318,7 @@ private:
         std::transform(f.begin(),f.end(),f0.begin(),func0);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void toVecN( const FunctionVec& f, VecN<2,FunctionScalar >& vecf,Loki::Int2Type<2>)
+    static void toVecN( const FunctionVec& f, VecN<2,FunctionScalar >& vecf,Int2Type<2>)
     {
         FunctionScalar & f0= vecf(0);
         FunctionScalar & f1= vecf(1);
@@ -332,7 +331,7 @@ private:
 
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void toVecN( const FunctionVec& f, VecN<3,FunctionScalar >& vecf,Loki::Int2Type<3>)
+    static void toVecN( const FunctionVec& f, VecN<3,FunctionScalar >& vecf,Int2Type<3>)
     {
         FunctionScalar & f0= vecf(0);
         FunctionScalar & f1= vecf(1);
@@ -349,7 +348,7 @@ private:
         std::transform(f.begin(),f.end(),f2.begin(),func2);
     }
     template<typename FunctionVec, typename FunctionScalar>
-    static void toVecN( const FunctionVec& f, VecN<4,FunctionScalar >& vecf,Loki::Int2Type<4>)
+    static void toVecN( const FunctionVec& f, VecN<4,FunctionScalar >& vecf,Int2Type<4>)
     {
         FunctionScalar & f0= vecf(0);
         FunctionScalar & f1= vecf(1);

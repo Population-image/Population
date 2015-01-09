@@ -40,7 +40,7 @@ in the Software.
 #include<typeinfo>
 #include"data/mat/MatN.h"
 #include"algorithm/ForEachFunctor.h"
-#include"dependency/CImg.h"
+#include"3rdparty/CImg.h"
 
 namespace pop
 {

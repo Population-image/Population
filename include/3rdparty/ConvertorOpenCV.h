@@ -20,7 +20,7 @@ struct ConvertorOpenCVMat
          From opencv, the input image
         \code
 #include"Population.h"
-#include"dependency/ConvertorOpenCV.h"
+#include"3rdparty/ConvertorOpenCV.h"
 #include"opencv2/opencv.hpp"
 using namespace pop;//Population namespace
 int main(){
@@ -38,7 +38,7 @@ int main(){
         From Population
         \code
 #include"Population.h"
-#include"dependency/ConvertorOpenCV.h"
+#include"3rdparty/ConvertorOpenCV.h"
 #include"opencv2/opencv.hpp"
 using namespace pop;//Population namespace
 int main()

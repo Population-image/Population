@@ -72,10 +72,10 @@ in the Software.
 #include <stdlib.h>
 #include<string>
 #include<iostream>
-#include"data/GP/NullType.h"
-#include"data/GP/Typelist.h"
-#include"data/GP/TypelistMacros.h"
-#include"data/GP/TypeTraitsTemplateTemplate.h"
+#include"modules/GP/NullType.h"
+#include"modules/GP/Typelist.h"
+#include"modules/GP/TypelistMacros.h"
+#include"modules/GP/TypeTraitsTemplateTemplate.h"
 
 namespace pop
 {

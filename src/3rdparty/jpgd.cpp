@@ -9,7 +9,7 @@
 // Chroma upsampling reference: "Fast Scheme for Image Size Change in the Compressed Domain"
 // http://vision.ai.uiuc.edu/~dugad/research/dct/index.html
 
-#include "dependency/jpgd.h"
+#include "3rdparty/jpgd.h"
 #include <string.h>
 
 #include <assert.h>

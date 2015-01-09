@@ -43,14 +43,10 @@ in the Software.
 #include <stack>
 #include <limits>
 
-#include"dependency/MTRand.h"
+#include"3rdparty/MTRand.h"
 #include"data/mat/MatNBoundaryCondition.h"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
-
-#include"data/GP/Factory.h"
-#include"data/GP/Singleton.h"
-
 
 /*! \ingroup Data
 * \defgroup DistributionFunction  Function (mathematics)

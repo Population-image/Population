@@ -20,7 +20,7 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution.
 */
-#include "dependency/tinythread.h"
+#include "3rdparty/tinythread.h"
 #if defined(HAVE_THREAD)
 #include <exception>
 #if defined(_TTHREAD_POSIX_)

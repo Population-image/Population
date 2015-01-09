@@ -38,7 +38,7 @@ in the Software.
 #include<fstream>
 #include<string>
 #include"PopulationConfig.h"
-#include"data/GP/NullType.h"
+#include"data/utility/BasicUtility.h"
 namespace pop
 {
 
@@ -128,7 +128,7 @@ public:
     }
 };
 
-template<typename VertexType=Loki::NullType,typename EdgeType=Loki::NullType>
+template<typename VertexType=NullType,typename EdgeType=NullType>
 class POP_EXPORTS GraphAdjencyList
 {
 public:

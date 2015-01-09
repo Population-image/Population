@@ -1,10 +1,10 @@
-#include "dependency/VideoVLC.h"
+#include "3rdparty/VideoVLC.h"
 
 #if defined(HAVE_VLC)
 
 #include <string.h>
 
-#include"dependency/tinythread.h"
+#include"3rdparty/tinythread.h"
 
 namespace pop
 {

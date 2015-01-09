@@ -34,7 +34,6 @@ in the Software.
 #ifndef PDEADVANCED_H
 #define PDEADVANCED_H
 #include<algorithm>
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorPDE.h"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"

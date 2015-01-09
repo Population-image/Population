@@ -33,12 +33,9 @@ in the Software.
 \***************************************************************************/
 #ifndef RANDOMGEOMETRY_H
 #define RANDOMGEOMETRY_H
-
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/typeF/RGB.h"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
-
 #include"data/distribution/Distribution.h"
 #include"data/distribution/DistributionMultiVariate.h"
 #include"data/germgrain/GermGrain.h"

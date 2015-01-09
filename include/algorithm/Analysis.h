@@ -43,7 +43,6 @@ in the Software.
 #include"data/functor/FunctorF.h"
 #include"algorithm/ForEachFunctor.h"
 #include"data/mat/MatN.h"
-#include"data/utility/CollectorExecutionInformation.h"
 #include"algorithm/ProcessingAdvanced.h"
 #include"algorithm/Representation.h"
 #include"data/notstable/graph/Graph.h"
@@ -64,7 +63,6 @@ in the Software.
      * This class provides a collection of algorithms to analyse a 2d/3d matrix. A simple analysis can be as follows:
 
      * \code
-     * #include"data/utility/CollectorExecutionInformation.h"
      * #include"data/mat/MatN.h"
      * #include"algorithm/Analysis.h"
      * using namespace pop;
@@ -257,7 +255,6 @@ struct POP_EXPORTS Analysis
      * This class provides a collection of algorithms to analyse a 2d/3d matrix. A simple analysis can be as follows:
 
      * \code
-     * #include"data/utility/CollectorExecutionInformation.h"
      * #include"data/mat/MatN.h"
      * #include"algorithm/Analysis.h"
      * using namespace pop;

@@ -5,7 +5,6 @@
 #include"algorithm/LinearAlgebra.h"
 #include"data/mat/MatNInOut.h"
 #include"data/mat/MatNDisplay.h"
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/utility/BasicUtility.h"
 #include"algorithm/GeometricalTransformation.h"
 #include"PopulationConfig.h"
@@ -26,7 +25,7 @@
 #include <GL/GLU.h>
 #define UNICODE 1
 #endif
-#include"dependency/tinythread.h"
+#include"3rdparty/tinythread.h"
 #endif
 namespace pop{
 void GeometricalFigure::setTransparent(UI8  transparent){_transparant=transparent;}

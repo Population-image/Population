@@ -33,8 +33,6 @@ in the Software.
 \***************************************************************************/
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
-
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorF.h"
 #include"algorithm/ForEachFunctor.h"
 #include"algorithm/Visualization.h"

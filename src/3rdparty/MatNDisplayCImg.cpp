@@ -1,6 +1,6 @@
-#include "dependency/MatNDisplayCImg.h"
+#include "3rdparty/MatNDisplayCImg.h"
 #if defined(HAVE_CIMG)
-#include"dependency/CImg.h"
+#include"3rdparty/CImg.h"
 namespace pop{
 
 class MatNDisplayCImg::impl

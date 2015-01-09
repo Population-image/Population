@@ -12,7 +12,7 @@
 
 #if Pop_OS==2
 #ifdef _MSC_VER
-#include"dependency/direntvc.h"
+#include"3rdparty/direntvc.h"
 #include <direct.h>
 #else
 #include <direct.h>

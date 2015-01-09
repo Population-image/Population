@@ -318,8 +318,6 @@ public:
     const DistributionMultiVariate * ___getPointerImplementation()const ;
     void ___setPointererImplementation(DistributionMultiVariate * d);
 };
-
-typedef Singleton<Factory<DistributionMultiVariate,  std::string > > DistributionMultiVariateFactory;
 /*!
 \fn pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
 * \param d1 other  DistributionMultiVariate

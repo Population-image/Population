@@ -36,30 +36,9 @@ in the Software.
 #define TYPETRAITSF_HPP
 #include<limits>
 #include<string>
-////////////////////////////////////////////////////////////////////////////////
-// These header files  come from the Loki Library
-// Copyright (c) 2001 by Andrei Alexandrescu
-// This code accompanies the book:
-// Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design
-//     Patterns Applied". Copyright (c) 2001. Addison-Wesley.
-// Permission to use, copy, modify, distribute and sell this software for any
-//     purpose is hereby granted without fee, provided that the above copyright
-//     notice appear in all copies and that both that copyright notice and this
-//     permission notice appear in supporting documentation.
-// The author or Addison-Welsey Longman make no representations about the
-//     suitability of this software for any purpose. It is provided "as is"
-//     without express or implied warranty.
-////////////////////////////////////////////////////////////////////////////////
-
-
-
-#include"limits"
-
-#include"cmath"
-#include"data/GP/Type2Id.h"
 #include"data/typeF/TypeF.h"
 #include"PopulationConfig.h"
-#include"data/GP/TypeManip.h"
+#include"data/utility/BasicUtility.h"
 
 
 namespace pop
@@ -71,18 +50,18 @@ class NumericLimits
 
 private:
     template<int DIM>
-    T _minimumRange(Loki::Int2Type<DIM>);
-    static inline T _minimumRange(Loki::Int2Type<true>){
+    T _minimumRange(Int2Type<DIM>);
+    static inline T _minimumRange(Int2Type<true>){
         return std::numeric_limits<T>::min();
     }
-    static inline T _minimumRange(Loki::Int2Type<false>){
+    static inline T _minimumRange(Int2Type<false>){
         return -std::numeric_limits<T>::max();
     }
 public:
     static const bool is_specialized = true;
 
     static T minimumRange() throw()
-    { return _minimumRange(Loki::Int2Type<std::numeric_limits<T>::is_integer>() );}
+    { return _minimumRange(Int2Type<std::numeric_limits<T>::is_integer>() );}
     static T maximumRange() throw()
     { return std::numeric_limits<T>::max(); }
     static const int digits10 = std::numeric_limits<T>::digits10;

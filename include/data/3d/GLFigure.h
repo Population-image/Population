@@ -45,9 +45,6 @@ in the Software.
 #include"data/typeF/TypeF.h"
 #include"data/typeF/RGB.h"
 #include"data/vec/VecN.h"
-#include"data/GP/Factory.h"
-#include"data/GP/Singleton.h"
-
 namespace pop
 {
 /*! \ingroup Data
@@ -334,6 +331,5 @@ public:
 
 
 };
-typedef Singleton<Factory<GeometricalFigure,std::string >,CreateUsingNew > FactoryGeometricalFigure;
 }
 #endif // GEOMETRICALFIGURE_H

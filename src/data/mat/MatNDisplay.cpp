@@ -1,7 +1,7 @@
 #include"data/mat/MatNDisplay.h"
 #include"Population.h"
 #if defined(HAVE_CIMG)
-#include"dependency/MatNDisplayCImg.h"
+#include"3rdparty/MatNDisplayCImg.h"
 #endif
 namespace pop{
 

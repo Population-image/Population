@@ -20,7 +20,7 @@
 
 #include <typeinfo>
 #include <cassert>
-#include"data/GP/Typelist.h"
+#include"modules/GP/Typelist.h"
 
 namespace Loki
 {

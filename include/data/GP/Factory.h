@@ -37,11 +37,11 @@ in the Software.
 #include<string>
 #include<vector>
 
-#include"data/GP/NullType.h"
-#include"data/GP/Typelist.h"
-#include"data/GP/TypelistMacros.h"
-#include"data/GP/TypeTraitsTemplateTemplate.h"
-#include"data/GP/Type2Id.h"
+#include"modules/GP/NullType.h"
+#include"modules/GP/Typelist.h"
+#include"modules/GP/TypelistMacros.h"
+#include"modules/GP/TypeTraitsTemplateTemplate.h"
+
 namespace pop
 {
 namespace Details {
@@ -133,33 +133,5 @@ public:
     }
 };
 
-//template<typename T>
-//struct GPFactoryRegister;
-//template <>
-//struct GPFactoryRegister<Loki::NullType>
-//{
-
-//    template<typename Factory, typename SubClassBlank>
-//    static bool Register( Factory & , Loki::Type2Type<SubClassBlank>)
-//    {
-//        return true;
-//    }
-//};
-//template <class Head, class Tail>
-//struct GPFactoryRegister<Loki::Typelist< Head, Tail> >
-//{
-//    template<typename Factory, typename SubClassBlank>
-//    static bool  Register(Factory & factory, Loki::Type2Type<SubClassBlank> t)
-//    {
-//        typedef typename SubstituteTemplateParameter<Head,SubClassBlank>::Result SubClass;
-//        Type2Id<SubClass> type;
-//        for(unsigned int i=0;i<type.id.size();i++)
-//        {
-//            SubClass * c = new SubClass();
-//            factory.Register( type.id[i],c);
-//        }
-//        return GPFactoryRegister<Tail>::Register(factory,t);
-//    }
-//};
 }
 #endif // FACTORY_H

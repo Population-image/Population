@@ -1,14 +1,14 @@
 #include"PopulationConfig.h"
 
-#include"dependency/jpgd.h"
-#include"dependency/jpge.h"
-#include"dependency/lodepng.h"
-#include"dependency/bipmap.h"
+#include"3rdparty/jpgd.h"
+#include"3rdparty/jpge.h"
+#include"3rdparty/lodepng.h"
+#include"3rdparty/bipmap.h"
 
 #include"data/mat/MatNInOut.h"
 
 #if defined(HAVE_CIMG)
-#include"dependency/ConvertorCImg.h"
+#include"3rdparty/ConvertorCImg.h"
 #endif
 
 //#include"data/mat/MatN.h"

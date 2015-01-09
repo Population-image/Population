@@ -2,10 +2,7 @@
 #define CONVERTORQIMAGE_H
 #include"PopulationConfig.h"
 #if defined(HAVE_QT)
-
 #include"data/mat/MatN.h"
-#include"data/GP/Dynamic2Static.h"
-#include"data/mat/MatNListType.h"
 #include<QImage>
 #include<QColor>
 namespace pop{
@@ -14,14 +11,14 @@ class ConvertorQImage
 private:
 
     template<pop::I32 DIM,typename Result>
-    static MatN<DIM,pop::UI8> fromQImage(const QImage &,Loki::Int2Type<DIM>,Loki::Type2Type<Result>)
+    static MatN<DIM,pop::UI8> fromQImage(const QImage &,Int2Type<DIM>,Type2Type<Result>)
     {
         std::cerr<<"In Convertor::fromQImage, Pixel/voxel type must be pop::UI8 or RGB";
     }
 
 
-    static MatN<2,pop::UI8> fromQImage(const QImage & qimg,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<pop::UI8>);
-    static MatN<2,RGBUI8> fromQImage(const QImage & qimg,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<RGBUI8>);
+    static MatN<2,pop::UI8> fromQImage(const QImage & qimg,bool isfastconversion,Int2Type<2>,Type2Type<pop::UI8>);
+    static MatN<2,RGBUI8> fromQImage(const QImage & qimg,bool isfastconversion,Int2Type<2>,Type2Type<RGBUI8>);
 public:
     /*!
     \fn QImage toQImage(const MatN<DIM,Result> & img)
@@ -77,7 +74,7 @@ public:
     {
         if(DIM!=2)
             std::cerr<<"In Convertor::fromQImage, Image must be bidimensionnel";
-        return ConvertorQImage::fromQImage(qimg,isfastconversion,Loki::Int2Type<DIM>(),Loki::Type2Type<Result>());
+        return ConvertorQImage::fromQImage(qimg,isfastconversion,Int2Type<DIM>(),Type2Type<Result>());
     }
 
 
