@@ -18,15 +18,15 @@ small_cube.display();//(64,64,64) 3d image size
 - to extract a 2d slice 
 \code
 // SLICE OF THE CUBE
-Mat2UI8 slice = img.getPlane(2,0);//the button corner of the cube is (0,0,0) and the top corner (64,64,64)
+Mat2UI8 slice = GeometricalTransformation::plane(img,0,2);//extract the plane of the index 0 of the z-direction 
 slice.display();//(256,256) 2d image size
 \endcode
 - to scale the image with a sub-resolution
 \code
-// SLICE OF THE CUBE
+// SUB-RESOLUTION
 Mat3UI8 sub_resoltion =GeometricalTransformation::scale(img,Vec3F64(0.5,0.5,0.5));//scale the domain with the factor (0.5,0.5,0.5) so (256*0.5,256*0.5,256*0.5)=(128,128,128)
 sub_resoltion.display();//(128,128,128) 3d image size
 \endcode
 
-When the prototype is finished, you comment this line to process the full matrix.
+When the prototype is finished, you comment this line to process the full matrix and you take a coffe.
 */

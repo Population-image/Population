@@ -7,37 +7,32 @@ See the article http://www.ias-iss.org/ojs/IAS/article/view/826
 To illustrate the swamping segmentation, we will show the application with the image given in the article
 First, you load the 2d matrix :
 \code
-#include"Population.h"//Single header
-using namespace pop;//Population namespace
-int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    try{//Enclose this portion of code in a try block with
-        Mat2UI8 img;
-        img.load("/home/vincent/population/iex.png");
+Mat2UI8 img;
+img.load("/home/vincent/population/iex.png");
 \endcode
 \image html iex.png
 Here, you load a 2d image.\n
 The first step of the swamping segmentation is to locate a single seed inside each object of the image (grain in this granular material). To avoid an oversegmentation, we filter
 the image with a horizontal filter as Processing::smoothDeriche, Processing::opening, PDE::nonLinearAnisotropicDiffusionDericheFast, following by a vertical filter Processing::dynamic. Then, we extract the regional minima :   
 \code
-        Mat2UI8 filter = Processing::smoothDeriche(img,1);
-        filter = Processing::dynamic(filter,40);
-        Mat2UI16 minima = Processing::minimaRegional(filter);
-	Visualization::labelForeground(minima,img).display();
+Mat2UI8 filter = Processing::smoothDeriche(img,1);
+filter = Processing::dynamic(filter,40);
+Mat2UI16 minima = Processing::minimaRegional(filter);
+Visualization::labelForeground(minima,img).display();
 \endcode
 \image html iexminima.png
 The second step of the swamping segmentation is to find a seed inside the background of the image. We apply the watershed transformation algorithm with a boundary on the
 original image :
 \code
-	Mat2UI16 water =Processing::watershedBoundary(minima,filter,1);
-	Mat2UI16 boundary = Processing::threshold(water,0,0);
-	boundary.display("boundary",true,false);
+Mat2UI16 water =Processing::watershedBoundary(minima,filter,1);
+Mat2UI16 boundary = Processing::threshold(water,0,0);
+boundary.display("boundary",true,false);
 \endcode
 \image html iexboundary.png
 The third step of the swamping segmentation is to merge the seeds of the first step and of the second step. Then, we apply the watershed transformation on the gradient magitude to enhance the object boundary.   
 \code
-        Mat2UI8 gradient = Processing::gradientMagnitudeDeriche(img,1);
-        water = Processing::watershed(minima,gradient);
+Mat2UI8 gradient = Processing::gradientMagnitudeDeriche(img,1);
+ water = Processing::watershed(minima,gradient);
 \endcode
 \image html iexswamping.png
 

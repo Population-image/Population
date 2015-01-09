@@ -10,28 +10,7 @@ This first step explains how to write your first program. This program
 
 
 The code source of the main.cpp delivered in the Population project is :
-\code
-#include"Population.h"//Single header
-using namespace pop;//Population namespace
-int main()
-{
-    try{//Enclose this portion of code in a try block
-        Mat2UI8 img;
-        img.load("../image/iex.png");//replace this path by those on your computer
-        img.display("Initial image",false);
-        img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
-        double value;
-        Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
-        threshold.save("iexthreshold.png");
-        Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
-        color.display("Segmented image",true);
-    }
-    catch(const pexception &e){
-        e.display();//Display the error in a window
-    }
-    return 0;
-}
-\endcode
+\include firststep.cpp
 producing this image.
  
 \image html iexseg.png
@@ -45,10 +24,6 @@ using namespace pop;
 \endcode
 -> population namespace to facilate the declarations in avoiding pop::
 \code
-try{
-\endcode
--> enclose this portion of code in a try block to handle error exception
-\code
 Mat2UI8 img;
 \endcode
 -> instantiate an object as 2d image with grey-level values  
@@ -57,7 +32,7 @@ img.load(../image/iex.png");
 \endcode
 -> load the image (iex.png file is contained in the population folder, Population manage pgm, png, jpg, bmp formats)
 \code
-img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
+img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
 \endcode
 -> filter the image to remove the noise. The algorithms are organized in <a href="modules.html">modules</a> as “procedural” classes containing a collection of static
 function members. To access the algorithms, you can write the scope resolution operator.
@@ -83,32 +58,5 @@ Now, you are ready to code your own program by replacing these source lines of c
 
 Pyton code:
 \include firststep.py
-
-
-<!--
-\section Java Java
-The code source of the main delivered in the Population project is:
-\code
-#include"Population.h"//Single header
-using namespace pop;//Population namespace
-int main()
-{
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//Activate the information manager
-    try{//Enclose this portion of code in a try block
-    	Img2d_grey img;//2d grey-level image object
-    	img.load("/home/vincent/Desktop/Population/iex.pgm");//replace this path by those on your computer
-    	img = PDE::nonLinearAnisotropicDiffusionDericheFast(img);//filtering
-    	Img2d_grey threshold = Processing::threshold(img,0,130);//threshold segmentation
-    	threshold.save("/home/vincent/Desktop/Population/iexthreshold.pgm");
-    	Img2d_color color = Visualization::labelForeground(threshold,img);//Visual validation
-    	color.display();
-    }
-    catch(const pexception &e){
-        e.display();//Display the error in a window
-    }
-    return 0;
-}
-\endcode
--->
 
 */ 

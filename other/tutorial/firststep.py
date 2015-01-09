@@ -9,7 +9,7 @@ from population import *
 
 img =Mat2UI8()#2d grey-level image object
 img.load(PathPop+"image/iex.png")#replace this path by those on your computer
-img.display("initial")
+img.display("initial",False)
 pde = PDE()
 img = pde.nonLinearAnisotropicDiffusion(img)
 proc = Processing()

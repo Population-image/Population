@@ -229,6 +229,6 @@ int main(){
 }
 \endcode
 \image html lena_template_5.jpg "dilation algorithm"
-I do not find more useful abstraction. So it is the last step for me. But perhaps, you have nice ideas. So do not hesitate to contact me. 
-
+I do not find more useful abstraction. So it is the last step for me. But perhaps, you have nice ideas. So do not hesitate to contact me ;)
+\include template_programming.cpp
 */

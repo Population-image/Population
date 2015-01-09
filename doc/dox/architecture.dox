@@ -2,8 +2,7 @@
 
 \section Architecture Program =  Data  + Algorithm
 
-In Image Processing, the pipeline process is a combination of algorithms, for instance, a practitioner can say   “I apply the median filter following by the Otsu’s threshold, then I merge the previous seeds and so one”. Therefore the verb (the action) is important as the object. 
-The modern paradigm is object-oriented programming and not verb. Verb seems to be old school for C language and not for C++. But, in Population library, programming mix object- and verb-oriented programming redesigning an old assertion “Program =  Data  + Algorithm” in a fashion way (see my book for further explanations). Data, as pop::MatN, pop::VecN,  are object-oriented programming with class organisation. Algorithm as pop::Processing, pop::Analysis are verb-oriented programming. 
+In Image Processing, the pipeline process is a combination of algorithms, for instance, a practitioner can say   “I apply the median filter following by the Otsu’s threshold, then I merge the previous seeds and so one”. Therefore the verb (the action) is important. The modern paradigm is object-oriented programming. Verb seems to be old school for C language and not for C++. But, in Population library, programming mix object- and verb-oriented programming redesigning an old assertion “Program =  Data  + Algorithm” in a fashion way (see my book for further explanations). Data, as pop::MatN, pop::VecN,  are object-oriented programming with class organisation. Algorithm organised in module classes as pop::Processing, pop::Analysis are verb-oriented programming. 
 
 So the code seems like that:
 \code
@@ -17,6 +16,8 @@ threshold.save("iexthreshold.pgm");
 Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//colored result -> Algorithm
 color.display("Segmented image",true);//display the image, facility of the class Mat2RGBUI8  -> Data
 \endcode
+
+ <!--
 \section TemplateParameter The template parameter <typename Function>
 When you find the template parameter Function that means the parameter can be a matrix. For instance, the signature of the threshold method, \ref pop::Processing::threshold of the algorithm \ref  pop::Processing, is 
 \code
@@ -36,5 +37,5 @@ img.load("../image/iex.png");//load the image,
 Mat2UI8 threshold = Processing::threshold(img,125,255);//thresholding  
 threshold.display();
 \endcode
-
+-->
 */

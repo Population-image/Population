@@ -3,7 +3,7 @@ using namespace pop;//Population namespace
 int main(){
 
     Mat2UI8 img;
-    img.load("/home/vincent/population/iex.png");
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
     Mat2UI8 filter = Processing::smoothDeriche(img,1);
     filter = Processing::dynamic(filter,40);
     Mat2UI16 minima = Processing::minimaRegional(filter);

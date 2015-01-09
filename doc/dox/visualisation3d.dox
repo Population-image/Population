@@ -5,7 +5,7 @@ In Image processing, a visual checking is essential to prototype and calibrate y
 In this following code, I give many methods to visualization a 3d matrix : 
 \include visualization3d.cpp
 
-- 2d slice by slice
+- 2d slice by slice"/image/
 - 3d volume    
 \image html cubeExtruded.png
 - 3d volume restricted by a mask

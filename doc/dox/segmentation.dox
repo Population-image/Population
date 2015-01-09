@@ -20,46 +20,38 @@ First, you load the 3d matrix:
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
 int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    try{//Enclose this portion of code in a try block with 
-    Mat3UI8 img;
-    img.loadFromDirectory("/home/vincent/Desktop/WorkSegmentation/sand/","500-755","pgm");
+Mat3UI8 img;
+img.loadFromDirectory("/home/vincent/Desktop/WorkSegmentation/sand/","500-755","pgm");
 \endcode
 Here, you load all pgm files in the folder /home/vincent/Desktop/WorkSegmentation/sand/ with the basename 500-755 and the extension pgm to create the 3D matrix.\n
 In order to create a prototype and calibrate it rapidly, you extract a sub-matrix to reduce the computational time of process:
 \code
-    img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
-    img.display();	
+img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
+img.display();	
 \endcode
 When the prototype is finished, you comment this line to process the full matrix and you go to the coffee room :)\n
 \image html sand1.png
 This matrix of sand material is hampered by noise (see the above matrix). You reduce it by applying the non linear anisotropic diffusion:
 \code 
-    Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusionGaussian(img,30,10,1);
-    imgfilter.display();
+Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusion(img);
+imgfilter.display();
 \endcode
 \image html sand2.png
 Now the grey level inside the pore-space and the sand grains is quite homogeneous, you can apply the threshold segmentation. To find the threshold value, you plot the histogram:
 \code
-    Mat2F64 m = Analysis::histogram(img);
-    Distribution d(m);
-    d.display();
+Mat2F64 m = Analysis::histogram(img);
+Distribution d(m);
+d.display();
 \endcode
 \image html sand3.png
 In this histogram, the minimum value between the peaks populated by the pore phase and the granular phase correspond to the argument 155. Therefore you will threshold the matrix with this value:
 \code
-    Mat3UI8 grain= Processing::threshold(imgfilter,155);//or you can apply Processing::thresholdOtsuMethod(imgfilter);
-    grain.display();
+Mat3UI8 grain= Processing::threshold(imgfilter,155);//or you can apply Processing::thresholdOtsuMethod(imgfilter);
+grain.display();
 
-    Mat3RGBUI8 color= Visualization::labelForegroundBoundary(grain,img);
-    color.display();
-    grain.save("/home/vincent/Desktop/WorkSegmentation/sand/grain.pgm");	
-    }
-    catch(const pexception &e){
-        std::cerr<<e.what()<<std::endl;
-    }
-    return 0;
-}
+Mat3RGBUI8 color= Visualization::labelForegroundBoundary(grain,img);
+color.display();
+grain.save("/home/vincent/Desktop/WorkSegmentation/sand/grain.pgm");	
 \endcode
 To check the agreement between the segmentation and the original matrix, you draw the boundary of the segmented phase on the original matrix.
 \image html sand4.png

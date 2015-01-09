@@ -1,11 +1,44 @@
 /*!
 \page pagecmake CMake (cross-platform)
 
+\section cmakeexecutable Executable 
+
 The first step is to generate a project file, as a makefile or Microsoft Visual Studio project with solution files. So, you download/install CMake  http://www.cmake.org/cmake/resources/software.html (for debian/ubuntu sudo apt-get install cmake cmake-qt-gui). Then, you execute cmake-gui where
 -  where is the source code  : $${POPULATIONPATH}
 -  where to build the binaries : $${POPULATIONPATH}/build
 You press the button configure and you specify the generator project, for instance Visual studio 2010. Then you press the button generate. Now you open the the visual studio IDE and you open the solution  $POPULATIONPATH/population.sln. Do not forget the set the project Population as StartUpProject. 
  
-Now, you can execute the program defined in the main.cpp. If you success, you can start to code in the main.cpp file.  
+Now, you can execute the program defined in the main.cpp. If you success, you can start to code in the main.cpp file.
+
+\section cmakesharedlibrary Shared library
+
+Also, you can include Population as shared library. The first step is to compile Population to generate the shared library.
+\image html cmake_sharedlibrary.png "BUILD_SHARED_LIBS is quoted in cmake-gui"
+Then, you create a cmake project with a main.cpp file with this following code in your CMakeLists.txt.    
+\code
+cmake_minimum_required(VERSION 2.6)
+project( t\section qmakesharedlibrary Shared libraryest_main )
+list(APPEND CMAKE_MODULE_PATH "/home/vincent/DEV2/Population/build")#replace this path by yours
+find_package(Population REQUIRED)
+include_directories(${POPULATION_INCLUDE_DIRS})
+add_executable( test_project main.cpp)
+target_link_libraries(test_error ${POPULATION_LIBRARY})
+\endcode
+In your main file, for instance this simple code
+\code
+#include"Population.h"
+using namespace pop;//Population namespace
+int main(){
+    Mat2F64 m(2,2);// a 2d matrix with two rows and two columns
+    m(0,0)=1;m(0,1)=0.5;
+    m.display();
+}
+\endcode
+
+That's all for CMake.
+
+\section cmakemodule Activate modules
+
+Of course, you can activate third party modules by quoting the variable in cmake-gui (for vlc WITH_VLC for instance). 
 
 */ 

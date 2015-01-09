@@ -1,26 +1,44 @@
 /*! \page pageqmake qmake
 
-This page explains how to use Population library with QtCreator.
-
+\section qmakeexecutable Executable 
+ 
 You open the project $${POPULATIONPATH}/population.pro. You compile this project and start to code in the main.cpp file (see \ref pagefirststep).
+
+\section qmakesharedlibrary Shared library
 
 Or you create a shared library by commenting this line in $${POPULATIONPATH}/population.pro
 \code
 #CONFIG += MAKE_EXE
 \endcode
-You compile it generating the file population.dll (.so for linux) in the directory  $${POPULATIONPATH}/bin .
+You compile it that generates the file population.dll (.so for linux) in the directory  $${POPULATIONPATH}/lib .
 
 To load this library in your program,  you create a project file (.pro) containing these following lines:
 \code
-POPULATIONPATH=/home/vincent/DEV2/Population #replace by yours
 TEMPLATE = app
+SOURCES += main.cpp # the main file of your project (you have to create it)
+
+POPULATIONPATH=/home/vincent/DEV2/Population #replace by yours
 !include($${POPULATIONPATH}/populationconfig.pri)
-SOURCES += $${POPULATIONPATH}/main.cpp # the main file of my project (you can replace by yours)
-DESTDIR = $${POPULATIONPATH}/bin # directory target
 DEPENDPATH=$${POPULATIONPATH}/lib
 LIBS+=-L$${POPULATIONPATH}/lib # the path where the dynamic shared library is located for the linking
 LIBS += -lpopulation
 \endcode
-You build and run this project. Now you can start to code in the main.cpp file (see \ref pagefirststep).
+You build and run this project. Now you can start to code in the main.cpp file (see \ref pagefirststep). For instance, 
+\code
+#include"Population.h"
+using namespace pop;//Population namespace
+int main(){
+    Mat2F64 m(2,2);// a 2d matrix with two rows and two columns
+    m(0,0)=1;m(0,1)=0.5;
+		std::cout<<m<<std::endl;//#display in console
+    m.display();//#display in windows
+}
+\endcode
+\section qmakemodule Activate modules
+
+Of course, you can activate third party modules (VLC, openmp) by uncommented lines in  populationconfig.pri file. For instance for openmp,
+\code
+CONFIG += HAVE_OPENMP  #openmp optimization working for many algorithms (a must have for 3d images or real time)
+\endcode
 */
 
