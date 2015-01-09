@@ -1,8 +1,6 @@
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
 int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    try{//Enclose this portion of code in a try block with
         Mat3UI8 img;
         img.loadFromDirectory("/home/vincent/Desktop/WorkSegmentation/RockANU/tomo/","tomo2048","pgm");
         img = img(Vec3I32(0,0,0),Vec3I32(128,128,128));
@@ -29,8 +27,4 @@ int main(){
         Visualization::lineCube(scene,img);
         scene.display();
 
-    }
-    catch(const pexception &e){
-        std::cerr<<e.what()<<std::endl;
-    }
 }

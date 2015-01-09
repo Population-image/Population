@@ -95,8 +95,8 @@ void MTRand_int32::seed(const unsigned long* array, int size) { // init by array
   p = NMAX; // force gen_state() to be called for next random number
 }
 MTRand::MTRand() : MTRand_int32() {}
-MTRand::MTRand(unsigned long seed) : MTRand_int32(seed) {}
-MTRand::MTRand(const unsigned long* seed, int size) : MTRand_int32(seed, size) {}
+MTRand::MTRand(unsigned long seed_value) : MTRand_int32(seed_value) {}
+MTRand::MTRand(const unsigned long* seed_ptr, int size) : MTRand_int32(seed_ptr, size) {}
 MTRand::~MTRand() {}
 pop::F64 MTRand::operator()() {
   return static_cast<pop::F64>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32

@@ -8,9 +8,9 @@ F64 GrainCylinder::getRadiusBallNorm0IncludingGrain(){
     if(maxradius==0)maxradius=std::sqrt(radius*radius+height*height/4);
     return  maxradius;
 }
-bool GrainCylinder::intersectionPoint(const VecN<3,F64> &  x)
+bool GrainCylinder::intersectionPoint(const VecN<3,F64> &  x_value)
 {
-    VecN<3,F64> p = this->x -x;
+    VecN<3,F64> p = this->x -x_value;
     p = this->orientation.inverseRotation(p);
     if(p[0]*p[0]+p[1]*p[1]>this->radius*this->radius)
         return false;
@@ -156,9 +156,9 @@ void GrainEquilateralRhombohedron::setAnglePlane(F64 angleradian)
 F64 GrainEquilateralRhombohedron::getRadiusBallNorm0IncludingGrain(){
     return 2*radius/cosangle;
 }
-bool GrainEquilateralRhombohedron::intersectionPoint(const VecN<3,F64> &  x)
+bool GrainEquilateralRhombohedron::intersectionPoint(const VecN<3,F64> &  x_value)
 {
-    VecN<3,F64> p = this->x -x;
+    VecN<3,F64> p = this->x -x_value;
     p = this->orientation.inverseRotation(p);
 
     F64 signe;

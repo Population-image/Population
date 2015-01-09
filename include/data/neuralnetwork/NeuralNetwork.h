@@ -823,7 +823,6 @@ struct POP_EXPORTS TrainingNeuralNetwork
 
     //@}
 
-public:
     static Vec<Vec<pop::Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
     static Vec<pop::Mat2UI8>   geometricalTransformationDataBaseMatrix(Vec<pop::Mat2UI8>  number_training,
                                                                             unsigned int number=10,
@@ -837,6 +836,9 @@ public:
                                                                             double gamma_y_scale=15);
     static void  convertMatrixToInputValueNeuron(Vec<VecF64> &v_neuron_in, Vec<VecF64> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, double ratio=1);
 
+
+private:
+    static int _reverseInt(int i);
 };
 
 template<typename TypeScalarPixel>

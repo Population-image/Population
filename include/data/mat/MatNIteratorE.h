@@ -237,16 +237,16 @@ public:
     void dilate(MatNIteratorENeighborhood & v_it){
         if(_isball==false){
             typename Vec<VecN>::iterator ittab,it_local;
-            Vec<VecN> tab =_tab;
+            Vec<VecN> v_tab =_tab;
             for(ittab =_tab.begin();ittab!=_tab.end();ittab++){
                 for(it_local =v_it.tab().begin();it_local!=v_it.tab().end();it_local++){
-                    VecN x = *it_local+*ittab;
-                    if(std::find (tab.begin(), tab.end(),x)==tab.end()){
-                        tab.push_back(x);
+                    VecN xx = *it_local+*ittab;
+                    if(std::find (v_tab.begin(), v_tab.end(),xx)==v_tab.end()){
+                        v_tab.push_back(xx);
                     }
                 }
             }
-            _tab=tab;
+            _tab=v_tab;
         }else{
             _radius+=v_it._radius;
             initBall();
@@ -269,9 +269,9 @@ public:
             }
         }
     }
-    void init(const VecN& x)
+    void init(const VecN& x_init)
     {
-        _x = x;
+        _x = x_init;
         _it=_tab.begin();
         _init=true;
     }
@@ -340,17 +340,17 @@ private:
     }
     void check()
     {
-        VecN check;
+        VecN check_value;
         for(I32 i=0;i<VecN::DIM;i++)
         {
-            check(i)=i;
+            check_value(i)=i;
         }
         for(I32 i=0;i<VecN::DIM;i++)
         {
             bool test=false;
             for(I32 j=0;j<VecN::DIM;j++)
             {
-                if(_inverselooporder(j)==check(i))
+                if(_inverselooporder(j)==check_value(i))
                 {
                     test=true;
                 }
@@ -358,7 +358,7 @@ private:
             if(test==false)
             {
                 std::cerr<<"Error in MatNIteratorEOrder\n Your looporder is not correct: "<<_inverselooporder<<std::endl;
-                _inverselooporder=check;
+                _inverselooporder=check_value;
                 std::cerr<<"By default your looporder becomes "<<_inverselooporder<<std::endl;
             }
 

@@ -84,7 +84,7 @@ public:
     GrainEquilateralRhombohedron();
     void setAnglePlane(F64 angleradian);
     virtual F64 getRadiusBallNorm0IncludingGrain();
-    bool intersectionPoint(const VecN<3,F64> &  x);
+    bool intersectionPoint(const VecN<3,F64> &  x_value);
     virtual Germ<3> * clone()const;
 };
 
@@ -178,7 +178,7 @@ public:
     OrientationEulerAngle<3> orientation;
     GrainCylinder();
     virtual F64 getRadiusBallNorm0IncludingGrain();
-    bool intersectionPoint(const VecN<3,F64> &  x);
+    bool intersectionPoint(const VecN<3,F64> &  x_value);
     virtual Germ<3> * clone()const;
 };
 template<int DIM>

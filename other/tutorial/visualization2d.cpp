@@ -51,13 +51,7 @@ void visualizealgorithm(){
 }
 
 int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    try{//Enclose this portion of code in a try block with
-//        classmember();
-//        classdisplay();
-//        visualizealgorithm();
-    }
-    catch(const pexception &e){
-        std::cerr<<e.what()<<std::endl;
-    }
+    classmember();
+    classdisplay();
+    visualizealgorithm();
 }

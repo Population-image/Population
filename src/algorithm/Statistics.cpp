@@ -116,30 +116,30 @@ bool DistributionMultiVariateIteratorE::next(){
 
 VecF64 DistributionMultiVariateIteratorE::x(){
     int indice = _index;
-    VecF64 x(_xminima.size());
+    VecF64 xx(_xminima.size());
     for(unsigned int i=0;i<_xminima.size();i++)
     {
         int temp=1;
         for(unsigned int j=0;j<_xminima.size()-(i+1);j++)
             temp*=_domain(i);
-        x(_xminima.size()-(i+1)) = (indice/temp);
-        indice -= (x(_xminima.size()-(i+1)) *temp);
-        x(_xminima.size()-(i+1)) =x(_xminima.size()-(i+1)) *_step + _xminima(_xminima.size()-(i+1)) ;
+        xx(_xminima.size()-(i+1)) = (indice/temp);
+        indice -= (xx(_xminima.size()-(i+1)) *temp);
+        xx(_xminima.size()-(i+1)) =xx(_xminima.size()-(i+1)) *_step + _xminima(_xminima.size()-(i+1)) ;
     }
-    return x;
+    return xx;
 }
 VecF64 DistributionMultiVariateIteratorE::xInteger(){
     int indice = _index;
-    VecF64 x(_xminima.size());
+    VecF64 xx(_xminima.size());
     for(unsigned int i=0;i<_xminima.size();i++)
     {
         int temp=1;
         for(unsigned int j=0;j<_xminima.size()-(i+1);j++)
             temp*=_domain(i);
-        x(_xminima.size()-(i+1)) = (indice/temp);
-        indice -= (x(_xminima.size()-(i+1)) *temp);
+        xx(_xminima.size()-(i+1)) = (indice/temp);
+        indice -= (xx(_xminima.size()-(i+1)) *temp);
     }
-    return x;
+    return xx;
 }
 DistributionRegularStep  Statistics::integral(const Distribution &f, F64 xmin, F64 xmax,F64 step)
 {
@@ -162,12 +162,12 @@ DistributionRegularStep  Statistics::integral(const Distribution &f, F64 xmin, F
 namespace Private{
 const VecN<2,double> d=VecN<2,double>(1,1)/normValue(VecN<2,double>(1,1));
 }
-void inverseVecN(double x,double y, double &x_minus_one, double& y_minus_two){
+void Statistics::__inverseVecN(double x,double y, double &x_minus_one, double& y_minus_two){
     VecN<2,double> vx;
     vx(0)=x;
     vx(1)=y;
     VecN<2,double> p;
-    p=  productInner(pop::Private::d,vx)*pop::Private::d;
+    p=  pop::productInner(pop::Private::d,vx)*pop::Private::d;
     VecN<2,double> vx_symmetry_axis;
     vx_symmetry_axis = p*2-vx;
     x_minus_one = vx_symmetry_axis(0);
@@ -182,7 +182,7 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64
 
     double xminus;
     double yminus;
-    inverseVecN(x,f(x),xminus,yminus);
+    __inverseVecN(x,f(x),xminus,yminus);
     double  xstep =step;
     while(x<xmax){
         m.resizeInformation(m.sizeI()+1,2);
@@ -197,7 +197,7 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64
         bool error = false;
         while(error==false){
 
-            inverseVecN(xnextmax,f(xnextmax),xminustemp,yminus);
+            __inverseVecN(xnextmax,f(xnextmax),xminustemp,yminus);
             if(xminustemp<xminus){
                 xnextmax=(xnextmax-x)*2+x;
             }else{
@@ -207,7 +207,7 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64
 
         x=(xnextmax-xnextmin)/2+xnextmin;
 
-        inverseVecN(x,f(x),xminustemp,yminus);
+        __inverseVecN(x,f(x),xminustemp,yminus);
         int k=0;
         while(absolute((xminustemp-xminus)/xminus)>error_step&&k<100){
             k++;
@@ -216,7 +216,7 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64
             else
                 xnextmin=x;
             x=(xnextmax-xnextmin)/2+xnextmin;
-            inverseVecN(x,f(x),xminustemp,yminus);
+            __inverseVecN(x,f(x),xminustemp,yminus);
         }
         xstep = x - xbefore+0.0001;
 

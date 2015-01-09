@@ -172,9 +172,9 @@ Mat2F64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &m){
         }
         for(unsigned int i =0;i<M.sizeI();i++){
             if(i!=k){
-                F64 temp = M(i, k) ;
+                F64 temp2 = M(i, k) ;
                 for(unsigned int j=0;j<M.sizeJ();j++){
-                    M(i,j) = M(i, j) - M(k, j) * (temp / M(k, k));
+                    M(i,j) = M(i, j) - M(k, j) * (temp2 / M(k, k));
                 }
             }
         }
@@ -203,11 +203,11 @@ VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &A,co
         x(k)/=temp;
         for(unsigned int i =0;i<M.sizeI();i++){
             if(i!=k){
-                F64 temp = M(i, k) ;
+                F64 temp2 = M(i, k) ;
                 for(unsigned int j= 0;j<M.sizeJ();j++){
-                    M(i,j) = M(i, j) - M(k, j) * (temp / M(k, k));
+                    M(i,j) = M(i, j) - M(k, j) * (temp2 / M(k, k));
                 }
-                x(i)= x(i)- x(k) * (temp / M(k, k));
+                x(i)= x(i)- x(k) * (temp2 / M(k, k));
             }
         }
 
@@ -215,7 +215,7 @@ VecF64 LinearAlgebra::solvingLinearSystemGaussianElimination(const Mat2F64 &A,co
     return x;
 }
 
-void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M){
+void LinearAlgebra::_solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M){
     for(unsigned int k =0;k<M.sizeI()-1;k++){
 
         double valuemax=0;
@@ -238,9 +238,9 @@ void solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M){
         }
         for(unsigned int i =0;i<M.sizeI();i++){
             if(i!=k){
-                F64 temp = M(i, k) ;
+                F64 temp2 = M(i, k) ;
                 for(unsigned int j=0;j<M.sizeJ();j++){
-                    M(i,j) = M(i, j) - M(k, j) * (temp / M(k, k));
+                    M(i,j) = M(i, j) - M(k, j) * (temp2 / M(k, k));
                 }
             }
 
@@ -254,7 +254,7 @@ Mat2F64 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F64 &m,VecF64 v_
     for(unsigned int j =0;j<v_eigen_value.size();j++){
         Mat2F64 m2=      I*  v_eigen_value(j) ;
         Mat2F64 M = m - m2;
-        solvingLinearSystemGaussianEliminationNonInvertible(M);
+        _solvingLinearSystemGaussianEliminationNonInvertible(M);
         VecF64 v(m.sizeI());
         v(v.size()-1)=1;
         for(int i=v.size()-2;i>=0;i--){

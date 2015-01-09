@@ -68,14 +68,14 @@ public:
 		//std::cout<<"delete Population"<<std::endl;
 	}
 
-    virtual void growth( const typename FunctionSeed::F & labelregion,const  typename FunctionSeed::E & x  ){
+    virtual void growth( const typename FunctionSeed::F & labelregion,const  typename FunctionSeed::E & x_pos  ){
         if(labelregion==RestrictedSet<typename FunctionSeed::F>::NoRegion)
         {
-            _region(x)=labelregion-1;
-            _rulegrowth.growth(labelregion-1,x, _region,_f,_SQ);
+            _region(x_pos)=labelregion-1;
+            _rulegrowth.growth(labelregion-1,x_pos, _region,_f,_SQ);
         }else{
-            _region(x)=labelregion;
-            _rulegrowth.growth(labelregion,x, _region,_f,_SQ);
+            _region(x_pos)=labelregion;
+            _rulegrowth.growth(labelregion,x_pos, _region,_f,_SQ);
         }
     }
 
@@ -100,11 +100,11 @@ public:
     FunctionSeed & getRegion(){
         return _region;
     }
-    void setRegion( const typename FunctionSeed::F & labelregion,const  typename Function::E & x  ){
+    void setRegion( const typename FunctionSeed::F & labelregion,const  typename Function::E & x_pos  ){
         if(labelregion==RestrictedSet<typename FunctionSeed::F>::NoRegion)
-            _region(x)=labelregion-1;
+            _region(x_pos)=labelregion-1;
         else
-            _region(x)=labelregion;
+            _region(x_pos)=labelregion;
     }
 
     typename FunctionSeed::F  getLabelNoRegion(){
@@ -209,21 +209,21 @@ public:
     {
 
     }
-    virtual void growth( const typename FunctionSeed::F &, const  typename FunctionSeed::E & x  )
+    virtual void growth( const typename FunctionSeed::F &, const  typename FunctionSeed::E & x_pos  )
     {
-        this->_region(x)=RestrictedSet::SingleRegion;
-        this->_zi(x)=RestrictedSet::NoRegion;
-        this->_rulegrowth.growth(x, this->_region,this->_f,this->_SQ,this->_zi);
+        this->_region(x_pos)=RestrictedSet::SingleRegion;
+        this->_zi(x_pos)=RestrictedSet::NoRegion;
+        this->_rulegrowth.growth(x_pos, this->_region,this->_f,this->_SQ,this->_zi);
     }
-    virtual void setDeadRegion( const  typename FunctionSeed::E & x  )
+    virtual void setDeadRegion( const  typename FunctionSeed::E & x_pos  )
     {
-        _region(x)=RestrictedSet::DeadRegion;
-        this->_zi(x)=RestrictedSet::DeadRegion;
+        _region(x_pos)=RestrictedSet::DeadRegion;
+        this->_zi(x_pos)=RestrictedSet::DeadRegion;
     }
-    virtual void degrowth( const  typename FunctionSeed::E & x  )
+    virtual void degrowth( const  typename FunctionSeed::E & x_pos  )
     {
-        this->_region(x)=RestrictedSet::NoRegion;
-        this->_rulegrowth.degrowthZI(x, this->_region,this->_f,this->_SQ,this->_zi);
+        this->_region(x_pos)=RestrictedSet::NoRegion;
+        this->_rulegrowth.degrowthZI(x_pos, this->_region,this->_f,this->_SQ,this->_zi);
     }
     bool next()
     {
@@ -348,14 +348,14 @@ public:
     {
 
     }
-    virtual void growth( const typename FunctionSeed::F & labelregion,const  typename FunctionSeed::E & x,Information &info  ){
+    virtual void growth( const typename FunctionSeed::F & labelregion,const  typename FunctionSeed::E & x_pos,Information &info  ){
         if(labelregion==RestrictedSet<typename FunctionSeed::F>::NoRegion)
         {
-            _region(x)=labelregion-1;
-            _rulegrowth.growth(labelregion-1,x, _region,_f,_SQ,info);
+            _region(x_pos)=labelregion-1;
+            _rulegrowth.growth(labelregion-1,x_pos, _region,_f,_SQ,info);
         }else{
-            _region(x)=labelregion;
-            _rulegrowth.growth(labelregion,x, _region,_f,_SQ,info);
+            _region(x_pos)=labelregion;
+            _rulegrowth.growth(labelregion,x_pos, _region,_f,_SQ,info);
         }
     }
 
@@ -380,11 +380,11 @@ public:
     FunctionSeed & getRegion(){
         return _region;
     }
-    void setRegion( const typename FunctionSeed::F & labelregion,const  typename Function::E & x  ){
+    void setRegion( const typename FunctionSeed::F & labelregion,const  typename Function::E & x_pos  ){
         if(labelregion==RestrictedSet<typename FunctionSeed::F>::NoRegion)
-            _region(x)=labelregion-1;
+            _region(x_pos)=labelregion-1;
         else
-            _region(x)=labelregion;
+            _region(x_pos)=labelregion;
     }
 
     typename FunctionSeed::F  getLabelNoRegion(){

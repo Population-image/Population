@@ -578,6 +578,9 @@ struct POP_EXPORTS Statistics
     static Mat2F64 toMatrix( const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step=0.01);
 
     //@}
+
+private:
+    static void __inverseVecN(double x,double y, double &x_minus_one, double& y_minus_two);
 };
 
 

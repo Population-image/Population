@@ -293,10 +293,10 @@ static int triTable[256][16] =
 
 
 
-Visualization::vertex Visualization::interpolate(Visualization::vertex p1, Visualization::vertex p2, F32 p1value, F32 p2value , F32 iso ) {
+Visualization::_vertex Visualization::_interpolate(Visualization::_vertex p1, Visualization::_vertex p2, F32 p1value, F32 p2value , F32 iso ) {
 
 
-    vertex p;
+    _vertex p;
     F32 diff;
     diff = (iso - p1value) / (p2value - p1value);
 
@@ -314,12 +314,10 @@ Visualization::vertex Visualization::interpolate(Visualization::vertex p1, Visua
     p.normal_z = p1.normal_z + diff * (p2.normal_z - p1.normal_z);
     F32 sum = std::sqrt(p.normal_x*p.normal_x+ p.normal_y*p.normal_y+p.normal_z*p.normal_z);
     if(sum==0){
-        F32 sum = std::sqrt(p1.normal_x*p1.normal_x+ p1.normal_y*p1.normal_y+p1.normal_z*p1.normal_z);
-
-
-        p.normal_x=p1.normal_x/sum;
-        p.normal_y=p1.normal_x/sum;
-        p.normal_z=p1.normal_x/sum;
+        F32 sum2 = std::sqrt(p1.normal_x*p1.normal_x+ p1.normal_y*p1.normal_y+p1.normal_z*p1.normal_z);
+        p.normal_x=p1.normal_x/sum2;
+        p.normal_y=p1.normal_x/sum2;
+        p.normal_z=p1.normal_x/sum2;
     }
     else{
         p.normal_x/=sum;
@@ -330,7 +328,7 @@ Visualization::vertex Visualization::interpolate(Visualization::vertex p1, Visua
     return p;
 }
 
-void Visualization::processCube(cubeF cube,std::vector<vertex>& vertexList,F32 isolevel ,bool diff) {
+void Visualization::_processCube(_cubeF cube,std::vector<_vertex>& vertexList,F32 isolevel ,bool diff) {
 
     //if(value<isolevel)
     {
@@ -348,59 +346,59 @@ void Visualization::processCube(cubeF cube,std::vector<vertex>& vertexList,F32 i
         if(edgeTable[cubeindex] == 0 || edgeTable[cubeindex] == 255)
             return;
 
-        vertex vertlist[12];
+        _vertex vertlist[12];
         // Find the vertices where the surface intersects the cube
         if(diff==false){
             if(edgeTable[cubeindex] & 1)
-                vertlist[0] = interpolate(cube.p[0],cube.p[1]);
+                vertlist[0] = _interpolate(cube.p[0],cube.p[1]);
             if(edgeTable[cubeindex] & 2)
-                vertlist[1] = interpolate(cube.p[1],cube.p[2]);
+                vertlist[1] = _interpolate(cube.p[1],cube.p[2]);
             if(edgeTable[cubeindex] & 4)
-                vertlist[2] = interpolate(cube.p[2],cube.p[3]);
+                vertlist[2] = _interpolate(cube.p[2],cube.p[3]);
             if(edgeTable[cubeindex] & 8)
-                vertlist[3] = interpolate(cube.p[3],cube.p[0]);
+                vertlist[3] = _interpolate(cube.p[3],cube.p[0]);
             if(edgeTable[cubeindex] & 16)
-                vertlist[4] = interpolate(cube.p[4],cube.p[5]);
+                vertlist[4] = _interpolate(cube.p[4],cube.p[5]);
             if(edgeTable[cubeindex] & 32)
-                vertlist[5] = interpolate(cube.p[5],cube.p[6]);
+                vertlist[5] = _interpolate(cube.p[5],cube.p[6]);
             if(edgeTable[cubeindex] & 64)
-                vertlist[6] = interpolate(cube.p[6],cube.p[7]);
+                vertlist[6] = _interpolate(cube.p[6],cube.p[7]);
             if(edgeTable[cubeindex] & 128)
-                vertlist[7] = interpolate(cube.p[7],cube.p[4]);
+                vertlist[7] = _interpolate(cube.p[7],cube.p[4]);
             if(edgeTable[cubeindex] & 256)
-                vertlist[8] = interpolate(cube.p[0],cube.p[4]);
+                vertlist[8] = _interpolate(cube.p[0],cube.p[4]);
             if(edgeTable[cubeindex] & 512)
-                vertlist[9] = interpolate(cube.p[1],cube.p[5]);
+                vertlist[9] = _interpolate(cube.p[1],cube.p[5]);
             if(edgeTable[cubeindex] & 1024)
-                vertlist[10] = interpolate(cube.p[2],cube.p[6]);
+                vertlist[10] = _interpolate(cube.p[2],cube.p[6]);
             if(edgeTable[cubeindex] & 2048)
-                vertlist[11] = interpolate(cube.p[3],cube.p[7]);
+                vertlist[11] = _interpolate(cube.p[3],cube.p[7]);
         }
         else{
             if(edgeTable[cubeindex] & 1)
-                vertlist[0] = interpolate(cube.p[0],cube.p[1],cube.val[0],cube.val[1],isolevel);
+                vertlist[0] = _interpolate(cube.p[0],cube.p[1],cube.val[0],cube.val[1],isolevel);
             if(edgeTable[cubeindex] & 2)
-                vertlist[1] = interpolate(cube.p[1],cube.p[2],cube.val[1],cube.val[2],isolevel);
+                vertlist[1] = _interpolate(cube.p[1],cube.p[2],cube.val[1],cube.val[2],isolevel);
             if(edgeTable[cubeindex] & 4)
-                vertlist[2] = interpolate(cube.p[2],cube.p[3],cube.val[2],cube.val[3],isolevel);
+                vertlist[2] = _interpolate(cube.p[2],cube.p[3],cube.val[2],cube.val[3],isolevel);
             if(edgeTable[cubeindex] & 8)
-                vertlist[3] = interpolate(cube.p[3],cube.p[0],cube.val[3],cube.val[0],isolevel);
+                vertlist[3] = _interpolate(cube.p[3],cube.p[0],cube.val[3],cube.val[0],isolevel);
             if(edgeTable[cubeindex] & 16)
-                vertlist[4] = interpolate(cube.p[4],cube.p[5],cube.val[4],cube.val[5],isolevel);
+                vertlist[4] = _interpolate(cube.p[4],cube.p[5],cube.val[4],cube.val[5],isolevel);
             if(edgeTable[cubeindex] & 32)
-                vertlist[5] = interpolate(cube.p[5],cube.p[6],cube.val[5],cube.val[6],isolevel);
+                vertlist[5] = _interpolate(cube.p[5],cube.p[6],cube.val[5],cube.val[6],isolevel);
             if(edgeTable[cubeindex] & 64)
-                vertlist[6] = interpolate(cube.p[6],cube.p[7],cube.val[6],cube.val[7],isolevel);
+                vertlist[6] = _interpolate(cube.p[6],cube.p[7],cube.val[6],cube.val[7],isolevel);
             if(edgeTable[cubeindex] & 128)
-                vertlist[7] = interpolate(cube.p[7],cube.p[4],cube.val[7],cube.val[4],isolevel);
+                vertlist[7] = _interpolate(cube.p[7],cube.p[4],cube.val[7],cube.val[4],isolevel);
             if(edgeTable[cubeindex] & 256)
-                vertlist[8] = interpolate(cube.p[0],cube.p[4],cube.val[0],cube.val[4],isolevel);
+                vertlist[8] = _interpolate(cube.p[0],cube.p[4],cube.val[0],cube.val[4],isolevel);
             if(edgeTable[cubeindex] & 512)
-                vertlist[9] = interpolate(cube.p[1],cube.p[5],cube.val[1],cube.val[5],isolevel);
+                vertlist[9] = _interpolate(cube.p[1],cube.p[5],cube.val[1],cube.val[5],isolevel);
             if(edgeTable[cubeindex] & 1024)
-                vertlist[10] = interpolate(cube.p[2],cube.p[6],cube.val[2],cube.val[6],isolevel);
+                vertlist[10] = _interpolate(cube.p[2],cube.p[6],cube.val[2],cube.val[6],isolevel);
             if(edgeTable[cubeindex] & 2048)
-                vertlist[11] = interpolate(cube.p[3],cube.p[7],cube.val[3],cube.val[7],isolevel);
+                vertlist[11] = _interpolate(cube.p[3],cube.p[7],cube.val[3],cube.val[7],isolevel);
         }
 
         for(int i = 0; triTable[cubeindex][i] != -1; i++) {
@@ -411,7 +409,7 @@ void Visualization::processCube(cubeF cube,std::vector<vertex>& vertexList,F32 i
 
 
 
-void Visualization::processCubeIso(Visualization::Cube cube, std::vector<std::pair<vertex,RGBUI8 > >& vertexList,RGBUI8 value,unsigned char isolevel) {
+void Visualization::_processCubeIso(Visualization::_Cube cube, std::vector<std::pair<_vertex,RGBUI8 > >& vertexList,RGBUI8 value,unsigned char isolevel) {
     //if(value<isolevel)
     {
         int cubeindex = 0;
@@ -428,32 +426,32 @@ void Visualization::processCubeIso(Visualization::Cube cube, std::vector<std::pa
         if(edgeTable[cubeindex] == 0 || edgeTable[cubeindex] == 255)
             return;
 
-        vertex vertlist[12];
+        _vertex vertlist[12];
         // Find the vertices where the surface intersects the cube
         if(edgeTable[cubeindex] & 1)
-            vertlist[0] = interpolate(cube.p[0],cube.p[1]);
+            vertlist[0] = _interpolate(cube.p[0],cube.p[1]);
         if(edgeTable[cubeindex] & 2)
-            vertlist[1] = interpolate(cube.p[1],cube.p[2]);
+            vertlist[1] = _interpolate(cube.p[1],cube.p[2]);
         if(edgeTable[cubeindex] & 4)
-            vertlist[2] = interpolate(cube.p[2],cube.p[3]);
+            vertlist[2] = _interpolate(cube.p[2],cube.p[3]);
         if(edgeTable[cubeindex] & 8)
-            vertlist[3] = interpolate(cube.p[3],cube.p[0]);
+            vertlist[3] = _interpolate(cube.p[3],cube.p[0]);
         if(edgeTable[cubeindex] & 16)
-            vertlist[4] = interpolate(cube.p[4],cube.p[5]);
+            vertlist[4] = _interpolate(cube.p[4],cube.p[5]);
         if(edgeTable[cubeindex] & 32)
-            vertlist[5] = interpolate(cube.p[5],cube.p[6]);
+            vertlist[5] = _interpolate(cube.p[5],cube.p[6]);
         if(edgeTable[cubeindex] & 64)
-            vertlist[6] = interpolate(cube.p[6],cube.p[7]);
+            vertlist[6] = _interpolate(cube.p[6],cube.p[7]);
         if(edgeTable[cubeindex] & 128)
-            vertlist[7] = interpolate(cube.p[7],cube.p[4]);
+            vertlist[7] = _interpolate(cube.p[7],cube.p[4]);
         if(edgeTable[cubeindex] & 256)
-            vertlist[8] = interpolate(cube.p[0],cube.p[4]);
+            vertlist[8] = _interpolate(cube.p[0],cube.p[4]);
         if(edgeTable[cubeindex] & 512)
-            vertlist[9] = interpolate(cube.p[1],cube.p[5]);
+            vertlist[9] = _interpolate(cube.p[1],cube.p[5]);
         if(edgeTable[cubeindex] & 1024)
-            vertlist[10] = interpolate(cube.p[2],cube.p[6]);
+            vertlist[10] = _interpolate(cube.p[2],cube.p[6]);
         if(edgeTable[cubeindex] & 2048)
-            vertlist[11] = interpolate(cube.p[3],cube.p[7]);
+            vertlist[11] = _interpolate(cube.p[3],cube.p[7]);
 
         for(int i = 0; triTable[cubeindex][i] != -1; i++) {
             vertexList.push_back(std::make_pair(vertlist[triTable[cubeindex][i]] ,value  ));
@@ -462,7 +460,7 @@ void Visualization::processCubeIso(Visualization::Cube cube, std::vector<std::pa
 }
 
 
-void Visualization::processCube(Visualization::Cube cube, std::vector<std::pair<vertex,RGBUI8 > >& vertexList,RGBUI8 value,bool diff) {
+void Visualization::_processCube(Visualization::_Cube cube, std::vector<std::pair<_vertex,RGBUI8 > >& vertexList,RGBUI8 value,bool diff) {
     //if(value<isolevel)
     F32 isolevel =0.5;
     {
@@ -480,59 +478,59 @@ void Visualization::processCube(Visualization::Cube cube, std::vector<std::pair<
         if(edgeTable[cubeindex] == 0 || edgeTable[cubeindex] == 255)
             return;
 
-        vertex vertlist[12];
+        _vertex vertlist[12];
         // Find the vertices where the surface intersects the cube
         if(diff==false){
             if(edgeTable[cubeindex] & 1)
-                vertlist[0] = interpolate(cube.p[0],cube.p[1]);
+                vertlist[0] = _interpolate(cube.p[0],cube.p[1]);
             if(edgeTable[cubeindex] & 2)
-                vertlist[1] = interpolate(cube.p[1],cube.p[2]);
+                vertlist[1] = _interpolate(cube.p[1],cube.p[2]);
             if(edgeTable[cubeindex] & 4)
-                vertlist[2] = interpolate(cube.p[2],cube.p[3]);
+                vertlist[2] = _interpolate(cube.p[2],cube.p[3]);
             if(edgeTable[cubeindex] & 8)
-                vertlist[3] = interpolate(cube.p[3],cube.p[0]);
+                vertlist[3] = _interpolate(cube.p[3],cube.p[0]);
             if(edgeTable[cubeindex] & 16)
-                vertlist[4] = interpolate(cube.p[4],cube.p[5]);
+                vertlist[4] = _interpolate(cube.p[4],cube.p[5]);
             if(edgeTable[cubeindex] & 32)
-                vertlist[5] = interpolate(cube.p[5],cube.p[6]);
+                vertlist[5] = _interpolate(cube.p[5],cube.p[6]);
             if(edgeTable[cubeindex] & 64)
-                vertlist[6] = interpolate(cube.p[6],cube.p[7]);
+                vertlist[6] = _interpolate(cube.p[6],cube.p[7]);
             if(edgeTable[cubeindex] & 128)
-                vertlist[7] = interpolate(cube.p[7],cube.p[4]);
+                vertlist[7] = _interpolate(cube.p[7],cube.p[4]);
             if(edgeTable[cubeindex] & 256)
-                vertlist[8] = interpolate(cube.p[0],cube.p[4]);
+                vertlist[8] = _interpolate(cube.p[0],cube.p[4]);
             if(edgeTable[cubeindex] & 512)
-                vertlist[9] = interpolate(cube.p[1],cube.p[5]);
+                vertlist[9] = _interpolate(cube.p[1],cube.p[5]);
             if(edgeTable[cubeindex] & 1024)
-                vertlist[10] = interpolate(cube.p[2],cube.p[6]);
+                vertlist[10] = _interpolate(cube.p[2],cube.p[6]);
             if(edgeTable[cubeindex] & 2048)
-                vertlist[11] = interpolate(cube.p[3],cube.p[7]);
+                vertlist[11] = _interpolate(cube.p[3],cube.p[7]);
         }
         else{
             if(edgeTable[cubeindex] & 1)
-                vertlist[0] = interpolate(cube.p[0],cube.p[1],cube.val[0],cube.val[1]);
+                vertlist[0] = _interpolate(cube.p[0],cube.p[1],cube.val[0],cube.val[1]);
             if(edgeTable[cubeindex] & 2)
-                vertlist[1] = interpolate(cube.p[1],cube.p[2],cube.val[1],cube.val[2]);
+                vertlist[1] = _interpolate(cube.p[1],cube.p[2],cube.val[1],cube.val[2]);
             if(edgeTable[cubeindex] & 4)
-                vertlist[2] = interpolate(cube.p[2],cube.p[3],cube.val[2],cube.val[3]);
+                vertlist[2] = _interpolate(cube.p[2],cube.p[3],cube.val[2],cube.val[3]);
             if(edgeTable[cubeindex] & 8)
-                vertlist[3] = interpolate(cube.p[3],cube.p[0],cube.val[3],cube.val[0]);
+                vertlist[3] = _interpolate(cube.p[3],cube.p[0],cube.val[3],cube.val[0]);
             if(edgeTable[cubeindex] & 16)
-                vertlist[4] = interpolate(cube.p[4],cube.p[5],cube.val[4],cube.val[5]);
+                vertlist[4] = _interpolate(cube.p[4],cube.p[5],cube.val[4],cube.val[5]);
             if(edgeTable[cubeindex] & 32)
-                vertlist[5] = interpolate(cube.p[5],cube.p[6],cube.val[5],cube.val[6]);
+                vertlist[5] = _interpolate(cube.p[5],cube.p[6],cube.val[5],cube.val[6]);
             if(edgeTable[cubeindex] & 64)
-                vertlist[6] = interpolate(cube.p[6],cube.p[7],cube.val[6],cube.val[7]);
+                vertlist[6] = _interpolate(cube.p[6],cube.p[7],cube.val[6],cube.val[7]);
             if(edgeTable[cubeindex] & 128)
-                vertlist[7] = interpolate(cube.p[7],cube.p[4],cube.val[7],cube.val[4]);
+                vertlist[7] = _interpolate(cube.p[7],cube.p[4],cube.val[7],cube.val[4]);
             if(edgeTable[cubeindex] & 256)
-                vertlist[8] = interpolate(cube.p[0],cube.p[4],cube.val[0],cube.val[4]);
+                vertlist[8] = _interpolate(cube.p[0],cube.p[4],cube.val[0],cube.val[4]);
             if(edgeTable[cubeindex] & 512)
-                vertlist[9] = interpolate(cube.p[1],cube.p[5],cube.val[1],cube.val[5]);
+                vertlist[9] = _interpolate(cube.p[1],cube.p[5],cube.val[1],cube.val[5]);
             if(edgeTable[cubeindex] & 1024)
-                vertlist[10] = interpolate(cube.p[2],cube.p[6],cube.val[2],cube.val[6]);
+                vertlist[10] = _interpolate(cube.p[2],cube.p[6],cube.val[2],cube.val[6]);
             if(edgeTable[cubeindex] & 2048)
-                vertlist[11] = interpolate(cube.p[3],cube.p[7],cube.val[3],cube.val[7]);
+                vertlist[11] = _interpolate(cube.p[3],cube.p[7],cube.val[3],cube.val[7]);
         }
 
         for(int i = 0; triTable[cubeindex][i] != -1; i++) {
@@ -540,16 +538,12 @@ void Visualization::processCube(Visualization::Cube cube, std::vector<std::pair<
         }
     }
 }
-
-namespace Private{
-F32 affectRGB(RGBUI8 c1,RGBUI8 c2){
+F32 Visualization::_affectRGB(RGBUI8 c1,RGBUI8 c2){
     F32 vv = c1.lumi()*1.0-c2.lumi()*1.0;
     return vv;
 
 }
-}
-
-std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchingCubesSurfaceContact(const MatN<3,RGB<UI8 > > &voxel) {
+std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarchingCubesSurfaceContact(const MatN<3,RGB<UI8 > > &voxel) {
 
     MatN<3,RGB<UI8 > > voxels(voxel.getDomain()+4);
     MatN<3,RGB< UI8 > >::IteratorEDomain it (voxel.getIteratorEDomain());
@@ -562,7 +556,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
         voxels(x)=voxel(it.x());
     }
 
-    std::vector<std::pair<vertex,RGBUI8 > > vertexList;
+    std::vector<std::pair<_vertex,RGBUI8 > > vertexList;
     int sizeX =  voxels.getDomain()(0);
     int sizeY=voxels.getDomain()(1);
     int sizeZ=voxels.getDomain()(2);
@@ -595,46 +589,46 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
                                                     voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),
                                                     voxels(VecN<3,int>(x,y+stepY,z+stepZ)))))))));
 
-                Visualization::Cube c = {{
+                Visualization::_Cube c = {{
                                              {x,y,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),voxels(VecN<3,int>(x,y,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),voxels(VecN<3,int>(x,y,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                                              },
                                              {x,y,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),voxels(VecN<3,int>(x,y,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),voxels(VecN<3,int>(x,y,z))) / -stepZ
                                              },
                                              {x,y+stepY,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),voxels(VecN<3,int>(x,y,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),voxels(VecN<3,int>(x,y,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y+stepY,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y+stepY,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                                              },
                                              {x,y+stepY,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
                                              }
                                          },{
                                              static_cast<pop::F32>(voxels(VecN<3,int>(x,y,z)).lumi()),
@@ -647,7 +641,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
                                              static_cast<pop::F32>(voxels(VecN<3,int>(x,y+stepY,z+stepZ)).lumi())
                                          }};
                 if(ccmin.lumi()>=1)
-                    processCubeIso(c, vertexList,cc,ccmin.lumi());
+                    _processCubeIso(c, vertexList,cc,ccmin.lumi());
 
             }
         }
@@ -656,7 +650,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
     return vertexList;
 }
 
-std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchingCubes2(const MatN<3,RGB<UI8 > > &voxel) {
+std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarchingCubes2(const MatN<3,RGB<UI8 > > &voxel) {
 
     MatN<3,RGB<UI8 > > voxels(voxel.getDomain()+4);
     MatN<3,RGB< UI8 > >::IteratorEDomain it (voxel.getIteratorEDomain());
@@ -669,7 +663,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
         voxels(x)=voxel(it.x());
     }
 
-    std::vector<std::pair<vertex,RGBUI8 > > vertexList;
+    std::vector<std::pair<_vertex,RGBUI8 > > vertexList;
     int sizeX =  voxels.getDomain()(0);
     int sizeY=voxels.getDomain()(1);
     int sizeZ=voxels.getDomain()(2);
@@ -692,46 +686,46 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
                                                 voxels(VecN<3,int>(x+stepX,y+stepY,z)),maximum(
                                                     voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),
                                                     voxels(VecN<3,int>(x,y+stepY,z+stepZ)))))))));
-                Visualization::Cube c = {{
+                Visualization::_Cube c = {{
                                              {x,y,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),    voxels(VecN<3,int>(x,y,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),    voxels(VecN<3,int>(x,y,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                                              },
                                              {x,y,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),    voxels(VecN<3,int>(x,y,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),    voxels(VecN<3,int>(x,y,z))) / -stepZ
                                              },
                                              {x,y+stepY,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),   voxels(VecN<3,int>(x,y,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),   voxels(VecN<3,int>(x,y,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y+stepY,z,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
                                              },
                                              {x+stepX,y+stepY,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                                              },
                                              {x,y+stepY,z+stepZ,
-                                              Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
-                                              Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
+                                              _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
+                                              _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
                                              }
                                          },{
                                              static_cast<pop::F32>(voxels(VecN<3,int>(x,y,z)).lumi()),
@@ -746,44 +740,44 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
 
                 //                Visualization::Cube c = {{
                 //                              {x,y,z,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x,y,z))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y,z))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x,y,z))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y,z))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z))) / -stepZ
                 //                              },
                 //                              {x+stepX,y,z,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                 //                              },
                 //                              {x+stepX,y,z+stepZ,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),    voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),    voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),    voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),    voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepZ
                 //                              },
                 //                              {x,y,z+stepZ,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepZ
                 //                              },
                 //                              {x,y+stepY,z,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
                 //                              },
                 //                              {x+stepX,y+stepY,z,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),    voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),    voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),    voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),    voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                 //                              },
                 //                              {x+stepX,y+stepY,z+stepZ,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))) / -stepZ
                 //                              },
                 //                              {x,y+stepY,z+stepZ,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),    voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepY,
-                //                               Private::affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),    voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepZ
+                //                               affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),    voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepY,
+                //                               affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),    voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepZ
                 //                              }
                 //                          },{
                 //                              voxels(VecN<3,int>(x,y,z)).lumi(),
@@ -795,7 +789,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
                 //                              voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)).lumi(),
                 //                              voxels(VecN<3,int>(x,y+stepY,z+stepZ)).lumi()
                 //                          }};
-                processCube(c, vertexList,cc);
+                _processCube(c, vertexList,cc);
 
             }
         }
@@ -803,7 +797,7 @@ std::vector<std::pair<Visualization::vertex,RGBUI8 > > Visualization::runMarchin
 
     return vertexList;
 }
-std::vector<Visualization::vertex > Visualization::runMarchingCubes2(const MatN<3,F64 > &voxel,F32 isosurface) {
+std::vector<Visualization::_vertex > Visualization::_runMarchingCubes2(const MatN<3,F64 > &voxel,F32 isosurface) {
 
     MatN<3,F32 > voxels(voxel.getDomain()+4);
     voxels=-1;
@@ -817,7 +811,7 @@ std::vector<Visualization::vertex > Visualization::runMarchingCubes2(const MatN<
         voxels(x)=voxel(it.x());
     }
 
-    std::vector<vertex > vertexList;
+    std::vector<_vertex > vertexList;
     int sizeX =  voxels.getDomain()(0);
     int sizeY=voxels.getDomain()(1);
     int sizeZ=voxels.getDomain()(2);
@@ -830,7 +824,7 @@ std::vector<Visualization::vertex > Visualization::runMarchingCubes2(const MatN<
     for(pop::F32 x = stepX; x < sizeX-2*stepX; x += stepX) {
         for(pop::F32 y = stepY; y < sizeY-2*stepY; y += stepY) {
             for(pop::F32 z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
-                cubeF c = {{
+                _cubeF c = {{
                                {x,y,z,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y,z))-voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x,y+stepY,z))-voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
@@ -881,7 +875,7 @@ std::vector<Visualization::vertex > Visualization::runMarchingCubes2(const MatN<
                                static_cast<pop::F32>(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))),
                                static_cast<pop::F32>(voxels(VecN<3,int>(x,y+stepY,z+stepZ)))
                            }};
-                processCube(c, vertexList,isosurface,true);
+                _processCube(c, vertexList,isosurface,true);
 
             }
         }

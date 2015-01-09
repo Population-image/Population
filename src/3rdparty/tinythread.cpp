@@ -308,6 +308,7 @@ ParallelWorkers::ParallelWorkers(int nbr_thread)
     :_current_thread(0),_v_thread(nbr_thread)
 #endif
 {
+    (void)nbr_thread;
 #if defined(HAVE_THREAD)
     for(unsigned int i=0;i<_v_thread.size();i++)
         _v_thread[i]=NULL;

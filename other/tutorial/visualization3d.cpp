@@ -90,18 +90,9 @@ void visu3DMarchingCube(){
 }
 
 int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    try{//Enclose this portion of code in a try block with
-
-        visu2DSlice();
-        visu3DCube();
-        visu3DCubeExtrudedWithAxis();
-
-        visu3DMarchingCube();
-        visu3DSlice();
-
-    }
-    catch(const pexception &e){
-        std::cerr<<e.what()<<std::endl;
-    }
+    visu2DSlice();
+    visu3DCube();
+    visu3DCubeExtrudedWithAxis();
+    visu3DMarchingCube();
+    visu3DSlice();
 }

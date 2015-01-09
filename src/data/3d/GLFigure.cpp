@@ -459,27 +459,27 @@ void FigureCone::callEndMode()
 void FigureArrow::draw()
 {
 
-    cone.draw();
-    line.draw();
+    _cone.draw();
+    _line.draw();
 
 }
 
 void FigureArrow::setArrow(const Vec3F64 x1,const Vec3F64 x2,double heigh_peak){
-    line.x1=x1;
-    line.x2=x2;
-    cone.x = x2;
-    cone.dir = (x2-x1)/(x2-x1).norm();
-    cone.h = heigh_peak;
-    cone.r = heigh_peak/2;
+    _line.x1=x1;
+    _line.x2=x2;
+    _cone.x = x2;
+    _cone.dir = (x2-x1)/(x2-x1).norm();
+    _cone.h = heigh_peak;
+    _cone.r = heigh_peak/2;
 }
 void FigureArrow::setTransparent(UI8  transparent){
-    line.setTransparent(transparent);
-    cone.setTransparent(transparent);
+    _line.setTransparent(transparent);
+    _cone.setTransparent(transparent);
 }
 
 void FigureArrow::setRGB(const RGBUI8& RGB){
-    line.setRGB(RGB);
-    cone.setRGB(RGB);
+    _line.setRGB(RGB);
+    _cone.setRGB(RGB);
 }
 
 
@@ -489,8 +489,8 @@ FigureArrow::FigureArrow(){
 FigureArrow * FigureArrow::clone()const
 {
     FigureArrow * cone = new FigureArrow();
-    cone->cone =this->cone;
-    cone->line =this->line;
+    cone->_cone =this->_cone;
+    cone->_line =this->_line;
     cone->_RGB =this->_RGB;
     cone->_transparant =this->_transparant;
     return cone;
@@ -499,11 +499,11 @@ FigureArrow * FigureArrow::clone()const
 
 VecN<3,F32> FigureArrow::getMax()const
 {
-    return line.getMax();
+    return _line.getMax();
 }
 VecN<3,F32> FigureArrow::getMin()const
 {
-    return line.getMin();
+    return _line.getMin();
 }
 void FigureArrow::callBeginMode()
 {

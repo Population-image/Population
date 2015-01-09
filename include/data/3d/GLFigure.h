@@ -195,8 +195,8 @@ class POP_EXPORTS FigureArrow:public GeometricalFigure
 {
 public:
 
-    FigureCone cone;
-    FigureLine line;
+    FigureCone _cone;
+    FigureLine _line;
     FigureArrow();
     void setArrow(const Vec3F64 x1,const Vec3F64 x2,double heigh_peak);
      void setTransparent(UI8  transparent);

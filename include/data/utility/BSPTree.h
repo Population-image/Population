@@ -235,8 +235,8 @@ private:
         }
     }* _root;
     struct HeapItem {
-        HeapItem( int index, double dist) :
-            index(index), dist(dist) {}
+        HeapItem( int index_value, double dist_value) :
+            index(index_value), dist(dist_value) {}
         int index;
         double dist;
         bool operator<( const HeapItem& o ) const {
@@ -248,7 +248,7 @@ private:
     {
         const T& item;
         DistanceOperator op_dist;
-        DistanceComparator( const T& item ) : item(item) {}
+        DistanceComparator( const T& item_value ) : item(item_value) {}
         bool operator()(const T& a, const T& b) {
             return op_dist( item, a ) <op_dist( item, b );
         }

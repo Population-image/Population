@@ -2713,11 +2713,11 @@ MatNIteratorENeighborhoodAmoebas<Function >::MatNIteratorENeighborhoodAmoebas(co
     _label=0;
     _grad = Processing::gradientVecSobel(in);
     for(unsigned int i=0;i<Function::DIM;i++){
-         VecN<Function::DIM,I32>  x;
-        x(i)=-1;
-        _x_add.push_back(x);
-        x(i)= 1;
-        _x_add.push_back(x);
+         VecN<Function::DIM,I32>  x_pos;
+        x_pos(i)=-1;
+        _x_add.push_back(x_pos);
+        x_pos(i)= 1;
+        _x_add.push_back(x_pos);
     }
 }
 

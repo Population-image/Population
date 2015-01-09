@@ -580,9 +580,9 @@ struct POP_EXPORTS Analysis
             while(it.next()&&inside==true){
                 typename MatN<DIM,TypePixel>::E xprime = it.x()-r;
                 if(xprime.norm(norm)<=r){
-                    typename MatN<DIM,TypePixel>::E xprime = it.x()+add;
-                    if(f.isValid(xprime)){
-                        m(f(xprime),r+1) ++;
+                    typename MatN<DIM,TypePixel>::E xxprime = it.x()+add;
+                    if(f.isValid(xxprime)){
+                        m(f(xxprime),r+1) ++;
                     }else{
                         inside = false;
                     }
@@ -644,10 +644,10 @@ struct POP_EXPORTS Analysis
                 typename MatN<DIM,UI8>::E xprime = it.x()-r;
                 F64 rrcurent = xprime.norm(norm);
                 if(rrcurent<=rr){
-                    typename MatN<DIM,UI8>::E xprime = it.x()+add;
-                    if(bin.isValid(xprime)){
+                    typename MatN<DIM,UI8>::E xxprime = it.x()+add;
+                    if(bin.isValid(xxprime)){
                         count++;
-                        if(bin(xprime)==0) countpore++;
+                        if(bin(xxprime)==0) countpore++;
                     }else{
                         inside = false;
                     }
@@ -914,11 +914,11 @@ struct POP_EXPORTS Analysis
         for(int i=0;i<DIM;i++)
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
 
-        for(int i=0;i<nbrtest;i++)
+        for(int index_test=0;index_test<nbrtest;index_test++)
         {
             typename MatN<DIM,TypePixel>::E  x ;
-            for(int i=0;i<DIM;i++)
-                x(i)=dist[i].randomVariable();
+            for(int ii=0;ii<DIM;ii++)
+                x(ii)=dist[ii].randomVariable();
             TypePixel etat1 = f(x);
             for(int i=0;i<DIM;i++)
             {
@@ -986,7 +986,7 @@ struct POP_EXPORTS Analysis
         std::vector<DistributionUniformInt> dist;
         for(int i=0;i<DIM;i++)
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
-        for(int i=0;i<nbrtest;i++)
+        for(int index_test=0;index_test<nbrtest;index_test++)
         {
             typename MatN<DIM,TypePixel>::E  x ;
             for(int i=0;i<DIM;i++)
@@ -1064,16 +1064,16 @@ struct POP_EXPORTS Analysis
     static Mat2F64 chord(const MatN<DIM,TypePixel> & f, int nbrchord=20000000)
     {
         Mat2F64 m;
-        std::vector<DistributionUniformInt> dist;
+        std::vector<DistributionUniformInt> random_dist;
         for(int i=0;i<DIM;i++)
-            dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
+            random_dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
         DistributionUniformInt c (0,DIM-1);
-        for(int i=0;i<nbrchord;i++)
+        for(int index_test=0;index_test<nbrchord;index_test++)
         {
             int direction = c.randomVariable();
             typename MatN<DIM,TypePixel>::E  x ;
             for(int i=0;i<DIM;i++)
-                x(i)=dist[i].randomVariable();
+                x(i)=random_dist[i].randomVariable();
             int phase = f(x);
             bool boundary =false;
             int dist =-1;
@@ -1721,8 +1721,8 @@ struct POP_EXPORTS Analysis
         {
             //      std::cout<<"i "<<v_link[i].first<<" et "<< v_link[i].second<<std::endl;
             if(v_link[i].first!=-1&& v_link[i].second!=-1){
-                int edge = g.addEdge();
-                g.connection(edge,v_link[i].first,  v_link[i].second);
+                int label_edge = g.addEdge();
+                g.connection(label_edge,v_link[i].first,  v_link[i].second);
             }
             else if(v_link[i].first==-1&& v_link[i].second==-1){
                 tore++;

@@ -193,6 +193,8 @@ inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,RGBU
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,RGBF64 > >){return std::make_pair("PU","PV");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,ComplexF64 > >){return std::make_pair("PZ","P1");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,Vec3F64 > >){return std::make_pair("Pc","Pd");}
+template<int Dim,typename PixelType>
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<Dim,PixelType > >){return std::make_pair("Unknown","Unknown");}
 }
 template<int Dim, typename Type>
 void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)

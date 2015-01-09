@@ -678,10 +678,10 @@ struct POP_EXPORTS Visualization
         //        }else {
         //            Convertor::fromRGB(img,img,img,binc);
         //        }
-        std::vector<std::pair<vertex,RGBUI8 > > vertices = runMarchingCubes2(binc);
+        std::vector<std::pair<_vertex,RGBUI8 > > vertices = _runMarchingCubes2(binc);
         while(vertices.empty()==false)
         {
-            vertex vert = vertices.back().first;
+            _vertex vert = vertices.back().first;
             RGBUI8 RGB = vertices.back().second;
             vertices.pop_back();
             FigureTriangle * triangle = new FigureTriangle();
@@ -734,11 +734,11 @@ struct POP_EXPORTS Visualization
     {
 
 
-        std::vector<vertex> vertices = runMarchingCubes2(phasefied,0);
+        std::vector<_vertex> vertices = _runMarchingCubes2(phasefied,0);
         //        MatN<3,RGBUI8 >::IteratorENeighborhood itn (maRGB.getIteratorENeighborhood(1,0));
         while(vertices.empty()==false)
         {
-            vertex vert = vertices.back();
+            _vertex vert = vertices.back();
             vertices.pop_back();
             FigureTriangle * triangle = new FigureTriangle();
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
@@ -791,10 +791,10 @@ struct POP_EXPORTS Visualization
 
     static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied,const MatN<3,RGBUI8>  & RGBfield)
     {
-        std::vector<vertex> vertices = runMarchingCubes2(phasefied,0);
+        std::vector<_vertex> vertices = _runMarchingCubes2(phasefied,0);
         while(vertices.empty()==false)
         {
-            vertex vert = vertices.back();
+            _vertex vert = vertices.back();
             vertices.pop_back();
             FigureTriangle * triangle = new FigureTriangle();
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
@@ -1279,28 +1279,30 @@ struct POP_EXPORTS Visualization
     //@}
 
 private:
-    struct vertex {
+    struct _vertex {
         F32 x, y, z, normal_x, normal_y, normal_z;
     };
 
 
-    struct Cube {
-        vertex p[8];
+    struct _Cube {
+        _vertex p[8];
         F32 val[8];
     };
-    struct cubeF {
-        vertex p[8];
+    struct _cubeF {
+        _vertex p[8];
         F32 val[8];
     };
 
 
-    static void processCube(Cube cube, std::vector<std::pair<vertex,RGBUI8 > >& vertexList,RGBUI8 value,bool diff=false);
-    static void processCubeIso(Cube cube, std::vector<std::pair<vertex,RGBUI8 > >& vertexList,RGBUI8 value,unsigned char isolevel);
-    static void processCube(cubeF cube, std::vector<vertex>& vertexList,F32 isolevel =0.5,bool diff=false);
-    static std::vector<std::pair<vertex,RGBUI8 > > runMarchingCubes2(const MatN<3,RGB<UI8 > > &voxel);
-    static std::vector<vertex > runMarchingCubes2(const MatN<3,F64 > &phasefield,F32 isosurface) ;
-    static std::vector<std::pair<vertex,RGBUI8 > > runMarchingCubesSurfaceContact(const MatN<3,RGB<UI8 > > &voxel);
-    static Visualization::vertex interpolate(Visualization::vertex p1, Visualization::vertex p2, F32 p1value=1, F32 p2value=0 , F32 iso=0.5 );
+    static void _processCube(_Cube cube, std::vector<std::pair<_vertex,RGBUI8 > >& vertexList,RGBUI8 value,bool diff=false);
+    static void _processCubeIso(_Cube cube, std::vector<std::pair<_vertex,RGBUI8 > >& vertexList,RGBUI8 value,unsigned char isolevel);
+    static void _processCube(_cubeF cube, std::vector<_vertex>& vertexList,F32 isolevel =0.5,bool diff=false);
+    static std::vector<std::pair<_vertex,RGBUI8 > > _runMarchingCubes2(const MatN<3,RGB<UI8 > > &voxel);
+    static std::vector<_vertex > _runMarchingCubes2(const MatN<3,F64 > &phasefield,F32 isosurface) ;
+    static std::vector<std::pair<_vertex,RGBUI8 > > _runMarchingCubesSurfaceContact(const MatN<3,RGB<UI8 > > &voxel);
+    static Visualization::_vertex _interpolate(Visualization::_vertex p1, Visualization::_vertex p2, F32 p1value=1, F32 p2value=0 , F32 iso=0.5 );
+    static F32 _affectRGB(RGBUI8 c1,RGBUI8 c2);
+
 };
 
 template<typename TypeVoxel1>

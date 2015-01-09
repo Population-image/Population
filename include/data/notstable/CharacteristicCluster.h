@@ -68,6 +68,11 @@ struct POP_EXPORTS CharacteristicClusterFilterAsymmetryHeightPerWidth : public C
 
     bool operator ()(const CharacteristicCluster& a);
 };
+namespace Private{
+    bool sortMyFunction (std::pair<double,int> i,std::pair<double,int> j);
+    bool sortMyFunctionLeft (std::pair<int,int>  i,std::pair<int,int> j) ;
+}
+
 Vec<CharacteristicCluster> applyCharacteristicClusterFilter(const Vec<CharacteristicCluster>& v_cluster, CharacteristicClusterFilter * filter);
 
 pop::Mat2UI32 POP_EXPORTS applyClusterFilter(const pop::Mat2UI32& labelled_image,const Vec<CharacteristicClusterFilter*> v_filter  );
@@ -240,9 +245,5 @@ struct CharacteristicClusterMix :  CharacteristicMass, CharacteristicBoundingBox
         CharacteristicGreyLevel<Function>::addPoint(x);
     }
 };
-
-
-
-
 }
 #endif // CARACTERISTICCLUSTER_H

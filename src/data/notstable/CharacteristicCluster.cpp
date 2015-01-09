@@ -135,10 +135,10 @@ pop::Mat2UI32 applyClusterFilter(const pop::Mat2UI32& labelled_image, Vec<Charac
     }
     return  Processing::greylevelRemoveEmptyValue(labelled_image_out);
 }
-
+namespace Private{
 bool sortMyFunction (std::pair<double,int> i,std::pair<double,int> j) { return (i.first<j.first); }
 bool sortMyFunctionLeft (std::pair<int,int>  i,std::pair<int,int> j) { return (i.first<j.first); }
-
+}
 
 Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<CharacteristicClusterDistance*> v_dist, Vec<double> v_weight ,double threshold ){
 
@@ -224,7 +224,7 @@ Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<Ch
     for(unsigned int i=0;i<v_word_label.size();i++){
         v_word.push_back(Vec<Mat2UI8>());
         Vec<std::pair<int,int> > & _v_temp = v_word_label(i);
-        std::sort(_v_temp.begin(),_v_temp.end(),sortMyFunctionLeft);
+        std::sort(_v_temp.begin(),_v_temp.end(),Private::sortMyFunctionLeft);
         for(unsigned int j=0;j<_v_temp.size();j++){
             //            labels(_v_temp(j).second-1).display();
             v_word(i).push_back(labels(_v_temp(j).second-1) );
