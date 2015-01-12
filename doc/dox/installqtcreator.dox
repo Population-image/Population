@@ -40,5 +40,10 @@ Of course, you can activate third party modules (VLC, openmp) by uncommented lin
 \code
 CONFIG += HAVE_OPENMP  #openmp optimization working for many algorithms (a must have for 3d images or real time)
 \endcode
+
+\section qmakecmake open CMakeLists.txt
+
+Thanks to qtcreator, you can also open CMakeLists.txt for people familiar with cmake. 
+
 */
 
