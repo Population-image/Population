@@ -29,4 +29,8 @@ sub_resoltion.display();//(128,128,128) 3d image size
 \endcode
 
 When the prototype is finished, you comment this line to process the full matrix and you take a coffe.
+C++ code:
+\include prototyping3d.cpp
 */
+
+

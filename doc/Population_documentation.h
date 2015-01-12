@@ -47,6 +47,8 @@ The documentation is on the <a href="modules.html">module page</a>.
 
 \section Tutorials  Tutorials
 
+
+For these tutorials, the C++/python codes are here $${PopulationPath}/other/tutorial/ (with cmake-gui BUILD_TUTORIAL=ON).
 The more important tutorial is this one  \ref pagefirststep to start coding. Then, you have : 
 - Matrix data-structure
 	- \ref pageimagebasic
@@ -63,7 +65,7 @@ The more important tutorial is this one  \ref pagefirststep to start coding. The
 	- \ref pagearchitecture
 	- \ref pagetemplateprogramming
 
-You can find some C++/python codes at the end of these following tutorials or here $${PopulationPath}/other/tutorial/.
+
   
 **/
 

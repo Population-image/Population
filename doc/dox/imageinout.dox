@@ -50,10 +50,6 @@ For instance, if the voxel is coded in 1 byte with 256 raw, 256 columns and 100 
 Mat3UI8 m;//contruct an empty 3d matrix with 1 byte pixel type 
 m.loadRaw("D:/Users/vtariel/Documents/binary/data_256_256_100.raw",Vec3I32(256,256,100));
 \endcode
-
-
-
-
-
-
+C++ code:
+\include loadsave.cpp
 */

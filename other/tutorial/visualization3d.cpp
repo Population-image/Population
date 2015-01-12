@@ -39,9 +39,6 @@ void visu3DCubeExtrudedWithAxis(){
     waitKey();
 }
 
-
-
-
 void visu3DSlice(){
     Mat3UI8 img;
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
@@ -53,14 +50,10 @@ void visu3DSlice(){
     scene.display(false);
     waitKey();
 }
-
-
 void visu3DMarchingCube(){
-
     Mat3UI8 img;
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/rock3d.pgm"));
     img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
-
     //SEGMENTATION OF THE TREE PHASES
     Mat3UI8 imgfilter= Processing::median(img,2);
     Mat3UI8 grain= Processing::threshold(imgfilter,155);

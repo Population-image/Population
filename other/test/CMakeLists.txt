@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project( test_main )
 link_directories (${POPULATION_LIB_DIR})
 include_directories(${POPULATION_INCLUDE_DIRS})
-add_executable( runtest runtest.cpp poptest.h poptest.cpp ${POPULATION_SOURCES})
+add_executable( runtest runtest.cpp poptest.h ${POPULATION_SOURCES})
 target_link_libraries(runtest ${POPULATION_LIBRARY})
 
 

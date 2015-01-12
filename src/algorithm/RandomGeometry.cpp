@@ -171,6 +171,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
         else
             g(i,1)=-Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral2,-autocorrelation(i,0),0,1,0.001);
     }
+    Distribution(g).display();
     double pi =3.14159265;
     double step2 =0.001;
     double maxrange=2;
@@ -180,16 +181,59 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
         double sum=0;
         double k =step2*i;
         rho_k(i,0)=k;
-        for(unsigned int r= 1; r<g.sizeI();r++)//(int)g.proba.size();r++)
+        for(unsigned int r= 1; r<g.sizeI();r++)//(int)g.proba.size();r++)P(k,1)=
         {
 
             sum +=(1/(2*pi*pi))*r*r*g(r,1)*std::sin(k*r)/(k*r);
         }
         rho_k(i,1)=sum;
     }
+    Distribution(rho_k).display();
     Mat2F64 P(rho_k.sizeI(),2);
     double sumnegative=0;
-    double factor=1;
+    double min_value =0;
+//    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
+//    {
+//        P(k,0)=rho_k(k,0);
+//        double value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
+//        P(k,1)= value;
+//        min_value = std::min(min_value,P(k,1));
+//    }
+//    Distribution(P).display();
+//    int index_neg_min=0, index_neg_max=0;
+//    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
+//    {
+//        P(k,1)+=-min_value;
+//        if(P(k,1)<0){
+//            sumnegative+=-P(k,1);
+//            if(index_neg_min==0){
+//                index_neg_min =k;
+//            }
+//        }else{
+//            if(sumnegative!=0){
+//                index_neg_max = k;
+//                index_neg_min=index_neg_min-1;
+//                while(sumnegative>0){
+//                    double mini = std::min(P(index_neg_min,1),P(index_neg_max,1));
+//                    if(mini<0.5*sumnegative){
+//                        P(index_neg_min,1)-=0.5*sumnegative;
+//                        P(index_neg_max,1)-=0.5*sumnegative;
+//                        sumnegative=0;
+//                    }else{
+//                        P(index_neg_min,1)-=mini;
+//                        P(index_neg_max,1)-=mini;
+//                        sumnegative=sumnegative-2*mini;
+//                        index_neg_max++;
+//                        index_neg_min--;
+//                    }
+//                }
+//                sumnegative=0;
+//                index_neg_min=0;
+//            }
+//        }
+//    }
+//    Distribution(P).display();
+
     for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
     {
         P(k,0)=rho_k(k,0);
@@ -197,7 +241,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
 
         if(value>0){
             if(sumnegative==0)
-                P(k,1)= value*factor;
+                P(k,1)= value;
             else{
                 if(value<sumnegative){
                     P(k,1)=0;
@@ -230,9 +274,9 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
         }
     }
     DistributionRegularStep Prob(P);
-    Prob.smoothGaussian(10);
+//    Prob.smoothGaussian(10);
     Prob = Statistics::toProbabilityDistribution(Prob,Prob.getXmin(),Prob.getXmax(),Prob.getStep());
-    Prob.display();
+//    Prob.display();
     return Prob;
 }
 }

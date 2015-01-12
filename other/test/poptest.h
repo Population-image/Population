@@ -37,7 +37,6 @@ in the Software.
 #include"Population.h"
 namespace pop
 {
-
 struct PopTest
 {
    std::string _name_operator;
@@ -46,9 +45,7 @@ struct PopTest
    PopTest(){
        _bool_write =false;
    }
-
-
-   void start(std::string name_operator, std::string param=std::string()){
+   inline void start(std::string name_operator, std::string param=std::string()){
        _name_operator = name_operator;
        _start_time = clock();
    }
@@ -79,7 +76,6 @@ struct PopTest
        _end_time = clock();
       std::cout<<"[GOOD]["+ _name_operator +"]  execute in " << (double) (_end_time - _start_time) / CLOCKS_PER_SEC<<std::endl;
    }
-
 };
 }
 

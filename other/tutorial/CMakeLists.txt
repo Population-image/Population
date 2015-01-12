@@ -10,6 +10,12 @@ link_directories (${POPULATION_LIB_DIR})
 add_executable(tutorial_basic_definition basic_definition.cpp)
 target_link_libraries (tutorial_basic_definition ${POPULATION_DEP_LIBRARIES} population)
 
+add_executable(tutorial_loadsave loadsave.cpp)
+target_link_libraries (tutorial_loadsave ${POPULATION_DEP_LIBRARIES} population)
+
+add_executable(tutorial_fastprototyping3d fastprototyping3d.cpp)
+target_link_libraries (tutorial_fastprototyping3d ${POPULATION_DEP_LIBRARIES} population)
+
 add_executable(tutorial_segmentation_threshold segmentation.cpp)
 target_link_libraries (tutorial_segmentation_threshold ${POPULATION_DEP_LIBRARIES} population)
 

@@ -13,7 +13,7 @@ void testAnnealing(){
     Vec2I32 v(512,512);
     Mat2F64 volume_fraction = Analysis::histogram(threshold);
     Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-    RandomGeometry::annealingSimutated(random,threshold,8);
+    RandomGeometry::annealingSimutated(random,threshold,8,256,0.01);
     Visualization::labelToRandomRGB(random).display();
 }
 void testUniformPoissonPointProcess2D(){
@@ -282,11 +282,11 @@ void artAborigene(){
     aborigenart.save("../../../art_aborigene.jpg");
    // aborigenart.save("/home/vincent/Desktop/Population/doc/image/AborigenLena.bmp");
 }
-
 int main()
 {
     testAnnealing();
-    artAborigene();
+//    artAborigene();
+
     return 0;
 }
 

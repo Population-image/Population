@@ -872,8 +872,6 @@ public:
 
 
     /*!
-
-
     * \brief annealing simulated method for 3d reconstruction based on correlation function
     * \param model model matrix (input t=0, output=end)
     * \param img_reference reference matrix
@@ -1634,18 +1632,21 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
 
     DistributionUniformReal d2pi(0,2*3.14159265);
     DistributionMultiVariateUnitSphere dpshere(DIM);
-    int number_cosinus=10000;
+    int number_cosinus=1000;
     Vec< VecN<DIM, double> > direction(number_cosinus);
     Vec<  double > module(number_cosinus);
     Vec<  double > phase(number_cosinus);
+    std::cout<<"generate cosinus"<<std::endl;
     for(int i=0;i<number_cosinus;i++){
         double p = d2pi.randomVariable();
         phase[i] = p;
         module[i] = Pmagnitude.randomVariable();
         direction[i]= dpshere.randomVariable();
     }
+
     gaussianfield.resize(domain);
     typename MatN<DIM,double>::IteratorEDomain b(gaussianfield.getIteratorEDomain());
+    std::cout<<"generate field"<<std::endl;
     while(b.next())
     {
         double sum=0;
