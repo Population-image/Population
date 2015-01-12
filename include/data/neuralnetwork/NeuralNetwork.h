@@ -813,7 +813,7 @@ struct POP_EXPORTS TrainingNeuralNetwork
     *     TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(n,"/home/vincent/train-images.idx3-ubyte",
                                                                            "/home/vincent/train-labels.idx1-ubyte",
                                                                            "/home/vincent/t10k-images.idx3-ubyte",
-                                                                           "/home/vincent/t10k-labels.idx1-ubyte",1,5);
+                                                                           "/home/vincent/t10k-labels.idx1-ubyte",1);
     * \endcode
     */
     static  void neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard=1,double elastic_distortion=0);

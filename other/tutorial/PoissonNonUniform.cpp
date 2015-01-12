@@ -2,9 +2,8 @@
 using namespace pop;//Population namespace
 int main()
 {
-
     Mat2UI8 img;
-    img.load("../Lena.bmp");
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
     //Initial porespacefield  with a local porosity equal to 1-(img(x)/255)
     Mat2F64 porespacefield =  Mat2F64(img)/255 ;
     std::cout<<"Macro porosity: "<<1-Analysis::meanValue(porespacefield)<<std::endl;//the
@@ -21,11 +20,10 @@ int main()
         nonuniformlambdafield(it.x())=v/surface_expectation;
     }
     //boolean model
-    GermGrain2 grain = RandomGeometry::poissonPointProcessNonUniform(nonuniformlambdafield);//generate the 2d Poisson point process
+    ModelGermGrain2 grain = RandomGeometry::poissonPointProcessNonUniform(nonuniformlambdafield);//generate the 2d Poisson point process
     RandomGeometry::sphere(grain,dnormal);//dress the VecNs with disks
     Mat2UI8 lattice = RandomGeometry::continuousToDiscrete(grain);//conversion to lattice
     std::cout<<"Realization porosity: "<<1-Analysis::meanValue(lattice)/255.<<std::endl;
     lattice.display();
-    lattice.save("../doc/image2/NonUniformLena.png");
     return 1;
 }

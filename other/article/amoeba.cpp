@@ -4,7 +4,6 @@ using namespace pop;
 
 
 
-Mat2UI8 erosion()
 
 
 int main(){

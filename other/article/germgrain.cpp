@@ -1,6 +1,6 @@
 #ifndef ARTICLEGERMGRAIN_H
 #define ARTICLEGERMGRAIN_H
-#include"../../../Population.h"//Single header
+#include"Population.h"
 using namespace pop;//Population namespace
 void testAnnealing(){
     Mat2UI8 img;//2d grey-level image object
@@ -55,7 +55,7 @@ void testMinOverlap(){
     ModelGermGrain<2> germgrain =  pop::RandomGeometry::poissonPointProcess(domain,0.002);
 
     ModelGermGrain<2> germgrain2 = germgrain;
-    pop::RandomGeometry::minOverlapFilter(germgrain2,20,true);
+    pop::RandomGeometry::minOverlapFilter(germgrain2,20);
     DistributionDirac d(10);
     pop::RandomGeometry::sphere(germgrain,d);
     pop::RandomGeometry::sphere(germgrain2,d);
@@ -84,7 +84,7 @@ void testSingleSphere(){
     ModelGermGrain3 germgrain;
     germgrain.setDomain(Vec3F64(size,size,size));
     germgrain.grains().push_back(sphere);
-    germgrain.setBoundaryCondition(Boundary_Condition_Mirror);
+    germgrain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
     Mat3UI8 m = RandomGeometry::continuousToDiscrete(germgrain);
     Scene3d scene;
     Visualization::marchingCube(scene,m);
@@ -256,7 +256,8 @@ void artAborigene(){
     Vec2F64 domain;
     domain= img.getDomain();
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,1);//generate the 2d Poisson point process
-    RandomGeometry::hardCoreFilter(grain,radius,false);
+    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+    RandomGeometry::hardCoreFilter(grain,radius);
     Distribution d ("1/x^3");
     d = Statistics::toProbabilityDistribution(d,5,256);
     //Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
@@ -265,9 +266,10 @@ void artAborigene(){
     grain.setModel( DeadLeave);
     grain.setTransparency(0.5);
     Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
-    RGBUI8 mean = Analysis::meanValue(img);
+    Mat2RGBUI8::IteratorEDomain it = img.getIteratorEDomain();
+    RGBUI8 mean = AnalysisAdvanced::meanValue(img,it);
     std::cout<<mean<<std::endl;
-    Mat2RGBUI8::IteratorEDomain it(img.getIteratorEDomain());
+    it.init();
     while(it.next()){
        if(aborigenart(it.x())==RGBUI8(0))
             aborigenart(it.x())=mean;
