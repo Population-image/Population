@@ -1,10 +1,10 @@
 #include "data/neuralnetwork/NeuralNetwork.h"
+#include "data/distribution/DistributionAnalytic.h"
+#include "data/mat/MatN.h"
+#include "data/mat/MatNInOut.h"
+#include "data/mat/MatNDisplay.h"
+#include "PopulationConfig.h"
 
-#include"data/distribution/DistributionAnalytic.h"
-
-#include"data/mat/MatN.h"
-#include"data/mat/MatNInOut.h"
-#include"data/mat/MatNDisplay.h"
 namespace pop {
 #define SIGMOID(x) (1.7159*tanh(0.66666667*x))
 #define DSIGMOID(S) (0.66666667/1.7159*(1.7159+(S))*(1.7159-(S)))  // derivative of the sigmoid as a function of the sigmoid's output
@@ -85,7 +85,9 @@ void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF6
     // to the input vector
     NNLayer & layerfirst = *(_layers[0]);
     POP_DbgAssert( in.size() == layerfirst._neurons.size() );
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for(unsigned int i_neuron=0;i_neuron<layerfirst._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerfirst._neurons[i_neuron]);
         neuron->_Xn =  in(i_neuron);
@@ -100,7 +102,9 @@ void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF6
     // load up output vector with results
     NNLayer & layerout = *(_layers[_layers.size()-1]);
     out.resize(layerout._neurons.size());
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for(unsigned int i_neuron=0;i_neuron<layerout._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerout._neurons[i_neuron]);
         out(i_neuron) = neuron->_Xn;
@@ -110,7 +114,9 @@ void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF64& des
 {
     NNLayer & layerlast = *(_layers[_layers.size()-1]);
     POP_DbgAssert( desired_output.size() == layerlast._neurons.size() );
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for(unsigned int i_neuron=0;i_neuron<layerlast._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerlast._neurons[i_neuron]);
         neuron->_dErr_dXn = neuron->_Xn -  desired_output(i_neuron);
@@ -123,7 +129,9 @@ void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF64& des
 void NeuralNetworkFeedForward::propagateBackSecondDerivate()
 {
     NNLayer & layerlast = *(_layers[_layers.size()-1]);
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for(unsigned int i_neuron=0;i_neuron<layerlast._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerlast._neurons[i_neuron]);
         neuron->_d2Err_dXn2 = 1;
@@ -870,14 +878,18 @@ NNLayer::~NNLayer(){
 
 void NNLayer::setLearningRate(double eta)
 {
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for(unsigned int i=0;i<_weights.size();i++){
         _weights[i]->_eta = eta;
     }
 }
 void NNLayer::propagateFront()
 {
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -885,7 +897,9 @@ void NNLayer::propagateFront()
     }
 }
 void NNLayer::initPropagateBackFirstDerivate(){
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -894,13 +908,17 @@ void NNLayer::initPropagateBackFirstDerivate(){
 }
 void NNLayer::propagateBackFirstDerivate()
 {
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
         n->initPropagateBackFirstDerivate();
     }
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -908,7 +926,9 @@ void NNLayer::propagateBackFirstDerivate()
     }
 }
 void NNLayer::initPropagateBackSecondDerivate(){
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -918,13 +938,17 @@ void NNLayer::initPropagateBackSecondDerivate(){
 
 void NNLayer::propagateBackSecondDerivate()
 {
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
         n->initPropagateBackSecondDerivate();
     }
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -935,7 +959,9 @@ void NNLayer::propagateBackSecondDerivate()
 
 void NNLayer::learningFirstDerivate()
 {
+#if defined(HAVE_OPENMP)
 #pragma omp parallel for
+#endif
     for( unsigned int i_weight =0;i_weight< _weights.size(); i_weight++ )
     {
         NNWeight * w =(_weights[i_weight]);
