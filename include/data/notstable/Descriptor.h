@@ -43,9 +43,9 @@ struct Pyramid
         domain(DIM) = nbr_layers;
         _pyramid.push_back(pop::MatN<DIM+1,Type>(domain));
     }
-    void pushOctave(const pop::MatN<DIM+1,Type>& octave)
+    void pushOctave(const pop::MatN<DIM+1,Type>& octave_single)
     {
-        _pyramid.push_back(octave);
+        _pyramid.push_back(octave_single);
     }
     unsigned int nbrOctave()const{return _pyramid.size();}
     unsigned int nbrLayers(unsigned int index_octave=0)const{return _pyramid(index_octave).getDomain()(DIM);}
@@ -80,8 +80,8 @@ struct KeyPoint
 {
     enum{DIM=Dim};
     KeyPoint(){}
-    KeyPoint(const VecN<DIM,F64>& x)
-        :_x(x){}
+    KeyPoint(const VecN<DIM,F64>& x_value)
+        :_x(x_value){}
     VecN<DIM,F64> _x;
     const VecN<DIM,F64> &x()const
     {
@@ -108,14 +108,14 @@ struct KeyPointPyramid
     unsigned int _nbr_layer_per_octave;
     int _label;
     KeyPointPyramid(){}
-    KeyPointPyramid(const VecN<DIM+1,F64> & x_in_pyramid,unsigned int octave,unsigned int nbr_layer_per_octave=3 )
-        :_x_in_pyramid(x_in_pyramid),_octave(octave),_nbr_layer_per_octave(nbr_layer_per_octave){}
+    KeyPointPyramid(const VecN<DIM+1,F64> & x_in_pyramid,unsigned int octave_value,unsigned int nbr_layer_per_octave=3 )
+        :_x_in_pyramid(x_in_pyramid),_octave(octave_value),_nbr_layer_per_octave(nbr_layer_per_octave){}
     VecN<DIM,F64> x()const
     {
-        VecN<DIM,F64> x;
+        VecN<DIM,F64> x_value;
         for(int i=0;i<DIM;i++)
-            x(i)=_x_in_pyramid(i)*pop::power2(_octave);
-        return x;
+            x_value(i)=_x_in_pyramid(i)*pop::power2(_octave);
+        return x_value;
     }
     F64 layer()const{
         return _x_in_pyramid(DIM);

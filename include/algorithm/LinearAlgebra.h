@@ -372,7 +372,8 @@ struct POP_EXPORTS LinearAlgebra
      * \sa LinearLeastSquareRANSACModel
     */
     static Vec2F64  linearLeastSquares(const Mat2F64 &X,const VecF64 &Y);
-
+private:
+    static void _solvingLinearSystemGaussianEliminationNonInvertible(Mat2F64 &M);
 };
 
 template<typename Matrix>

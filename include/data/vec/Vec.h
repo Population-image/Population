@@ -172,12 +172,12 @@ public:
     Vec(const std::vector<Type1> &v);
 
     /*!
-    * \param  size number of elements
+    * \param  size_vec number of elements
     * \param  value affection value for all elements
     *
     *  constructor a vector with the given size
     */
-    explicit Vec(int size,Type value=Type());
+    explicit Vec(int size_vec, Type value=Type());
 
 
     /*!
@@ -501,8 +501,8 @@ Vec<Type> * Vec<Type>::clone(){
 }
 
 template<typename Type>
-Vec<Type>::Vec(int size,Type value)
-    :std::vector<Type>(size,value)
+Vec<Type>::Vec(int size_vec,Type value)
+    :std::vector<Type>(size_vec,value)
 {
 }
 template<typename Type>

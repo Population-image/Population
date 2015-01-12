@@ -30,24 +30,7 @@ struct exception{
   };
 }
 %template(pairi) std::pair<int,int>;
-namespace pop{
-class pexception : public std::exception
-{
-private:
-  std::string _message;
-public:
-  pexception();
-  pexception(const char *message);
-  pexception(std::string message);
-  //! Return a C-string containing the error message associated to the thrown exception.
-  const char *what() const throw();
-  void display()const throw();
-  virtual ~pexception() throw();
-};
-
-typedef  pop::pexception pexception;
-
-}
+#pragma SWIG nowarn=302,314,317,362,389,509
 //###Processing###
 %include populationfull.i
 

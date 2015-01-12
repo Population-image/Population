@@ -506,7 +506,7 @@ public:
     /*!
     \fn MatN(const VecN<Dim,int>& x,const std::vector<Type>& data)
     \param x domain size of the matrix
-    \param data value of each pixel/voxel
+    \param data_values value of each pixel/voxel
     *
     * construct an matrix of size domain(0),domain(1) for 2D matrix and  domain(0),domain(1),domain(2) for 3D matrix where each pixel/voxel is set by the values contained in the std::vector \n
     *   This code: \n
@@ -526,7 +526,7 @@ public:
     3 2 1 0
     \endcode
     */
-    explicit MatN(const VecN<Dim,int> & x,const std::vector<Type>& data );
+    explicit MatN(const VecN<Dim,int> & x,const std::vector<Type>& data_values );
     /*!
     \fn MatN(const VecN<Dim,int> & x,const Type* v_value )
     \param x domain size of the matrix
@@ -1486,11 +1486,12 @@ public:
     MatN inverse()const;
 
     /*! \brief  \f$I_n = \begin{bmatrix}1 & 0 & \cdots & 0 \\0 & 1 & \cdots & 0 \\\vdots & \vdots & \ddots & \vdots \\0 & 0 & \cdots & 1 \end{bmatrix}\f$
+     * \param size_mat size of the output matrix
      * \return  Identity matrix
      *
      *  Generate the identity matrix or unit matrix of square matrix with the given size for size!=0 or this matrix size with ones on the main diagonal and zeros elsewhere
     */
-    MatN identity(int size=0)const;
+    MatN identity(int size_mat=0)const;
 
     //@}
 
@@ -1606,10 +1607,10 @@ MatN<Dim,Type>::MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
     _domain(0)=sizei;_domain(1)=sizej;_domain(2)=sizek;
 }
 template<int Dim, typename Type>
-MatN<Dim,Type>::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data )
-    :std::vector<Type>(data),_domain(x)
+MatN<Dim,Type>::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data_values )
+    :std::vector<Type>(data_values),_domain(x)
 {
-    POP_DbgAssertMessage((int)data.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data ), the size of input std::vector data must be equal to the number of pixel/voxel");
+    POP_DbgAssertMessage((int)data_values.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const std::vector<Type>& data ), the size of input std::vector data must be equal to the number of pixel/voxel");
 }
 
 template<int Dim, typename Type>
@@ -2189,9 +2190,13 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
     Type sum = 0;
     unsigned int i,j;
     typename MatN::const_iterator this_it,mtrans_it;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(m,mtrans,mout) private(i,j,sum,this_it,mtrans_it)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<this->sizeI();i++){
             for(j=0;j<m.sizeJ();j++){
                 sum = 0;
@@ -2411,10 +2416,10 @@ Type MatN<DIM,Type>::trace() const
 
 }
 template<int DIM, typename Type>
-MatN<DIM,Type> MatN<DIM,Type>::identity(int size)const{
-    if(size==0)
-        size=this->sizeI();
-    MatN<DIM,Type> I(size,size);
+MatN<DIM,Type> MatN<DIM,Type>::identity(int size_mat)const{
+    if(size_mat==0)
+        size_mat=this->sizeI();
+    MatN<DIM,Type> I(size_mat,size_mat);
     for(unsigned int i=0;i<I.sizeI();i++){
         I(i,i)=1;
     }
@@ -2887,9 +2892,13 @@ pop::MatN<2,T1>  productTensoriel(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<2,Type1>::IteratorEDomain ){
     int i,j;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,it_local)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 it_local.init(Vec2I32(i,j));
@@ -2901,9 +2910,13 @@ void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAc
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<3,Type1>::IteratorEDomain ){
     int i,j,k;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,it_local)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 for(k=0;k<f.sizeK();k++){
@@ -2918,9 +2931,13 @@ template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
 {
     unsigned int i,j;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
@@ -2932,9 +2949,13 @@ template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
 {
     unsigned int i,j,k;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
+#endif
     {
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
         for(i=0;i<f.sizeI();i++){
             for(j=0;j<f.sizeJ();j++){
                 for(k=0;k<f.sizeK();k++){

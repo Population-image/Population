@@ -48,7 +48,7 @@ namespace pop
 {
 
 template<int DIM>
-struct ___caractere{
+struct _caractere{
     static double _A_[63],_B_[63], _C_[63],_D_[63],_E_[63],_F_[63],_G_[63],_H_[63],_I_[63],_J_[63],_K_[63],_L_[63],_M_[63],_N_[63],_O_[63],_P_[63],_Q_[63],_R_[63],_S_[63],_T_[63],_U_[63],_V_[63],_W_[63],_X_[63],_Y_[63],_Z_[63],_0_[54],_1_[54],_2_[54],_3_[54],_4_[54],_5_[54],_6_[54],_7_[54],_8_[54],_9_[54],_virgule_[63],_point_[63],_dash_[63],_apostrope_[63],_colons_[63],_space_[63],_parenthese_open_[63],_parenthese_close_[63],_div_[63],_mult_[63],_sub_[63],_plus_[63],_exclamation_[63],_interrogation_[63];
     static Mat2F64 LetterA,LetterB,LetterC,LetterD,LetterE,LetterF,LetterG,LetterH,LetterI,LetterJ,LetterK,LetterL,LetterM,LetterN,LetterO,LetterP,LetterQ,LetterR,LetterS,LetterT,LetterU,LetterV,LetterW,LetterX,LetterY,LetterZ,Letter0,Letter1,Letter2,Letter3,Letter4,Letter5,Letter6,Letter7,Letter8,Letter9,Lettervirgule,Letterpoint,Letterdash,Letterapostrope,Lettercolons,Letterspace,Letterparenthese_open,Letterparenthese_close,Letterdiv,Lettermult,Lettersub,Letterplus,Letterexclamation,Letterinterrogation;
 
@@ -385,157 +385,157 @@ struct POP_EXPORTS Draw
             Mat2F64 mask_letter;
             switch (letter)
             {
-            case '?': mask_letter =pop::___caractere<0>::Letterinterrogation ;
+            case '?': mask_letter =pop::_caractere<0>::Letterinterrogation ;
                 break;
-            case '!': mask_letter =pop::___caractere<0>::Letterexclamation ;
+            case '!': mask_letter =pop::_caractere<0>::Letterexclamation ;
                 break;
-            case ',': mask_letter =pop::___caractere<0>::Lettervirgule ;
+            case ',': mask_letter =pop::_caractere<0>::Lettervirgule ;
                 break;
-            case '.': mask_letter =pop::___caractere<0>::Letterpoint ;
+            case '.': mask_letter =pop::_caractere<0>::Letterpoint ;
                 break;
-            case '_': mask_letter =pop::___caractere<0>::Letterdash ;
+            case '_': mask_letter =pop::_caractere<0>::Letterdash ;
                 break;
-            case '\'': mask_letter =pop::___caractere<0>::Letterapostrope ;
+            case '\'': mask_letter =pop::_caractere<0>::Letterapostrope ;
                 break;
-            case ':': mask_letter =pop::___caractere<0>::Lettercolons ;
+            case ':': mask_letter =pop::_caractere<0>::Lettercolons ;
                 break;
-            case ' ': mask_letter =pop::___caractere<0>::Letterspace ;
+            case ' ': mask_letter =pop::_caractere<0>::Letterspace ;
                 break;
-            case '(': mask_letter =pop::___caractere<0>::Letterparenthese_open ;
+            case '(': mask_letter =pop::_caractere<0>::Letterparenthese_open ;
                 break;
-            case ')': mask_letter =pop::___caractere<0>::Letterparenthese_close ;
+            case ')': mask_letter =pop::_caractere<0>::Letterparenthese_close ;
                 break;
-            case '/': mask_letter =pop::___caractere<0>::Letterdiv ;
+            case '/': mask_letter =pop::_caractere<0>::Letterdiv ;
                 break;
-            case '*': mask_letter =pop::___caractere<0>::Lettermult ;
+            case '*': mask_letter =pop::_caractere<0>::Lettermult ;
                 break;
-            case '-': mask_letter =pop::___caractere<0>::Lettersub ;
+            case '-': mask_letter =pop::_caractere<0>::Lettersub ;
                 break;
-            case '+': mask_letter =pop::___caractere<0>::Letterplus ;
+            case '+': mask_letter =pop::_caractere<0>::Letterplus ;
                 break;
-            case 'a': mask_letter =pop::___caractere<0>::Lettera ;
+            case 'a': mask_letter =pop::_caractere<0>::Lettera ;
                 break;
-            case 'b': mask_letter =pop::___caractere<0>::Letterb ;
+            case 'b': mask_letter =pop::_caractere<0>::Letterb ;
                 break;
-            case 'c': mask_letter =pop::___caractere<0>::Letterc ;
+            case 'c': mask_letter =pop::_caractere<0>::Letterc ;
                 break;
-            case 'd': mask_letter =pop::___caractere<0>::Letterd ;
+            case 'd': mask_letter =pop::_caractere<0>::Letterd ;
                 break;
-            case 'e': mask_letter =pop::___caractere<0>::Lettere ;
+            case 'e': mask_letter =pop::_caractere<0>::Lettere ;
                 break;
-            case 'f': mask_letter =pop::___caractere<0>::Letterf ;
+            case 'f': mask_letter =pop::_caractere<0>::Letterf ;
                 break;
-            case 'g': mask_letter =pop::___caractere<0>::Letterg ;
+            case 'g': mask_letter =pop::_caractere<0>::Letterg ;
                 break;
-            case 'h': mask_letter =pop::___caractere<0>::Letterh ;
+            case 'h': mask_letter =pop::_caractere<0>::Letterh ;
                 break;
-            case 'i': mask_letter =pop::___caractere<0>::Letteri ;
+            case 'i': mask_letter =pop::_caractere<0>::Letteri ;
                 break;
-            case 'j': mask_letter =pop::___caractere<0>::Letterj ;
+            case 'j': mask_letter =pop::_caractere<0>::Letterj ;
                 break;
-            case 'k': mask_letter =pop::___caractere<0>::Letterk ;
+            case 'k': mask_letter =pop::_caractere<0>::Letterk ;
                 break;
-            case 'l': mask_letter =pop::___caractere<0>::Letterl ;
+            case 'l': mask_letter =pop::_caractere<0>::Letterl ;
                 break;
-            case 'm': mask_letter =pop::___caractere<0>::Letterm ;
+            case 'm': mask_letter =pop::_caractere<0>::Letterm ;
                 break;
-            case 'n': mask_letter =pop::___caractere<0>::Lettern ;
+            case 'n': mask_letter =pop::_caractere<0>::Lettern ;
                 break;
-            case 'o': mask_letter =pop::___caractere<0>::Lettero ;
+            case 'o': mask_letter =pop::_caractere<0>::Lettero ;
                 break;
-            case 'p': mask_letter =pop::___caractere<0>::Letterp ;
+            case 'p': mask_letter =pop::_caractere<0>::Letterp ;
                 break;
-            case 'q': mask_letter =pop::___caractere<0>::Letterq ;
+            case 'q': mask_letter =pop::_caractere<0>::Letterq ;
                 break;
-            case 'r': mask_letter =pop::___caractere<0>::Letterr ;
+            case 'r': mask_letter =pop::_caractere<0>::Letterr ;
                 break;
-            case 's': mask_letter =pop::___caractere<0>::Letters ;
+            case 's': mask_letter =pop::_caractere<0>::Letters ;
                 break;
-            case 't': mask_letter =pop::___caractere<0>::Lettert ;
+            case 't': mask_letter =pop::_caractere<0>::Lettert ;
                 break;
-            case 'u': mask_letter =pop::___caractere<0>::Letteru ;
+            case 'u': mask_letter =pop::_caractere<0>::Letteru ;
                 break;
-            case 'v': mask_letter =pop::___caractere<0>::Letterv ;
+            case 'v': mask_letter =pop::_caractere<0>::Letterv ;
                 break;
-            case 'w': mask_letter =pop::___caractere<0>::Letterw ;
+            case 'w': mask_letter =pop::_caractere<0>::Letterw ;
                 break;
-            case 'x': mask_letter =pop::___caractere<0>::Letterx ;
+            case 'x': mask_letter =pop::_caractere<0>::Letterx ;
                 break;
-            case 'y': mask_letter =pop::___caractere<0>::Lettery ;
+            case 'y': mask_letter =pop::_caractere<0>::Lettery ;
                 break;
-            case 'z': mask_letter =pop::___caractere<0>::Letterz ;
+            case 'z': mask_letter =pop::_caractere<0>::Letterz ;
                 break;
-            case 'A': mask_letter =pop::___caractere<0>::LetterA ;
+            case 'A': mask_letter =pop::_caractere<0>::LetterA ;
                 break;
-            case 'B': mask_letter =pop::___caractere<0>::LetterB ;
+            case 'B': mask_letter =pop::_caractere<0>::LetterB ;
                 break;
-            case 'C': mask_letter =pop::___caractere<0>::LetterC ;
+            case 'C': mask_letter =pop::_caractere<0>::LetterC ;
                 break;
-            case 'D': mask_letter =pop::___caractere<0>::LetterD ;
+            case 'D': mask_letter =pop::_caractere<0>::LetterD ;
                 break;
-            case 'E': mask_letter =pop::___caractere<0>::LetterE ;
+            case 'E': mask_letter =pop::_caractere<0>::LetterE ;
                 break;
-            case 'F': mask_letter =pop::___caractere<0>::LetterF ;
+            case 'F': mask_letter =pop::_caractere<0>::LetterF ;
                 break;
-            case 'G': mask_letter =pop::___caractere<0>::LetterG ;
+            case 'G': mask_letter =pop::_caractere<0>::LetterG ;
                 break;
-            case 'H': mask_letter =pop::___caractere<0>::LetterH ;
+            case 'H': mask_letter =pop::_caractere<0>::LetterH ;
                 break;
-            case 'I': mask_letter =pop::___caractere<0>::LetterI ;
+            case 'I': mask_letter =pop::_caractere<0>::LetterI ;
                 break;
-            case 'J': mask_letter =pop::___caractere<0>::LetterJ ;
+            case 'J': mask_letter =pop::_caractere<0>::LetterJ ;
                 break;
-            case 'K': mask_letter =pop::___caractere<0>::LetterK ;
+            case 'K': mask_letter =pop::_caractere<0>::LetterK ;
                 break;
-            case 'L': mask_letter =pop::___caractere<0>::LetterL ;
+            case 'L': mask_letter =pop::_caractere<0>::LetterL ;
                 break;
-            case 'M': mask_letter =pop::___caractere<0>::LetterM ;
+            case 'M': mask_letter =pop::_caractere<0>::LetterM ;
                 break;
-            case 'N': mask_letter =pop::___caractere<0>::LetterN ;
+            case 'N': mask_letter =pop::_caractere<0>::LetterN ;
                 break;
-            case 'O': mask_letter =pop::___caractere<0>::LetterO ;
+            case 'O': mask_letter =pop::_caractere<0>::LetterO ;
                 break;
-            case 'P': mask_letter =pop::___caractere<0>::LetterP ;
+            case 'P': mask_letter =pop::_caractere<0>::LetterP ;
                 break;
-            case 'Q': mask_letter =pop::___caractere<0>::LetterQ ;
+            case 'Q': mask_letter =pop::_caractere<0>::LetterQ ;
                 break;
-            case 'R': mask_letter =pop::___caractere<0>::LetterR ;
+            case 'R': mask_letter =pop::_caractere<0>::LetterR ;
                 break;
-            case 'S': mask_letter =pop::___caractere<0>::LetterS ;
+            case 'S': mask_letter =pop::_caractere<0>::LetterS ;
                 break;
-            case 'T': mask_letter =pop::___caractere<0>::LetterT ;
+            case 'T': mask_letter =pop::_caractere<0>::LetterT ;
                 break;
-            case 'U': mask_letter =pop::___caractere<0>::LetterU ;
+            case 'U': mask_letter =pop::_caractere<0>::LetterU ;
                 break;
-            case 'V': mask_letter =pop::___caractere<0>::LetterV ;
+            case 'V': mask_letter =pop::_caractere<0>::LetterV ;
                 break;
-            case 'W': mask_letter =pop::___caractere<0>::LetterW ;
+            case 'W': mask_letter =pop::_caractere<0>::LetterW ;
                 break;
-            case 'X': mask_letter =pop::___caractere<0>::LetterX ;
+            case 'X': mask_letter =pop::_caractere<0>::LetterX ;
                 break;
-            case 'Y': mask_letter =pop::___caractere<0>::LetterY ;
+            case 'Y': mask_letter =pop::_caractere<0>::LetterY ;
                 break;
-            case 'Z': mask_letter =pop::___caractere<0>::LetterZ ;
+            case 'Z': mask_letter =pop::_caractere<0>::LetterZ ;
                 break;
-            case '0': mask_letter =pop::___caractere<0>::Letter0 ;
+            case '0': mask_letter =pop::_caractere<0>::Letter0 ;
                 break;
-            case '1': mask_letter =pop::___caractere<0>::Letter1 ;
+            case '1': mask_letter =pop::_caractere<0>::Letter1 ;
                 break;
-            case '2': mask_letter =pop::___caractere<0>::Letter2 ;
+            case '2': mask_letter =pop::_caractere<0>::Letter2 ;
                 break;
-            case '3': mask_letter =pop::___caractere<0>::Letter3 ;
+            case '3': mask_letter =pop::_caractere<0>::Letter3 ;
                 break;
-            case '4': mask_letter =pop::___caractere<0>::Letter4 ;
+            case '4': mask_letter =pop::_caractere<0>::Letter4 ;
                 break;
-            case '5': mask_letter =pop::___caractere<0>::Letter5 ;
+            case '5': mask_letter =pop::_caractere<0>::Letter5 ;
                 break;
-            case '6': mask_letter =pop::___caractere<0>::Letter6 ;
+            case '6': mask_letter =pop::_caractere<0>::Letter6 ;
                 break;
-            case '7': mask_letter =pop::___caractere<0>::Letter7 ;
+            case '7': mask_letter =pop::_caractere<0>::Letter7 ;
                 break;
-            case '8': mask_letter =pop::___caractere<0>::Letter8 ;
+            case '8': mask_letter =pop::_caractere<0>::Letter8 ;
                 break;
-            case '9': mask_letter =pop::___caractere<0>::Letter9 ;
+            case '9': mask_letter =pop::_caractere<0>::Letter9 ;
                 break;
             }
             int add = scale_factor*(mask_letter.getDomain()(0)-3);
@@ -996,7 +996,7 @@ struct POP_EXPORTS Draw
 };
 
 
-template<int DIM>double ___caractere<DIM>::_interrogation_[]={
+template<int DIM>double _caractere<DIM>::_interrogation_[]={
     0,0,0,0,0,0,0,
     0,0,1,1,1,0,0,
     0,1,0,0,0,1,0,
@@ -1008,9 +1008,9 @@ template<int DIM>double ___caractere<DIM>::_interrogation_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterinterrogation =Mat2F64(Vec2I32(9,7),_interrogation_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterinterrogation =Mat2F64(Vec2I32(9,7),_interrogation_);
 
-template<int DIM>double ___caractere<DIM>::_exclamation_[]={
+template<int DIM>double _caractere<DIM>::_exclamation_[]={
     0,0,0,0,0,0,0,
     0,0,0,1,0,0,0,
     0,0,0,1,0,0,0,
@@ -1022,11 +1022,11 @@ template<int DIM>double ___caractere<DIM>::_exclamation_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterexclamation =Mat2F64(Vec2I32(9,7),_exclamation_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterexclamation =Mat2F64(Vec2I32(9,7),_exclamation_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_plus_[]={
+template<int DIM>double _caractere<DIM>::_plus_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,1,0,0,0,
@@ -1038,9 +1038,9 @@ template<int DIM>double ___caractere<DIM>::_plus_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterplus =Mat2F64(Vec2I32(9,7),_plus_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterplus =Mat2F64(Vec2I32(9,7),_plus_);
 
-template<int DIM>double ___caractere<DIM>::_sub_[]={
+template<int DIM>double _caractere<DIM>::_sub_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1052,9 +1052,9 @@ template<int DIM>double ___caractere<DIM>::_sub_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettersub =Mat2F64(Vec2I32(9,7),_sub_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettersub =Mat2F64(Vec2I32(9,7),_sub_);
 
-template<int DIM>double ___caractere<DIM>::_mult_[]={
+template<int DIM>double _caractere<DIM>::_mult_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,1,0,1,0,1,0,
@@ -1066,9 +1066,9 @@ template<int DIM>double ___caractere<DIM>::_mult_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettermult =Mat2F64(Vec2I32(9,7),_mult_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettermult =Mat2F64(Vec2I32(9,7),_mult_);
 
-template<int DIM>double ___caractere<DIM>::_div_[]={
+template<int DIM>double _caractere<DIM>::_div_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,1,0,
     0,0,0,0,1,0,0,
@@ -1080,10 +1080,10 @@ template<int DIM>double ___caractere<DIM>::_div_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterdiv =Mat2F64(Vec2I32(9,7),_div_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterdiv =Mat2F64(Vec2I32(9,7),_div_);
 
 
-template<int DIM>double ___caractere<DIM>::_parenthese_close_[]={
+template<int DIM>double _caractere<DIM>::_parenthese_close_[]={
     0,0,0,0,0,0,0,
     0,0,1,0,0,0,0,
     0,0,0,1,0,0,0,
@@ -1095,9 +1095,9 @@ template<int DIM>double ___caractere<DIM>::_parenthese_close_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterparenthese_close =Mat2F64(Vec2I32(9,7),_parenthese_close_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterparenthese_close =Mat2F64(Vec2I32(9,7),_parenthese_close_);
 
-template<int DIM>double ___caractere<DIM>::_parenthese_open_[]={
+template<int DIM>double _caractere<DIM>::_parenthese_open_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,1,0,0,
     0,0,0,1,0,0,0,
@@ -1109,10 +1109,10 @@ template<int DIM>double ___caractere<DIM>::_parenthese_open_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterparenthese_open =Mat2F64(Vec2I32(9,7),_parenthese_open_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterparenthese_open =Mat2F64(Vec2I32(9,7),_parenthese_open_);
 
 
-template<int DIM>double ___caractere<DIM>::_space_[]={
+template<int DIM>double _caractere<DIM>::_space_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1124,10 +1124,10 @@ template<int DIM>double ___caractere<DIM>::_space_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterspace =Mat2F64(Vec2I32(9,7),_space_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterspace =Mat2F64(Vec2I32(9,7),_space_);
 
 
-template<int DIM>double ___caractere<DIM>::_colons_[]={
+template<int DIM>double _caractere<DIM>::_colons_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1139,9 +1139,9 @@ template<int DIM>double ___caractere<DIM>::_colons_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettercolons =Mat2F64(Vec2I32(9,7),_colons_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettercolons =Mat2F64(Vec2I32(9,7),_colons_);
 
-template<int DIM>double ___caractere<DIM>::_apostrope_[]={
+template<int DIM>double _caractere<DIM>::_apostrope_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,1,0,0,0,
@@ -1153,9 +1153,9 @@ template<int DIM>double ___caractere<DIM>::_apostrope_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterapostrope =Mat2F64(Vec2I32(9,7),_apostrope_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterapostrope =Mat2F64(Vec2I32(9,7),_apostrope_);
 
-template<int DIM>double ___caractere<DIM>::_dash_[]={
+template<int DIM>double _caractere<DIM>::_dash_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1167,10 +1167,10 @@ template<int DIM>double ___caractere<DIM>::_dash_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterdash =Mat2F64(Vec2I32(9,7),_dash_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterdash =Mat2F64(Vec2I32(9,7),_dash_);
 
 
-template<int DIM>double ___caractere<DIM>::_point_[]={
+template<int DIM>double _caractere<DIM>::_point_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1182,9 +1182,9 @@ template<int DIM>double ___caractere<DIM>::_point_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterpoint =Mat2F64(Vec2I32(9,7),_point_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterpoint =Mat2F64(Vec2I32(9,7),_point_);
 
-template<int DIM>double ___caractere<DIM>::_virgule_[]={
+template<int DIM>double _caractere<DIM>::_virgule_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1196,10 +1196,10 @@ template<int DIM>double ___caractere<DIM>::_virgule_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettervirgule =Mat2F64(Vec2I32(9,7),_virgule_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettervirgule =Mat2F64(Vec2I32(9,7),_virgule_);
 
 
-template<int DIM>double ___caractere<DIM>::_a_[]={
+template<int DIM>double _caractere<DIM>::_a_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1211,10 +1211,10 @@ template<int DIM>double ___caractere<DIM>::_a_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettera =Mat2F64(Vec2I32(9,7),_a_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettera =Mat2F64(Vec2I32(9,7),_a_);
 
 
-template<int DIM>double ___caractere<DIM>::_b_[]={
+template<int DIM>double _caractere<DIM>::_b_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,0,0,
     0,1,0,0,0,0,0,
@@ -1226,11 +1226,11 @@ template<int DIM>double ___caractere<DIM>::_b_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterb =Mat2F64(Vec2I32(9,7),_b_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterb =Mat2F64(Vec2I32(9,7),_b_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_c_[]={
+template<int DIM>double _caractere<DIM>::_c_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1242,9 +1242,9 @@ template<int DIM>double ___caractere<DIM>::_c_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterc =Mat2F64(Vec2I32(9,7),_c_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterc =Mat2F64(Vec2I32(9,7),_c_);
 
-template<int DIM>double ___caractere<DIM>::_d_[]={
+template<int DIM>double _caractere<DIM>::_d_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,1,0,
     0,0,0,0,0,1,0,
@@ -1256,10 +1256,10 @@ template<int DIM>double ___caractere<DIM>::_d_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterd =Mat2F64(Vec2I32(9,7),_d_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterd =Mat2F64(Vec2I32(9,7),_d_);
 
 
-template<int DIM>double ___caractere<DIM>::_e_[]={
+template<int DIM>double _caractere<DIM>::_e_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1271,10 +1271,10 @@ template<int DIM>double ___caractere<DIM>::_e_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettere =Mat2F64(Vec2I32(9,7),_e_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettere =Mat2F64(Vec2I32(9,7),_e_);
 
 
-template<int DIM>double ___caractere<DIM>::_f_[]={
+template<int DIM>double _caractere<DIM>::_f_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,1,1,0,
     0,0,0,1,0,0,0,
@@ -1286,10 +1286,10 @@ template<int DIM>double ___caractere<DIM>::_f_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterf =Mat2F64(Vec2I32(9,7),_f_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterf =Mat2F64(Vec2I32(9,7),_f_);
 
 
-template<int DIM>double ___caractere<DIM>::_g_[]={
+template<int DIM>double _caractere<DIM>::_g_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1301,10 +1301,10 @@ template<int DIM>double ___caractere<DIM>::_g_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterg =Mat2F64(Vec2I32(9,7),_g_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterg =Mat2F64(Vec2I32(9,7),_g_);
 
 
-template<int DIM>double ___caractere<DIM>::_h_[]={
+template<int DIM>double _caractere<DIM>::_h_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,0,0,
     0,1,0,0,0,0,0,
@@ -1316,9 +1316,9 @@ template<int DIM>double ___caractere<DIM>::_h_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterh =Mat2F64(Vec2I32(9,7),_h_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterh =Mat2F64(Vec2I32(9,7),_h_);
 
-template<int DIM>double ___caractere<DIM>::_i_[]={
+template<int DIM>double _caractere<DIM>::_i_[]={
     0,0,0,0,0,0,0,
     0,0,0,1,0,0,0,
     0,0,0,0,0,0,0,
@@ -1330,9 +1330,9 @@ template<int DIM>double ___caractere<DIM>::_i_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letteri =Mat2F64(Vec2I32(9,7),_i_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letteri =Mat2F64(Vec2I32(9,7),_i_);
 
-template<int DIM>double ___caractere<DIM>::_j_[]={
+template<int DIM>double _caractere<DIM>::_j_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,1,0,0,
     0,0,0,0,0,0,0,
@@ -1344,11 +1344,11 @@ template<int DIM>double ___caractere<DIM>::_j_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterj =Mat2F64(Vec2I32(9,7),_j_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterj =Mat2F64(Vec2I32(9,7),_j_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_k_[]={
+template<int DIM>double _caractere<DIM>::_k_[]={
     0,0,0,0,0,0,0,
     0,0,1,0,0,0,0,
     0,0,1,0,0,0,0,
@@ -1360,10 +1360,10 @@ template<int DIM>double ___caractere<DIM>::_k_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterk =Mat2F64(Vec2I32(9,7),_k_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterk =Mat2F64(Vec2I32(9,7),_k_);
 
 
-template<int DIM>double ___caractere<DIM>::_l_[]={
+template<int DIM>double _caractere<DIM>::_l_[]={
     0,0,0,0,0,0,0,
     0,0,1,1,0,0,0,
     0,0,0,1,0,0,0,
@@ -1375,9 +1375,9 @@ template<int DIM>double ___caractere<DIM>::_l_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterl =Mat2F64(Vec2I32(9,7),_l_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterl =Mat2F64(Vec2I32(9,7),_l_);
 
-template<int DIM>double ___caractere<DIM>::_m_[]={
+template<int DIM>double _caractere<DIM>::_m_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1389,9 +1389,9 @@ template<int DIM>double ___caractere<DIM>::_m_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterm =Mat2F64(Vec2I32(9,7),_m_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterm =Mat2F64(Vec2I32(9,7),_m_);
 
-template<int DIM>double ___caractere<DIM>::_n_[]={
+template<int DIM>double _caractere<DIM>::_n_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1403,9 +1403,9 @@ template<int DIM>double ___caractere<DIM>::_n_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettern =Mat2F64(Vec2I32(9,7),_n_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettern =Mat2F64(Vec2I32(9,7),_n_);
 
-template<int DIM>double ___caractere<DIM>::_o_[]={
+template<int DIM>double _caractere<DIM>::_o_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1417,9 +1417,9 @@ template<int DIM>double ___caractere<DIM>::_o_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettero =Mat2F64(Vec2I32(9,7),_o_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettero =Mat2F64(Vec2I32(9,7),_o_);
 
-template<int DIM>double ___caractere<DIM>::_p_[]={
+template<int DIM>double _caractere<DIM>::_p_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1431,10 +1431,10 @@ template<int DIM>double ___caractere<DIM>::_p_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterp =Mat2F64(Vec2I32(9,7),_p_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterp =Mat2F64(Vec2I32(9,7),_p_);
 
 
-template<int DIM>double ___caractere<DIM>::_q_[]={
+template<int DIM>double _caractere<DIM>::_q_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1446,10 +1446,10 @@ template<int DIM>double ___caractere<DIM>::_q_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterq =Mat2F64(Vec2I32(9,7),_q_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterq =Mat2F64(Vec2I32(9,7),_q_);
 
 
-template<int DIM>double ___caractere<DIM>::_r_[]={
+template<int DIM>double _caractere<DIM>::_r_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1461,10 +1461,10 @@ template<int DIM>double ___caractere<DIM>::_r_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterr =Mat2F64(Vec2I32(9,7),_r_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterr =Mat2F64(Vec2I32(9,7),_r_);
 
 
-template<int DIM>double ___caractere<DIM>::_s_[]={
+template<int DIM>double _caractere<DIM>::_s_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1476,10 +1476,10 @@ template<int DIM>double ___caractere<DIM>::_s_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letters =Mat2F64(Vec2I32(9,7),_s_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letters =Mat2F64(Vec2I32(9,7),_s_);
 
 
-template<int DIM>double ___caractere<DIM>::_t_[]={
+template<int DIM>double _caractere<DIM>::_t_[]={
     0,0,0,0,0,0,0,
     0,0,0,1,0,0,0,
     0,0,0,1,0,0,0,
@@ -1491,10 +1491,10 @@ template<int DIM>double ___caractere<DIM>::_t_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettert =Mat2F64(Vec2I32(9,7),_t_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettert =Mat2F64(Vec2I32(9,7),_t_);
 
 
-template<int DIM>double ___caractere<DIM>::_u_[]={
+template<int DIM>double _caractere<DIM>::_u_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1506,11 +1506,11 @@ template<int DIM>double ___caractere<DIM>::_u_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letteru =Mat2F64(Vec2I32(9,7),_u_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letteru =Mat2F64(Vec2I32(9,7),_u_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_v_[]={
+template<int DIM>double _caractere<DIM>::_v_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1522,9 +1522,9 @@ template<int DIM>double ___caractere<DIM>::_v_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterv =Mat2F64(Vec2I32(9,7),_v_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterv =Mat2F64(Vec2I32(9,7),_v_);
 
-template<int DIM>double ___caractere<DIM>::_w_[]={
+template<int DIM>double _caractere<DIM>::_w_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1536,9 +1536,9 @@ template<int DIM>double ___caractere<DIM>::_w_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterw =Mat2F64(Vec2I32(9,7),_w_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterw =Mat2F64(Vec2I32(9,7),_w_);
 
-template<int DIM>double ___caractere<DIM>::_x_[]={
+template<int DIM>double _caractere<DIM>::_x_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1550,9 +1550,9 @@ template<int DIM>double ___caractere<DIM>::_x_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterx =Mat2F64(Vec2I32(9,7),_x_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterx =Mat2F64(Vec2I32(9,7),_x_);
 
-template<int DIM>double ___caractere<DIM>::_y_[]={
+template<int DIM>double _caractere<DIM>::_y_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1564,9 +1564,9 @@ template<int DIM>double ___caractere<DIM>::_y_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Lettery =Mat2F64(Vec2I32(9,7),_y_);
+template<int DIM>Mat2F64 _caractere<DIM>::Lettery =Mat2F64(Vec2I32(9,7),_y_);
 
-template<int DIM>double ___caractere<DIM>::_z_[]={
+template<int DIM>double _caractere<DIM>::_z_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,
@@ -1578,12 +1578,12 @@ template<int DIM>double ___caractere<DIM>::_z_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letterz =Mat2F64(Vec2I32(9,7),_z_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letterz =Mat2F64(Vec2I32(9,7),_z_);
 
 
 
 
-template<int DIM>double ___caractere<DIM>::_A_[]={
+template<int DIM>double _caractere<DIM>::_A_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,1,0,0,0,1,0,
@@ -1595,55 +1595,55 @@ template<int DIM>double ___caractere<DIM>::_A_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterA =Mat2F64(Vec2I32(9,7),_A_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterA =Mat2F64(Vec2I32(9,7),_A_);
 
 
-template<int DIM>double ___caractere<DIM>::_B_[]={
+template<int DIM>double _caractere<DIM>::_B_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
     0,1,1,1,1,1,0,
-    0,1,0,0,0,1,0,
-    0,1,0,0,0,1,0,
-    0,1,1,1,1,0,0,
-    0,0,0,0,0,0,0
-};
-
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterB =Mat2F64(Vec2I32(9,7),_B_);
-
-
-
-template<int DIM>double ___caractere<DIM>::_C_[]={
-    0,0,0,0,0,0,0,
-    0,1,1,1,1,1,0,
-    0,1,0,0,0,0,0,
-    0,1,0,0,0,0,0,
-    0,1,0,0,0,0,0,
-    0,1,0,0,0,0,0,
-    0,1,0,0,0,0,0,
-    0,1,1,1,1,1,0,
-    0,0,0,0,0,0,0
-};
-
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterC =Mat2F64(Vec2I32(9,7),_C_);
-
-template<int DIM>double ___caractere<DIM>::_D_[]={
-    0,0,0,0,0,0,0,
-    0,1,1,1,1,0,0,
-    0,1,0,0,0,1,0,
-    0,1,0,0,0,1,0,
-    0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
     0,1,1,1,1,0,0,
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterD =Mat2F64(Vec2I32(9,7),_D_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterB =Mat2F64(Vec2I32(9,7),_B_);
 
 
-template<int DIM>double ___caractere<DIM>::_E_[]={
+
+template<int DIM>double _caractere<DIM>::_C_[]={
+    0,0,0,0,0,0,0,
+    0,1,1,1,1,1,0,
+    0,1,0,0,0,0,0,
+    0,1,0,0,0,0,0,
+    0,1,0,0,0,0,0,
+    0,1,0,0,0,0,0,
+    0,1,0,0,0,0,0,
+    0,1,1,1,1,1,0,
+    0,0,0,0,0,0,0
+};
+
+template<int DIM>Mat2F64 _caractere<DIM>::LetterC =Mat2F64(Vec2I32(9,7),_C_);
+
+template<int DIM>double _caractere<DIM>::_D_[]={
+    0,0,0,0,0,0,0,
+    0,1,1,1,1,0,0,
+    0,1,0,0,0,1,0,
+    0,1,0,0,0,1,0,
+    0,1,0,0,0,1,0,
+    0,1,0,0,0,1,0,
+    0,1,0,0,0,1,0,
+    0,1,1,1,1,0,0,
+    0,0,0,0,0,0,0
+};
+
+template<int DIM>Mat2F64 _caractere<DIM>::LetterD =Mat2F64(Vec2I32(9,7),_D_);
+
+
+template<int DIM>double _caractere<DIM>::_E_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,1,0,0,0,0,0,
@@ -1655,10 +1655,10 @@ template<int DIM>double ___caractere<DIM>::_E_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterE =Mat2F64(Vec2I32(9,7),_E_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterE =Mat2F64(Vec2I32(9,7),_E_);
 
 
-template<int DIM>double ___caractere<DIM>::_F_[]={
+template<int DIM>double _caractere<DIM>::_F_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,1,0,0,0,0,0,
@@ -1670,10 +1670,10 @@ template<int DIM>double ___caractere<DIM>::_F_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterF =Mat2F64(Vec2I32(9,7),_F_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterF =Mat2F64(Vec2I32(9,7),_F_);
 
 
-template<int DIM>double ___caractere<DIM>::_G_[]={
+template<int DIM>double _caractere<DIM>::_G_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,1,0,0,0,0,0,
@@ -1685,10 +1685,10 @@ template<int DIM>double ___caractere<DIM>::_G_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterG =Mat2F64(Vec2I32(9,7),_G_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterG =Mat2F64(Vec2I32(9,7),_G_);
 
 
-template<int DIM>double ___caractere<DIM>::_H_[]={
+template<int DIM>double _caractere<DIM>::_H_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
@@ -1700,9 +1700,9 @@ template<int DIM>double ___caractere<DIM>::_H_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterH =Mat2F64(Vec2I32(9,7),_H_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterH =Mat2F64(Vec2I32(9,7),_H_);
 
-template<int DIM>double ___caractere<DIM>::_I_[]={
+template<int DIM>double _caractere<DIM>::_I_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,0,0,1,0,0,0,
@@ -1714,9 +1714,9 @@ template<int DIM>double ___caractere<DIM>::_I_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterI =Mat2F64(Vec2I32(9,7),_I_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterI =Mat2F64(Vec2I32(9,7),_I_);
 
-template<int DIM>double ___caractere<DIM>::_J_[]={
+template<int DIM>double _caractere<DIM>::_J_[]={
     0,0,0,0,0,0,0,
     0,0,0,0,0,1,0,
     0,0,0,0,0,1,0,
@@ -1728,11 +1728,11 @@ template<int DIM>double ___caractere<DIM>::_J_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterJ =Mat2F64(Vec2I32(9,7),_J_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterJ =Mat2F64(Vec2I32(9,7),_J_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_K_[]={
+template<int DIM>double _caractere<DIM>::_K_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,1,0,0,
@@ -1744,10 +1744,10 @@ template<int DIM>double ___caractere<DIM>::_K_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterK =Mat2F64(Vec2I32(9,7),_K_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterK =Mat2F64(Vec2I32(9,7),_K_);
 
 
-template<int DIM>double ___caractere<DIM>::_L_[]={
+template<int DIM>double _caractere<DIM>::_L_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,0,0,
     0,1,0,0,0,0,0,
@@ -1759,9 +1759,9 @@ template<int DIM>double ___caractere<DIM>::_L_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterL =Mat2F64(Vec2I32(9,7),_L_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterL =Mat2F64(Vec2I32(9,7),_L_);
 
-template<int DIM>double ___caractere<DIM>::_M_[]={
+template<int DIM>double _caractere<DIM>::_M_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,1,0,1,1,0,
@@ -1773,9 +1773,9 @@ template<int DIM>double ___caractere<DIM>::_M_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterM =Mat2F64(Vec2I32(9,7),_M_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterM =Mat2F64(Vec2I32(9,7),_M_);
 
-template<int DIM>double ___caractere<DIM>::_N_[]={
+template<int DIM>double _caractere<DIM>::_N_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,1,0,0,1,0,
@@ -1787,9 +1787,9 @@ template<int DIM>double ___caractere<DIM>::_N_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterN =Mat2F64(Vec2I32(9,7),_N_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterN =Mat2F64(Vec2I32(9,7),_N_);
 
-template<int DIM>double ___caractere<DIM>::_O_[]={
+template<int DIM>double _caractere<DIM>::_O_[]={
     0,0,0,0,0,0,0,
     0,0,1,1,1,0,0,
     0,1,0,0,0,1,0,
@@ -1801,9 +1801,9 @@ template<int DIM>double ___caractere<DIM>::_O_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterO =Mat2F64(Vec2I32(9,7),_O_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterO =Mat2F64(Vec2I32(9,7),_O_);
 
-template<int DIM>double ___caractere<DIM>::_P_[]={
+template<int DIM>double _caractere<DIM>::_P_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,0,0,
     0,1,0,0,0,1,0,
@@ -1815,10 +1815,10 @@ template<int DIM>double ___caractere<DIM>::_P_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterP =Mat2F64(Vec2I32(9,7),_P_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterP =Mat2F64(Vec2I32(9,7),_P_);
 
 
-template<int DIM>double ___caractere<DIM>::_Q_[]={
+template<int DIM>double _caractere<DIM>::_Q_[]={
     0,0,0,0,0,0,0,
     0,0,1,1,1,0,0,
     0,1,0,0,0,1,0,
@@ -1830,10 +1830,10 @@ template<int DIM>double ___caractere<DIM>::_Q_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterQ =Mat2F64(Vec2I32(9,7),_Q_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterQ =Mat2F64(Vec2I32(9,7),_Q_);
 
 
-template<int DIM>double ___caractere<DIM>::_R_[]={
+template<int DIM>double _caractere<DIM>::_R_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,0,0,
     0,1,0,0,0,1,0,
@@ -1845,10 +1845,10 @@ template<int DIM>double ___caractere<DIM>::_R_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterR =Mat2F64(Vec2I32(9,7),_R_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterR =Mat2F64(Vec2I32(9,7),_R_);
 
 
-template<int DIM>double ___caractere<DIM>::_S_[]={
+template<int DIM>double _caractere<DIM>::_S_[]={
     0,0,0,0,0,0,0,
     0,0,1,1,1,1,0,
     0,1,0,0,0,0,0,
@@ -1860,10 +1860,10 @@ template<int DIM>double ___caractere<DIM>::_S_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterS =Mat2F64(Vec2I32(9,7),_S_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterS =Mat2F64(Vec2I32(9,7),_S_);
 
 
-template<int DIM>double ___caractere<DIM>::_T_[]={
+template<int DIM>double _caractere<DIM>::_T_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,0,0,1,0,0,0,
@@ -1875,10 +1875,10 @@ template<int DIM>double ___caractere<DIM>::_T_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterT =Mat2F64(Vec2I32(9,7),_T_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterT =Mat2F64(Vec2I32(9,7),_T_);
 
 
-template<int DIM>double ___caractere<DIM>::_U_[]={
+template<int DIM>double _caractere<DIM>::_U_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
@@ -1890,11 +1890,11 @@ template<int DIM>double ___caractere<DIM>::_U_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterU =Mat2F64(Vec2I32(9,7),_U_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterU =Mat2F64(Vec2I32(9,7),_U_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_V_[]={
+template<int DIM>double _caractere<DIM>::_V_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
@@ -1906,9 +1906,9 @@ template<int DIM>double ___caractere<DIM>::_V_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterV =Mat2F64(Vec2I32(9,7),_V_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterV =Mat2F64(Vec2I32(9,7),_V_);
 
-template<int DIM>double ___caractere<DIM>::_W_[]={
+template<int DIM>double _caractere<DIM>::_W_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
@@ -1920,9 +1920,9 @@ template<int DIM>double ___caractere<DIM>::_W_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterW =Mat2F64(Vec2I32(9,7),_W_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterW =Mat2F64(Vec2I32(9,7),_W_);
 
-template<int DIM>double ___caractere<DIM>::_X_[]={
+template<int DIM>double _caractere<DIM>::_X_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,0,1,0,1,0,0,
@@ -1934,9 +1934,9 @@ template<int DIM>double ___caractere<DIM>::_X_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterX =Mat2F64(Vec2I32(9,7),_X_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterX =Mat2F64(Vec2I32(9,7),_X_);
 
-template<int DIM>double ___caractere<DIM>::_Y_[]={
+template<int DIM>double _caractere<DIM>::_Y_[]={
     0,0,0,0,0,0,0,
     0,1,0,0,0,1,0,
     0,1,0,0,0,1,0,
@@ -1948,9 +1948,9 @@ template<int DIM>double ___caractere<DIM>::_Y_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterY =Mat2F64(Vec2I32(9,7),_Y_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterY =Mat2F64(Vec2I32(9,7),_Y_);
 
-template<int DIM>double ___caractere<DIM>::_Z_[]={
+template<int DIM>double _caractere<DIM>::_Z_[]={
     0,0,0,0,0,0,0,
     0,1,1,1,1,1,0,
     0,0,0,0,1,0,0,
@@ -1962,11 +1962,11 @@ template<int DIM>double ___caractere<DIM>::_Z_[]={
     0,0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::LetterZ =Mat2F64(Vec2I32(9,7),_Z_);
+template<int DIM>Mat2F64 _caractere<DIM>::LetterZ =Mat2F64(Vec2I32(9,7),_Z_);
 
 
 
-template<int DIM>double ___caractere<DIM>::_0_[]={
+template<int DIM>double _caractere<DIM>::_0_[]={
     0,0,0,0,0,0,
     0,0,1,1,0,0,
     0,1,0,0,1,0,
@@ -1978,9 +1978,9 @@ template<int DIM>double ___caractere<DIM>::_0_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter0 =Mat2F64(Vec2I32(9,6),_0_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter0 =Mat2F64(Vec2I32(9,6),_0_);
 
-template<int DIM>double ___caractere<DIM>::_1_[]={
+template<int DIM>double _caractere<DIM>::_1_[]={
     0,0,0,0,0,
     0,0,0,1,0,
     0,0,1,1,0,
@@ -1992,9 +1992,9 @@ template<int DIM>double ___caractere<DIM>::_1_[]={
     0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter1 =Mat2F64(Vec2I32(9,5),_1_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter1 =Mat2F64(Vec2I32(9,5),_1_);
 
-template<int DIM>double ___caractere<DIM>::_2_[]={
+template<int DIM>double _caractere<DIM>::_2_[]={
     0,0,0,0,0,0,
     0,0,1,1,0,0,
     0,1,0,0,1,0,
@@ -2006,9 +2006,9 @@ template<int DIM>double ___caractere<DIM>::_2_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter2 =Mat2F64(Vec2I32(9,6),_2_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter2 =Mat2F64(Vec2I32(9,6),_2_);
 
-template<int DIM>double ___caractere<DIM>::_3_[]={
+template<int DIM>double _caractere<DIM>::_3_[]={
     0,0,0,0,0,0,
     0,1,1,1,0,0,
     0,0,0,0,1,0,
@@ -2020,9 +2020,9 @@ template<int DIM>double ___caractere<DIM>::_3_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter3 =Mat2F64(Vec2I32(9,6),_3_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter3 =Mat2F64(Vec2I32(9,6),_3_);
 
-template<int DIM>double ___caractere<DIM>::_4_[]={
+template<int DIM>double _caractere<DIM>::_4_[]={
     0,0,0,0,0,0,
     0,0,0,1,0,0,
     0,0,1,1,0,0,
@@ -2034,9 +2034,9 @@ template<int DIM>double ___caractere<DIM>::_4_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter4 =Mat2F64(Vec2I32(9,6),_4_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter4 =Mat2F64(Vec2I32(9,6),_4_);
 
-template<int DIM>double ___caractere<DIM>::_5_[]={
+template<int DIM>double _caractere<DIM>::_5_[]={
     0,0,0,0,0,0,
     0,1,1,1,1,0,
     0,1,0,0,0,0,
@@ -2048,9 +2048,9 @@ template<int DIM>double ___caractere<DIM>::_5_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter5 =Mat2F64(Vec2I32(9,6),_5_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter5 =Mat2F64(Vec2I32(9,6),_5_);
 
-template<int DIM>double ___caractere<DIM>::_6_[]={
+template<int DIM>double _caractere<DIM>::_6_[]={
     0,0,0,0,0,0,
     0,0,1,1,0,0,
     0,1,0,0,0,0,
@@ -2062,9 +2062,9 @@ template<int DIM>double ___caractere<DIM>::_6_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter6 =Mat2F64(Vec2I32(9,6),_6_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter6 =Mat2F64(Vec2I32(9,6),_6_);
 
-template<int DIM>double ___caractere<DIM>::_7_[]={
+template<int DIM>double _caractere<DIM>::_7_[]={
     0,0,0,0,0,0,
     0,1,1,1,1,0,
     0,0,0,0,1,0,
@@ -2076,9 +2076,9 @@ template<int DIM>double ___caractere<DIM>::_7_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter7 =Mat2F64(Vec2I32(9,6),_7_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter7 =Mat2F64(Vec2I32(9,6),_7_);
 
-template<int DIM>double ___caractere<DIM>::_8_[]={
+template<int DIM>double _caractere<DIM>::_8_[]={
     0,0,0,0,0,0,
     0,0,1,1,0,0,
     0,1,0,0,1,0,
@@ -2090,9 +2090,9 @@ template<int DIM>double ___caractere<DIM>::_8_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter8 =Mat2F64(Vec2I32(9,6),_8_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter8 =Mat2F64(Vec2I32(9,6),_8_);
 
-template<int DIM>double ___caractere<DIM>::_9_[]={
+template<int DIM>double _caractere<DIM>::_9_[]={
     0,0,0,0,0,0,
     0,0,1,1,0,0,
     0,1,0,0,1,0,
@@ -2104,7 +2104,7 @@ template<int DIM>double ___caractere<DIM>::_9_[]={
     0,0,0,0,0,0
 };
 
-template<int DIM>Mat2F64 ___caractere<DIM>::Letter9 =pop::Mat2F64(pop::Vec2I32(9,6),_9_);
+template<int DIM>Mat2F64 _caractere<DIM>::Letter9 =pop::Mat2F64(pop::Vec2I32(9,6),_9_);
 
 }
 

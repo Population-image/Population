@@ -33,12 +33,9 @@ in the Software.
 \***************************************************************************/
 #ifndef RANDOMGEOMETRY_H
 #define RANDOMGEOMETRY_H
-
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/typeF/RGB.h"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
-
 #include"data/distribution/Distribution.h"
 #include"data/distribution/DistributionMultiVariate.h"
 #include"data/germgrain/GermGrain.h"
@@ -1171,8 +1168,8 @@ void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius)
     KDTree<DIM,F64> kptree;
     Vec<bool> v_in;
 
-    for(int i =0; i<(int)grain.grains().size();i++){
-        VecN<DIM,F64> x = grain.grains()[i]->x;
+    for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++){
+        VecN<DIM,F64> x = grain.grains()[index_grain]->x;
         VecN<DIM,F64> xfind;
         double dist;
         kptree.search(x,xfind,dist);
@@ -1210,9 +1207,9 @@ void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)
     Vec<F64> v;
     v= grain.getDomain();
     DistributionNormal d(0,radius);
-    for(int i =0; i<(int)grain.grains().size();i++)
+    for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++)
     {
-        Germ<DIM> * g =grain.grains()[i];
+        Germ<DIM> * g =grain.grains()[index_grain];
         for(int i=0;i<DIM;i++){
             g->x(i)+=d.randomVariable();
             if(g->x(i)<0){
@@ -1232,8 +1229,8 @@ void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius)
 
     Vec<VecN<DIM,F64> > v_x;
 
-    for(int i =0; i<(int)grain.grains().size();i++){
-        VecN<DIM,F64> x = grain.grains()[i]->x;
+    for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++){
+        VecN<DIM,F64> x = grain.grains()[index_grain]->x;
         v_x.push_back(x);
         if(grain.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_BOUNDED){
             for(int i=0;i<DIM;i++){
@@ -1532,12 +1529,12 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
             rectemp.size = rectempsize;
 
             Vec<int> vtemp;
-            for(int i=0;i<(int)v.size();i++)
+            for(int k=0;k<(int)v.size();k++)
             {
-                if(rectemp.perhapsIntersection(grainlist.grains()[v[i]],grainlist.getDomain(),grainlist.getBoundaryCondition())==true)
+                if(rectemp.perhapsIntersection(grainlist.grains()[v[k]],grainlist.getDomain(),grainlist.getBoundaryCondition())==true)
                 {
 
-                    vtemp.push_back(v[i]);
+                    vtemp.push_back(v[k]);
                 }
             }
             divideTilling(vtemp,rectemp,grainlist, img);
@@ -1581,14 +1578,14 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                     for(it=v_hit.begin();it!=v_hit.end();it++)
                         img(ximg) = std::max (img(ximg),   (grainlist.grains()[*it])->color);
                 }else if(grainlist.getModel()==DeadLeave){
-                    int v=0;
+                    int value_=0;
                     Vec<int>::iterator it;
                     if(v_hit.size()>6)
-                        v=0;
+                        value_=0;
                     for(it=v_hit.begin();it!=v_hit.end();it++){
-                        if(v<*it){
+                        if(value_<*it){
                             img(ximg) =   grainlist.grains()[*it]->color;
-                            v = *it;
+                            value_ = *it;
                         }
                     }
                 }

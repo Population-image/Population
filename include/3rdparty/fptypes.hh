@@ -12,7 +12,7 @@
 #ifndef ONCE_FPARSER_TYPES_H_
 #define ONCE_FPARSER_TYPES_H_
 
-#include"dependency/fpconfig.hh"
+#include"3rdparty/fpconfig.hh"
 
 namespace FUNCTIONPARSERTYPES
 {

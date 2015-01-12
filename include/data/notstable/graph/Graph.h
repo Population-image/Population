@@ -38,8 +38,7 @@ in the Software.
 #include<fstream>
 #include<string>
 #include"PopulationConfig.h"
-#include"data/GP/Type2Id.h"
-#include"data/GP/NullType.h"
+#include"data/utility/BasicUtility.h"
 namespace pop
 {
 
@@ -129,7 +128,7 @@ public:
     }
 };
 
-template<typename VertexType=Loki::NullType,typename EdgeType=Loki::NullType>
+template<typename VertexType=NullType,typename EdgeType=NullType>
 class POP_EXPORTS GraphAdjencyList
 {
 public:
@@ -187,30 +186,30 @@ public:
     }
 
     int addVertex();
-    VertexType & vertex(int vertex);
-    const VertexType & vertex(int vertex)const;
+    VertexType & vertex(int vertex_label);
+    const VertexType & vertex(int vertex_label)const;
     unsigned int sizeVertex()const;
 
-    VertexType & operator()(int vertex){
-        return _v_vertex[vertex];
+    VertexType & operator()(int vertex_label){
+        return _v_vertex[vertex_label];
     }
-    const VertexType & operator()(int vertex)const{
-        return _v_vertex[vertex];
+    const VertexType & operator()(int vertex_label)const{
+        return _v_vertex[vertex_label];
     }
 
 
     int addEdge();
-    EdgeType & edge(int edge);
-    const EdgeType & edge(int edge)const;
+    EdgeType & edge(int edge_label);
+    const EdgeType & edge(int edge_label)const;
     unsigned int sizeEdge()const;
-    void connection(int edge, int vertex1,int vertex2);
+    void connection(int edge_label, int vertex_label1,int vertex_label2);
 
     const std::vector<std::pair<int,int> >& links()const;
-    std::pair<int,int> getLink(int edge)const;
+    std::pair<int,int> getLink(int edge_label)const;
 
-    int getEdge(int vertex1,int vertex2)const;
-    const std::vector<int>& getEdges(int vertex1)const;
-    std::vector<int> getConnectedVertex(int vertex)const;
+    int getEdge(int vertex_label1,int vertex_label2)const;
+    const std::vector<int>& getEdges(int vertex_label1)const;
+    std::vector<int> getConnectedVertex(int vertex_label)const;
 
 
         void load(std::string file);
@@ -223,8 +222,8 @@ struct FunctionTypeTraitsSubstituteF<GraphAdjencyList<VertexType1,EdgeType>,Vert
 };
 
 template<typename VertexType,typename EdgeType>
-std::pair<int,int> GraphAdjencyList<VertexType,EdgeType>::getLink(int edge) const{
-    return _v_edge_link[edge];
+std::pair<int,int> GraphAdjencyList<VertexType,EdgeType>::getLink(int edge_label) const{
+    return _v_edge_link[edge_label];
 }
 template<typename VertexType,typename EdgeType>
 const std::vector<std::pair<int,int> >& GraphAdjencyList<VertexType,EdgeType>::links()const{
@@ -247,12 +246,12 @@ unsigned int GraphAdjencyList<VertexType,EdgeType>::sizeEdge() const{
     return (int)_v_edge.size();
 }
 template<typename VertexType,typename EdgeType>
-VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex){
-    return _v_vertex[vertex];
+VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex_label){
+    return _v_vertex[vertex_label];
 }
 template<typename VertexType,typename EdgeType>
-const VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex)const{
-    return _v_vertex[vertex];
+const VertexType & GraphAdjencyList<VertexType,EdgeType>::vertex(int vertex_label)const{
+    return _v_vertex[vertex_label];
 }
 template<typename VertexType,typename EdgeType>
 int GraphAdjencyList<VertexType,EdgeType>::addEdge(){
@@ -261,45 +260,45 @@ int GraphAdjencyList<VertexType,EdgeType>::addEdge(){
     return  (int)_v_edge.size()-1;
 }
 template<typename VertexType,typename EdgeType>
-EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge){
-    return _v_edge[edge];
+EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge_label){
+    return _v_edge[edge_label];
 }
 template<typename VertexType,typename EdgeType>
-const EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge)const{
-    return _v_edge[edge];
+const EdgeType & GraphAdjencyList<VertexType,EdgeType>::edge(int edge_label)const{
+    return _v_edge[edge_label];
 }
 template<typename VertexType,typename EdgeType>
-void GraphAdjencyList<VertexType,EdgeType>::connection(int edge, int vertex1,int vertex2){
-    _v_adjency_list[vertex1].push_back(edge);
-    _v_adjency_list[vertex2].push_back(edge);
-    _v_edge_link[edge] = std::make_pair(vertex1,vertex2);
+void GraphAdjencyList<VertexType,EdgeType>::connection(int edge_label, int vertex_label1,int vertex_label2){
+    _v_adjency_list[vertex_label1].push_back(edge_label);
+    _v_adjency_list[vertex_label2].push_back(edge_label);
+    _v_edge_link[edge_label] = std::make_pair(vertex_label1,vertex_label2);
 }
 template<typename VertexType,typename EdgeType>
-int GraphAdjencyList<VertexType,EdgeType>::getEdge(int vertex1,int vertex2) const{
+int GraphAdjencyList<VertexType,EdgeType>::getEdge(int vertex_label1,int vertex_label2) const{
     std::vector<int>::const_iterator it;
-    for ( it=_v_adjency_list[vertex1].begin() ; it < _v_adjency_list[vertex1].end(); it++ ){
-        int edge = *it;
-        if(_v_edge_link[edge].second ==vertex2 )
-            return edge;
-        else if(_v_edge_link[edge].first ==vertex2)
-            return edge;
+    for ( it=_v_adjency_list[vertex_label1].begin() ; it < _v_adjency_list[vertex_label1].end(); it++ ){
+        int edge_label = *it;
+        if(_v_edge_link[edge_label].second ==vertex_label2 )
+            return edge_label;
+        else if(_v_edge_link[edge_label].first ==vertex_label2)
+            return edge_label;
     }
     return NO_EDGE_INDEX;
 }
 template<typename VertexType,typename EdgeType>
-const std::vector<int> &GraphAdjencyList<VertexType,EdgeType>::getEdges(int vertex) const{
-    return _v_adjency_list[vertex] ;
+const std::vector<int> &GraphAdjencyList<VertexType,EdgeType>::getEdges(int vertex_label) const{
+    return _v_adjency_list[vertex_label] ;
 }
 template<typename VertexType,typename EdgeType>
-std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getConnectedVertex(int vertex) const{
+std::vector<int> GraphAdjencyList<VertexType,EdgeType>::getConnectedVertex(int vertex_label) const{
     std::vector<int> v_vertex;
     std::vector<int>::const_iterator it;
-    for ( it=_v_adjency_list[vertex].begin() ; it < _v_adjency_list[vertex].end(); it++ ){
-        int edge = *it;
-        if(_v_edge_link[edge].second !=vertex )
-            v_vertex.push_back(_v_edge_link[edge].second);
+    for ( it=_v_adjency_list[vertex_label].begin() ; it < _v_adjency_list[vertex_label].end(); it++ ){
+        int edge_label = *it;
+        if(_v_edge_link[edge_label].second !=vertex_label )
+            v_vertex.push_back(_v_edge_link[edge_label].second);
         else
-            v_vertex.push_back(_v_edge_link[edge].first);
+            v_vertex.push_back(_v_edge_link[edge_label].first);
     }
     return v_vertex;
 }

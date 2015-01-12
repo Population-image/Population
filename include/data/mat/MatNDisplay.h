@@ -51,7 +51,7 @@ public:
 
     virtual ~MatNDisplayInterface ();
     virtual MatNDisplayInterface & display(const MatN<2, RGBUI8 > &img)=0;
-    virtual MatNDisplayInterface & display(const MatN<2, RGBAUI8 > &img)=0;
+//    virtual MatNDisplayInterface & display(const MatN<2, RGBAUI8 > &img)=0;
     virtual MatNDisplayInterface & display(const MatN<2, UI8 > &img)=0;
     virtual operator  bool () const=0;
     virtual bool 	is_empty () const=0;
@@ -205,7 +205,7 @@ public:
     MatNDisplay & 	operator= (const MatNDisplay &disp);
     virtual ~MatNDisplay ();
     virtual MatNDisplay & display(const MatN<2, RGBUI8 > &img);
-    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
+//    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
     virtual MatNDisplay & display(const MatN<2, UI8 > &img);
     template<int DIM,typename Type>
     MatNDisplay & display(const MatN<DIM, Type > &){return *this;}
@@ -224,8 +224,8 @@ public:
     virtual bool 	is_event () const;
     virtual bool 	is_fullscreen () const;
     virtual bool 	is_key () const;
-    virtual bool 	is_key (const unsigned int keycode) const;
-    virtual bool 	is_key (const char *const keycode) const;
+    virtual bool 	is_key (const unsigned int keycode_value) const;
+    virtual bool 	is_key (const char *const keycode_value) const;
     virtual bool 	is_key_sequence (const unsigned int *const keycodes_sequence, const unsigned int length, const  bool remove_sequence=false);
     virtual bool 	is_keyESC () const;
     virtual bool 	is_keyF1 () const;
@@ -337,16 +337,16 @@ public:
     virtual MatNDisplay & 	close ();
     virtual MatNDisplay & 	move (const int pos_x, const int pos_y);
     virtual MatNDisplay & 	resize (const  bool force_redraw=true);
-    virtual MatNDisplay & 	resize (const int width, const int height, const bool force_redraw=true);
-    virtual MatNDisplay & 	set_normalization (const unsigned int normalization);
+    virtual MatNDisplay & 	resize (const int width_value, const int height_value, const bool force_redraw=true);
+    virtual MatNDisplay & 	set_normalization (const unsigned int normalization_value);
     virtual MatNDisplay & 	set_title (const char *const format,...);
-    virtual MatNDisplay & 	set_fullscreen (const bool is_fullscreen, const bool force_redraw=true);
+    virtual MatNDisplay & 	set_fullscreen (const bool is_fullscreen_value, const bool force_redraw=true);
     virtual MatNDisplay & 	toggle_fullscreen (const bool force_redraw=true);
     virtual MatNDisplay & 	show_mouse ();
     virtual MatNDisplay & 	hide_mouse ();
     virtual MatNDisplay & 	set_mouse (const int pos_x, const int pos_y);
     virtual MatNDisplay & 	set_button ();
-    virtual MatNDisplay & 	set_button (const unsigned int button, const bool is_pressed=true);
+    virtual MatNDisplay & 	set_button (const unsigned int button_value, const bool is_pressed=true);
     virtual MatNDisplay & 	set_wheel ();
     virtual MatNDisplay & 	set_wheel (const int amplitude);
     virtual MatNDisplay & 	set_key ();

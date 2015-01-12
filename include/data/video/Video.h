@@ -11,19 +11,7 @@ namespace pop
 * \defgroup Video Video
 * \brief  video player frame by frame (ip-camera, avi)
 *
-* \section InstallExternal External library vlc
 *
-* OS
-* - for linux,  install the vlc library as usual (ubuntu  sudo apt-get install libvlc-dev vlc-nox vlc)
-* - for windows, execute the installer package http://www.videolan.org/vlc/download-windows.html and you can find the SDK files in the install directory, i.e. development headers and import libraries.
-*
-* IDE
-* - in qt-creator, you have to uncomment the CONFIG += vlc to use vlv player implementation.
-* - in others,
-*   -# add preprocessor definitions -DLIBVLC
-*   -# add include path C:/Program Files (x86)/VideoLAN/VLC/sdk/include/ for windows
-*   -# add library path C:/Program Files (x86)/VideoLAN/VLC for windows
-*   -# link shared library -lvlc
 */
 
 

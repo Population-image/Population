@@ -49,12 +49,12 @@ template<int DIM,typename TypePixel>
 class LaplacienSmooth
 {
 private:
-    MatNIteratorENeighborhood<VecN<DIM,int>,MatNBoundaryConditionMirror> itn;
-    std::vector<F64> v_value;
-    double sigma;
-    int radius_kernel;
+    MatNIteratorENeighborhood<VecN<DIM,int>,MatNBoundaryConditionMirror> _itn;
+    std::vector<F64> _v_value;
+    double _sigma;
+    int _radius_kernel;
 public:
-    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel=1);
+    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 _sigma,int _radius_kernel=1);
     TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x);
 };
 }
@@ -748,24 +748,24 @@ private:
 
 template<int DIM,typename TypePixel>
 Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel)
-    :itn(f.getIteratorENeighborhood(radius_kernel,0)),sigma(sigma),radius_kernel(radius_kernel){
+    :_itn(f.getIteratorENeighborhood(radius_kernel,0)),_sigma(sigma),_radius_kernel(radius_kernel){
     F64 sum=0;
-    itn.init(0);
-    while(itn.next()){
-        double dist = itn.xreal().normPower();
+    _itn.init(0);
+    while(_itn.next()){
+        double dist = _itn.xreal().normPower();
         if(dist!=0){
             F64  value = std::exp(-0.5*dist/(sigma*sigma));
-            v_value.push_back(value);
+            _v_value.push_back(value);
             sum+=value;
         }
         else
-            v_value.push_back(-2*DIM);
+            _v_value.push_back(-2*DIM);
 
     }
     //normalisation
-    for(int i=0;i<(int)v_value.size();i++){
-        if(v_value[i]>0)
-            v_value[i]*=(2*DIM/sum);
+    for(int i=0;i<(int)_v_value.size();i++){
+        if(_v_value[i]>0)
+            _v_value[i]*=(2*DIM/sum);
 
     }
 }
@@ -773,10 +773,10 @@ template<int DIM,typename TypePixel>
 TypePixel Private::LaplacienSmooth<DIM,TypePixel>::operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
     F64 sum=0;
     FunctorF::FunctorMultiplicationF2<TypePixel,F64,F64> op;
-    itn.init( x);
-    std::vector<F64>::iterator it = v_value.begin();
-    while(itn.next()){
-        sum += op((*it),f(itn.x()));
+    _itn.init( x);
+    std::vector<F64>::iterator it = _v_value.begin();
+    while(_itn.next()){
+        sum += op((*it),f(_itn.x()));
         it ++;
     }
     return sum;

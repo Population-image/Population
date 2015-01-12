@@ -58,8 +58,8 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
 
     MatNDisplay windows;
 
-    for(int i =0;i<nbrwalkers;i++){
-        std::cout<<"walker "<<i<<std::endl;
+    for(int index_walker =0;index_walker<nbrwalkers;index_walker++){
+        std::cout<<"walker "<<index_walker<<std::endl;
         MatN<2,UI8 >::E randomwalker;
         //GENERATE INIT POSITION
         int face= dface.randomVariable();
@@ -89,7 +89,7 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
                 {
                     touch=true;
                     in(randomwalker)=255;
-                    if(i%50==0)
+                    if(index_walker%50==0)
                         windows.display(in);
                 }
             }
@@ -108,8 +108,8 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
     Distribution dpos(0,in.sizeI()-1,"UNIFORMINT");
 
     MatN<3,UI8 >::IteratorENeighborhood N(in.getIteratorENeighborhood(1,1));
-    for(int i =0;i<nbrwalkers;i++){
-        std::cout<<"walker "<<i<<std::endl;
+    for(int index_walker =0;index_walker<nbrwalkers;index_walker++){
+        std::cout<<"walker "<<index_walker<<std::endl;
 
         MatN<3,UI8 >::E randomwalker;
         //GENERATE INIT POSITION

@@ -403,11 +403,11 @@ public:
         return x;
     }
     /*!
-    * \param v  VecN
+    * \param v VecN
     * \param value factor
     * \return output VecN
     *
-    * division of the factor \a value to all elements of the VecN \a  \f$(value/u_1,value/u_2) \f$
+    * division of the factor \a value to all elements of the VecN \a  \f$(value/v_1,value/v_2) \f$
     */
     template<int D1,class  Type1>
     friend inline VecN<D1, Type1>   operator/(  Type1  value,const VecN<D1, Type1>&  v);

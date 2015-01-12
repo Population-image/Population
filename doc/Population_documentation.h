@@ -35,9 +35,9 @@ If something wrong occurs, whatever your skills, if you wan to join the communit
 In sourceforge https://sourceforge.net/projects/population/ , you download  population source with this \ref pagedirectoryorganisation .  
 
 \section pageC  Install C++
-Select your integrated development environment: 
-- \ref pagetechnicalqt 
-- \ref pagetechnicalother
+Select your build process: 
+- \ref pageqmake 
+- \ref pagecmake
 
 \section Python  Install Python 
 - \ref pagetechnicalpython

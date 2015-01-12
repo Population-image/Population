@@ -12,7 +12,6 @@ MAKE_EXE{
     CONFIG += executable
     TEMPLATE = app
     SOURCES +=  $${PWD}/main.cpp
-    DESTDIR=$${PWD}/bin
 }else{
     CONFIG+=plugin
     TEMPLATE = lib

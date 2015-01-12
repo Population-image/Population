@@ -507,14 +507,11 @@ struct POP_EXPORTS Processing
     Visualization::labelAverageRGB(label2,img2).display();
       \endcode
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,double dynamic=0.001){
 
-        if(typeid(TypePixel)!=typeid(UI8))
-            return thresholdMultiValley(MatN<DIM,UI8>(Processing::greylevelRange(f,TypePixel(0),TypePixel(255))),dynamic);
+
+    template<int DIM>
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,UI8>& f,double dynamic=0.001){
         MatN<DIM,UI8>  ff(f);
-
-
         Mat2F64 mm =Analysis::histogram(ff);
         Mat2F64 mmm(mm);
         mmm.deleteCol(0);
@@ -531,14 +528,14 @@ struct POP_EXPORTS Processing
         }
         ff=0;
         for( int i =(static_cast<int>(vmin.size())-1);i>=0;i--){
-            typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+            typename MatN<DIM,UI8>::IteratorEDomain it(f.getIteratorEDomain());
             if(i==(static_cast<int>(vmin.size())-1)){
-                FunctorF::FunctorThreshold<UI8,double,TypePixel> func(vmin[i],255,255);
+                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],255,255);
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
             }else{
-                FunctorF::FunctorThreshold<UI8,double,TypePixel> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
+                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
@@ -547,7 +544,10 @@ struct POP_EXPORTS Processing
         return ff;
 
     }
-
+    template<int DIM,typename TypePixel>
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,double dynamic=0.001){
+        return thresholdMultiValley(MatN<DIM,UI8>(Processing::greylevelRange(f,TypePixel(0),TypePixel(255))),dynamic);
+    }
     /*!
      * \brief apply at pixel value, f(x), the distribution : h(x)=d(f(x))
      * \param f input function
@@ -624,7 +624,7 @@ struct POP_EXPORTS Processing
     static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
-        return ProcessingAdvanced::greylevelRange(f,it,min,max,Loki::Int2Type<isVectoriel<TypePixel>::value >());
+        return ProcessingAdvanced::greylevelRange(f,it,min,max,Int2Type<isVectoriel<TypePixel>::value >());
     }
 
 
@@ -645,7 +645,7 @@ struct POP_EXPORTS Processing
     template<int DIM,typename TypePixel>
     static MatN<DIM,TypePixel> greylevelTranslateMeanValue(const MatN<DIM,TypePixel>& f, typename MatN<DIM,TypePixel>::F mean )
     {
-        return ProcessingAdvanced::greylevelTranslateMeanValueCast(f,mean,Loki::Type2Type<TypePixel >() );
+        return ProcessingAdvanced::greylevelTranslateMeanValueCast(f,mean,Type2Type<TypePixel >() );
     }
     /*!
      *  \brief  Remove the grey-level values not populated by pixesl/voxels
@@ -701,7 +701,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename TypePixel>
     static MatN<DIM,TypePixel> integral(const MatN<DIM,TypePixel> & f)
     {
-        return ProcessingAdvanced::integral(f,Loki::Int2Type<DIM>());
+        return ProcessingAdvanced::integral(f,Int2Type<DIM>());
     }
     /*!
      *  \brief  integral of the matrix http://research.microsoft.com/~viola/Pubs/Detect/violaJones_IJCV.pdf
@@ -725,7 +725,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename TypePixel>
     static MatN<DIM,TypePixel> integralPower2(const MatN<DIM,TypePixel> & f)
     {
-        return ProcessingAdvanced::integral(f.multTermByTerm(f),Loki::Int2Type<DIM>());
+        return ProcessingAdvanced::integral(f.multTermByTerm(f),Int2Type<DIM>());
     }
 
     /*!
@@ -2713,11 +2713,11 @@ MatNIteratorENeighborhoodAmoebas<Function >::MatNIteratorENeighborhoodAmoebas(co
     _label=0;
     _grad = Processing::gradientVecSobel(in);
     for(unsigned int i=0;i<Function::DIM;i++){
-         VecN<Function::DIM,I32>  x;
-        x(i)=-1;
-        _x_add.push_back(x);
-        x(i)= 1;
-        _x_add.push_back(x);
+         VecN<Function::DIM,I32>  x_pos;
+        x_pos(i)=-1;
+        _x_add.push_back(x_pos);
+        x_pos(i)= 1;
+        _x_add.push_back(x_pos);
     }
 }
 

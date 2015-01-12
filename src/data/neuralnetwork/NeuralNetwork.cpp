@@ -498,8 +498,8 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
                                 int i_height_previous =  i_height*2 + step_previous + i_heigh_kernel - step_previous;
 
                                 NNNeuron * nprevious = (layerprevious->_neurons_matrix(i_pattern_previous)(i_height_previous,i_width_previous)) ;
-                                unsigned int i_weight = 1+i_width_kernel + i_heigh_kernel*kernelsize + i_pattern*(kernelsize*kernelsize+1)+i_pattern_previous*nbr_map*(kernelsize*kernelsize+1);
-                                n->addConnection(layer->_weights[i_weight], nprevious );
+                                unsigned int i_weight_index = 1+i_width_kernel + i_heigh_kernel*kernelsize + i_pattern*(kernelsize*kernelsize+1)+i_pattern_previous*nbr_map*(kernelsize*kernelsize+1);
+                                n->addConnection(layer->_weights[i_weight_index], nprevious );
                             }
 
                         }
@@ -547,8 +547,8 @@ void NeuralNetworkFeedForward::save(const char * file)const
                 XMLNode nodechild = node.addChild("layer");
                 nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
                 nodechild.addAttribute("size",BasicUtility::Any2String(inputlayer->_neurons_matrix[0].getDomain()));
-                nodechild.addAttribute("method",BasicUtility::Any2String(inputlayer->_method));
-                nodechild.addAttribute("normalization",BasicUtility::Any2String(inputlayer->_normalization_value));
+                nodechild.addAttribute("method",BasicUtility::Any2String((unsigned int)inputlayer->_method));
+                nodechild.addAttribute("normalization",BasicUtility::Any2String((unsigned int)inputlayer->_normalization_value));
             }else{
 
                 XMLNode nodechild = node.addChild("layer");
@@ -696,11 +696,11 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 str = tool.getAttribute("weight");
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
-                for(unsigned int i=0;i<layer->_weights.size();i++){
+                for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     double weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
-                    layer->_weights[i]->_Wn = weight;
+                    layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXCONVOLUTIONNAL2"){
 
@@ -717,11 +717,11 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 str = tool.getAttribute("weight");
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
-                for(unsigned int i=0;i<layer->_weights.size();i++){
+                for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     double weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
-                    layer->_weights[i]->_Wn = weight;
+                    layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXSUBSALE"){
 
@@ -739,11 +739,11 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 str = tool.getAttribute("weight");
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
-                for(unsigned int i=0;i<layer->_weights.size();i++){
+                for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     double weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
-                    layer->_weights[i]->_Wn = weight;
+                    layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXMAXPOOLING"){
 
@@ -765,11 +765,11 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 str = tool.getAttribute("weight");
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
-                for(unsigned int i=0;i<layer->_weights.size();i++){
+                for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     double weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
-                    layer->_weights[i]->_Wn = weight;
+                    layer->_weights[index_weight]->_Wn = weight;
                 }
             }
         }
@@ -1390,8 +1390,7 @@ void NNNeuronMaxPool::initPropagateBackFirstDerivate(){
         c._neuron->_dErr_dXn=0;
     }
 }
-
-int reverseInt(int i) {
+int TrainingNeuralNetwork::_reverseInt(int i) {
     unsigned char c1, c2, c3, c4;
     c1 = i & 255;
     c2 = (i >> 8) & 255;
@@ -1414,13 +1413,13 @@ Vec<Vec<Mat2UI8> > TrainingNeuralNetwork::loadMNIST( std::string datapath,  std:
 
     // parse data header
     datas.read((char*)&magic_number,sizeof(magic_number));
-    magic_number=reverseInt(magic_number);
+    magic_number=_reverseInt(magic_number);
     datas.read((char*)&number_of_images,sizeof(number_of_images));
-    number_of_images=reverseInt(number_of_images);
+    number_of_images=_reverseInt(number_of_images);
     datas.read((char*)&n_rows,sizeof(n_rows));
-    n_rows=reverseInt(n_rows);
+    n_rows=_reverseInt(n_rows);
     datas.read((char*)&n_cols,sizeof(n_cols));
-    n_cols=reverseInt(n_cols);
+    n_cols=_reverseInt(n_cols);
 
     // parse label header - ignore
     int dummy;

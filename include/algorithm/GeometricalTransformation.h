@@ -797,10 +797,10 @@ struct POP_EXPORTS GeometricalTransformation
 
         MatN<2,Type> panoramic(xmax-trans);
         ForEachDomain2D(xit,panoramic){
-            Vec2F64 x = Vec2F64(xit)+trans;
-            Vec2F64 xx  =  GeometricalTransformation::transformHomogeneous2D(mhom,x);
-            if(f.isValid(x)==true)
-                panoramic(xit) = f(x);
+            Vec2F64 x_trans = Vec2F64(xit)+trans;
+            Vec2F64 xx  =  GeometricalTransformation::transformHomogeneous2D(mhom,x_trans);
+            if(f.isValid(x_trans)==true)
+                panoramic(xit) = f(x_trans);
             if(g.isValid(xx)==true)
                 panoramic(xit)=g(xx);
 

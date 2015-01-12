@@ -6,7 +6,6 @@
 #include"data/vec/VecN.h"
 #include"data/functor/FunctorPDE.h"
 #include"data/notstable/Descriptor.h"
-#include"data/notstable/SearchStructure.h"
 #include"data/notstable/Ransac.h"
 #include"algorithm/LinearAlgebra.h"
 #include"algorithm/Statistics.h"

@@ -42,7 +42,7 @@ in the Software.
 #include <limits>
 
 #include"data/distribution/DistributionMultiVariate.h"
-#include"dependency/fparser.hh"
+#include"3rdparty/fparser.hh"
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
 

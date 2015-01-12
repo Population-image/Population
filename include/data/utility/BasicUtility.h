@@ -359,6 +359,38 @@ T1  squareRoot(T1  x)
 {
     return std::sqrt(x);
 }
+////////////////////////////////////////////////////////////////////////////////
+// class template Int2Type
+// Converts each integral constant into a unique type
+// Invocation: Int2Type<v> where v is a compile-time constant integral
+// Defines 'value', an enum that evaluates to v
+////////////////////////////////////////////////////////////////////////////////
+
+    template <int v>
+    struct Int2Type
+    {
+        enum { value = v };
+    };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template Type2Type
+// Converts each type into a unique, insipid type
+// Invocation Type2Type<T> where T is a type
+// Defines the type OriginalType which maps back to T
+////////////////////////////////////////////////////////////////////////////////
+
+    template <typename T>
+    struct Type2Type
+    {
+        typedef T OriginalType;
+    };
+    class NullType {};
+    inline std::ostream& operator << (std::ostream& out, const NullType & ){
+        return out;
+    }
+    inline std::istream& operator >> (std::istream& in, NullType & ){
+        return in;
+    }
 }
 namespace std{
 

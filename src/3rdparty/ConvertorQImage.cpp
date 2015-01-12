@@ -1,8 +1,9 @@
-#include "dependency/ConvertorQImage.h"
+#include "3rdparty/ConvertorQImage.h"
 #include"PopulationConfig.h"
+#include"data/utility/BasicUtility.h"
 #if defined(HAVE_QT)
 namespace pop{
-MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<pop::UI8>)
+MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconversion,Int2Type<2>,Type2Type<pop::UI8>)
 {
 
     if(qimg.isNull()==false){
@@ -28,7 +29,7 @@ MatN<2,pop::UI8> ConvertorQImage::fromQImage(const QImage & qimg,bool isfastconv
         return MatN<2,pop::UI8>();
     }
 }
-MatN<2,RGBUI8> ConvertorQImage::fromQImage(const QImage & temp,bool isfastconversion,Loki::Int2Type<2>,Loki::Type2Type<RGBUI8>)
+MatN<2,RGBUI8> ConvertorQImage::fromQImage(const QImage & temp,bool isfastconversion,Int2Type<2>,Type2Type<RGBUI8>)
 {
     if(temp.isNull()==false){
         if(isfastconversion==true){

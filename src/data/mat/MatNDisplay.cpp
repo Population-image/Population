@@ -1,7 +1,7 @@
 #include"data/mat/MatNDisplay.h"
 #include"Population.h"
 #if defined(HAVE_CIMG)
-#include"dependency/MatNDisplayCImg.h"
+#include"3rdparty/MatNDisplayCImg.h"
 #endif
 namespace pop{
 
@@ -46,10 +46,10 @@ MatNDisplay & MatNDisplay::display(const MatN<2, RGBUI8 > & m){
     return *this;
 }
 
-MatNDisplay & MatNDisplay::display(const MatN<2, RGBAUI8 > &m){
-    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
-    return *this;
-}
+//MatNDisplay & MatNDisplay::display(const MatN<2, RGBAUI8 > &m){
+//    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
+//    return *this;
+//}
 
 MatNDisplay & MatNDisplay::display(const MatN<2, UI8 > &m){
     if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";}else _impl->display(m);
@@ -112,11 +112,11 @@ bool 	MatNDisplay::is_fullscreen () const{
 bool 	MatNDisplay::is_key () const{
     if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key();
 }
-bool 	MatNDisplay::is_key (const unsigned int keycode) const{
-    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key(keycode);
+bool 	MatNDisplay::is_key (const unsigned int keycode_value) const{
+    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key(keycode_value);
 }
-bool 	MatNDisplay::is_key (const char *const keycode) const{
-    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key(keycode);
+bool 	MatNDisplay::is_key (const char *const keycode_value) const{
+    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key(keycode_value);
 }
 bool 	MatNDisplay::is_key_sequence (const unsigned int *const keycodes_sequence, const unsigned int length, const bool remove_sequence){
     if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->is_key_sequence(keycodes_sequence,length,remove_sequence);
@@ -436,8 +436,8 @@ int 	MatNDisplay::screen_width (){
 int 	MatNDisplay::screen_height (){
     if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->screen_height();
 }
-unsigned int 	MatNDisplay::keycode (const char *const keycode){
-    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->keycode(keycode);
+unsigned int 	MatNDisplay::keycode (const char *const keycode_value){
+    if(_impl==NULL){std::cerr<<"No visual display because CImg is not included. Add it in CMake !";return false;}else return _impl->keycode(keycode_value);
 }
 MatNDisplay & 	MatNDisplay::show (){
     if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->show();
@@ -455,22 +455,22 @@ MatNDisplay & 	MatNDisplay::resize (const bool force_redraw){
     if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->resize(force_redraw);
     return *this;
 }
-MatNDisplay & 	MatNDisplay::resize (const int width, const int height, const bool force_redraw){
-    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->resize(width,height,force_redraw);
+MatNDisplay & 	MatNDisplay::resize (const int width_value, const int height_value, const bool force_redraw){
+    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->resize(width_value,height_value,force_redraw);
     return *this;
 }
 
 
-MatNDisplay & 	MatNDisplay::set_normalization (const unsigned int normalization){
-    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_normalization(normalization);
+MatNDisplay & 	MatNDisplay::set_normalization (const unsigned int normalization_value){
+    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_normalization(normalization_value);
     return *this;
 }
 MatNDisplay & 	MatNDisplay::set_title (const char *const format,...){
     if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_title(format);
     return *this;
 }
-MatNDisplay & 	MatNDisplay::set_fullscreen (const bool is_fullscreen, const bool force_redraw){
-    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_fullscreen(is_fullscreen,force_redraw);
+MatNDisplay & 	MatNDisplay::set_fullscreen (const bool is_fullscreen_value, const bool force_redraw){
+    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_fullscreen(is_fullscreen_value,force_redraw);
     return *this;
 }
 MatNDisplay & 	MatNDisplay::toggle_fullscreen (const bool force_redraw){
@@ -493,8 +493,8 @@ MatNDisplay & 	MatNDisplay::set_button (){
     if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_button();
     return *this;
 }
-MatNDisplay & 	MatNDisplay::set_button (const unsigned int button, const bool is_pressed){
-    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_button(button,  is_pressed);
+MatNDisplay & 	MatNDisplay::set_button (const unsigned int button_value, const bool is_pressed){
+    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_button(button_value,  is_pressed);
     return *this;
 }
 MatNDisplay & 	MatNDisplay::set_wheel (){
@@ -509,8 +509,8 @@ MatNDisplay & 	MatNDisplay::set_key (){
     if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_key();
     return *this;
 }
-MatNDisplay & 	MatNDisplay::set_key (const unsigned int keycode, const bool is_pressed){
-    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_key( keycode,  is_pressed);
+MatNDisplay & 	MatNDisplay::set_key (const unsigned int keycode_value, const bool is_pressed){
+    if(_impl==NULL)std::cerr<<"No visual display because CImg is not included. Add it in CMake !";else _impl->set_key( keycode_value,  is_pressed);
     return *this;
 }
 MatNDisplay & 	MatNDisplay::flush (){

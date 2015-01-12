@@ -12,8 +12,8 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_VERSION VERSION_GREATER "2.8")
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_VERBOSE_MAKEFILE 1)
+#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
 # ----------------------------------------------------------------------------
@@ -23,27 +23,27 @@ include(cmake/popUtils.cmake)
 
 # Optional 3rd party components
 # ===================================================
-POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON   IF (NOT ANDROID))
+POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
+POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
+POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
 
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
-POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
+POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" ON )
-POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
-POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
+POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
+POP_OPTION(BUILD_ARTICLE     "Build article code" ON )
 POP_OPTION(BUILD_DOCS        "Create build rules for Population Documentation" OFF )
-POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
-POP_OPTION(BUILD_TEST        "Test" OFF )
+POP_OPTION(BUILD_TEMP        "Build experimental code" ON )
+POP_OPTION(BUILD_TEST        "Test" ON )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_EXPORT      "export library" OFF )
-POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
+POP_OPTION(BUILD_EXPORT      "export library" ON )
+POP_OPTION(CMAKE_VERBOSE     "Verbose mode" ON )
 
 
 # Offer the user the choice of overriding the installation directories

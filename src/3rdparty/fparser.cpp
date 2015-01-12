@@ -4,9 +4,9 @@
 |* Copyright: Juha Nieminen                                                *|
 \***************************************************************************/
 
-#include"dependency/fpconfig.hh"
-#include"dependency/fparser.hh"
-#include"dependency/fptypes.hh"
+#include"3rdparty/fpconfig.hh"
+#include"3rdparty/fparser.hh"
+#include"3rdparty/fptypes.hh"
 using namespace FUNCTIONPARSERTYPES;
 
 #include <cstdlib>

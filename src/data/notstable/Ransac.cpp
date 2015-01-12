@@ -34,6 +34,9 @@ LinearLeastSquareRANSACModel::Data::Data(pop::VecF64 x,pop::F64 y)
 LinearLeastSquareRANSACModel::Data::Data()
 {
 }
+GeometricalTransformationRANSACModel::~GeometricalTransformationRANSACModel()
+{
+}
 GeometricalTransformationRANSACModel::GeometricalTransformationRANSACModel()
     :_error(NumericLimits<double>::maximumRange()){
 }

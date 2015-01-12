@@ -3,7 +3,7 @@
 #include"data/mat/MatNDisplay.h"
 #include"PopulationConfig.h"
 #if defined(HAVE_CIMG)
-#include"dependency/CImg.h"
+#include"3rdparty/CImg.h"
 namespace pop{
 /*! \ingroup Matrix
 * \defgroup MatNDisplayCImg  MatNDisplayCImg
@@ -160,7 +160,7 @@ public:
     unsigned int 	keycode (const char *const keycode);
 
     MatNDisplayCImg & display(const MatN<2, RGBUI8 > &img);
-    MatNDisplayCImg & display(const MatN<2, RGBAUI8 > &img);
+//    MatNDisplayCImg & display(const MatN<2, RGBAUI8 > &img);
     MatNDisplayCImg & display(const MatN<2, UI8 > &img);
     MatNDisplayCImg & display(const MatN<2, UI16 > &img);
     MatNDisplayCImg & display(const MatN<2, UI32 > &img);

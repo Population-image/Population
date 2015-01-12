@@ -1,5 +1,5 @@
 #include "data/utility/XML.h"
-#include "dependency/pugixml.hpp"
+#include "3rdparty/pugixml.hpp"
 #include <sstream>
 namespace pop{
 class XMLNode::impl

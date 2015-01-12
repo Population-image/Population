@@ -89,29 +89,23 @@ MatN<DIM,UI32> poreDecompositionGrainContactNarrowContact(MatN<DIM,UI8> m ){
 }
 
 int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);
-    try{
-        Mat3UI8 m;
+    Mat3UI8 m;
 #if Pop_OS==2
-        std::string dir = "C:/Users/tariel/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
+    std::string dir = "C:/Users/tariel/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
 #else
-        std::string dir = "/home/vincent/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
+    std::string dir = "/home/vincent/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
 #endif
-        m.loadFromDirectory(dir.c_str());
-        {
-            Mat2UI8 plane = GeometricalTransformation::plane(m,120);
+    m.loadFromDirectory(dir.c_str());
+    {
+        Mat2UI8 plane = GeometricalTransformation::plane(m,120);
 
-               m = m(Vec3I32(0,0,0),Vec3I32(50,50,50));
-//               Mat3UI32 grain3d = poreDecompositionGrainBoundarySharpVariationGreyLevel(m);
-               Mat3UI32 grain3d = poreDecompositionGrainContactNarrowContact(m);
-//            Mat3UI32 grain3d = poreDecompositionMixedMethod(m,2);
+        m = m(Vec3I32(0,0,0),Vec3I32(50,50,50));
+        //               Mat3UI32 grain3d = poreDecompositionGrainBoundarySharpVariationGreyLevel(m);
+        Mat3UI32 grain3d = poreDecompositionGrainContactNarrowContact(m);
+        //            Mat3UI32 grain3d = poreDecompositionMixedMethod(m,2);
 
-            Visualization::labelForegroundBoundary(grain3d,m,2).display();
-            return 1;
-        }
-
+        Visualization::labelForegroundBoundary(grain3d,m,2).display();
+        return 1;
     }
-    catch(const pexception &e){
-        e.display();//Display the error in a window
-    }
+
 }

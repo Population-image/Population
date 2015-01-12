@@ -1,12 +1,11 @@
 import sys
 import os
-PathPop= os.getcwd()+"/../../"
-
-sys.path.append("/home/vincent/qtcreator-build//lib")
-if (sys.platform == "win32" or sys.platform == "win64"):
-    from populationpythonwin32 import * #uncomment this line for windoww
-else:
-    from population import * #uncomment this line for linux
+PathPop= ""
+if os.path.isfile(PathPop+"population.py")==0:
+    print "set the variable PathPop to the path where you compile population, for instance D:\Users/vtariel/Desktop/ANV/Population-build/. This folder must contain population.py"
+    sys.exit(-1)
+sys.path.append(PathPop)
+from population import * 
     
 
 def visu2DSlice() :
@@ -81,11 +80,10 @@ def visu3DCubeExtrudedWithAxis():
     scene.display(0)#display the scene
     waitKey()
         
-try:    
-    visu2DSlice()
-    visu3DCube()
-    visu3DSlice()
-    visu3DMarchingCube()
-    visu3DCubeExtrudedWithAxis()
-except pexception, e:
-    e.display()
+  
+visu2DSlice()
+visu3DCube()
+visu3DSlice()
+visu3DMarchingCube()
+visu3DCubeExtrudedWithAxis()
+

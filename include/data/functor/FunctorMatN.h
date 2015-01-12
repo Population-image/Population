@@ -71,7 +71,7 @@ struct POP_EXPORTS FunctorMatN
 
         MatN<DIM,TypePixel1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         int radius = (kernel.size()-1)/2;
         while(itglobal.next()){
             typename MatN<DIM,TypePixel1>::E x = itglobal.x()  ;
@@ -100,10 +100,14 @@ struct POP_EXPORTS FunctorMatN
         int dir;
         Type_F64 value;
         Vec2I32 x;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
+#endif
         {
             radius = (kernel.size()-1)/2;
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
             for(i=0;i<f.sizeI();i++){
                 for(j=0;j<f.sizeJ();j++){
                     x(0)=i;x(1)=j;
@@ -128,15 +132,19 @@ struct POP_EXPORTS FunctorMatN
 
         MatN<3,TypePixel1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         int radius;
         int i,j,z,k,dir;
         Type_F64 value;
         Vec3I32 x;
+#if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,z,k,dir,value,x,radius)
+#endif
         {
             radius = (kernel.size()-1)/2;
+#if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
+#endif
             for(i=0;i<f.sizeI();i++){
                 for(j=0;j<f.sizeJ();j++){
                     for(z=0;z<f.sizeK();z++){
@@ -162,7 +170,7 @@ struct POP_EXPORTS FunctorMatN
     {
         MatN<DIM,TypePixel1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-           typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         typename MatN<DIM,TypePixel2>::IteratorEDomain itlocal(kernel.getIteratorEDomain());
         typename MatN<DIM,TypePixel2>::E center = (kernel.getDomain()-1)/2;
 

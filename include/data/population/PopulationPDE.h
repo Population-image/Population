@@ -48,9 +48,9 @@ private:
     std::vector<E> _v;
     I32 _index;
 public:
-    void push_x(const E & x)
+    void push_x(const E & x_value)
     {
-        _v.push_back(x);
+        _v.push_back(x_value);
     }
     void pop_x()
     {

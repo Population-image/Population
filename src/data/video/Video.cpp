@@ -1,6 +1,6 @@
 #include"data/video/Video.h"
-#include"dependency/VideoVLC.h"
-#include"dependency/VideoFFMPEG.h"
+#include"3rdparty/VideoVLC.h"
+#include"3rdparty/VideoFFMPEG.h"
 
 namespace pop {
 Video * Video::create(VideoImpl impl){

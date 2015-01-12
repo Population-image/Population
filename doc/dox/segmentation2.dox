@@ -10,28 +10,22 @@ A prerequisite of a quantitative matrix analysis is the phase partition (segment
 To illustrate the watershed segmentation, we will show you an example with a 3D matrix.\n
 First, you load the 3d matrix:
 \code
-#include"utility/CollectorExecutionInformation.h"
-#include"algorithm/Processing.h"
-#include"algorithm/Visualization.h"
-#include"algorithm/PDE.h"
-int main(){
-    CollectorExecutionInformationSingleton::getInstance()->setActivate(true);//execution information in the standart outstream
-    Mat3UI8 img;
-    img.loadFromDirectory("/home/vincent/Desktop/ImageProject/SedimentaryRock/slice/","Data","tiff");
+Mat3UI8 img;
+img.loadFromDirectory("/home/vincent/Desktop/ImageProject/SedimentaryRock/slice/","Data","png");
 \endcode
 \image html Rock.gif
-Here, you load all tiff files in the folder /home/vincent/Desktop/ImageProject/SedimentaryRock/slice/ with the basename Data and the extension tiff to create the 3D matrix.\n
+Here, you load all png files in the folder /home/vincent/Desktop/ImageProject/SedimentaryRock/slice/ with the basename Data and the extension png to create the 3D matrix.\n
 In order to create a prototype and calibrate it rapidly, you extract a sub-matrix to reduce the computational time of process:
 \code
-    img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
-    img.display();	
+img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
+img.display();	
 \endcode
 When the prototype is finished, you comment this line to process the full matrix and you go to the coffee room :)\n
 \image html rock1.png
 This matrix of rock material is hampered by noise (see the above matrix). You reduce it by applying the non linear anisotropic diffusion:
 \code 
-    Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusionGaussian(img,30,20,1);
-    imgfilter.display();
+Mat3UI8 imgfilter= PDE::nonLinearAnisotropicDiffusion(img);
+imgfilter.display();
 \endcode
 \image html rock2.png
 The grey level inside the pore-space (the blackest phase), the oil (the middle gray phase) and the granular (the lighest phase) is quite homogeneous but you cannot apply the
@@ -44,31 +38,31 @@ For this matrix, we will apply the watershed segmentation as presented in the ch
 
 To create the seeds, you apply the threshold operation in order to respect these previous constraints. To find the threshold values, you can use this manual tool:
 \code
-    int lowvalue,highvalue;
-    Application::thresholdSelection(imgfilter,lowvalue,highvalue);	
+int lowvalue,highvalue;
+Application::thresholdSelection(imgfilter,lowvalue,highvalue);	
 \endcode
 When these values are found, you can apply the threshold operation
 \code
-    Mat3UI8 grain= Processing::threshold(imgfilter,155);
-    Mat3UI8 oil  = Processing::threshold(imgfilter,70,110);
-    oil  = Processing::openingRegionGrowing(oil,2);//To remove the interface artefact
-    Mat3UI8 air  =  Processing::threshold(imgfilter,0,40);
+Mat3UI8 grain= Processing::threshold(imgfilter,155);
+Mat3UI8 oil  = Processing::threshold(imgfilter,70,110);
+oil  = Processing::openingRegionGrowing(oil,2);//To remove the interface artefact
+Mat3UI8 air  =  Processing::threshold(imgfilter,0,40);
 \endcode
 For the oil seed, you apply the opening operator to remove the interface artefact. Then to merge the seeds in a single label matrix, you do that:
 \code
-    Mat3UI8 seed  = Processing::labelMerge(grain,oil);
-    seed  = Processing::labelMerge(seed,air);
-    Visualization::labelForeground(seed,imgfilter).display();//check the good seed localization
+Mat3UI8 seed  = Processing::labelMerge(grain,oil);
+seed  = Processing::labelMerge(seed,air);
+Visualization::labelForeground(seed,imgfilter).display();//check the good seed localization
 \endcode
 \image html rock4.png "Seed Localization"
 Then, you create the topographic surface as the magnitude of the gradient matrix. The Deriche's gradient removes the fluctuation at small scales for a smooth gradient. 
 \code
-   Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
+Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
 \endcode
 Finally, you apply the watershed transformation on the topographic surface with the seed matrix.
 \code
-   Mat3UI8 water = Processing::watershed(seed,gradient);
-   Visualization::labelAverageColor(water,img).display();
+Mat3UI8 water = Processing::watershed(seed,gradient);
+Visualization::labelAverageColor(water,img).display();
 \endcode
 \image html rock5.png
 Now, you can comment the crop at the beginning to apply the segmentation procedure on the full image to get this matrix at the end:

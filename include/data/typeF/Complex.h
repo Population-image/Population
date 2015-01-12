@@ -118,15 +118,15 @@ public:
         _data[1]=c.img();
     }
     /*!
-    * \param real real part
-    * \param img imaginary part
+    * \param real_value real part
+    * \param img_value imaginary part
     *
-    * constructor the complex number c = real + i* img
+    * constructor the complex number c = real_value + i* img_value
     */
-    Complex(const  Type & real,const Type & img=0)
+    Complex(const  Type & real_value,const Type & img_value=0)
     {
-        _data[0]=real;
-        _data[1]=img;
+        _data[0]=real_value;
+        _data[1]=img_value;
     }
     /*!
     * \param i index
@@ -623,14 +623,14 @@ struct ArithmeticsSaturation<RGB<Scalar>,Complex<F64> >
         return RGB<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
     }
 };
-template<typename Scalar>
-struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F64> >
-{
-    static RGBA<Scalar>  Range(const Complex<F64>& p)
-    {
-        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
-    }
-};
+//template<typename Scalar>
+//struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F64> >
+//{
+//    static RGBA<Scalar>  Range(const Complex<F64>& p)
+//    {
+//        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
+//    }
+//};
 template<typename Scalar>
 struct ArithmeticsSaturation<Complex<F64> , RGB<Scalar> >
 {

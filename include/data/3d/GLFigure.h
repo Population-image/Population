@@ -45,9 +45,6 @@ in the Software.
 #include"data/typeF/TypeF.h"
 #include"data/typeF/RGB.h"
 #include"data/vec/VecN.h"
-#include"data/GP/Factory.h"
-#include"data/GP/Singleton.h"
-
 namespace pop
 {
 /*! \ingroup Data
@@ -198,8 +195,8 @@ class POP_EXPORTS FigureArrow:public GeometricalFigure
 {
 public:
 
-    FigureCone cone;
-    FigureLine line;
+    FigureCone _cone;
+    FigureLine _line;
     FigureArrow();
     void setArrow(const Vec3F64 x1,const Vec3F64 x2,double heigh_peak);
      void setTransparent(UI8  transparent);
@@ -334,6 +331,5 @@ public:
 
 
 };
-typedef Singleton<Factory<GeometricalFigure,std::string >,CreateUsingNew > FactoryGeometricalFigure;
 }
 #endif // GEOMETRICALFIGURE_H

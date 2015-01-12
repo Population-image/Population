@@ -12,7 +12,7 @@
 
 #if Pop_OS==2
 #ifdef _MSC_VER
-#include"dependency/direntvc.h"
+#include"3rdparty/direntvc.h"
 #include <direct.h>
 #else
 #include <direct.h>
@@ -60,8 +60,8 @@ std::string BasicUtility::IntFixedDigit2String(unsigned int value,int digitnumbe
     std::string s;
     for(int i =digitnumber-1;i>=0;i--)
     {
-        long int number =std::pow (10.,i);
-        long int tempvalue = value/number;
+        number =std::pow (10.,i);
+        tempvalue = value/number;
         value-=tempvalue*number;
         std::string str;
         Any2String(tempvalue,str);

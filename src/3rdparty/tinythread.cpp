@@ -20,7 +20,7 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution.
 */
-#include "dependency/tinythread.h"
+#include "3rdparty/tinythread.h"
 #if defined(HAVE_THREAD)
 #include <exception>
 #if defined(_TTHREAD_POSIX_)
@@ -308,6 +308,7 @@ ParallelWorkers::ParallelWorkers(int nbr_thread)
     :_current_thread(0),_v_thread(nbr_thread)
 #endif
 {
+    (void)nbr_thread;
 #if defined(HAVE_THREAD)
     for(unsigned int i=0;i<_v_thread.size();i++)
         _v_thread[i]=NULL;

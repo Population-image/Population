@@ -32,17 +32,51 @@ class  TrackingVideoYang
     * \endcode
     *
     */
-private:
-    MatN<DIM,TypePixel> dynamicmatric;
-    MatN<DIM,TypePixel> img_old;
-    MatN<DIM,TypePixel> background;
-    bool first ;
-    //        pop::MatNDisplay display;
-    //        pop::MatNDisplay display2;
-    //        pop::MatNDisplay display3;
 
+
+public:
+    //init the image if the size of the frame changed!!!
+    void init(){
+        _first =true;
+    }
+    TrackingVideoYang(){
+        init();
+    }
+    MatN<DIM,TypePixel> processFrame( const MatN<DIM,TypePixel>& in,double sigma=2,double Tf=3,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.1,double T=10){
+        MatN<DIM,TypePixel> img(in);
+        img = pop::Processing::smoothGaussian(img,sigma);
+        if(!(in.getDomain()==_background.getDomain()))
+        {
+            _first=true;
+        }
+        if(_first==true){
+            _first = false;
+            _background =img;
+            _img_old =img;
+            _dynamicmatric.resize(img.getDomain());
+            _dynamicmatric = 0;
+            return _dynamicmatric;
+        }else{
+            _dynamicMatrixModifiedTaoAlgorithm(img,_img_old,_dynamicmatric,_background,Tf,lambda,alpha);
+            MatN<DIM,TypePixel> moving(img.getDomain());
+            typename MatN<DIM,TypePixel>::IteratorEDomain it(_background.getIteratorEDomain());
+            while(it.next()){
+                if(normValue((double)img(it.x())-_background(it.x()))>T){
+                    moving(it.x())=255;
+                }
+                else
+                    moving(it.x())=0;
+            }
+            _img_old = img;
+            return moving;
+        }
+    }
 private:
-    void dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,TypePixel> & frame_timet,const MatN<DIM,TypePixel> & frame_timet_minus_deltat,MatN<DIM,TypePixel> & dynamic_matrix,MatN<DIM,TypePixel> &background,double Tf=10,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.2)
+    MatN<DIM,TypePixel> _dynamicmatric;
+    MatN<DIM,TypePixel> _img_old;
+    MatN<DIM,TypePixel> _background;
+    bool _first ;
+    void _dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,TypePixel> & frame_timet,const MatN<DIM,TypePixel> & frame_timet_minus_deltat,MatN<DIM,TypePixel> & dynamic_matrix,MatN<DIM,TypePixel> &background,double Tf=10,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.2)
     {
 
         //frameToFrameDifferenceImage
@@ -64,44 +98,6 @@ private:
             }
         }
         //           display2.display(Draw::mergeTwoImageHorizontal(dynamic_matrix*10,background));
-    }
-
-public:
-    //init the image if the size of the frame changed!!!
-    void init(){
-        first =true;
-    }
-    TrackingVideoYang(){
-        init();
-    }
-    MatN<DIM,TypePixel> processFrame( const MatN<DIM,TypePixel>& in,double sigma=2,double Tf=3,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.1,double T=10){
-        MatN<DIM,TypePixel> img(in);
-        img = pop::Processing::smoothGaussian(img,sigma);
-        if(!(in.getDomain()==background.getDomain()))
-        {
-            first=true;
-        }
-        if(first==true){
-            first = false;
-            background =img;
-            img_old =img;
-            dynamicmatric.resize(img.getDomain());
-            dynamicmatric = 0;
-            return dynamicmatric;
-        }else{
-            dynamicMatrixModifiedTaoAlgorithm(img,img_old,dynamicmatric,background,Tf,lambda,alpha);
-            MatN<DIM,TypePixel> moving(img.getDomain());
-            typename MatN<DIM,TypePixel>::IteratorEDomain it(background.getIteratorEDomain());
-            while(it.next()){
-                if(normValue((double)img(it.x())-background(it.x()))>T){
-                    moving(it.x())=255;
-                }
-                else
-                    moving(it.x())=0;
-            }
-            img_old = img;
-            return moving;
-        }
     }
 };
 }

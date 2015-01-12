@@ -1,4 +1,4 @@
-#include "dependency/VideoFFMPEG.h"
+#include "3rdparty/VideoFFMPEG.h"
 #if defined(HAVE_FFMPEG)
 extern "C"
 {

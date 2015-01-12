@@ -33,8 +33,6 @@ in the Software.
 \***************************************************************************/
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
-
-#include"data/utility/CollectorExecutionInformation.h"
 #include"data/functor/FunctorF.h"
 #include"algorithm/ForEachFunctor.h"
 #include"algorithm/Visualization.h"
@@ -143,19 +141,19 @@ struct POP_EXPORTS Representation
             MatN<1,ComplexF64> lign(in.getDomain()(fixed_coordinate));
             MatN<1,ComplexF64> lign2(in.getDomain()(fixed_coordinate));
             while(it.next()){
-                typename MatN<DIM,ComplexF64>::E x;
+                typename MatN<DIM,ComplexF64>::E xx;
                 for(int i=0;i<DIM;i++){
                     if(i<fixed_coordinate)
-                        x(i) =it.x()(i);
+                        xx(i) =it.x()(i);
                     else if(i>fixed_coordinate)
-                        x(i) =it.x()(i-1);
+                        xx(i) =it.x()(i-1);
                 }
-                for(x(fixed_coordinate)=0;x(fixed_coordinate)<in.getDomain()(fixed_coordinate);x(fixed_coordinate)++){
-                    lign(x(fixed_coordinate))=F(x);
+                for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
+                    lign(xx(fixed_coordinate))=F(xx);
                 }
                 lign2 = Representation::FFTOneDimension(lign,direction);
-                for(x(fixed_coordinate)=0;x(fixed_coordinate)<in.getDomain()(fixed_coordinate);x(fixed_coordinate)++){
-                    F(x)=lign2(x(fixed_coordinate));
+                for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
+                    F(xx)=lign2(xx(fixed_coordinate));
                 }
 
 
