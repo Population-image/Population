@@ -85,9 +85,10 @@ void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF6
     // to the input vector
     NNLayer & layerfirst = *(_layers[0]);
     POP_DbgAssert( in.size() == layerfirst._neurons.size() );
+#pragma omp parallel for
     for(unsigned int i_neuron=0;i_neuron<layerfirst._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerfirst._neurons[i_neuron]);
-        neuron->_Xn =  in(i_neuron );
+        neuron->_Xn =  in(i_neuron);
     }
 
     // propagate layer by layer
@@ -96,19 +97,20 @@ void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF6
         layer.propagateFront();
     }
 
-
     // load up output vector with results
     NNLayer & layerout = *(_layers[_layers.size()-1]);
     out.resize(layerout._neurons.size());
+#pragma omp parallel for
     for(unsigned int i_neuron=0;i_neuron<layerout._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerout._neurons[i_neuron]);
-        out(i_neuron ) = neuron->_Xn;
+        out(i_neuron) = neuron->_Xn;
     }
 }
 void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF64& desired_output)
 {
     NNLayer & layerlast = *(_layers[_layers.size()-1]);
     POP_DbgAssert( desired_output.size() == layerlast._neurons.size() );
+#pragma omp parallel for
     for(unsigned int i_neuron=0;i_neuron<layerlast._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerlast._neurons[i_neuron]);
         neuron->_dErr_dXn = neuron->_Xn -  desired_output(i_neuron);
@@ -121,18 +123,17 @@ void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF64& des
 void NeuralNetworkFeedForward::propagateBackSecondDerivate()
 {
     NNLayer & layerlast = *(_layers[_layers.size()-1]);
+#pragma omp parallel for
     for(unsigned int i_neuron=0;i_neuron<layerlast._neurons.size();i_neuron++){
         NNNeuron *  neuron = (layerlast._neurons[i_neuron]);
         neuron->_d2Err_dXn2 = 1;
     }
+
     for(unsigned int i_layer=_layers.size()-1;i_layer>0;i_layer--){
         NNLayer & layer = *(_layers[i_layer]);
         layer.propagateBackSecondDerivate();
     }
 }
-
-
-
 
 void NeuralNetworkFeedForward::learningFirstDerivate()
 {
@@ -148,7 +149,6 @@ void NeuralNetworkFeedForward::addInputLayer(int nbr_neuron){
     _layers.push_back( new NNLayer(nbr_neuron) );
     NNLayer & layer = *(_layers[_layers.size()-1]);
     layer._type = NNLayer::INPUT;
-
 }
 
 void NeuralNetworkFeedForward::addInputLayerMatrix(unsigned int height,unsigned int width,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization){
@@ -158,9 +158,6 @@ void NeuralNetworkFeedForward::addInputLayerMatrix(unsigned int height,unsigned 
     NNLayer & layer = *(_layers[_layers.size()-1]);
     layer._type = NNLayer::INPUTMATRIX;
 }
-
-
-
 
 void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,double standart_deviation_weight){
 
@@ -519,20 +516,6 @@ NeuralNetworkFeedForward::~NeuralNetworkFeedForward()
     init();
 }
 
-Vec<std::string>& NeuralNetworkFeedForward::label2String(){
-    return _label2string;
-}
-const Vec<std::string>& NeuralNetworkFeedForward::label2String()const{
-    return _label2string;
-}
-Vec<NNLayer*>& NeuralNetworkFeedForward::layers(){
-    return _layers;
-}
-
-const Vec<NNLayer*>& NeuralNetworkFeedForward::layers()const{
-    return _layers;
-}
-
 void NeuralNetworkFeedForward::init(){
     for(unsigned int i=0;i<_layers.size();i++){
         delete _layers[i];
@@ -858,14 +841,9 @@ NNLayerMatrixMaxPooling::NNLayerMatrixMaxPooling(unsigned int nbr_map,unsigned i
 
 void NNLayerMatrix::setLearningRate(double eta){
     if(this->_type==MATRIXCONVOLUTIONNAL){
-        for(unsigned int i=0;i<_weights.size();i++)
-        {
-            _weights[i]->_eta = eta/std::sqrt(_neurons_matrix(0).getDomain()(0)*_neurons_matrix(0).getDomain()(1)*1.);
-        }
-    }else{
-        NNLayer::setLearningRate(eta);
+        eta = eta/std::sqrt(_neurons_matrix(0).getDomain()(0)*_neurons_matrix(0).getDomain()(1)*1.);
     }
-
+    NNLayer::setLearningRate(eta);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -892,12 +870,14 @@ NNLayer::~NNLayer(){
 
 void NNLayer::setLearningRate(double eta)
 {
+#pragma omp parallel for
     for(unsigned int i=0;i<_weights.size();i++){
         _weights[i]->_eta = eta;
     }
 }
 void NNLayer::propagateFront()
 {
+#pragma omp parallel for
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -905,16 +885,22 @@ void NNLayer::propagateFront()
     }
 }
 void NNLayer::initPropagateBackFirstDerivate(){
+#pragma omp parallel for
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
         n->initPropagateBackFirstDerivate();
     }
 }
-
 void NNLayer::propagateBackFirstDerivate()
 {
-    initPropagateBackFirstDerivate();
+#pragma omp parallel for
+    for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
+    {
+        NNNeuron * n =(_neurons[i_neuron]);
+        n->initPropagateBackFirstDerivate();
+    }
+#pragma omp parallel for
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -922,6 +908,7 @@ void NNLayer::propagateBackFirstDerivate()
     }
 }
 void NNLayer::initPropagateBackSecondDerivate(){
+#pragma omp parallel for
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -929,11 +916,15 @@ void NNLayer::initPropagateBackSecondDerivate(){
     }
 }
 
-
-
 void NNLayer::propagateBackSecondDerivate()
 {
-    initPropagateBackSecondDerivate();
+#pragma omp parallel for
+    for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
+    {
+        NNNeuron * n =(_neurons[i_neuron]);
+        n->initPropagateBackSecondDerivate();
+    }
+#pragma omp parallel for
     for( unsigned int i_neuron =0;i_neuron< _neurons.size(); i_neuron++ )
     {
         NNNeuron * n =(_neurons[i_neuron]);
@@ -944,6 +935,7 @@ void NNLayer::propagateBackSecondDerivate()
 
 void NNLayer::learningFirstDerivate()
 {
+#pragma omp parallel for
     for( unsigned int i_weight =0;i_weight< _weights.size(); i_weight++ )
     {
         NNWeight * w =(_weights[i_weight]);
@@ -992,16 +984,9 @@ void NNNeuron::propagateFront(){
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
-        if(c.isBiais()==false)
-        {
-            double weight = c._weight->_Wn;
-            double neuron_out_previous = c._neuron->_Xn;
-            _Yn += weight*neuron_out_previous;
-        }
-        else
-        {
-            _Yn += c._weight->_Wn;
-        }
+        double weight = c._weight->_Wn;
+        double neuron_out_previous = (c.isBiais() ? 1 : c._neuron->_Xn);
+        _Yn += weight*neuron_out_previous;
     }
     switch ( _f_act) {
     case SIGMOID_FUNCTION:
@@ -1022,7 +1007,7 @@ void NNNeuron::initPropagateBackFirstDerivate(){
     {
         NNConnection& c = (_connections[i_connection]);
         c._weight->_dE_dWn =0;
-        if(c.isBiais()==false)
+        if(!c.isBiais())
         {
             c._neuron->_dErr_dXn=0;
         }
@@ -1034,7 +1019,7 @@ void NNNeuron::initPropagateBackSecondDerivate(){
     {
         NNConnection& c = (_connections[i_connection]);
         c._weight->_d2E_dWn2 =0;
-        if(c.isBiais()==false)
+        if(!c.isBiais())
         {
             c._neuron->_d2Err_dXn2=0;
         }
@@ -1057,24 +1042,15 @@ void NNNeuron::propagateBackFirstDerivate(){
         break;
     }
 
-    _dErr_dYn = fprime_Y*_dErr_dXn;
+    _dErr_dYn = fprime_Y * _dErr_dXn;
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
-        double Xnm1;
-        if(c.isBiais()==false)
+        double Xnm1 = (c.isBiais() ? 1 : c._neuron->_Xn);
+        c._weight->_dE_dWn += Xnm1 * _dErr_dYn;
+        if(!c.isBiais())
         {
-            Xnm1  = c._neuron->_Xn;
-        }
-        else
-        {
-            Xnm1  =1 ;
-        }
-        c._weight->_dE_dWn += Xnm1*_dErr_dYn;
-        if(c.isBiais()==false)
-        {
-
-            c._neuron->_dErr_dXn+= c._weight->_Wn*_dErr_dYn;
+            c._neuron->_dErr_dXn += c._weight->_Wn * _dErr_dYn;
         }
     }
 }
@@ -1099,16 +1075,9 @@ void NNNeuron::propagateBackSecondDerivate(){
     {
         NNConnection& c = (_connections[i_connection]);
         double Xnm1;
-        if(c.isBiais()==false)
-        {
-            Xnm1  = c._neuron->_Xn;
-        }
-        else
-        {
-            Xnm1  =1 ;
-        }
+        Xnm1 = (c.isBiais() ? 1 : c._neuron->_Xn);
         c._weight->_d2E_dWn2 += Xnm1*Xnm1*_d2Err_dYn2;
-        if(c.isBiais()==false)
+        if(!c.isBiais())
         {
             c._neuron->_d2Err_dXn2+= c._weight->_Wn*c._weight->_Wn*_d2Err_dYn2;
         }
@@ -1127,23 +1096,14 @@ NNConnection::NNConnection(NNWeight* weight , NNNeuron* neuron)
 
 }
 
-bool NNConnection::isBiais()const{
-    if(_neuron==NULL)
-        return true;
-    else
-        return false;
-}
-
-
-
 void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard,double elastic_distortion)
 {
 
     Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
     Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
 
-//        number_training.resize(2);
-//        number_test.resize(2);
+    //        number_training.resize(2);
+    //        number_test.resize(2);
 
     if(lecun_or_simard==0){
         std::cout<<"LECUN"<<std::endl;
@@ -1272,7 +1232,8 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
     std::vector<int> v_global_rand(trainingins.size());
     for(unsigned int i=0;i<v_global_rand.size();i++)
         v_global_rand[i]=i;
-    std::cout<<"iter_epoch\t error_train"<<std::endl;
+    if(display_error_classification==true)
+        std::cout<<"iter_epoch\t error_train"<<std::endl;
     Distribution d;
     for(unsigned int i=0;i<nbr_epoch;i++){
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,d.MTRand());
@@ -1319,6 +1280,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
             }
         }
         //        std::cout<<testins.size()<<std::endl;
+
         for(unsigned int j=0;j<testins.size();j++){
             VecF64 vout;
             n.propagateFront(testins(j),vout);
@@ -1409,21 +1371,15 @@ void NNNeuronMaxPool::propagateBackFirstDerivate(){
     {
         NNConnection& c = (_connections[i_connection]);
         NNNeuron * neuron = c._neuron;
+        c._neuron->_dErr_dXn = _dErr_dXn;
         if(neuron->_Xn>max_value){
             i_index_max = i_connection;
             max_value = neuron->_Xn;
+        }
+    }
 
-        }
-    }
-    for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
-    {
-        NNConnection& c = (_connections[i_connection]);
-        if(i_connection == i_index_max){
-            c._neuron->_dErr_dXn= 0;
-        }else{
-            c._neuron->_dErr_dXn = _dErr_dXn;
-        }
-    }
+    NNConnection& c = (_connections[i_index_max]);
+    c._neuron->_dErr_dXn = 0;
 }
 
 void NNNeuronMaxPool::initPropagateBackFirstDerivate(){
@@ -1434,6 +1390,7 @@ void NNNeuronMaxPool::initPropagateBackFirstDerivate(){
         c._neuron->_dErr_dXn=0;
     }
 }
+
 int reverseInt(int i) {
     unsigned char c1, c2, c3, c4;
     c1 = i & 255;
@@ -1448,7 +1405,7 @@ Vec<Vec<Mat2UI8> > TrainingNeuralNetwork::loadMNIST( std::string datapath,  std:
     std::ifstream labels(labelpath.c_str(),std::ios::binary);
 
     if (!datas.is_open() || !labels.is_open()){
-        std::cerr<<"binary files could not be loaded";
+        std::cerr<<"binary files could not be loaded" << std::endl;
         return dataset;
     }
 
@@ -1540,7 +1497,7 @@ Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix
             //                    sum2+=m(x);
             //                }
             //                std::cout<<sum2/sum<<std::endl;
-//             m.display();
+            //             m.display();
             v_out_i.push_back(m);
         }
     }

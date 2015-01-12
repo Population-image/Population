@@ -12,6 +12,8 @@
 #include"algorithm/GeometricalTransformation.h"
 #include"data/utility/XML.h"
 
+#define CACHE_LINE_SIZE 64
+
 namespace pop {
 
 /*! \defgroup NeuralNetwork NeuralNetwork
@@ -140,6 +142,10 @@ public:
 };
 
 
+inline bool NNConnection::isBiais() const{
+    return (_neuron==NULL);
+}
+
 class POP_EXPORTS NNNeuron
 {
 public:
@@ -249,11 +255,12 @@ public:
     * second partial derivated of the error function over the propagation value
     */
     double _d2Err_dYn2;
-};
-
-
-
-
+}
+#ifdef __GNUC__
+__attribute__((__aligned__(CACHE_LINE_SIZE)));
+#else
+;
+#endif
 
 class POP_EXPORTS NNLayer
 {
@@ -708,9 +715,6 @@ public:
         }
     }
 
-
-
-
     /*!
     * vector of layers
     */
@@ -720,6 +724,19 @@ public:
     bool _is_input_layer;
 private:
 };
+
+inline Vec<std::string>& NeuralNetworkFeedForward::label2String(){
+    return _label2string;
+}
+inline const Vec<std::string>& NeuralNetworkFeedForward::label2String()const{
+    return _label2string;
+}
+inline Vec<NNLayer*>& NeuralNetworkFeedForward::layers(){
+    return _layers;
+}
+inline const Vec<NNLayer*>& NeuralNetworkFeedForward::layers()const{
+    return _layers;
+}
 
 
 struct POP_EXPORTS TrainingNeuralNetwork
