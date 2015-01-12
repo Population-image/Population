@@ -898,7 +898,7 @@ public:
     */
 
     template<int DIM1,int DIM2>
-    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F64 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,double temperature_inverse=500);
+    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F64 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,double temperature_inverse=1);
 
 
     /*!
@@ -1730,7 +1730,6 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
     Vec<Vec< Vec<int> > > vref = RandomGeometry::autoCorrelation(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodel = RandomGeometry::autoCorrelation(model,lengthcorrelation,nbrphase);
 
-
     Vec<Vec< Vec<int> > > vrefcross = RandomGeometry::autoCorrelationCross(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodelcross = RandomGeometry::autoCorrelationCross(model,lengthcorrelation,nbrphase);
 
@@ -1796,6 +1795,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
         }
 
         if(count%(model.getDomain().multCoordinate()/10)==0){
+            std::cout<<"annealingSimutated E="<<energytemp<<" and nbr permutation per pixel(voxel)="<<count*1.0/model.getDomain().multCoordinate()<<std::endl;
             d.display(Visualization::labelToRandomRGB(model));
         }
         count++;

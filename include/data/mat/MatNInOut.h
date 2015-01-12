@@ -71,7 +71,7 @@ public:
     * default destructor
     */
     template<I32 D,typename T>
-    static void read(MatN<D,T> &in,std::istream &File );
+    static bool read(MatN<D,T> &in,std::istream &File );
     template<I32 D,typename T>
     static void writeAscii(const MatN<D,T>&in,std::ostream & out );
     template<I32 D,typename T>
@@ -79,9 +79,9 @@ public:
     template<I32 D,typename T>
     static void writeHeader(const MatN<D,T> &in,std::ostream & out,bool ascii  );
     template<I32 D,typename T>
-    static void readRaw(MatN<D,T> &in,std::istream &File);
+    static bool readRaw(MatN<D,T> &in,std::istream &File);
     template<I32 D,typename T>
-    static void readAscii(MatN<D,T> &in ,std::istream &File);
+    static bool readAscii(MatN<D,T> &in ,std::istream &File);
     template<I32 D,typename T>
     static void writeRawData(const MatN<D,T> &in ,std::ostream &File);
     template<I32 D,typename T>
@@ -97,7 +97,7 @@ private:
     template<int DIM,typename Type>
     static void  _save(const MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
-    static void  _load(const MatN<DIM, Type > &, const char * );
+    static bool  _load(const MatN<DIM, Type > &, const char * );
 
     static void  _save(const MatN<2, UI8 > &img, const char * filename);
     static void  _save(const MatN<2, UI16 > &img, const char * filename);
@@ -108,13 +108,13 @@ private:
     static void  _save(const MatN<2, RGBUI8 > &img, const char * filename);
 
 
-    static void  _load( MatN<2, UI8 > &img, const char * filename);
-    static void  _load( MatN<2, UI16 > &img, const char * filename);
-    static void  _load( MatN<2, UI32 > &img, const char * filename);
-    static void  _load( MatN<2, I32 > &img, const char * filename);
-    static void  _load( MatN<2, F32 > &img, const char * filename);
-    static void  _load( MatN<2, F64 > &img, const char * filename);
-    static void  _load( MatN<2, RGBUI8 > &img, const char * filename);
+    static bool  _load( MatN<2, UI8 > &img, const char * filename);
+    static bool  _load( MatN<2, UI16 > &img, const char * filename);
+    static bool  _load( MatN<2, UI32 > &img, const char * filename);
+    static bool  _load( MatN<2, I32 > &img, const char * filename);
+    static bool  _load( MatN<2, F32 > &img, const char * filename);
+    static bool  _load( MatN<2, F64 > &img, const char * filename);
+    static bool  _load( MatN<2, RGBUI8 > &img, const char * filename);
 
 
 
@@ -123,28 +123,28 @@ private:
     static void  _savePNG(const MatN<DIM, Type > &, const char * );
 
     template<int DIM,typename Type>
-    static void  _loadPNG(const MatN<DIM, Type > &, const char * );
+    static bool  _loadPNG(const MatN<DIM, Type > &, const char * );
     static void  _savePNG(const MatN<2, UI8 > &img, const char * filename);
     static void  _savePNG(const MatN<2, RGBUI8 > &img, const char * filename);
-    static void  _loadPNG( MatN<2, UI8 > &img, const char * filename);
-    static void  _loadPNG( MatN<2, RGBUI8 > &img, const char * filename);
+    static bool  _loadPNG( MatN<2, UI8 > &img, const char * filename);
+    static bool  _loadPNG( MatN<2, RGBUI8 > &img, const char * filename);
 
     template<int DIM,typename Type>
-    static void  _loadBMP( MatN<DIM, Type > &, const char * );
+    static bool  _loadBMP( MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
     static void  _saveBMP(const MatN<DIM, Type > &, const char * );
-    static void  _loadBMP( MatN<2, UI8 > &img, const char * filename);
-    static void  _loadBMP( MatN<2, RGBUI8 > &img, const char * filename);
+    static bool  _loadBMP( MatN<2, UI8 > &img, const char * filename);
+    static bool  _loadBMP( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, UI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, RGBUI8 > &img, const char * filename);
 
 
     template<int DIM,typename Type>
-    static void  _loadJPG( MatN<DIM, Type > &, const char * );
+    static bool  _loadJPG( MatN<DIM, Type > &, const char * );
     template<int DIM,typename Type>
     static void  _saveJPG(const MatN<DIM, Type > &, const char * );
-    static void  _loadJPG( MatN<2, UI8 > &img, const char * filename);
-    static void  _loadJPG( MatN<2, RGBUI8 > &img, const char * filename);
+    static bool  _loadJPG( MatN<2, UI8 > &img, const char * filename);
+    static bool  _loadJPG( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveJPG(const MatN<2, UI8 > &img, const char * filename);
     static void  _saveJPG(const MatN<2, RGBUI8 > &img, const char * filename);
 
@@ -155,26 +155,26 @@ public:
     template<I32 D,typename T>
     static void saveRaw(const MatN<D,T> &in,const char * file );
     template<I32 DIM,typename Result>
-    static void load(MatN<DIM,Result> &in,const char * file  );
+    static bool load(MatN<DIM,Result> &in,const char * file  );
     template<I32 DIM,typename Result>
-    static void loadRaw(MatN<DIM,Result> &in,const char * file  );
+    static bool loadRaw(MatN<DIM,Result> &in,const char * file  );
 
     template<int DIM,typename Type>
-    static void loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
+    static bool loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
     template<int DIM,typename Result>
     static void saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
 };
 
 namespace Private{
 inline void  headerPNG(std::ostream & out,Type2Type<pop::UI8>){
-      out<<"255"<<std::endl;
+    out<<"255"<<std::endl;
 }
 inline void  headerPNG(std::ostream & out,Type2Type<pop::RGBUI8>){
-      out<<"255"<<std::endl;
+    out<<"255"<<std::endl;
 }
 template<typename PixelType>
 inline void  headerPNG(std::ostream & out,Type2Type<PixelType>){
-      out<<NumericLimits<typename TypeTraitsTypeScalar<PixelType>::Result >::maximumRange()<<std::endl;
+    out<<NumericLimits<typename TypeTraitsTypeScalar<PixelType>::Result >::maximumRange()<<std::endl;
 }
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,UI8> >){return std::make_pair("P2","P5");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,UI16> >){return std::make_pair("P3","PA");}
@@ -202,15 +202,15 @@ void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefil
     MatNInOut::loadFromDirectory(*this,pathdir,basefilename,extension);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::load(const char * file)
+bool MatN<Dim,Type>::load(const char * file)
 {
-    MatNInOut::load(*this,file);
+    return MatNInOut::load(*this,file);
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::loadRaw(const char * file,const Domain & d)
+bool MatN<Dim,Type>::loadRaw(const char * file,const Domain & d)
 {
     this->resize(d);
-    MatNInOut::loadRaw(*this,file);
+    return MatNInOut::loadRaw(*this,file);
 }
 template<int Dim, typename Type>
 void MatN<Dim,Type>::saveFromDirectory(const char * pathdir,const char * basefilename,const char * extension)const 
@@ -232,7 +232,7 @@ void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const
 {
     std::ofstream  out(file);
     if (out.fail())
-        std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
+        std::cerr<<"In MatN::save, cannot open file: "+std::string(file)<<std::endl;
     else{
         if(header!="")
             out<<header<<std::endl;
@@ -240,10 +240,11 @@ void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const
     }
 }
 template<I32 D,typename T>
-void MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )
+bool MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )
 {
     if (File.fail()){
         std::cerr<<"In MatN::read, cannot open the file";
+        return false;
     }
     std::pair<std::string,std::string> type=Private::header2PNG(Type2Type<MatN<D,T> >());
     std::string idascii = type.first;
@@ -288,11 +289,12 @@ void MatNInOutPgm::read(MatN<D,T> &in,std::istream &File )
     std::swap(x(0),x(1));
     in.resize(x);
     if(_ascii==true){
-        readAscii(in,File);
+        return readAscii(in,File);
     }
     else{
-        readRaw(in,File);
+        return readRaw(in,File);
     }
+
 }
 template<I32 D,typename T>
 void MatNInOutPgm::writeAscii(const MatN<D,T>&in ,std::ostream & out)
@@ -341,22 +343,24 @@ void MatNInOutPgm::writeHeader(const MatN<D,T> &in,std::ostream & out,bool ascii
     }
     out<<std::endl;
 
-   Private::headerPNG(out,Type2Type<T>());
+    Private::headerPNG(out,Type2Type<T>());
 
 }
 template<I32 D,typename T>
-void MatNInOutPgm::readRaw(MatN<D,T> &in,std::istream &File )
+bool MatNInOutPgm::readRaw(MatN<D,T> &in,std::istream &File )
 {
     T * t =&( in.operator()(0));
     File.read(reinterpret_cast<char*>(t), sizeof(T)*in.getDomain().multCoordinate());
+        return true;
 }
 
 
 //void readRaw(std::istream &File,MatN<2,RGBConditionBounded > *in );
 template<I32 D,typename T>
-void MatNInOutPgm::readAscii(MatN<D,T> &in,std::istream &File )
+bool MatNInOutPgm::readAscii(MatN<D,T> &in,std::istream &File )
 {
     File>>in;
+    return true;
 }
 
 
@@ -384,13 +388,14 @@ void  MatNInOut::_save(const MatN<DIM, Type > &, const char * )
         std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_load(const MatN<DIM, Type > &, const char * )
+bool MatNInOut::_load(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
+    return false;
 
 }
 
@@ -404,23 +409,24 @@ void  MatNInOut::_savePNG(const MatN<DIM, Type > &, const char * )
         std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
 template<int DIM,typename Type>
-void  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )
+bool  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
-
+    return false;
 }
 template<int DIM,typename Type>
-void  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )
+bool  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
+    return false;
 }
 template<int DIM,typename Type>
 void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )
@@ -436,13 +442,15 @@ void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )
 
 
 template<int DIM,typename Type>
-void  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )
+bool  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
     }
     else
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
+
+    return false;
 }
 template<int DIM,typename Type>
 void  MatNInOut::_saveJPG(const MatN<DIM, Type > &, const char * )
@@ -501,11 +509,12 @@ void MatNInOut::save(const MatN<D,T> &in ,const char * file){
     }
 }
 template<I32 DIM,typename Result>
-void MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
+bool MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
 
     std::ifstream  is(file,std::iostream::binary);
     if (is.fail()){
         std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+        return false;
     }
     else{
         is.seekg (0, is.end);
@@ -513,18 +522,21 @@ void MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
         is.seekg (0, is.beg);
         if(length>=sizeof(Result)*in.getDomain().multCoordinate())
             MatNInOutPgm::readRaw(in,is);
-        else
+        else{
             std::cerr<<"In MatN::loadRaw, the file should be equal or superior to sizeof(Type)*in.getDomain().multCoordinate()";
+            return false;
+        }
     }
 }
 
 template<I32 DIM,typename Result>
-void MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
+bool MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
 {
     std::ifstream  is2(file,std::iostream::binary);
     if (is2.fail())
     {
         std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+        return false;
     }
     is2.close();
 
@@ -535,27 +547,28 @@ void MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
         if (is.fail())
         {
             std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+            return false;
         }
         else
         {
-            MatNInOutPgm::read(in,is);
+            return MatNInOutPgm::read(in,is);
         }
     }else if(ext==".png"||ext==".PNG"){
-        _loadPNG(in,file);
+        return _loadPNG(in,file);
     }else if(ext==".bmp"||ext==".BMP"){
-        _loadBMP(in,file);
+        return _loadBMP(in,file);
     }
     else if(ext==".jpg"||ext==".jpeg"||ext==".JPG"||ext==".JPEG"){
-        _loadJPG(in,file);
+        return _loadJPG(in,file);
     }
     else{
-        _load(in,file);
+        return  _load(in,file);
     }
-
+    return false;
 
 }
 template<int DIM,typename Type>
-void MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension)
+bool MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension)
 {
     std::vector<std::string> vec =BasicUtility::getFilesInDirectory(std::string(pathdir));
     std::string ext =extension;
@@ -576,11 +589,15 @@ void MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
         }
     }
     std::sort (vec.begin(), vec.end());
-    if(vec.size()==0)
+    if(vec.size()==0){
         std::cerr<<"In MatN::loadFromDirectory, the directory is empty"+std::string(pathdir);
+        return false;
+    }
 
     MatN<2,Type> img;
-    MatNInOut::load(img,vec[0].c_str());
+    bool load0= MatNInOut::load(img,vec[0].c_str());
+    if(load0==false)
+        return false;
     VecN<3,int> d;
     d(0)=img.getDomain()(0);
     d(1)=img.getDomain()(1);
@@ -591,11 +608,13 @@ void MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
             MatNInOut::load(img,vec[i].c_str());
         if(img.sizeI()!=in1cast.sizeI()||img.sizeJ()!=in1cast.sizeJ()){
             std::cerr<<std::string("In MatN::loadFromDirectory, all matrix must have the same domain");
+            return false;
         }
         typename MatN<2,Type>::IteratorEDomain it(img.getIteratorEDomain());
         while(it.next())
             in1cast.operator ()(it.x()(0),it.x()(1),i)=img(it.x()(0),it.x()(1));;
     }
+    return true;
 }
 template<int DIM,typename Result>
 void MatNInOut::saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension)

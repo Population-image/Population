@@ -929,20 +929,23 @@ public:
     void loadFromDirectory(const char * pathdir,const char * basefilename="",const char * extension="");
     /*!
     * \param file input file
+    * \return true in case of success
     *
     * The loader attempts to read the matrix using the specified format. Natively, this library support the pgm, png, jpg, bmp formats. However thanks to the CImg library, this library can
     read various matrix formats http://cimg.sourceforge.net/reference/group__cimg__files__io.html if you install Image Magick http://www.imagemagick.org/script/binary-releases.php.
     */
-    void load(const char * file);
+    bool load(const char * file);
     /*!
     * \param file input file
+    * \return true in case of success
     *
     * \sa MatN::load(const char * file)
     */
-    void load(const std::string file) ;
+    bool load(const std::string file) ;
     /*!
     * \param file input file
     * \param d  domain of definition of the image
+    * \return true in case of success
     *
     * The loader attempts to read the 3d raw matrix. The voxel type of the matrix must be the same as in raw file and, in more, you need to
     * give the domain (size) of the image in the raw file. \n
@@ -954,7 +957,7 @@ public:
     * \endcode
     *
     */
-    void loadRaw(const char * file,const Domain & d);
+    bool loadRaw(const char * file,const Domain & d);
     /*!
     * \param pathdir directory path
     * \param basefilename filename base by default "toto"
@@ -2004,8 +2007,8 @@ const
     return &(*this->begin());
 }
 template<int Dim, typename Type>
-void MatN<Dim,Type>::load(const std::string file) {
-    this->load(file.c_str());
+bool MatN<Dim,Type>::load(const std::string file) {
+    return this->load(file.c_str());
 }
 template<int Dim, typename Type>
 void MatN<Dim,Type>::save(const std::string file)const {

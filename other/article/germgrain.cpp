@@ -4,12 +4,16 @@
 using namespace pop;//Population namespace
 void testAnnealing(){
     Mat2UI8 img;//2d grey-level image object
-    img.load("/home/vincent/Desktop/0000.pgm");//replace this path by those on your computer
-    img = Processing::greylevelRemoveEmptyValue(img);
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
+    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
+    double value;
+    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
+    threshold.display("initial",false);
+    threshold = Processing::greylevelRemoveEmptyValue(threshold);
     Vec2I32 v(512,512);
-    Mat2F64 volume_fraction = Analysis::histogram(img);
-    Mat2UI8 random= RandomGeometry::randomStructure(v,volume_fraction);
-    RandomGeometry::annealingSimutated(random,img,8,10);
+    Mat2F64 volume_fraction = Analysis::histogram(threshold);
+    Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
+    RandomGeometry::annealingSimutated(random,threshold,8);
     Visualization::labelToRandomRGB(random).display();
 }
 void testUniformPoissonPointProcess2D(){
@@ -281,6 +285,7 @@ void artAborigene(){
 
 int main()
 {
+    testAnnealing();
     artAborigene();
     return 0;
 }
