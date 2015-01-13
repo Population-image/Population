@@ -12,7 +12,9 @@
 #include"algorithm/GeometricalTransformation.h"
 #include"data/utility/XML.h"
 
+#if defined(HAVE_OPENMP)
 #define CACHE_LINE_SIZE 64
+#endif
 
 namespace pop {
 
@@ -256,10 +258,12 @@ public:
     */
     double _d2Err_dYn2;
 }
+#if defined(HAVE_OPENMP)
 #ifdef __GNUC__
 __attribute__((__aligned__(CACHE_LINE_SIZE)));
 #else
 ;
+#endif
 #endif
 
 class POP_EXPORTS NNLayer
