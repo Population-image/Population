@@ -1,0 +1,75 @@
+/*! \page pageiteratormatrix  Iterator over a (sub)-domain of a matrix
+
+In most of algorithms, you iterate an operation over the domain of the matrix. For instance, to fill a matrix with a value:
+\code
+template<typename PixelType>
+void fill1(MatN<2,PixelType> & m, PixelType value){
+    for(int i =0;i<m.sizeI();i++)
+        for(int j =0;j<m.sizeJ();j++)
+            m(i,j)=value;
+}
+\endcode
+To avoid to write too many lines of code, you can use the facility ForEachDomain2D
+\code
+template<typename PixelType>
+void fill2(MatN<2,PixelType> & m, PixelType value){
+    ForEachDomain2D(x,m){
+            m(x)=value;
+    }
+}
+\endcode
+This algorithm works only for 2d matrix. To have a algorithm working with a nD matrix, we use the IteratorE concept:
+\code
+template<int DIM,typename PixelType>
+void fill3(MatN<DIM,PixelType> & m, PixelType value){
+    typename MatN<DIM,PixelType>::IteratorEDomain it = m.getIteratorEDomain();//in C++11, you can write: auto it =  img.getIteratorEDomain();
+    while(it.next()){
+            m(it.x())=value;
+    }
+}
+\endcode
+Population library provides many ways to iterate over a sub-domain of the matrix decompose in two categories:
+- global : IteratorEDomain (all points of the domain),  IteratorEROI (all points, x, such that the ROI(x) is not equal to zero), IteratorEOrder (all points such that the last loop and the way is definded), IteratorERectangle (all points in a rectangle) 
+- local : IteratorENeighborhood (all points in the neightborhood of a input point defined with a structural element or a ball), IteratorENeighborhoodAmoebas (all point the neightborhood of a input point defined with a special distance).
+
+For instance, the erosion algorithm defines with a ball:
+\code
+template<int DIM,typename PixelType>
+MatN<DIM,PixelType> erosion1(const MatN<DIM,PixelType> & m, double radius, int norm){
+    MatN<DIM,PixelType> m_ero(m.getDomain());
+    typename MatN<DIM,PixelType>::IteratorEDomain it_global = m.getIteratorEDomain();//in C++11, you can write: auto it_global =  m.getIteratorEDomain();
+    typename MatN<DIM,PixelType>::IteratorENeighborhood it_local = m.getIteratorENeighborhood(radius,norm);//in C++11, you can write: auto it_local =  m.getIteratorENeighborhood(radius,norm);
+    //Global scan
+    while(it_global.next()){
+        PixelType value = pop::NumericLimits<PixelType>::maximumRange();
+        it_local.init(it_global.x());
+        //local scan
+        while(it_local.next()){
+            value = pop::minimum(value,m(it_local.x()));
+        }
+        m_ero(it_global.x())=value;
+    }
+    return m_ero;
+}
+\endcode
+In the previous code, the global iteration is done on the domain of the matrix and the local iteration is done on a ball.  We will extend this code to call this algorithm whatever the global iteration or the local iteration. Therefore, they become template parameters.
+\code  
+template<int DIM,typename PixelType,typename IteratorEGlobal,typename IteratorELocal>
+MatN<DIM,PixelType> erosion2(const MatN<DIM,PixelType> & m, IteratorEGlobal it_global, IteratorELocal it_local){
+    MatN<DIM,PixelType> m_ero(m);
+   //Global scan
+    while(it_global.next()){
+        PixelType value = pop::NumericLimits<PixelType>::maximumRange();
+        it_local.init(it_global.x());
+        //local scan
+        while(it_local.next()){
+            value = pop::minimum(value,m(it_local.x()));
+        }
+        m_ero(it_global.x())=value;
+    }
+    return m_ero;
+}
+\endcode
+C++ code:
+\include iterator_matrix.cpp
+*/

@@ -260,12 +260,11 @@ public:
 }
 #if defined(HAVE_OPENMP)
 #ifdef __GNUC__
-__attribute__((__aligned__(CACHE_LINE_SIZE)));
+__attribute__((__aligned__(CACHE_LINE_SIZE)))
 #else
+#endif
+#endif
 ;
-#endif
-#endif
-
 class POP_EXPORTS NNLayer
 {
 public:

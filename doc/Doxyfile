@@ -779,6 +779,7 @@ INPUT  =  ../include/data/typeF/TypeF.h \
 			 ../include/algorithm/RandomGeometry.h \
 			 ../include/algorithm/Application.h \
 			Population_documentation.h \
+			dox/iterator_matrix.dox \
 			dox/segmentation.dox \
 			dox/application.dox \
 			dox/segmentation2.dox \
