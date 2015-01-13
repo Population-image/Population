@@ -2191,7 +2191,7 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
     MatN<Dim,Type> mtrans = m.transpose();
     MatN<Dim,Type> mout(this->sizeI(),m.sizeJ());
     Type sum = 0;
-    unsigned int i,j;
+    int i,j;
     typename MatN::const_iterator this_it,mtrans_it;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(m,mtrans,mout) private(i,j,sum,this_it,mtrans_it)
@@ -2200,8 +2200,8 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-        for(i=0;i<this->sizeI();i++){
-            for(j=0;j<m.sizeJ();j++){
+        for(i=0;i<static_cast<int>(this->sizeI());i++){
+            for(j=0;j<static_cast<int>(m.sizeJ());j++){
                 sum = 0;
                 this_it  = this->begin() +  i*this->sizeJ();
                 mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
@@ -2933,7 +2933,7 @@ void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAc
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
 {
-    unsigned int i,j;
+    int i,j;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
 #endif
@@ -2941,8 +2941,8 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
+        for(i=0;i<static_cast<int>(f.sizeI());i++){
+            for(j=0;j<static_cast<int>(f.sizeJ());j++){
                 h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
             }
         }
@@ -2951,7 +2951,7 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
 {
-    unsigned int i,j,k;
+    int i,j,k;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
 #endif
@@ -2959,9 +2959,9 @@ void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h, 
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
-                for(k=0;k<f.sizeK();k++){
+        for(i=0;i<static_cast<int>(f.sizeI());i++){
+            for(j=0;j<static_cast<int>(f.sizeJ());j++){
+                for(k=0;k<static_cast<int>(f.sizeK());k++){
                     h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
                 }
             }

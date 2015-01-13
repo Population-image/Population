@@ -96,7 +96,7 @@ struct POP_EXPORTS FunctorMatN
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
         int radius;
-        unsigned int i,j,k;
+        int i,j,k;
         int dir;
         Type_F64 value;
         Vec2I32 x;
@@ -108,13 +108,13 @@ struct POP_EXPORTS FunctorMatN
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-            for(i=0;i<f.sizeI();i++){
-                for(j=0;j<f.sizeJ();j++){
+            for(i=0;i<static_cast<int>(f.sizeI());i++){
+                for(j=0;j<static_cast<int>(f.sizeJ());j++){
                     x(0)=i;x(1)=j;
                     dir = x(direction);
                     value=0;
-                    for(k=0;k<kernel.size();k++){
-                        x(direction)= dir+(radius-k);
+                    for(k=0;k<static_cast<int>(kernel.size());k++){
+                        x(direction)= dir+(radius-static_cast<unsigned int>(k));
                         if(BoundaryCondition::isValid(f.getDomain(),x)){
                             BoundaryCondition::apply(f.getDomain(),x);
                             value+=Type_F64(f(x))*Type2_F64(kernel(k));

@@ -85,7 +85,7 @@ bool  MatNInOut::_load( MatN<2, UI8 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,UI8>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -101,7 +101,7 @@ bool  MatNInOut::_load( MatN<2, UI16 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,UI16>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -116,7 +116,7 @@ bool  MatNInOut::_load( MatN<2, UI32 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,UI32>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -131,7 +131,7 @@ bool  MatNInOut::_load( MatN<2, I32 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,I32>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -146,7 +146,7 @@ bool  MatNInOut::_load( MatN<2, F32 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,F32>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -161,7 +161,7 @@ bool  MatNInOut::_load( MatN<2, F64 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,F64>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
@@ -176,7 +176,7 @@ bool  MatNInOut::_load( MatN<2, RGBUI8 > &img, const char * filename){
         img = ConvertorCImg::fromCImg<2,RGBUI8>(temp);
         return true;
     }
-    catch (cimg_library::CImgException &e) {
+    catch (cimg_library::CImgException &) {
         return false;
     }
 #endif
