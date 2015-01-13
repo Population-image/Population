@@ -28,11 +28,17 @@ Population is a versatile framework to answer the diversity of developer expecta
  <!-- - a dictionary of caméléon language to prototype and calibrate a data-process with drag and drop in real time for everybody. -->
 
 Around a community project, its objective is to structure a reproducible and shared science in the image field.\n
-If something wrong occurs, whatever your skills, if you wan to join the community, contact me at vincent.tariel@polytechnique.edu .    
+If something wrong occurs or if you wan to join the community whatever your skills, contact me at vincent.tariel@polytechnique.edu .    
  
 \section Download Download
 
-In sourceforge https://sourceforge.net/projects/population/ , you download  population source with this \ref pagedirectoryorganisation .  
+The zip with sourceforge https://sourceforge.net/projects/population/ .
+
+The Git repository:
+\code
+git clone git://69007hpv111117.ikoula.com/Population.git
+\endcode
+You find this \ref pagedirectoryorganisation .  
 
 \section pageC  Install C++
 Select your build process: 
@@ -64,7 +70,7 @@ The more important tutorial is this one  \ref pagefirststep to start coding. The
 - Code your own algorithms
 	- \ref pagearchitecture
 	- \ref pagetemplateprogramming
-
+	- \ref pageiteratormatrix
 
   
 **/

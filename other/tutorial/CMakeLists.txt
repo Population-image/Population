@@ -6,7 +6,6 @@ add_executable(tutorial_firststep firststep.cpp)
 target_link_libraries (tutorial_firststep ${POP_LINKER_LIBS} population)
 link_directories (${POPULATION_LIB_DIR})
 
-
 add_executable(tutorial_basic_definition basic_definition.cpp)
 target_link_libraries (tutorial_basic_definition ${POPULATION_DEP_LIBRARIES} population)
 
@@ -35,5 +34,8 @@ target_link_libraries (tutorial_visualization_2d ${POPULATION_DEP_LIBRARIES} pop
 add_executable(tutorial_visualization_3d visualization3d.cpp)
 target_link_libraries (tutorial_visualization_3d ${POPULATION_DEP_LIBRARIES} population)
 
-add_executable(template_programming template_programming.cpp)
-target_link_libraries (template_programming ${POPULATION_DEP_LIBRARIES} population)
+add_executable(tutorial_template_programming template_programming.cpp)
+target_link_libraries (tutorial_template_programming ${POPULATION_DEP_LIBRARIES} population)
+
+add_executable(tutorial_iterator_matrix iterator_matrix.cpp)
+target_link_libraries (tutorial_iterator_matrix ${POPULATION_DEP_LIBRARIES} population)
