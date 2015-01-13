@@ -175,15 +175,15 @@ bool VideoVLC::open(const std::string & path){
 
     libvlc_media_t* media = NULL;
     _isfile = BasicUtility::isFile(path);
+    file_playing = path;
     if(_isfile){
 #if Pop_OS==2
-        path = BasicUtility::replaceSlashByAntiSlash(path);
+        file_playing = BasicUtility::replaceSlashByAntiSlash(path);
 #endif
-        media = libvlc_media_new_path(instance, path.c_str());
+        media = libvlc_media_new_path(instance, file_playing.c_str());
     } else{
-        media = libvlc_media_new_location(instance, path.c_str());
+        media = libvlc_media_new_location(instance, file_playing.c_str());
     }
-
     if (media == NULL) {
         std::cerr << "[VideoVLC::open] libvlc_media_new_path() error" << std::endl;
         return false;
@@ -207,7 +207,6 @@ bool VideoVLC::open(const std::string & path){
         return false;
     }
 
-    file_playing = path;
     isplaying = true;
     my_index = 0;
 

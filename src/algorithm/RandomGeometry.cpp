@@ -191,7 +191,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
     Distribution(rho_k).display();
     Mat2F64 P(rho_k.sizeI(),2);
     double sumnegative=0;
-    double min_value =0;
+//  double min_value =0;
 //    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
 //    {
 //        P(k,0)=rho_k(k,0);
