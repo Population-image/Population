@@ -887,6 +887,7 @@ public:
     * access the interpolated pixel/voxel value at the float position
     */
     Type interpolationBilinear(const VecN<DIM,F64> xf)const;
+
     /*!
     * Return a ptr to the first pixel value
     *
@@ -1888,112 +1889,118 @@ Type & MatN<Dim,Type>::operator ()(unsigned int index)
 template<int Dim, typename Type>
 Type MatN<Dim,Type>::interpolationBilinear(const VecN<DIM,F64> xf)const
 {
-    if(DIM==2){
-        Vec2F64 x;
-        x(0)=xf(0)+EPSILON;
-        x(1)=xf(1)+EPSILON;
-        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
-        double sum=0;
-        Vec2I32 x1;
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
-        if(this->isValid(x1(0),x1(1))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
-            value+=this->operator ()(x1(0),x1(1))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::ceil(x(0));
-        if(this->isValid(x1(0),x1(1))){
-            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
-            value+=this->operator ()(x1(0),x1(1))*norm;
-            sum+= norm;
-        }
-        x1(1)=std::ceil(x(1));
-        if(this->isValid(x1(0),x1(1))){
-            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
-            value+=this->operator ()(x1(0),x1(1))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::floor(x(0));
-        if(this->isValid(x1(0),x1(1))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
-            value+=this->operator ()(x1(0),x1(1))*norm;
-            sum+= norm;
-        }
-        if(sum==0)
-            return 0;
-        else if(NumericLimits<Type>::is_integer==true)
-            return round(value/sum);
-        else
-            return value/sum;
-    }else if(DIM==3){
-        Vec3F64 x;
-        x(0)=xf(0)+EPSILON;
-        x(1)=xf(1)+EPSILON;
-        x(2)=xf(2)+EPSILON;
-        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
-        double sum=0;
-        Vec3I32 x1;
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
-        x1(2)=std::floor(x(2));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::ceil(x(0));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(1)=std::ceil(x(1));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::floor(x(0));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
-        x1(2)=std::ceil(x(2));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::ceil(x(0));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(1)=std::ceil(x(1));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        x1(0)=std::floor(x(0));
-        if(this->isValid(x1(0),x1(1),x(2))){
-            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
-            sum+= norm;
-        }
-        if(sum==0)
-            return 0;
-        else if(NumericLimits<Type>::is_integer==true)
-            return round(value/sum);
-        else
-            return value/sum;
+    VecN<PowerGP<2,DIM>::value,std::pair<double,VecN<DIM,int> > > v_out =interpolationBilinearWeigh(this->getDomain(),xf);
+    typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
+    for( int i=0;i<PowerGP<2,DIM>::value;i++){
+        value+=this->operator ()(v_out(i).second)*v_out(i).first;
     }
-    return 0;
+    return value;
+//    if(DIM==2){
+//        Vec2F64 x;
+//        x(0)=xf(0)+EPSILON;
+//        x(1)=xf(1)+EPSILON;
+//        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
+//        double sum=0;
+//        Vec2I32 x1;
+//        x1(0)=std::floor(x(0));
+//        x1(1)=std::floor(x(1));
+//        if(this->isValid(x1(0),x1(1))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
+//            value+=this->operator ()(x1(0),x1(1))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::ceil(x(0));
+//        if(this->isValid(x1(0),x1(1))){
+//            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
+//            value+=this->operator ()(x1(0),x1(1))*norm;
+//            sum+= norm;
+//        }
+//        x1(1)=std::ceil(x(1));
+//        if(this->isValid(x1(0),x1(1))){
+//            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
+//            value+=this->operator ()(x1(0),x1(1))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::floor(x(0));
+//        if(this->isValid(x1(0),x1(1))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
+//            value+=this->operator ()(x1(0),x1(1))*norm;
+//            sum+= norm;
+//        }
+//        if(sum==0)
+//            return 0;
+//        else if(NumericLimits<Type>::is_integer==true)
+//            return round(value/sum);
+//        else
+//            return value/sum;
+//    }else if(DIM==3){
+//        Vec3F64 x;
+//        x(0)=xf(0)+EPSILON;
+//        x(1)=xf(1)+EPSILON;
+//        x(2)=xf(2)+EPSILON;
+//        typename FunctionTypeTraitsSubstituteF<Type,F64>::Result value=0;
+//        double sum=0;
+//        Vec3I32 x1;
+//        x1(0)=std::floor(x(0));
+//        x1(1)=std::floor(x(1));
+//        x1(2)=std::floor(x(2));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::ceil(x(0));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(1)=std::ceil(x(1));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::floor(x(0));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::floor(x(0));
+//        x1(1)=std::floor(x(1));
+//        x1(2)=std::ceil(x(2));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::ceil(x(0));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(1)=std::ceil(x(1));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        x1(0)=std::floor(x(0));
+//        if(this->isValid(x1(0),x1(1),x(2))){
+//            double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+//            value+=this->operator ()(x1(0),x1(1),x(2))*norm;
+//            sum+= norm;
+//        }
+//        if(sum==0)
+//            return 0;
+//        else if(NumericLimits<Type>::is_integer==true)
+//            return round(value/sum);
+//        else
+//            return value/sum;
+//    }
+//    return 0;
 }
 template<int Dim, typename Type>
 Type *  MatN<Dim,Type>::data()

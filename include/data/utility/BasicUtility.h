@@ -301,7 +301,7 @@ public:
 template<typename T>
 static int power2(T x)
 {
-	return (x <= 0 ? 1 : 1 << x);
+    return (x <= 0 ? 1 : 1 << x);
 }
 
 template<typename T1>
@@ -344,10 +344,10 @@ double productInner(const T1&  x1,const T2&  x2)
 
 struct FunctoProductInner{
     template <class T1, class T2>
-double operator ()(const T1&  x1,const T2&  x2)
-{
-    return static_cast<double>(x1)*static_cast<double>(x2);
-}
+    double operator ()(const T1&  x1,const T2&  x2)
+    {
+        return static_cast<double>(x1)*static_cast<double>(x2);
+    }
 };
 
 template<typename T1>
@@ -366,11 +366,11 @@ T1  squareRoot(T1  x)
 // Defines 'value', an enum that evaluates to v
 ////////////////////////////////////////////////////////////////////////////////
 
-    template <int v>
-    struct Int2Type
-    {
-        enum { value = v };
-    };
+template <int v>
+struct Int2Type
+{
+    enum { value = v };
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template Type2Type
@@ -379,18 +379,22 @@ T1  squareRoot(T1  x)
 // Defines the type OriginalType which maps back to T
 ////////////////////////////////////////////////////////////////////////////////
 
-    template <typename T>
-    struct Type2Type
-    {
-        typedef T OriginalType;
-    };
-    class NullType {};
-    inline std::ostream& operator << (std::ostream& out, const NullType & ){
-        return out;
-    }
-    inline std::istream& operator >> (std::istream& in, NullType & ){
-        return in;
-    }
+template <typename T>
+struct Type2Type
+{
+    typedef T OriginalType;
+};
+class NullType {};
+inline std::ostream& operator << (std::ostream& out, const NullType & ){
+    return out;
+}
+inline std::istream& operator >> (std::istream& in, NullType & ){
+    return in;
+}
+template<int Value,int Dim>
+struct PowerGP{enum{value=Value*PowerGP<Value,Dim-1>::value};};
+template<int Value>
+struct PowerGP<Value,0>{enum{value=1};};
 }
 namespace std{
 

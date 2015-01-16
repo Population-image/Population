@@ -122,28 +122,6 @@ struct POP_EXPORTS Processing
         typename MatN<DIM,TypePixel>::IteratorEDomain it(h.getIteratorEDomain());
         h= ProcessingAdvanced::randomField< MatN<DIM,TypePixel> >(domain,d,it);
     }
-
-    /*!
-     *  \brief fill the function with a constant value
-     * \param f input matrix
-     * \param value constant value
-     * \return h output function
-     *
-     *
-        \code
-                Mat2UI8 img(255,255);//2d grey-level matrix object
-                img = Processing::fill(img,30);
-                img.display();
-                //For a fast implementation, you have alse:
-                img=30;
-        \endcode
-        \sa Distribution Analysis
-    */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  fill(const MatN<DIM,TypePixel> & f, TypePixel value){
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
-        return ProcessingAdvanced::fill(f,value,it);
-    }
     //@}
     //-------------------------------------
     //
@@ -557,10 +535,10 @@ struct POP_EXPORTS Processing
      *  We apply a transformation at each pixel defined by a function with a symbolic link, h(x) = d(f(x)) for instance,
      *  this code applies this transformation f(x) = (x/255)^3*255
         \code
-                Mat2RGBUI8 img;
+                Mat2UI8 img;
                 img.load("../image/Lena.bmp");
                 Distribution d("(x/255)^3*255");
-                Mat2RGBUI8 power2 =Processing::fofx(img,d);
+                Mat2UI8 power2 =Processing::fofx(img,d);
                 power2.display();
         \endcode
         \image html dilatgrey.png
@@ -613,7 +591,7 @@ struct POP_EXPORTS Processing
      *
      * Scale the pixel/voxel value range using this formula h(x)=(f(x)-min(f))*(max-min)/(max(f)-min(f))+min
         \code
-                Mat2RGBUI8 img;
+                Mat2UI8 img;
                 img.load("../image/Lena.bmp");
                 img = Processing::greylevelRange(img);
                 img.display();
@@ -624,7 +602,7 @@ struct POP_EXPORTS Processing
     static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
-        return ProcessingAdvanced::greylevelRange(f,it,min,max,Int2Type<isVectoriel<TypePixel>::value >());
+        return ProcessingAdvanced::greylevelRange(f,it,min,max);
     }
 
 
@@ -633,19 +611,19 @@ struct POP_EXPORTS Processing
      * \param f input function
      * \param mean mean value of the output function
      * \return output function noted h
-     *  Translate the mean value of the input function using this transformation h(x)=(f(x)/max(F))^d*max(F) with max(F)=255 for 1Byte pixel/voxel type. for instance, this code:
+     *  Translate the mean value of the input function using this transformation h(x)=(f(x)/max(F))^d*max(F) with max(F)=255 for 1Byte pixel/voxel type.
+     *  For instance, this code:
         \code
-                Mat2RGBUI8 img;
+                Mat2UI8 img;
                 img.load("../image/Lena.bmp");
-                img = Processing::greylevelTranslateMeanValue(img,RGBUI8(150,150,150));
+                img = Processing::greylevelTranslateMeanValue(img,150);
                 img.display();
         \endcode
-        produces the RGB red (200,10,10) if you look far away.
+
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> greylevelTranslateMeanValue(const MatN<DIM,TypePixel>& f, typename MatN<DIM,TypePixel>::F mean )
+    static inline Mat2UI8 greylevelTranslateMeanValue(const Mat2UI8 & f, Mat2UI8::F mean )
     {
-        return ProcessingAdvanced::greylevelTranslateMeanValueCast(f,mean,Type2Type<TypePixel >() );
+        return ProcessingAdvanced::greylevelTranslateMeanValue(f,mean );
     }
     /*!
      *  \brief  Remove the grey-level values not populated by pixesl/voxels

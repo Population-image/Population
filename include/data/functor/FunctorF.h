@@ -85,6 +85,10 @@ struct POP_EXPORTS FunctorF
     * Some generic programming functor to operate generic programming facilities as extract a given channel of a vector value (pop::RGB, pop::VecN, pop::Complex )
     *
     */
+
+    template<typename Result >
+    struct FunctorConst{const Result & _v;FunctorConst(const Result & v ):_v(v){}Result operator()(){return _v;}};
+
     //-------------------------------------
     //
     //! \name Elementary arithmetic

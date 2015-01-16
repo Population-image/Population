@@ -47,41 +47,7 @@ in the Software.
 #include"algorithm/Statistics.h"
 namespace pop
 {
-namespace Private{
-template<typename Result >
-struct FunctorConst{const Result & _v;FunctorConst(const Result & v ):_v(v){}Result operator()(){return _v;}};
-template<typename Result, typename Type,bool isVectoriel, template<typename,typename> class PolicyClassOverFlow=ArithmeticsSaturation >
-class FunctorDistribution: public PolicyClassOverFlow<Result,F64 >
-{
-private:
-    Distribution & _f;
-public:
-    FunctorDistribution(Distribution & f )
-        :_f(f)
-    {}
-    Result operator()(Type  x)
-    {
-        return PolicyClassOverFlow<Result,F64 >::Range(_f(x));
-    }
-};
-template<typename Result, typename Type>
-class FunctorDistribution<Result,  Type,true,ArithmeticsSaturation>: public ArithmeticsSaturation<Result,F64 >
-{
-private:
-    Distribution & _f;
-public:
-    FunctorDistribution(Distribution & f )
-        :_f(f)
-    {}
-    Result operator()(Type  x)
-    {
-        Result r;
-        for(int i=0;i<Result::DIM;i++)
-            r(i)=ArithmeticsSaturation<typename Result::F,F64 >::Range(_f(x(i)));
-        return r;
-    }
-};
-}
+
 struct ProcessingAdvanced
 {
     template<typename Function,int DIM>
@@ -332,23 +298,10 @@ struct ProcessingAdvanced
         }
         return out;
     }
-
-
-    template<typename Function,typename Iterator>
-    static Function  fill(const Function & in,const typename Function::F & y,Iterator &it){
-        Function out (in.getDomain());
-        Private::FunctorConst<typename Function::F> func(y);
-        forEachFunctorGenerator(out,func,it);
-        return out;
-    }
-
-
     template<typename Function,typename Iterator>
     static Function  fofx(const Function& in,Distribution &d,Iterator &it){
         Function out (in.getDomain());
-
-        Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(d);
-        forEachFunctorUnaryF(in,out,func,it);
+        forEachFunctorUnaryF(in,out,d,it);
         return out;
     }
     template<typename Function,typename Iterator>
@@ -375,65 +328,32 @@ struct ProcessingAdvanced
         }
         return out;
     }
-    template<typename Function,typename Iterator,int isVec>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<isVec>);
+
 
     template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<true>)
+    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max)
     {
-        typedef typename TypeTraitsTypeScalar<typename Function::F>::Result  FScalar;
-        typedef typename FunctionTypeTraitsSubstituteF<Function,FScalar>::Result  FunctionScalar;
-        VecN< Function::F::DIM,FunctionScalar > v ;
-        pop::Convertor::toVecN(f,v);
-        for(int i=0;i<Function::F::DIM;i++){
-            it.init();
-            v[i] = ProcessingAdvanced::greylevelRange(v[i],it,min(i),max(i),Int2Type< isVectoriel<FScalar>::value>());
-        }
-        Function dilat;
-        Convertor::fromVecN(v,dilat);
-        return dilat;
-    }
 
-    template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min, typename Function::F max,Int2Type<false>)
-    {
-        Function h(f.getDomain());
         FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
         typename Function::F mini = forEachFunctorAccumulator(f,funcmini,it);
         it.init();
         FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
         typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
         typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result ratio;
-        if(maxi!=mini)
+        if(maxi!=mini){
+            Function h(f.getDomain());
             ratio= 1.0*(max-min)/(maxi-mini);
+            it.init();
+            while(it.next()){
+                h(it.x())=ArithmeticsSaturation<typename Function::F,double>::Range(f(it.x())*ratio);
+            }
+            return h;
+        }
         else
-            ratio =1;
+            return f;
 
-        std::string exp =BasicUtility::Any2String(ratio)+"*(x-"+BasicUtility::Any2String(double(mini))+")+"+BasicUtility::Any2String(double(min));
-        DistributionExpression dist(exp);
-        Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(dist);
-        it.init();
-        forEachFunctorUnaryF(f,h,func,it);
-        return h;
     }
-    template<typename Function,typename Iterator>
-    static Function greylevelRange(const Function & f,Iterator & it,typename Function::F min=NumericLimits<typename Function::F>::minimumRange(), typename Function::F max=NumericLimits<typename Function::F>::maximumRange())
-    {
-        Function h(f.getDomain());
-        FunctorF::FunctorAccumulatorMin<typename Function::F > funcmini;
-        typename Function::F mini = forEachFunctorAccumulator(f,funcmini,it);
-        it.init();
-        FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
-        typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
-        typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result ratio= 1.0*(max-min)/(maxi-mini);
 
-        std::string exp =BasicUtility::Any2String(ratio)+"*(x-"+BasicUtility::Any2String(mini)+")+"+BasicUtility::Any2String(min);
-        DistributionExpression dist(exp);
-        Private::FunctorDistribution<typename Function::F,typename Function::F,isVectoriel<typename Function::F>::value > func(dist);
-        it.init();
-        forEachFunctorUnaryF(f,h,func,it);
-        return h;
-    }
 
     template<typename Function,typename Iterator>
     static Function greylevelRemoveEmptyValue(const Function & f,  Iterator & it)
@@ -458,49 +378,13 @@ struct ProcessingAdvanced
         }
         return h;
     }
-    template<typename Function,typename Type>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<Type> )
+
+    template<int DIM>
+    static MatN<DIM,UI8> greylevelTranslateMeanValue(const MatN<DIM,UI8>& f, UI8 mean )
     {
-        return  greylevelTranslateMeanValueScalar(f,mean);
-    }
-    template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<RGBUI8> )
-    {
-        typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBUI8>::Result>::Result r,g,b;
-        Convertor::toRGB(f,r,g,b);
-        typename TypeTraitsTypeScalar<RGBUI8>::Result rmean,gmean,bmean;
-        rmean=mean.r();
-        gmean=mean.g();
-        bmean=mean.b();
-        r = greylevelTranslateMeanValueScalar(r,rmean);
-        g = greylevelTranslateMeanValueScalar(g,gmean);
-        b = greylevelTranslateMeanValueScalar(b,bmean);
-        Function h(f.getDomain());
-        Convertor::fromRGB(r,g,b,h);
-        return h;
-    }
-    template<typename Function>
-    static Function greylevelTranslateMeanValueCast(const Function& f, typename Function::F mean,Type2Type<RGBF64> )
-    {
-        typename FunctionTypeTraitsSubstituteF<Function,typename TypeTraitsTypeScalar<RGBF64>::Result>::Result r,g,b;
-        Convertor::toRGB(f,r,g,b);
-        typename TypeTraitsTypeScalar<RGBF64>::Result rmean,gmean,bmean;
-        rmean=mean.r();
-        gmean=mean.g();
-        bmean=mean.b();
-        r = greylevelTranslateMeanValueScalar(r,rmean);
-        g = greylevelTranslateMeanValueScalar(g,gmean);
-        b = greylevelTranslateMeanValueScalar(b,bmean);
-        Function h(f.getDomain());
-        Convertor::fromRGB(r,g,b,h);
-        return h;
-    }
-    template<typename Function>
-    static Function greylevelTranslateMeanValueScalar(const Function& f, typename Function::F mean )
-    {
-        typename Function::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,UI8>::IteratorEDomain it(f.getIteratorEDomain());
         Mat2F64 m = AnalysisAdvanced::histogram(f,it);
-        it.init();
+
         F64 pow_min=0;
         F64 pow_max=1000;
         F64 pow_current=1;
@@ -510,12 +394,9 @@ struct ProcessingAdvanced
         bool test=false;
         while(test==false){
             number++;
-            DistributionExpression exp;
-            std::string str = "(x/256)^("+BasicUtility::Any2String(pow_current)+")*256";
-            exp.fromRegularExpression(str);
             F64 meantemp=0;
             for(unsigned int i=0;i<m.sizeI();i++){
-                meantemp  +=  exp.operator ()(m(i,0))*m(i,1);
+                meantemp  +=  std::pow(static_cast<double>(m(i,0))/256,pow_current)*256*m(i,1);
             }
             error_current = absolute(meantemp-mean);
             if(error_current<error_max)
@@ -531,22 +412,12 @@ struct ProcessingAdvanced
                 }
             }
         }
-        it.init();
-        //small covolution
-        typedef typename FunctionTypeTraitsSubstituteF<Function,F64>::Result FunctionF64;
-        FunctionF64 fd(f.getDomain());
         DistributionUniformReal d(-0.5,0.5);
-        while(it.next()){
-            fd(it.x())=f(it.x())+d.randomVariable();
-        }
-
-        Function outcast(f.getDomain());
-        DistributionExpression exp;
-        std::string str = "(x/256)^("+BasicUtility::Any2String(pow_current)+")*256";
-        exp.fromRegularExpression(str);
-        Private::FunctorDistribution<typename Function::F,F64,false> func(exp);
+        MatN<DIM,UI8> outcast(f.getDomain());
         it.init();
-        forEachFunctorUnaryF(fd,outcast,func,it);
+        while(it.next()){
+            outcast(it.x())= std::pow( (f(it.x())+d.randomVariable())/256,pow_current)*256;
+        }
         return outcast;
     }
     template<typename Function,typename FunctionMask, typename Iterator>

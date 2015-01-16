@@ -41,8 +41,6 @@ in the Software.
 #include <numeric>
 #include<cmath>
 #include"data/typeF/TypeF.h"
-
-#include"data/mat/MatNBoundaryCondition.h"
 #include"data/utility/BasicUtility.h"
 #include"data/typeF/Complex.h"
 #include"data/typeF/TypeTraitsF.h"

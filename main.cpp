@@ -2,21 +2,18 @@
 using namespace pop;//Population namespace
 
 
-Mat2UI16 Transform(Mat2UI8 m,UI8 threshold_value);
-std::vector<std::pair<Vec2I32, Vec2I32> > GetLines(Mat2UI16 accu,int img_w,int img_h,  int threshold);
 
 
 
-
-
-Mat2UI16 Transform(Mat2UI8 m,UI8 threshold_value)
+template<typename PixelType>
+Mat2F64 transformHough(MatN<2,PixelType> m,typename MatN<2,PixelType>::F threshold_value)
 {
     double DEG2RAD=0.017453293f;
     //Create the accu
     double hough_h = ((sqrt(2.0) * (double)(m.sizeI()>m.sizeJ()?m.sizeI():m.sizeJ())) / 2.0);
-    double heigh = hough_h * 2.0; // -r -> +r
-    double width = 180;
-    Mat2UI16 accu (heigh,width);
+    int heigh = hough_h * 2.0; // -r -> +r
+    int width = 180;
+    Mat2F64 accu (heigh,width);
     double center_x = m.sizeJ()/2;
     double center_y = m.sizeI()/2;
     for(int i=0;i<m.sizeI();i++)
@@ -25,27 +22,32 @@ Mat2UI16 Transform(Mat2UI8 m,UI8 threshold_value)
         {
             if( m(i,j) > threshold_value)
             {
-                for(int t=0;t<180;t++)
+                for(double t=0;t<180;t++)
                 {
                     double r = ( (j- center_x) * cos((double)t * DEG2RAD)) + ((i - center_y) * sin((double)t * DEG2RAD));
-                    accu(round(r + hough_h), t)++;
+                    VecN<4,std::pair<F64,Vec2I32> > v_hit = interpolationBilinearWeigh(accu.getDomain(),Vec2F64(r+hough_h,t));
+                    for(unsigned int i=0;i<4;i++){
+                        accu(v_hit(i).second)+=v_hit(i).first;
+                    }
+
                 }
             }
         }
     }
-    return accu;
+    accu = Processing::smoothGaussian(accu,1);
+    return Processing::greylevelRange(accu,0,1);
 }
 
-std::vector< std::pair<Vec2I32, Vec2I32 > > GetLines(Mat2UI16 accu,int img_w,int img_h,  int threshold)
+std::vector< std::pair<Vec2I32, Vec2I32 > > GetLines(Mat2F64 accu,Mat2UI8 img,  double threshold)
 {
     std::vector< std::pair<Vec2I32, Vec2I32 > > lines;
     double DEG2RAD=0.017453293f;
-    Mat2UI16::IteratorENeighborhood it=accu.getIteratorENeighborhood(4,0);
-
+    Mat2F64::IteratorENeighborhood it=accu.getIteratorENeighborhood(4,0);
     ForEachDomain2D(x,accu){
+        Vec2I32 xpoint =x;
         if(accu(x) >= threshold){
             it.init(x);
-            double value=accu(it.x());
+            double value=accu(x);
             bool max_local=true;
             while(it.next()){
                 if(accu(it.x())>value){
@@ -53,63 +55,71 @@ std::vector< std::pair<Vec2I32, Vec2I32 > > GetLines(Mat2UI16 accu,int img_w,int
                     break;
                 }
             }
-
             if(max_local==true){
-                std::cout<<"line "<<x<<std::endl;
+                accu(x)=0;
                 Vec2I32 x1,x2;
                 double radius  = x(0);
                 double angle   = x(1);
-                //                int accu.sizeI();
-//                if(x(1) >= 45 && x(1) <= 135){//y = (r - x cos(t)) / sin(t)
-
-//                    x1(1) = 0;
-//                    x1(0) = ((double)(x(0)-(accu.sizeI()/2)) - ((x1(1) - (img_w/2) ) * cos(x(1) * DEG2RAD))) / sin(x(1) * DEG2RAD) + (img_h / 2);
-//                    x2(1) = img_w - 0;
-//                    x2(0) = ((double)(x(0)-(accu.sizeI()/2)) - ((x2(1) - (img_w/2) ) * cos(x(1) * DEG2RAD))) / sin(x(1) * DEG2RAD) + (img_h / 2);
-//                }
-//                else{//x = (r - y sin(t)) / cos(t);
-
-                    double value1=80;
-                    x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-accu.sizeI()/2)/sin(angle* DEG2RAD)+img_h/2;
-                    x1(1) = value1 + img_w/2;
-                    x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-accu.sizeI()/2)/sin(angle* DEG2RAD)+img_h/2;
-                    x2(1) = (-value1) + img_w/2;
-//                }
-//                std::cout<<x1<<std::endl;
-//                std::cout<<x2<<std::endl;
-                    lines.push_back(std::make_pair(x1,x2));
-//                        return lines;
+                double value1=img.sizeJ()/2;
+                x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-accu.sizeI()/2)/sin(angle* DEG2RAD)+img.sizeI()/2;
+                x1(1) = value1 + img.sizeJ()/2;
+                x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-accu.sizeI()/2)/sin(angle* DEG2RAD)+img.sizeI()/2;
+                x2(1) = (-value1) + img.sizeJ()/2;
+                lines.push_back(std::make_pair(x1,x2));
             }
         }
     }
+//    accu.display();
     return lines;
 }
 
-//const unsigned int* Hough::GetAccu(int *w, int *h)
-//{
-//    *w = _accu_w;
-//    *h = _accu_h;
-//    return _accu;
-//}
 
 
 
+template<int DIM>
+void addValue(const MatN<DIM,UI8>&m){
+   std::cout<<interpolationBilinearWeigh(m.getDomain(),VecN<DIM,F64>())<<std::endl;
+}
 
 int main(){
     {
         Mat2UI8 m;
+        m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
+        std::cout<<(int)Analysis::maxValue(m)<<std::endl;
+        m = Processing::greylevelRange(m,0,255);
+        std::cout<<(int)Analysis::maxValue(m)<<std::endl;
+    }
+    {
+//        Mat3UI8 m3d(3,2,4);
+//        VecN<8,std::pair<double,Vec3I32 > > v= interpolationBilinearWeigh(Vec3F64(0.2,0.8,0.9),m3d.getDomain());
+//        std::cout<<v<<std::endl;
+//        addValue(m3d);
+////        std::cout<<interpolationBilinearWeigh(Vec2F64(2.7,0.2),m.getDomain())<<std::endl;
+//        return 0;
+        Mat2UI8 m;
+        addValue(m);
         m.load("/home/vincent/Desktop/Hough-example-result-en.png");
-        m = Processing::erosion(m,1);
-//        m.display();
-        //m= Processing::edgeDetectorCanny(m,1,2,20);//.display("canny",true,false);
-        Mat2UI32 accu = Transform(m,50);
-//       accu.display();
-        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = GetLines(accu,m.sizeJ(),m.sizeI() ,100);
 
-        Mat2UI8 m_hough(m);
+
+
+//        m.display();
+//        m= GeometricalTransformation::scale(m,Vec2F64(0.1,0.1),1);
+//        m.display();
+        m.load("/home/vincent/Desktop/_.png");
+        Mat2UI8 mm=m;
+//        m.display();
+//        m = Processing::erosion(m,1);
+        //        m.display();
+        //m
+        m= Processing::edgeDetectorCanny(m,2,1,10);//.display("canny",true,false);
+        Mat2F64 accu = transformHough(m,50);
+//        accu.display();
+        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = GetLines(accu,m ,0.6);
+
+        Mat2UI8 m_hough(mm);
         std::cout<<m.getDomain()<<std::endl;
         for(unsigned int i=0;i<v_lines.size();i++){
-            Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  100,2);
+            Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  255,2);
         }
         m_hough.display();
 

@@ -282,7 +282,6 @@ In this simulation, the numerical permeability is estimated with \f$\mu\f$and \f
 As example, this code produces
  \code
     Mat2UI8 img;
-    img = Processing::fill(img,(UI8)255);
     img.load(POP_PROJECT_SOURCE_DIR+(std::string)"/image/outil.bmp");
     img = img.opposite();
     Mat2Vec2F64 vel;

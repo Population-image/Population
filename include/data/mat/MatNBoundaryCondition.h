@@ -34,6 +34,7 @@ in the Software.
 #ifndef FUNCTIONMatNBOUNDARYCONDITION_HPP
 #define FUNCTIONMatNBOUNDARYCONDITION_HPP
 #include"PopulationConfig.h"
+#include"data/vec/VecN.h"
 namespace pop
 {
 enum  MatNBoundaryConditionType{
@@ -201,5 +202,204 @@ public:
 private:
     MatNBoundaryConditionType _condition;
 };
+template<int DIM>
+inline VecN<PowerGP<2,DIM>::value,std::pair<double,VecN<DIM,int> > > interpolationBilinearWeigh(const VecN<DIM,int> &x_domain ,const VecN<DIM,F64> &x_point,MatNBoundaryCondition boundary = MATN_BOUNDARY_CONDITION_BOUNDED){
+    return  _interpolationBilinearWeigh(x_domain,x_point,boundary, Int2Type<DIM>()) ;
+}
+template<int DIM>
+VecN<PowerGP<2,DIM>::value,std::pair<double,VecN<DIM,int> > > _interpolationBilinearWeigh(const VecN<DIM,int> ,const VecN<DIM,F64> &,MatNBoundaryCondition , Int2Type<DIM>)
+{
+
+}
+
+inline VecN<4,std::pair<double,Vec2I32 > > _interpolationBilinearWeigh(const Vec2I32 x_domain,const Vec2F64 &x_point,MatNBoundaryCondition boundary, Int2Type<2>)
+{
+    VecN<4,std::pair<double,Vec2I32 > > v_out(std::make_pair(0,Vec2I32(0,0)));
+    Vec2F64 x;
+    x(0)=x_point(0)+EPSILON;
+    x(1)=x_point(1)+EPSILON;
+    bool all_hit=true;
+    double sum=0;
+    Vec2I32 x1;
+    x1(0)=std::floor(x(0));
+    x1(1)=std::floor(x(1));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
+        sum+= norm;
+        v_out(0).second=x1;
+        v_out(0).first =norm;
+    }else{
+       v_out(0).second=Vec2I32(0,0);
+       v_out(0).first =0;
+       all_hit=false;
+    }
+    x1(0)=std::ceil(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
+        sum+= norm;
+        v_out(1).second=x1;
+        v_out(1).first =norm;
+    }else{
+        v_out(1).second=Vec2I32(0,0);
+        v_out(1).first =0;
+        all_hit=false;
+     }
+    x1(1)=std::ceil(x(1));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
+        sum+= norm;
+        v_out(2).second=x1;
+        v_out(2).first =norm;
+    }else{
+        v_out(2).second=Vec2I32(0,0);
+        v_out(2).first =0;
+        all_hit=false;
+     }
+    x1(0)=std::floor(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
+        sum+= norm;
+        v_out(3).second=x1;
+        v_out(3).first =norm;
+    }else{
+        v_out(3).second=Vec2I32(0,0);
+        v_out(3).first =0;
+        all_hit=false;
+     }
+    if(all_hit==false)
+    {
+        if(sum!=0){
+            v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
+        }
+    }
+    return v_out;
+}
+
+
+inline VecN<8,std::pair<double,Vec3I32 > > _interpolationBilinearWeigh(const Vec3I32 x_domain,const Vec3F64 &x_point,MatNBoundaryCondition boundary ,Int2Type<2>)
+{
+    VecN<8,std::pair<double,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
+    Vec3F64 x;
+    x(0)=x_point(0)+EPSILON;
+    x(1)=x_point(1)+EPSILON;
+    x(2)=x_point(1)+EPSILON;
+    bool all_hit=true;
+    double sum=0;
+    Vec3I32 x1;
+    x1(0)=std::floor(x(0));
+    x1(1)=std::floor(x(1));
+    x1(2)=std::floor(x(2));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+        sum+= norm;
+        v_out(0).second=x1;
+        v_out(0).first =norm;
+    }else{
+       v_out(0).second=Vec3I32(0,0,0);
+       v_out(0).first =0;
+       all_hit=false;
+    }
+    x1(0)=std::ceil(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+        sum+= norm;
+        v_out(1).second=x1;
+        v_out(1).first =norm;
+    }else{
+        v_out(1).second=Vec3I32(0,0,0);
+        v_out(1).first =0;
+        all_hit=false;
+     }
+    x1(1)=std::ceil(x(1));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+        sum+= norm;
+        v_out(2).second=x1;
+        v_out(2).first =norm;
+    }else{
+        v_out(2).second=Vec3I32(0,0,0);
+        v_out(2).first =0;
+        all_hit=false;
+     }
+    x1(0)=std::floor(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+        sum+= norm;
+        v_out(3).second=x1;
+        v_out(3).first =norm;
+    }else{
+        v_out(3).second=Vec3I32(0,0,0);
+        v_out(3).first =0;
+        all_hit=false;
+     }
+    x1(0)=std::floor(x(0));
+    x1(1)=std::floor(x(1));
+    x1(2)=std::ceil(x(2));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+        sum+= norm;
+        v_out(4).second=x1;
+        v_out(4).first =norm;
+    }else{
+       v_out(4).second=Vec3I32(0,0,0);
+       v_out(4).first =0;
+       all_hit=false;
+    }
+    x1(0)=std::ceil(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+        sum+= norm;
+        v_out(5).second=x1;
+        v_out(5).first =norm;
+    }else{
+        v_out(5).second=Vec3I32(0,0,0);
+        v_out(5).first =0;
+        all_hit=false;
+     }
+    x1(1)=std::ceil(x(1));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+        sum+= norm;
+        v_out(6).second=x1;
+        v_out(6).first =norm;
+    }else{
+        v_out(6).second=Vec3I32(0,0,0);
+        v_out(6).first =0;
+        all_hit=false;
+     }
+    x1(0)=std::floor(x(0));
+    if(boundary.isValid(x_domain,x1)){
+        boundary.apply(x_domain,x1);
+        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+        sum+= norm;
+        v_out(7).second=x1;
+        v_out(7).first =norm;
+    }else{
+        v_out(7).second=Vec3I32(0,0,0);
+        v_out(7).first =0;
+        all_hit=false;
+     }
+
+    if(all_hit==false)
+    {
+        if(sum!=0){
+            v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
+            v_out(4).first /=sum;v_out(5).first /=sum;v_out(6).first /=sum;v_out(7).first /=sum;
+        }
+    }
+    return v_out;
+}
+
 }
 #endif // FUNCTIONMatNBOUNDARYCONDITION_HPP

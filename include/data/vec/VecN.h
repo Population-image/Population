@@ -118,7 +118,7 @@ public:
     VecN()
     {
         for(int i = 0;i<D;i++)
-            this->_dat[i]=Type(0);
+            this->_dat[i]=Type();
     }
 
     /*!
