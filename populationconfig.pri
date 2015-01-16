@@ -2,8 +2,8 @@
 
 #### PLUG-IN #####
 ## Uncommented a line to use these plug-in
-CONFIG += HAVE_OPENGL  #opengl for 3d rendering
-CONFIG += HAVE_CIMG    #CIMG to display 2d image in windows
+#CONFIG += HAVE_OPENGL  #opengl for 3d rendering
+#CONFIG += HAVE_CIMG    #CIMG to display 2d image in windows
 #CONFIG += HAVE_OPENMP #openmp optimization working for many algorithms (a must have for 3d images or real time)
 #CONFIG += HAVE_QT     #convert QImage to pop::Mat2UI8 or pop::Mat2RGBUI8
 #CONFIG += HAVE_VLC    #VideoVLC to load stream video as rtsp (if you use QT5 http://stackoverflow.com/questions/19175391/libvlc-qt-realloc-error-executing-example-program-of-libvlc-qt)

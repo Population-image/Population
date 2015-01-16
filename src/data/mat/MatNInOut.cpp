@@ -89,6 +89,7 @@ bool  MatNInOut::_load( MatN<2, UI8 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 
 bool  MatNInOut::_load( MatN<2, UI16 > &img, const char * filename){
@@ -105,6 +106,7 @@ bool  MatNInOut::_load( MatN<2, UI16 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 bool  MatNInOut::_load( MatN<2, UI32 > &img, const char * filename){
     (void)img;
@@ -120,6 +122,7 @@ bool  MatNInOut::_load( MatN<2, UI32 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 bool  MatNInOut::_load( MatN<2, I32 > &img, const char * filename){
     (void)img;
@@ -135,6 +138,7 @@ bool  MatNInOut::_load( MatN<2, I32 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 bool  MatNInOut::_load( MatN<2, F32 > &img, const char * filename){
     (void)img;
@@ -150,6 +154,7 @@ bool  MatNInOut::_load( MatN<2, F32 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 bool  MatNInOut::_load( MatN<2, F64 > &img, const char * filename){
     (void)img;
@@ -165,6 +170,7 @@ bool  MatNInOut::_load( MatN<2, F64 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 bool  MatNInOut::_load( MatN<2, RGBUI8 > &img, const char * filename){
     (void)img;
@@ -180,6 +186,7 @@ bool  MatNInOut::_load( MatN<2, RGBUI8 > &img, const char * filename){
         return false;
     }
 #endif
+    return false;
 }
 
 

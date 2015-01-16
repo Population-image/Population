@@ -33,7 +33,6 @@ If something wrong occurs or if you wan to join the community whatever your skil
 \section Download Download
 
 The zip with sourceforge https://sourceforge.net/projects/population/ .
-
 The Git repository:
 \code
 git clone git://69007hpv111117.ikoula.com/Population.git
@@ -47,12 +46,11 @@ Select your build process:
 
 \section Python  Install Python 
 - \ref pagetechnicalpython
-\section DocTuto  Documentation
 
+\section DocTuto  Documentation
 The documentation is on the <a href="modules.html">module page</a>.
 
 \section Tutorials  Tutorials
-
 
 For these tutorials, the C++/python codes are here $${PopulationPath}/other/tutorial/ (with cmake-gui BUILD_TUTORIAL=ON).
 The more important tutorial is this one  \ref pagefirststep to start coding. Then, you have : 
@@ -72,6 +70,9 @@ The more important tutorial is this one  \ref pagefirststep to start coding. The
 	- \ref pagetemplateprogramming
 	- \ref pageiteratormatrix
 
+\section Theory  Theoritical aspects
+
+A book is freely available <a href="http://www.population-image.fr/PopulationLibrary.pdf">here</a> under a creative Commons license.
   
 **/
 
