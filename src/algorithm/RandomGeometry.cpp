@@ -192,6 +192,49 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
     Mat2F64 P(rho_k.sizeI(),2);
     double sumnegative=0;
 
+//  double min_value =0;
+//    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
+//    {
+//        P(k,0)=rho_k(k,0);
+//        double value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
+//        P(k,1)= value;
+//        min_value = std::min(min_value,P(k,1));
+//    }
+//    Distribution(P).display();
+//    int index_neg_min=0, index_neg_max=0;
+//    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
+//    {
+//        P(k,1)+=-min_value;
+//        if(P(k,1)<0){
+//            sumnegative+=-P(k,1);
+//            if(index_neg_min==0){
+//                index_neg_min =k;
+//            }
+//        }else{
+//            if(sumnegative!=0){
+//                index_neg_max = k;
+//                index_neg_min=index_neg_min-1;
+//                while(sumnegative>0){
+//                    double mini = std::min(P(index_neg_min,1),P(index_neg_max,1));
+//                    if(mini<0.5*sumnegative){
+//                        P(index_neg_min,1)-=0.5*sumnegative;
+//                        P(index_neg_max,1)-=0.5*sumnegative;
+//                        sumnegative=0;
+//                    }else{
+//                        P(index_neg_min,1)-=mini;
+//                        P(index_neg_max,1)-=mini;
+//                        sumnegative=sumnegative-2*mini;
+//                        index_neg_max++;
+//                        index_neg_min--;
+//                    }
+//                }
+//                sumnegative=0;
+//                index_neg_min=0;
+//            }
+//        }
+//    }
+//    Distribution(P).display();
+
     for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
     {
         P(k,0)=rho_k(k,0);
