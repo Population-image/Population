@@ -17,7 +17,7 @@ namespace pop
 /*!
 \defgroup Feature Feature
 \ingroup Algorithm
-\brief Matrix In -> Features (harris, SIFT,...)
+\brief Matrix In -> Features (harris, Hough, SIFT,...)
 
 
 */
@@ -60,6 +60,126 @@ private:
      * \image html SIFT.png
      */
 public:
+    //-------------------------------------
+    //
+    //! \name Lines
+    //@{
+    //-------------------------------------
+
+    /*!
+    * \brief hough transformation  http://en.wikipedia.org/wiki/Hough_transform
+    * \param img input binary matrix
+    * \return hough transformation normalized in the range [0-1]
+
+    * \code
+        Mat2UI8 m;
+        m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/barriere.png"));
+        Mat2UI8 edge = Processing::edgeDetectorCanny(m,2,0.5,5);
+        edge.display("edge",false);
+        Mat2F64 hough = Feature::transformHough(edge);
+        hough.display("hough",false);
+        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
+        Mat2RGBUI8 m_hough(m);
+        for(unsigned int i=0;i<v_lines.size();i++){
+            Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  RGBUI8(255,0,0),2);
+        }
+        m_hough.display();
+    * \endcode
+    * \image html hough.png
+    */
+    static inline Mat2F64 transformHough(Mat2UI8 binary)
+    {
+        double DEG2RAD=0.017453293f;
+        //Create the accu
+        double hough_h = ((sqrt(2.0) * (double)(binary.sizeI()>binary.sizeJ()?binary.sizeI():binary.sizeJ())) / 2.0);
+        int heigh = hough_h * 2.0; // -r -> +r
+        int width = 180;
+        Mat2F64 accu (heigh,width);
+        double center_x = binary.sizeJ()/2;
+        double center_y = binary.sizeI()/2;
+        for(unsigned int i=0;i<binary.sizeI();i++){
+            for(unsigned int j=0;j<binary.sizeJ();j++){
+                if( binary(i,j) > 125){
+                    for(double t=0;t<180;t++){
+                        double r = ( (j- center_x) * std::cos((double)t * DEG2RAD)) + ((i - center_y) * std::sin((double)t * DEG2RAD));
+                        r = r + hough_h;
+                        unsigned int r_min= static_cast<unsigned int>(std::floor(r));
+                        double weigh_min= 1-(r-r_min);
+                        unsigned int r_max= r_min+1;
+                        double weigh_max= 1-(r_max-r);
+                        if(accu.isValid(r_min,t))
+                            accu(r_min,t)+=weigh_min;
+                        if(accu.isValid(r_max,t))
+                            accu(r_max,t)+=weigh_max;
+                    }
+                }
+            }
+        }
+        accu = Processing::greylevelRange(accu,0,1);
+        return accu;
+    }
+    /*!
+    * \brief get lines from the hough transformation  http://en.wikipedia.org/wiki/Hough_transform
+    * \param hough transformation normalized in the range [0-1]
+    * \param img input binary matrix input binary matrix
+    * \param threshold the minimum value to be considered as a line in the Hough tranformations
+    * \code
+        Mat2UI8 m;
+        m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/barriere.png"));
+        Mat2UI8 edge = Processing::edgeDetectorCanny(m,2,0.5,5);
+        edge.display("edge",false);
+        Mat2F64 hough = Feature::transformHough(edge);
+        hough.display("hough",false);
+        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
+        Mat2RGBUI8 m_hough(m);
+        for(unsigned int i=0;i<v_lines.size();i++){
+            Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  RGBUI8(255,0,0),2);
+        }
+        m_hough.display();
+    * \endcode
+    * \image html hough.png
+    */
+    static inline std::vector< std::pair<Vec2I32, Vec2I32 > > HoughToLines(Mat2F64 hough,Mat2UI8 binary,  double threshold=0.7, int radius_maximum_neightborhood=4)
+    {
+        std::vector< std::pair<Vec2I32, Vec2I32 > > lines;
+        double DEG2RAD=0.017453293f;
+        Mat2F64::IteratorENeighborhood it=hough.getIteratorENeighborhood(radius_maximum_neightborhood,2);
+        ForEachDomain2D(x,hough){
+            if(hough(x) >= threshold){
+                it.init(x);
+                double value=hough(x);
+                bool max_local=true;
+                while(it.next()){
+                    if(hough(it.x())>value){
+                        max_local=false;
+                        break;
+                    }
+                }
+                if(max_local==true){
+                    Vec2I32 x1,x2;
+                    double radius  = x(0);
+                    double angle   = x(1);
+
+                    if(angle>45&&angle<135){
+                        double value1=binary.sizeJ()/2;
+                        x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
+                        x1(1) = value1 + binary.sizeJ()/2;
+                        x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
+                        x2(1) = (-value1) + binary.sizeJ()/2;
+                    }else{
+                        double value1=binary.sizeI()/2;
+                        x1(1) = (-sin(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
+                        x1(0) = value1 + binary.sizeI()/2;
+                        x2(1) = (-sin(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
+                        x2(0) = -(value1) + binary.sizeI()/2;
+                    }
+                    lines.push_back(std::make_pair(x1,x2));
+                }
+            }
+        }
+        return lines;
+    }
+    //@}
     //-------------------------------------
     //
     //! \name Key points

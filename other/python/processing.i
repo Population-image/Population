@@ -4,9 +4,6 @@ typedef pop::Processing Processing;
 
 //Generator
 ALL_IMAGE_DIM_TYPE(Processing,randomField,randomField)
-ALL_IMAGE_DIM_TYPE(Processing,fill,fill)
-
-
 
 
 ALL_IMAGE_DIM_TYPE(Processing,threshold,threshold);
@@ -21,17 +18,15 @@ ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphologicalFabrizio,thresh
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI16>;
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI32>;
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::F64>;
-ALL_IMAGE_DIM_TYPE(Processing,thresholdMultiValley,thresholdMultiValley)
 ALL_IMAGE_DIM_TYPE(Processing,edgeDetectorCanny,edgeDetectorCanny)
 
-ALL_IMAGE_DIM_TYPE(Processing,fofx,fofx)
-ALL_IMAGE_DIM_TYPE(Processing,greylevelScaleContrast,greylevelScaleContrast)
-ALL_IMAGE_DIM_TYPE(Processing,greylevelRange,greylevelRange)
-ALL_IMAGE_DIM_TYPE(Processing,greylevelTranslateMeanValue,greylevelTranslateMeanValue)
-ALL_IMAGE_DIM_TYPE(Processing,greylevelRemoveEmptyValue,greylevelRemoveEmptyValue)
-ALL_IMAGE_DIM_TYPE(Processing,integral,integral)
-ALL_IMAGE_DIM_TYPE(Processing,integralPower2,integralPower2)
-ALL_IMAGE_DIM_TYPE(Processing,mask,mask)
+ALL_IMAGE_SCALAR_TYPE(Processing,fofx)
+ALL_IMAGE_SCALAR_TYPE(Processing,greylevelScaleContrast)
+ALL_IMAGE_SCALAR_TYPE(Processing,greylevelRange)
+ALL_IMAGE2_UINT_TYPE(Processing,greylevelRemoveEmptyValue)
+ALL_IMAGE_SCALAR_TYPE(Processing,integral)
+ALL_IMAGE_SCALAR_TYPE(Processing,integralPower2)
+ALL_IMAGE_SCALAR_TYPE(Processing,mask)
 
 
  //Neighborhood

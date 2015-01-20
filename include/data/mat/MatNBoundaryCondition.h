@@ -34,6 +34,7 @@ in the Software.
 #ifndef FUNCTIONMatNBOUNDARYCONDITION_HPP
 #define FUNCTIONMatNBOUNDARYCONDITION_HPP
 #include"PopulationConfig.h"
+#include"data/utility/BasicUtility.h"
 #include"data/vec/VecN.h"
 namespace pop
 {
@@ -48,8 +49,8 @@ enum  MatNBoundaryConditionType{
 class POP_EXPORTS MatNBoundaryConditionBounded
 {
 public:
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & domain,const Vec2 & x){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & domain,const VecN<DIM,int> & x){
         if(x.allSuperiorEqual(0)&&x.allInferior(domain)){
             return true;
         }
@@ -57,8 +58,8 @@ public:
             return false;
         }
     }
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & domain,const Vec2 & x,int direction){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x,int direction){
         if(x(direction)>=0&&x(direction)<domain(direction)){
             return true;
         }
@@ -66,8 +67,8 @@ public:
             return false;
         }
     }
-    template<typename Vec1,typename Vec2>
-    static void apply(const Vec1 & ,Vec2 & )
+    template<int DIM>
+    static void apply(const VecN<DIM,int> & , VecN<DIM,int> & )
     {
 
     }
@@ -76,24 +77,24 @@ public:
 class POP_EXPORTS MatNBoundaryConditionMirror
 {
 public:
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & ,const Vec2 & ){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ){
         return true;
     }
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & ,const Vec2 & ,int){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ,int){
         return true;
     }
-    template<typename Vec1,typename Vec2>
-    static void apply(const Vec1 & domain,Vec2 & x)
+    template<int DIM>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x)
     {
-        for(int direction=0;direction<Vec1::DIM;direction++)
+        for(int direction=0;direction<VecN<DIM,int>::DIM;direction++)
         {
             apply(domain,x,direction);
         }
     }
-    template<typename Vec1,typename Vec2>
-    static void apply(const Vec1 & domain,Vec2 & x,int direction)
+    template<int DIM>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction)
     {
 
         if(x(direction)<0){
@@ -106,24 +107,24 @@ public:
 class POP_EXPORTS MatNBoundaryConditionPeriodic
 {
 public:
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & ,const Vec2 & ){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ){
         return true;
     }
-    template<typename Vec1,typename Vec2>
-    static bool isValid(const Vec1 & ,const Vec2 & ,int){
+    template<int DIM>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ,int){
         return true;
     }
-    template<typename Vec1,typename Vec2>
-    static void apply(const Vec1 & domain,Vec2 & x)
+    template<int DIM>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x)
     {
-        for(int direction=0;direction<Vec1::DIM;direction++)
+        for(int direction=0;direction<VecN<DIM,int>::DIM;direction++)
         {
             apply(domain,x,direction);
         }
     }
-    template<typename Vec1,typename Vec2>
-    static void apply(const Vec1 & domain,Vec2 & x,int direction)
+    template<int DIM>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction)
     {
         if(x(direction)<0)
             x(direction)= domain(direction)+x(direction);
@@ -138,8 +139,8 @@ public:
     MatNBoundaryCondition(MatNBoundaryConditionType condition=MATN_BOUNDARY_CONDITION_BOUNDED)
         :_condition(condition)
     {}
-    template<typename Vec1,typename Vec2>
-    bool isValid(const Vec1 & domain,const Vec2 & x){
+    template<int DIM>
+    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -152,8 +153,8 @@ public:
             return true;
         }
     }
-    template<typename Vec1,typename Vec2>
-    bool isValid(const Vec1 & domain,const Vec2 & x,int direction){
+    template<int DIM>
+    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x,int direction){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -166,8 +167,8 @@ public:
             return true;
         }
     }
-    template<typename Vec1,typename Vec2>
-    void  apply(const Vec1 & domain,Vec2 & x){
+    template<int DIM>
+    void  apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -181,8 +182,8 @@ public:
             break;
         }
     }
-    template<typename Vec1,typename Vec2>
-    void  apply(const Vec1 & domain,Vec2 & x,int direction){
+    template<int DIM>
+    void  apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -202,204 +203,257 @@ public:
 private:
     MatNBoundaryConditionType _condition;
 };
-template<int DIM>
-inline VecN<PowerGP<2,DIM>::value,std::pair<double,VecN<DIM,int> > > interpolationBilinearWeigh(const VecN<DIM,int> &x_domain ,const VecN<DIM,F64> &x_point,MatNBoundaryCondition boundary = MATN_BOUNDARY_CONDITION_BOUNDED){
-    return  _interpolationBilinearWeigh(x_domain,x_point,boundary, Int2Type<DIM>()) ;
-}
-template<int DIM>
-VecN<PowerGP<2,DIM>::value,std::pair<double,VecN<DIM,int> > > _interpolationBilinearWeigh(const VecN<DIM,int> ,const VecN<DIM,F64> &,MatNBoundaryCondition , Int2Type<DIM>)
-{
 
-}
+enum  MatNInterpolationType{
+    MATN_INTERPOLATION_NEAREST = 0,
+    MATN_INTERPOLATION_BILINEAR= 1
+};
 
-inline VecN<4,std::pair<double,Vec2I32 > > _interpolationBilinearWeigh(const Vec2I32 x_domain,const Vec2F64 &x_point,MatNBoundaryCondition boundary, Int2Type<2>)
-{
-    VecN<4,std::pair<double,Vec2I32 > > v_out(std::make_pair(0,Vec2I32(0,0)));
-    Vec2F64 x;
-    x(0)=x_point(0)+EPSILON;
-    x(1)=x_point(1)+EPSILON;
-    bool all_hit=true;
-    double sum=0;
-    Vec2I32 x1;
-    x1(0)=std::floor(x(0));
-    x1(1)=std::floor(x(1));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
-        sum+= norm;
-        v_out(0).second=x1;
-        v_out(0).first =norm;
-    }else{
-       v_out(0).second=Vec2I32(0,0);
-       v_out(0).first =0;
-       all_hit=false;
+
+
+struct POP_EXPORTS MatNInterpolationNearest{
+    template<typename MatN,typename FloatType>
+    static  typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
+        return m(VecN<MatN::DIM,I32>(pop::round(x)));
     }
-    x1(0)=std::ceil(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
-        sum+= norm;
-        v_out(1).second=x1;
-        v_out(1).first =norm;
-    }else{
-        v_out(1).second=Vec2I32(0,0);
-        v_out(1).first =0;
-        all_hit=false;
-     }
-    x1(1)=std::ceil(x(1));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
-        sum+= norm;
-        v_out(2).second=x1;
-        v_out(2).first =norm;
-    }else{
-        v_out(2).second=Vec2I32(0,0);
-        v_out(2).first =0;
-        all_hit=false;
-     }
-    x1(0)=std::floor(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
-        sum+= norm;
-        v_out(3).second=x1;
-        v_out(3).first =norm;
-    }else{
-        v_out(3).second=Vec2I32(0,0);
-        v_out(3).first =0;
-        all_hit=false;
-     }
-    if(all_hit==false)
-    {
-        if(sum!=0){
-            v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
+};
+class POP_EXPORTS MatNInterpolationBiliniear{
+public:
+    template<typename MatN,typename FloatType>
+    static  typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
+
+        VecN<PowerGP<2,MatN::DIM>::value,std::pair<FloatType,VecN<MatN::DIM,I32> > > v_out =getWeightPosition(m.getDomain(),x);
+        typename FunctionTypeTraitsSubstituteF<typename MatN::F,FloatType>::Result value=0;
+        for( int i=0;i<PowerGP<2,MatN::DIM>::value;i++){
+            value+=m(v_out(i).second)*v_out(i).first;
         }
+        return value;
     }
-    return v_out;
-}
 
 
-inline VecN<8,std::pair<double,Vec3I32 > > _interpolationBilinearWeigh(const Vec3I32 x_domain,const Vec3F64 &x_point,MatNBoundaryCondition boundary ,Int2Type<2>)
-{
-    VecN<8,std::pair<double,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
-    Vec3F64 x;
-    x(0)=x_point(0)+EPSILON;
-    x(1)=x_point(1)+EPSILON;
-    x(2)=x_point(1)+EPSILON;
-    bool all_hit=true;
-    double sum=0;
-    Vec3I32 x1;
-    x1(0)=std::floor(x(0));
-    x1(1)=std::floor(x(1));
-    x1(2)=std::floor(x(2));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-        sum+= norm;
-        v_out(0).second=x1;
-        v_out(0).first =norm;
-    }else{
-       v_out(0).second=Vec3I32(0,0,0);
-       v_out(0).first =0;
-       all_hit=false;
+    template<int DIM,typename FloatType>
+    static VecN<PowerGP<2,DIM>::value,std::pair<FloatType,VecN<DIM,I32> > >  getWeightPosition(const VecN<DIM,I32> &x_domain,const VecN<DIM,FloatType> & x,MatNBoundaryCondition boundary=MatNBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED)){
+        return  _getWeightPosition(x_domain,x,boundary, pop::Int2Type<DIM>()) ;
     }
-    x1(0)=std::ceil(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
-        sum+= norm;
-        v_out(1).second=x1;
-        v_out(1).first =norm;
-    }else{
-        v_out(1).second=Vec3I32(0,0,0);
-        v_out(1).first =0;
-        all_hit=false;
-     }
-    x1(1)=std::ceil(x(1));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-        sum+= norm;
-        v_out(2).second=x1;
-        v_out(2).first =norm;
-    }else{
-        v_out(2).second=Vec3I32(0,0,0);
-        v_out(2).first =0;
-        all_hit=false;
-     }
-    x1(0)=std::floor(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
-        sum+= norm;
-        v_out(3).second=x1;
-        v_out(3).first =norm;
-    }else{
-        v_out(3).second=Vec3I32(0,0,0);
-        v_out(3).first =0;
-        all_hit=false;
-     }
-    x1(0)=std::floor(x(0));
-    x1(1)=std::floor(x(1));
-    x1(2)=std::ceil(x(2));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-        sum+= norm;
-        v_out(4).second=x1;
-        v_out(4).first =norm;
-    }else{
-       v_out(4).second=Vec3I32(0,0,0);
-       v_out(4).first =0;
-       all_hit=false;
-    }
-    x1(0)=std::ceil(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
-        sum+= norm;
-        v_out(5).second=x1;
-        v_out(5).first =norm;
-    }else{
-        v_out(5).second=Vec3I32(0,0,0);
-        v_out(5).first =0;
-        all_hit=false;
-     }
-    x1(1)=std::ceil(x(1));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-        sum+= norm;
-        v_out(6).second=x1;
-        v_out(6).first =norm;
-    }else{
-        v_out(6).second=Vec3I32(0,0,0);
-        v_out(6).first =0;
-        all_hit=false;
-     }
-    x1(0)=std::floor(x(0));
-    if(boundary.isValid(x_domain,x1)){
-        boundary.apply(x_domain,x1);
-        double norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
-        sum+= norm;
-        v_out(7).second=x1;
-        v_out(7).first =norm;
-    }else{
-        v_out(7).second=Vec3I32(0,0,0);
-        v_out(7).first =0;
-        all_hit=false;
-     }
-
-    if(all_hit==false)
+private:
+    template<int DIM,typename FloatType>
+    static VecN<PowerGP<2,DIM>::value,std::pair<FloatType,VecN<DIM,I32> > > _getWeightPosition(const VecN<DIM,I32> ,const VecN<DIM,FloatType> &,MatNBoundaryCondition , pop::Int2Type<DIM>)
     {
-        if(sum!=0){
-            v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
-            v_out(4).first /=sum;v_out(5).first /=sum;v_out(6).first /=sum;v_out(7).first /=sum;
-        }
+        return    VecN<PowerGP<2,DIM>::value,std::pair<FloatType,VecN<DIM,I32> > >();
     }
-    return v_out;
-}
+
+    template<typename FloatType>
+    static VecN<4,std::pair<FloatType,Vec2I32> > _getWeightPosition(const  Vec2I32 x_domain,const  VecN<2,FloatType> &x_point,MatNBoundaryCondition boundary, pop::Int2Type<2>)
+    {
+        VecN<4,std::pair<FloatType,Vec2I32> > v_out(std::make_pair(0, Vec2I32(0,0)));
+        VecN<2,FloatType> x;
+        x(0)=x_point(0)+EPSILON;
+        x(1)=x_point(1)+EPSILON;
+        bool all_hit=true;
+        FloatType sum=0;
+        Vec2I32 x1;
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
+            sum+= norm;
+            v_out(0).second=x1;
+            v_out(0).first =norm;
+        }else{
+            v_out(0).second= Vec2I32(0,0);
+            v_out(0).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::ceil(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
+            sum+= norm;
+            v_out(1).second=x1;
+            v_out(1).first =norm;
+        }else{
+            v_out(1).second= Vec2I32(0,0);
+            v_out(1).first =0;
+            all_hit=false;
+        }
+        x1(1)=std::ceil(x(1));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
+            sum+= norm;
+            v_out(2).second=x1;
+            v_out(2).first =norm;
+        }else{
+            v_out(2).second= Vec2I32(0,0);
+            v_out(2).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::floor(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
+            sum+= norm;
+            v_out(3).second=x1;
+            v_out(3).first =norm;
+        }else{
+            v_out(3).second= Vec2I32(0,0);
+            v_out(3).first =0;
+            all_hit=false;
+        }
+        if(all_hit==false)
+        {
+            if(sum!=0){
+                v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
+            }
+        }
+        return v_out;
+    }
+
+    template<typename FloatType>
+    static  VecN<8,std::pair<FloatType,Vec3I32 > > _getWeightPosition(const Vec3I32 x_domain,const VecN<3,FloatType> &x_point,MatNBoundaryCondition boundary ,Int2Type<2>)
+    {
+        VecN<8,std::pair<FloatType,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
+        VecN<3,FloatType> x;
+        x(0)=x_point(0)+EPSILON;
+        x(1)=x_point(1)+EPSILON;
+        x(2)=x_point(1)+EPSILON;
+        bool all_hit=true;
+        FloatType sum=0;
+        Vec3I32 x1;
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        x1(2)=std::floor(x(2));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+            sum+= norm;
+            v_out(0).second=x1;
+            v_out(0).first =norm;
+        }else{
+            v_out(0).second=Vec3I32(0,0,0);
+            v_out(0).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::ceil(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
+            sum+= norm;
+            v_out(1).second=x1;
+            v_out(1).first =norm;
+        }else{
+            v_out(1).second=Vec3I32(0,0,0);
+            v_out(1).first =0;
+            all_hit=false;
+        }
+        x1(1)=std::ceil(x(1));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+            sum+= norm;
+            v_out(2).second=x1;
+            v_out(2).first =norm;
+        }else{
+            v_out(2).second=Vec3I32(0,0,0);
+            v_out(2).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::floor(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
+            sum+= norm;
+            v_out(3).second=x1;
+            v_out(3).first =norm;
+        }else{
+            v_out(3).second=Vec3I32(0,0,0);
+            v_out(3).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::floor(x(0));
+        x1(1)=std::floor(x(1));
+        x1(2)=std::ceil(x(2));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+            sum+= norm;
+            v_out(4).second=x1;
+            v_out(4).first =norm;
+        }else{
+            v_out(4).second=Vec3I32(0,0,0);
+            v_out(4).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::ceil(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
+            sum+= norm;
+            v_out(5).second=x1;
+            v_out(5).first =norm;
+        }else{
+            v_out(5).second=Vec3I32(0,0,0);
+            v_out(5).first =0;
+            all_hit=false;
+        }
+        x1(1)=std::ceil(x(1));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+            sum+= norm;
+            v_out(6).second=x1;
+            v_out(6).first =norm;
+        }else{
+            v_out(6).second=Vec3I32(0,0,0);
+            v_out(6).first =0;
+            all_hit=false;
+        }
+        x1(0)=std::floor(x(0));
+        if(boundary.isValid(x_domain,x1)){
+            boundary.apply(x_domain,x1);
+            FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
+            sum+= norm;
+            v_out(7).second=x1;
+            v_out(7).first =norm;
+        }else{
+            v_out(7).second=Vec3I32(0,0,0);
+            v_out(7).first =0;
+            all_hit=false;
+        }
+
+        if(all_hit==false)
+        {
+            if(sum!=0){
+                v_out(0).first /=sum;v_out(1).first /=sum;v_out(2).first /=sum;v_out(3).first /=sum;
+                v_out(4).first /=sum;v_out(5).first /=sum;v_out(6).first /=sum;v_out(7).first /=sum;
+            }
+        }
+        return v_out;
+    }
+
+
+};
+
+struct POP_EXPORTS MatNInterpolation
+{
+    MatNInterpolationType _type;
+    MatNInterpolation(MatNInterpolationType type = MATN_INTERPOLATION_NEAREST)
+        :_type(type){}
+
+    template<int DIM,typename FloatType>
+    static bool isValid(const VecN<DIM,I32> & domain,const VecN<DIM,FloatType> & x){
+        return MatNBoundaryConditionBounded::isValid(domain,VecN<DIM,I32>(pop::round(x)));
+    }
+    template< typename MatN,typename FloatType>
+    typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
+        if(_type==MATN_INTERPOLATION_NEAREST)
+            return MatNInterpolationNearest::apply(m,x);
+        else
+            return MatNInterpolationBiliniear::apply(m,x);
+    }
+};
+
 
 }
 #endif // FUNCTIONMatNBOUNDARYCONDITION_HPP

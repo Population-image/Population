@@ -367,7 +367,7 @@ T1  squareRoot(T1  x)
 ////////////////////////////////////////////////////////////////////////////////
 
 template <int v>
-struct Int2Type
+struct POP_EXPORTS Int2Type
 {
     enum { value = v };
 };

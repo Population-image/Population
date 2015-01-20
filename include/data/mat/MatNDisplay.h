@@ -384,7 +384,7 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
     scale =1;
     if(automaticresize ==true&&Dim==2){
         scale = scale*(600./img.getDomain()(0));
-        img= GeometricalTransformation::scale(img,scale,0);
+        img= GeometricalTransformation::scale(img,scale);
     }
 
     if(Dim==2){

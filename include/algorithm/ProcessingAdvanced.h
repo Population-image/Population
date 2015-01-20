@@ -339,13 +339,14 @@ struct ProcessingAdvanced
         it.init();
         FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
         typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
-        typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result ratio;
+        typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result FloatType;
+        FloatType ratio;
         if(maxi!=mini){
             Function h(f.getDomain());
             ratio= 1.0*(max-min)/(maxi-mini);
             it.init();
             while(it.next()){
-                h(it.x())=ArithmeticsSaturation<typename Function::F,double>::Range(f(it.x())*ratio);
+                h(it.x())=ArithmeticsSaturation<typename Function::F,FloatType>::Range(f(it.x())*ratio);
             }
             return h;
         }

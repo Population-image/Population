@@ -10,6 +10,7 @@
 
 //###basic types###
 %include "../../include/data/typeF/TypeF.h"
+
 namespace pop{
 typedef unsigned char UI8;      /* 8 bit unsigned */
 typedef signed char I8;         /* 8 bit signed */
@@ -20,6 +21,11 @@ typedef int I32;                /* 32 bit signed */
 typedef float F32;
 typedef double F64 ;
 typedef long double F128;
+template <int v>
+struct Int2Type
+{
+    enum { value = v };
+};
 }
 
 namespace std

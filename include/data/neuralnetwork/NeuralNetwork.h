@@ -886,7 +886,7 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             scale_factor = double(domain(1))/m.getDomain()(1);
         }
 
-        Mat2F64 mr = GeometricalTransformation::scale(m,Vec2F64(scale_factor,scale_factor),1);
+        Mat2F64 mr = GeometricalTransformation::scale(m,Vec2F64(scale_factor,scale_factor),MATN_INTERPOLATION_BILINEAR);
         Mat2F64 mrf(domain);
         Vec2I32 trans(0,0);
         if(index==0){

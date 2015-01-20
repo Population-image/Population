@@ -141,10 +141,13 @@ endif(BUILD_SHARED_LIBS OR BUILD_TUTORIAL OR BUILD_ARTICLE OR BUILD_TEMP )
 
 
 if(BUILD_EXECUTABLE)
-    enable_testing()
+    list(APPEND CMAKE_MODULE_PATH "D:/Users/vtariel/Downloads/opencv/build")
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)
+    find_package( OpenCV REQUIRED )
+    include_directories( ${OpenCV_INCLUDE_DIRS} )
+    target_link_libraries( test_main ${OpenCV_LIBS} )
 endif(BUILD_EXECUTABLE)
 
 if(BUILD_PYTHON_SWIG)
