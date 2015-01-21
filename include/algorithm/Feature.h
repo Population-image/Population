@@ -253,7 +253,7 @@ public:
     *
     */
     template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,Type> & pyramid_gaussian,double threshold_low_contrast=0.005,double ratio_edge_response=10)
+    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,Type> & pyramid_gaussian,double threshold_low_contrast=0.04,double ratio_edge_response=10)
     {
         Pyramid<DIM,F64>         pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
         Vec<KeyPointPyramid<DIM> > extrema   =   Feature::pyramidExtrema(pyramid_difference);
@@ -423,7 +423,7 @@ public:
     *
     */
     template<int DIM,typename Type>
-    static Pyramid<DIM,F64 > pyramidGaussian(const MatN<DIM,Type> & img,  double sigma=1.6,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
+    static Pyramid<DIM,F64 > pyramidGaussian(const MatN<DIM,Type> & img,  double sigma=1.6,double sigma_init=0.5,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
     {
         MatN<DIM,F64> I(img);
 
@@ -431,8 +431,9 @@ public:
         if(number_octave<1)
             number_octave = round(std::log(  (double)img.getDomain().minCoordinate()) / std::log(2.) - 2);
 
-
-        I = FunctorMatN::convolutionGaussian(I,sigma,std::ceil(2.5*sigma));
+        double sig_diff = std::sqrt( std::max(sigma * sigma - sigma_init * sigma_init, 0.0001) );
+        if(sig_diff>0.01)
+            I = FunctorMatN::convolutionGaussian(I,sig_diff,std::ceil(2.5*sig_diff));
 
 
         Vec<double> sig(number_layers_per_octave + number_extra_layer_per_octave);
@@ -454,7 +455,7 @@ public:
                 VecN<DIM,int> size(pyramid.octave(pyramid.nbrOctave()-1).getDomain()/2);//half size of the previous octave
                 pyramid.pushOctave(size,number_layers_per_octave + number_extra_layer_per_octave);
                 MatN<DIM,F64>  temp = pyramid.getLayer(pyramid.nbrOctave()-2,number_layers_per_octave);//last octave and last layer
-                temp = GeometricalTransformation::scale(temp,VecN<DIM,F64>(0.5));
+                temp = GeometricalTransformation::subResolution(temp,2);
                 pyramid.setLayer(pyramid.nbrOctave()-1,0,temp);
                 temp = pyramid.getLayer(pyramid.nbrOctave()-1,0);
 
@@ -493,12 +494,14 @@ public:
     /*!
     * \brief extract the extrema of the pyramid \f$\{(x,y,k_i):  D(x,y,k_i \sigma)\leq \min_{x'\in\{x-1,x,x+1\},y'\in\{y-1,y,y+1\},k'\in\{k_{i-1},k_{i},k_{i+1}\}  }D(x',y',k'\sigma) \}\f$
     * \param pyramid_DofG input sigma-derivate gaussian pyramid
+    * \param contrast_threshold the contrast threshold used to filter out weak features in semi-uniform (low-contrast) regions. The larger the threshold, the less features are produced by the detector.
     * \param border do not extract the extrema in the border zone of the domain
     * \param nbr_layer_per_octave number of layers per octave
     * \return extrema of the pyramid
     */
     template<int DIM,typename Type>
-    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,Type>& pyramid_DofG, int border=5,unsigned int nbr_layer_per_octave=3){
+    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,Type>& pyramid_DofG,double contrast_threshold=0.04, int border=5,unsigned int nbr_layer_per_octave=3){
+        double threshold = 0.5*contrast_threshold/(pyramid_DofG.nbrLayers(0)-2);
         Vec<KeyPointPyramid<DIM> >  extrema;
         for(unsigned int index_octave=0;index_octave<pyramid_DofG.nbrOctave();index_octave++){
             const MatN<DIM+1,Type> & foctave = pyramid_DofG.octave(index_octave);
@@ -509,10 +512,35 @@ public:
 
             typename MatN<DIM+1,Type>::IteratorERectangle itg (foctave.getIteratorERectangle(xmin,xmax));
             typename MatN<DIM+1,Type>::IteratorENeighborhood itn (foctave.getIteratorENeighborhood(1,0));
-
-            Vec<VecN<DIM+1,int> > minoctave = ProcessingAdvanced::extremaLocal(foctave,itg,itn);
-            for(int i=0;i<(int)minoctave.size();i++){
-                extrema.push_back(KeyPointPyramid<DIM>(minoctave[i],index_octave,nbr_layer_per_octave));
+            while(itg.next()){
+                double value = foctave(itg.x());
+                if(std::abs(value)>threshold)
+                {
+                    if(value>0){
+                        itn.init(itg.x());
+                        bool bmax=true;
+                        while(itn.next()){
+                            if(foctave(itn.x())>value){
+                                bmax=false;
+                                break;
+                            }
+                        }
+                        if(bmax==true)
+                            extrema.push_back(KeyPointPyramid<DIM>(itg.x(),index_octave,nbr_layer_per_octave));
+                    }
+                    if(value<0){
+                        itn.init(itg.x());
+                        bool bmax=true;
+                        while(itn.next()){
+                            if(foctave(itn.x())<value){
+                                bmax=false;
+                                break;
+                            }
+                        }
+                        if(bmax==true)
+                            extrema.push_back(KeyPointPyramid<DIM>(itg.x(),index_octave,nbr_layer_per_octave));
+                    }
+                }
             }
         }
         return extrema;
@@ -535,7 +563,6 @@ public:
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust;
         FunctorPDE::Gradient<> grad;
         FunctorPDE::HessianMatrix<> hessian;
-        double scale_parameter=0.5;
         VecN<DIM+1,F64> ZeroCinq;
         ZeroCinq = 0.5;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
@@ -549,28 +576,17 @@ public:
                 v= grad(pyramid_DofG.octave(octave),xint);
                 Mat2x<F64,DIM+1,DIM+1> H =  hessian(pyramid_DofG.octave(octave),xint);
                 VecN<DIM+1,F64> X;
-                    H = -H.inverse();
-                    X=H*v;
-                    X*=scale_parameter;
-                    if(X(0)!=X(0)||X(1)!=X(1))//NaN is the only value, for which is expression value == value always  false
-                        break;
-                if(absolute(X).allInferior(ZeroCinq)){
-                    x+=X;
-                    for(int i=0;i<DIM;i++)
-                        if(round(x(i))<border||round(x(i))>pyramid_DofG.octave(octave).getDomain()(i)-1-border)
-                            local_iteration= max_iteration;;
-                    if(round(x(DIM))<0||round(x(DIM))>=pyramid_DofG.octave(octave).getDomain()(DIM))
+                H = -H.inverse();
+                X=H*v;
+                x+=X;
+                for(int i=0;i<DIM;i++)
+                    if(round(x(i))<border||round(x(i))>pyramid_DofG.octave(octave).getDomain()(i)-1-border)
                         local_iteration= max_iteration;
-                    if(local_iteration!= max_iteration)
-                        v_extrema_adjust.push_back(KeyPointPyramid<DIM>(x,octave));
+                if(round(x(DIM))<0||round(x(DIM))>=pyramid_DofG.octave(octave).getDomain()(DIM))
                     local_iteration= max_iteration;
-                }else{
-                    x+=X;
-                    for(int i=0;i<DIM;i++)
-                        if(round(x(i))<border||round(x(i))>pyramid_DofG.octave(octave).getDomain()(i)-1-border)
-                            local_iteration= max_iteration;
-                    if(round(x(DIM))<0||round(x(DIM))>=pyramid_DofG.octave(octave).getDomain()(DIM)-1)
-                        local_iteration= max_iteration;
+                if(absolute(X).allInferior(ZeroCinq)&&local_iteration!= max_iteration){
+                    local_iteration= max_iteration;
+                    v_extrema_adjust.push_back(KeyPointPyramid<DIM>(x,octave));
                 }
             }
         }
@@ -581,22 +597,22 @@ public:
     * \brief filter unstable extrema if  \f$D(\mathbf{x})+\frac{1}{2}\frac{\partial D^T}{\partial \mathbf{x}} \mathbf{x} <v\f$
     * \param pyramid_DofG input sigma-derivate gaussian pyramid
     * \param extrema extrema of the sigma-derivate gaussian pyramid
-    * \param threshold threshold value v
+    * \param contrast_threshold contrast threshold value v
     * \return extrema without unstable extrema
     */
 
     template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, double threshold=0.005)
+    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, double contrast_threshold=0.04)
     {
 
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust2;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
             VecN<DIM+1,F64> x=extrema[index_extrema].xInPyramid();
             int octave = extrema[index_extrema].octave();
-            FunctorPDE::Gradient<FunctorPDE::PartialDerivateBackward> grad;
+            FunctorPDE::Gradient<FunctorPDE::PartialDerivateCentered> grad;
             VecN<DIM+1,int> xint(round(x));
             VecN<DIM+1,F64> D=    grad(pyramid_DofG.octave(octave),xint);
-            if(absolute(0.5*productInner(D,x)+pyramid_DofG.octave(octave)(x))>threshold)
+            if(absolute(0.5*productInner(D,x)+pyramid_DofG.octave(octave)(x))* (pyramid_DofG.nbrLayers(0)-2)>contrast_threshold*2)
                 v_extrema_adjust2.push_back(KeyPointPyramid<DIM>(x,octave));
         }
         return v_extrema_adjust2;
@@ -750,8 +766,8 @@ public:
             const TDescriptor & descriptor = descriptors[index_extrema];
             VecN<DIM,F64> x= descriptor.keyPoint().x();
             RGBUI8 color = RGBUI8::randomRGB();
-           Draw::circle(h,round(x),sigma*descriptor.keyPoint().scale(),color,1);
-           Draw::arrow(h,round(x),round(x)+descriptor.orientation()*length,color,1);
+            Draw::circle(h,round(x),sigma*descriptor.keyPoint().scale(),color,1);
+            Draw::arrow(h,round(x),round(x)+descriptor.orientation()*length,color,1);
 
         }
         return h;

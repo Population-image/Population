@@ -471,6 +471,7 @@ public:
 };
 typedef Vec<ComplexF64> VecComplexF64;
 typedef Vec<F64> VecF64;
+typedef Vec<F32> VecF32;
 typedef Vec<I32> VecI32;
 template<typename Type>
 Vec<Type>::Vec()

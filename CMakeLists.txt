@@ -12,7 +12,7 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_VERSION VERSION_GREATER "2.8")
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
@@ -141,7 +141,6 @@ endif(BUILD_SHARED_LIBS OR BUILD_TUTORIAL OR BUILD_ARTICLE OR BUILD_TEMP )
 
 
 if(BUILD_EXECUTABLE)
-    list(APPEND CMAKE_MODULE_PATH "D:/Users/vtariel/Downloads/opencv/build")
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)

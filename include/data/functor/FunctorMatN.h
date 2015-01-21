@@ -78,8 +78,8 @@ struct POP_EXPORTS FunctorMatN
             Type_F64 value(0);
             for(unsigned int k=0;k<kernel.size();k++){
                 x(direction)= itglobal.x()(direction)+(radius-k);
-                if(BoundaryCondition::isValid(f.getDomain(),x)){
-                    BoundaryCondition::apply(f.getDomain(),x);
+                if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
+                    BoundaryCondition::apply(f.getDomain(),x,direction);
                     value+=Type_F64(f(x))*Type2_F64(kernel(k));
                 }
             }
@@ -114,9 +114,9 @@ struct POP_EXPORTS FunctorMatN
                     dir = x(direction);
                     value=0;
                     for(k=0;k<static_cast<int>(kernel.size());k++){
-                        x(direction)= dir+(radius-static_cast<unsigned int>(k));
-                        if(BoundaryCondition::isValid(f.getDomain(),x)){
-                            BoundaryCondition::apply(f.getDomain(),x);
+                        x(direction)= dir+(radius-k);
+                        if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
+                            BoundaryCondition::apply(f.getDomain(),x,direction);
                             value+=Type_F64(f(x))*Type2_F64(kernel(k));
                         }
                     }
@@ -145,16 +145,16 @@ struct POP_EXPORTS FunctorMatN
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-            for(i=0;i<f.sizeI();i++){
-                for(j=0;j<f.sizeJ();j++){
-                    for(z=0;z<f.sizeK();z++){
+            for(i=0;i<static_cast<int>(f.sizeI());i++){
+                for(j=0;j<static_cast<int>(f.sizeJ());j++){
+                    for(z=0;z<static_cast<int>(f.sizeK());z++){
                         x(0)=i;x(1)=j;x(2)=z;
                         dir = x(direction);
                         value=0;
-                        for(k=0;k<kernel.size();k++){
+                        for(k=0;k<static_cast<int>(kernel.size());k++){
                             x(direction)= dir+(radius-k);
-                            if(BoundaryCondition::isValid(f.getDomain(),x)){
-                                BoundaryCondition::apply(f.getDomain(),x);
+                            if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
+                                BoundaryCondition::apply(f.getDomain(),x,direction);
                                 value+=Type_F64(f(x))*Type2_F64(kernel(k));
                             }
                         }

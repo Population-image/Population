@@ -346,7 +346,7 @@ struct ProcessingAdvanced
             ratio= 1.0*(max-min)/(maxi-mini);
             it.init();
             while(it.next()){
-                h(it.x())=ArithmeticsSaturation<typename Function::F,FloatType>::Range(f(it.x())*ratio);
+                h(it.x())=ArithmeticsSaturation<typename Function::F,FloatType>::Range(FloatType(f(it.x())-FloatType(mini))*ratio);
             }
             return h;
         }

@@ -85,6 +85,7 @@ public:
     static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ,int){
         return true;
     }
+
     template<int DIM>
     static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x)
     {

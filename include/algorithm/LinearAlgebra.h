@@ -78,11 +78,6 @@ struct POP_EXPORTS LinearAlgebra
     */
 
 
-
-
-
-
-
     /*! \brief Determine if matrix is diagonal
      *  \param m input matrix
      *  \param error tolerance value

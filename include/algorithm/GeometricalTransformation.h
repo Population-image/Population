@@ -57,7 +57,37 @@ struct POP_EXPORTS GeometricalTransformation
     //! \name Direct transformation
     //@{
     //-------------------------------------
-
+    /*!
+     * \brief get a 2d matrix from a 3d matrix (e.g. a slice in a core sample)
+     * \param m input 3d matrix
+     * \param index_plane plane index
+     * \param fixed_coordinate coordinate fixed
+     *
+     * \code
+     * \endcode
+     * \image html Lena.bmp
+     * \image html Lenascale.png
+    */
+    template<typename TypePixel>
+    static MatN<2,TypePixel> subResolution(const MatN<2,TypePixel> &m , int sub_resolution_factor)
+    {
+        MatN<2,TypePixel> m_sub (m.getDomain()/sub_resolution_factor);
+        typename MatN<2,TypePixel>::iterator it_sub=m_sub.begin();
+        typename MatN<2,TypePixel>::const_iterator it=m.begin();
+        typename MatN<2,TypePixel>::const_iterator it_index_start=m.begin();
+        int step_m_y=sub_resolution_factor;
+        int step_m_x=(sub_resolution_factor)*m.sizeJ();
+        for(unsigned int i=0;i<m_sub.sizeI();i++){
+            for(unsigned int j=0;j<m_sub.sizeJ();j++){
+                *it_sub= *it;
+                it_sub++;
+                it+=step_m_y;
+            }
+            it_index_start+=step_m_x;
+            it=it_index_start;
+        }
+        return m_sub;
+    }
     /*!
      * \brief get a 2d matrix from a 3d matrix (e.g. a slice in a core sample)
      * \param m input 3d matrix

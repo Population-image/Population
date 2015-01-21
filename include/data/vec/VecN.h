@@ -870,8 +870,9 @@ typedef VecN<4,I32> Vec4I32;
 typedef VecN<2,F64> Vec2F64;
 typedef VecN<3,F64> Vec3F64;
 typedef VecN<4,F64> Vec4F64;
-
-
+typedef VecN<2,F32> Vec2F32;
+typedef VecN<3,F32> Vec3F32;
+typedef VecN<4,F32> Vec4F32;
 
 
 
