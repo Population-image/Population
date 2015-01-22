@@ -56,7 +56,7 @@ struct Pyramid
     Vec<Type> getProfile(const VecN<DIM,int>& point)const{
         Vec<Type> v (_pyramid.size()*(_pyramid[0].getDomain()(DIM)-_nbrextralayerperoctave));
         int k=0;
-        VecN<DIM+1,F64> point_pyramid;
+        VecN<DIM+1,F32> point_pyramid;
         for(int i=0;i<DIM;i++)
             point_pyramid(i)=point(i);
         for(unsigned int i_octave =0;i_octave<_pyramid.size();i_octave++){
@@ -80,19 +80,19 @@ struct KeyPoint
 {
     enum{DIM=Dim};
     KeyPoint(){}
-    KeyPoint(const VecN<DIM,F64>& x_value)
+    KeyPoint(const VecN<DIM,F32>& x_value)
         :_x(x_value){}
-    VecN<DIM,F64> _x;
-    const VecN<DIM,F64> &x()const
+    VecN<DIM,F32> _x;
+    const VecN<DIM,F32> &x()const
     {
         return _x;
     }
-    VecN<DIM,F64> &x()
+    VecN<DIM,F32> &x()
     {
         return _x;
     }
 
-    double scale()const
+    F32 scale()const
     {
         return 1;
     }
@@ -103,21 +103,21 @@ template<int Dim>
 struct KeyPointPyramid
 {
     enum{DIM=Dim};
-    VecN<DIM+1,F64> _x_in_pyramid;
+    VecN<DIM+1,F32> _x_in_pyramid;
     unsigned int _octave;
     unsigned int _nbr_layer_per_octave;
     int _label;
     KeyPointPyramid(){}
-    KeyPointPyramid(const VecN<DIM+1,F64> & x_in_pyramid,unsigned int octave_value,unsigned int nbr_layer_per_octave=3 )
+    KeyPointPyramid(const VecN<DIM+1,F32> & x_in_pyramid,unsigned int octave_value,unsigned int nbr_layer_per_octave=3 )
         :_x_in_pyramid(x_in_pyramid),_octave(octave_value),_nbr_layer_per_octave(nbr_layer_per_octave){}
-    VecN<DIM,F64> x()const
+    VecN<DIM,F32> x()const
     {
-        VecN<DIM,F64> x_value;
+        VecN<DIM,F32> x_value;
         for(int i=0;i<DIM;i++)
             x_value(i)=_x_in_pyramid(i)*pop::power2(_octave);
         return x_value;
     }
-    F64 layer()const{
+    F32 layer()const{
         return _x_in_pyramid(DIM);
     }
     unsigned int octave()const{
@@ -126,15 +126,15 @@ struct KeyPointPyramid
     unsigned int &octave(){
         return _octave;
     }
-    const VecN<DIM+1,F64>& xInPyramid()const
+    const VecN<DIM+1,F32>& xInPyramid()const
     {
         return _x_in_pyramid;
     }
-    VecN<DIM+1,F64>& xInPyramid()
+    VecN<DIM+1,F32>& xInPyramid()
     {
         return _x_in_pyramid;
     }
-    double scale()const
+    F32 scale()const
     {
         return std::pow(2.,_octave*1.)*std::pow(2.,layer()/_nbr_layer_per_octave);
     }
@@ -145,17 +145,17 @@ struct Descriptor
 {
     enum{DIM=TKeyPoint::DIM};
     TKeyPoint _keypoint;
-    VecN<TKeyPoint::DIM,F64> _orientation;
-    Mat2F64 _data;
+    VecN<TKeyPoint::DIM,F32> _orientation;
+    Mat2F32 _data;
 
 
-    VecN<DIM,F64> x()const{return _keypoint.x();}
+    VecN<DIM,F32> x()const{return _keypoint.x();}
     TKeyPoint &keyPoint(){return _keypoint;}
     const TKeyPoint &keyPoint()const{return _keypoint;}
-    VecN<TKeyPoint::DIM,F64> &orientation(){return _orientation;}
-    const VecN<TKeyPoint::DIM,F64> &orientation()const{return _orientation;}
-    Mat2F64 &data(){return _data;}
-    const Mat2F64 &data()const{return _data;}
+    VecN<TKeyPoint::DIM,F32> &orientation(){return _orientation;}
+    const VecN<TKeyPoint::DIM,F32> &orientation()const{return _orientation;}
+    Mat2F32 &data(){return _data;}
+    const Mat2F32 &data()const{return _data;}
 };
 
 
@@ -165,48 +165,53 @@ struct DescriptorMatch
     enum{DIM=Descriptor::DIM};
     Descriptor _d1;
     Descriptor _d2;
-    double _error;
+    F32 _error;
     bool operator <(const DescriptorMatch& d)const{
         if(_error<d._error)
             return true;
         else
             return false;
     }
-    VecN<Descriptor::DIM,F64> x()const{return _d1.x();}
-    VecN<Descriptor::DIM,F64> x1()const{return _d1.x();}
-    VecN<Descriptor::DIM,F64> x2()const{return _d2.x();}
+    VecN<Descriptor::DIM,F32> x()const{return _d1.x();}
+    VecN<Descriptor::DIM,F32> x1()const{return _d1.x();}
+    VecN<Descriptor::DIM,F32> x2()const{return _d2.x();}
 };
 template<int DIM>
 class PieChartInPieChart
 {
 
 public:
-    Mat2F64 _data;
-    std::vector<double> _v_projection;
-    VecN<DIM,double> _orientation;
-    PieChartInPieChart(const VecN<DIM,double>& orientation,int nbr_orientations=6)
+    Mat2F32 _data;
+    std::vector<F32> _v_projection;
+    VecN<DIM,F32> _orientation;
+    PieChartInPieChart(const VecN<DIM,F32>& orientation,int nbr_orientations=6)
         :_data(nbr_orientations,nbr_orientations),_v_projection(nbr_orientations),_orientation(orientation/normValue(orientation))
     {
         for(int i=0;i<nbr_orientations;i++){
             if(DIM==2)
-                _v_projection[i]=(-std::cos(1.0*i/nbr_orientations*PI));
+                _v_projection[i]=(-std::cos(1.f*i/nbr_orientations*PI));
             else
-                _v_projection[i]=((1.0*i/nbr_orientations)*2.-1.);
+                _v_projection[i]=((1.f*i/nbr_orientations)*2.-1.f);
         }
     }
-    void addValue(const VecN<DIM,double>& orientationglobal ,  const VecN<DIM,double>& orientationlocal,double weigh=1){
-        double value = productInner(_orientation,orientationglobal/normValue(orientationglobal));
-        std::vector<double>::iterator it_projection = std::upper_bound(_v_projection.begin(),_v_projection.end(),value);
+    void addValue(const VecN<DIM,F32>& orientationglobal ,  const VecN<DIM,F32>& orientationlocal,F32 weigh=1){
+        F32 value = productInner(_orientation,orientationglobal/normValue(orientationglobal));
+
+        std::vector<F32>::iterator it_projection = std::upper_bound(_v_projection.begin(),_v_projection.end(),value);
         int index_orientation_global = _v_projection.size()-int(it_projection- _v_projection.begin());
 
         value = productInner(_orientation,orientationlocal/normValue(orientationlocal));
         it_projection = std::upper_bound(_v_projection.begin(),_v_projection.end(),value);
         int index_orientation_local = _v_projection.size()-int(it_projection- _v_projection.begin());
+        if(index_orientation_global<0)index_orientation_global=0;
+        if(index_orientation_global>5)index_orientation_global=5;
+        if(index_orientation_local<0)index_orientation_local=0;
+        if(index_orientation_local>5)index_orientation_local=5;
         _data(index_orientation_global,index_orientation_local)+=weigh;
     }
     void normalize(){
         for(unsigned int i=0;i<_data.sizeI();i++){
-            double sum =0;
+            F32 sum =0;
             for(unsigned int j=0;j<_data.sizeJ();j++){
                 sum+=_data(i,j);
             }
@@ -221,7 +226,7 @@ public:
     }
 };
 template<typename TKeyPoint>
-double distance(const pop::Descriptor<TKeyPoint> & d1,const pop::Descriptor<TKeyPoint>  & d2, int p =2)
+F32 distance(const pop::Descriptor<TKeyPoint> & d1,const pop::Descriptor<TKeyPoint>  & d2, int p =2)
 {
     return distance(d1.data(),d2.data(),p);
 }

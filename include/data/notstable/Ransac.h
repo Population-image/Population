@@ -21,14 +21,14 @@ namespace pop
  * The requirements of the template are :
  *  - a associated Data as the type of a observation (Model::Data) ,
  *  - a constructor based of these observations (Model(const Vec<Model::Data >& data))
- *  - a method double getError() the error of this model relative to these observations
- *  - a method double getError(const Data & p) the error of this model relative to this observation
+ *  - a method F32 getError() the error of this model relative to these observations
+ *  - a method F32 getError(const Data & p) the error of this model relative to this observation
  *  - a method unsigned int getNumberDataFitModel() the minimum number of data required to fit the model
  *
  * \code
 //   four inliners  (x=(1,1), y=5.2), (x=(1,2), y=5.8), (x=(1,3), y=6.8), (x=(1,4), y=8.2), and one outliners (x=(1,5), y=13)
 Vec<LinearLeastSquareRANSACModel::Data> data;
-VecF64 x(2);F64 y;
+VecF32 x(2);F32 y;
 x(0)=1;x(1)=1;y=5.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
 x(0)=1;x(1)=2;y=5.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
 x(0)=1;x(1)=3;y=6.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
@@ -44,7 +44,7 @@ std::cout<<m.getError()<<std::endl;
   */
 
 template<typename Model>
-POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriteration,double threshold,unsigned int minnbrdatatoassertmodel,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
+POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriteration,F32 threshold,unsigned int minnbrdatatoassertmodel,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
     typedef typename Model::Data DataModel;
     Distribution d;
     for(unsigned int iterations=0;iterations<nbriteration;iterations++){
@@ -59,7 +59,7 @@ POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriterati
         }
         if(consensus_set.size()>=best_model.getNumberDataFitModel()+minnbrdatatoassertmodel){
             Model this_model(consensus_set);
-            double this_error =this_model.getError();
+            F32 this_error =this_model.getError();
             if(this_error<best_model.getError()){
                 best_model = this_model;
                 best_consensus_set = consensus_set;
@@ -69,7 +69,7 @@ POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriterati
 }
 
 template<typename Model>
-POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned int nbriteration,double threshold,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
+POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned int nbriteration,F32 threshold,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
     typedef typename Model::Data DataModel;
     unsigned int minnbrdatatoassertmodel =1;
     Distribution d;
@@ -86,7 +86,7 @@ POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned
         if(consensus_set.size()>=best_model.getNumberDataFitModel()+minnbrdatatoassertmodel){
 
             Model this_model(consensus_set);
-            double this_error =this_model.getError();
+            F32 this_error =this_model.getError();
             if(consensus_set.size()>best_model.getNumberDataFitModel()+minnbrdatatoassertmodel){
                 best_model = this_model;
                 best_consensus_set = consensus_set;
@@ -104,41 +104,41 @@ POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned
 class POP_EXPORTS LinearLeastSquareRANSACModel
 {
 private:
-    pop::VecF64 _beta;
-    double _error;
+    pop::VecF32 _beta;
+    F32 _error;
 public:
     struct POP_EXPORTS Data {
         Data();
-        Data(pop::VecF64 x,pop::F64 y);
-        pop::VecF64 X;
-        pop::F64 Y;
+        Data(pop::VecF32 x,pop::F32 y);
+        pop::VecF32 X;
+        pop::F32 Y;
     };
     LinearLeastSquareRANSACModel(const Vec<Data >& data);
-    double getError();
-    double getError(const Data & p);
+    F32 getError();
+    F32 getError(const Data & p);
      unsigned int getNumberDataFitModel()const;
-    pop::VecF64 getBeta();
+    pop::VecF32 getBeta();
 };
 
 
 class POP_EXPORTS GeometricalTransformationRANSACModel
 {
 protected:
-    pop::Mat2x33F64 _geometricaltransformation;
-    double _error;
+    pop::Mat2x33F32 _geometricaltransformation;
+    F32 _error;
 public:
     struct POP_EXPORTS Data
     {
         Data();
-        Data(pop::Vec2F64 src,pop::Vec2F64 dst);
-        pop::Vec2F64 _src;
-        pop::Vec2F64 _dst;
+        Data(pop::Vec2F32 src,pop::Vec2F32 dst);
+        pop::Vec2F32 _src;
+        pop::Vec2F32 _dst;
     };
     virtual ~GeometricalTransformationRANSACModel();
     GeometricalTransformationRANSACModel();
-    double getError();
-    double getError(const Data & p);
-    pop::Mat2x33F64 getTransformation();
+    F32 getError();
+    F32 getError(const Data & p);
+    pop::Mat2x33F32 getTransformation();
 
     //virtual GeometricalTransformationRANSACModel(const Vec<Data >& data)=0;
     virtual  unsigned int getNumberDataFitModel()const =0 ;

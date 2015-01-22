@@ -176,10 +176,10 @@ class POP_EXPORTS FigureCone :public GeometricalFigure
 {
 public:
 
-    Vec3F64  x;
-    Vec3F64 dir;
-    double h;
-    double r;
+    Vec3F32  x;
+    Vec3F32 dir;
+    F32 h;
+    F32 r;
     FigureCone();
     void draw();
 
@@ -198,7 +198,7 @@ public:
     FigureCone _cone;
     FigureLine _line;
     FigureArrow();
-    void setArrow(const Vec3F64 x1,const Vec3F64 x2,double heigh_peak);
+    void setArrow(const Vec3F32 x1,const Vec3F32 x2,F32 heigh_peak);
      void setTransparent(UI8  transparent);
      void setRGB(const RGBUI8& RGB);
     void draw();
@@ -238,9 +238,9 @@ class POP_EXPORTS Scene3d
     Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
     Mat3UI8 water = Processing::watershed(seed,gradient);
     grain = Processing::labelFromSingleSeed(water,grain);
-    grain=Mat3F64(grain)*0.75;
+    grain=Mat3F32(grain)*0.75;
     oil = Processing::labelFromSingleSeed(water,oil);
-    oil = Mat3F64(oil)*0.4;
+    oil = Mat3F32(oil)*0.4;
     Scene3d scene;
     Visualization::marchingCube(scene,grain);
     Visualization::marchingCube(scene,oil);
@@ -255,8 +255,8 @@ public:
 private:
     static bool _instance;
      std::string _file;
-     pop::RGBF64 _ambient;
-     RGBF64 _diffuse;
+     pop::RGBF32 _ambient;
+     RGBF32 _diffuse;
      /*! \var _transparencymode
       *  if transparency_mode=1 no transparent, otherwise yes
       */
@@ -316,16 +316,16 @@ public:
     void unlock();
     void snapshot(const char * file);
     void _snapshot();
-    void rotateX(F64 angle);
-    void rotateY(F64 angle);
-    void rotateZ(F64 angle);
+    void rotateX(F32 angle);
+    void rotateY(F32 angle);
+    void rotateZ(F32 angle);
     void setColorAllGeometricalFigure(const RGBUI8 & value);
     void setTransparencyAllGeometricalFigure(UI8 value);
 
-    void setAmbient(const pop::RGBF64 &ambient);
-    pop::RGBF64 getAmbient()const;
-    void setDiffuse(const pop::RGBF64 &diffuse);
-    pop::RGBF64 getDiffuse()const;
+    void setAmbient(const pop::RGBF32 &ambient);
+    pop::RGBF32 getAmbient()const;
+    void setDiffuse(const pop::RGBF32 &diffuse);
+    pop::RGBF32 getDiffuse()const;
     void setTransparentMode(bool istranspararent);
     bool getTransparentMode()const;
 

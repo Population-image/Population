@@ -66,7 +66,7 @@ public:
     unsigned long operator()(unsigned int N ) ;
 
 //Max value
-  static pop::F64 maxValue();
+  static pop::F32 maxValue();
 // 2007-02-11: made the destructor virtual; thanks "float64 more" for pointing this out
   virtual ~MTRand_int32(); // destructor
 protected: // used by derived classes, otherwise not accessible; use the ()-operator
@@ -75,7 +75,7 @@ private:
  #if defined(HAVE_THREAD)
   static tthread::mutex _mutex;
 #endif
-  static pop::F64 _max;
+  static pop::F32 _max;
 
 // the variables below are static (no duplicates can exist)
   static unsigned long state[624]; // state std::vector array
@@ -98,7 +98,7 @@ public:
   MTRand(unsigned long seed) ;
   MTRand(const unsigned long* seed, int size);
   ~MTRand() ;
-  pop::F64 operator()() ;
+  pop::F32 operator()() ;
 private:
   MTRand(const MTRand&); // copy constructor not defined
   void operator=(const MTRand&); // assignment operator not defined

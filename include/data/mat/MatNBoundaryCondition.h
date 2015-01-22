@@ -207,10 +207,16 @@ private:
 
 enum  MatNInterpolationType{
     MATN_INTERPOLATION_NEAREST = 0,
-    MATN_INTERPOLATION_BILINEAR= 1
+    MATN_INTERPOLATION_BILINEAR= 1,
+    MATN_INTERPOLATION_FLOOR= 2
 };
 
-
+struct POP_EXPORTS MatNInterpolationFloor{
+    template<typename MatN,typename FloatType>
+    static  typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
+        return m(VecN<MatN::DIM,I32>(x));
+    }
+};
 
 struct POP_EXPORTS MatNInterpolationNearest{
     template<typename MatN,typename FloatType>

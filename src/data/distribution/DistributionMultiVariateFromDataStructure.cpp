@@ -20,7 +20,7 @@ DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const D
 
 }
 
-DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const MatN<2,F64> data_x_y, VecF64& xmin,F64 step)
+DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step)
     :DistributionMultiVariate(),uni(0,1)
 {
     _xmin= xmin;
@@ -32,9 +32,9 @@ DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const M
 void DistributionMultiVariateRegularStep::generateRepartition(){
     if(_xmin.size()==2){
         _repartition.resize(_mat2d.getDomain().multCoordinate());
-        double value = std::accumulate(_mat2d.begin(),_mat2d.end(),0.);
+        F32 value = std::accumulate(_mat2d.begin(),_mat2d.end(),0.);
 
-        F64 sumtemp =0;
+        F32 sumtemp =0;
         for(int i =0;i<_mat2d.getDomain().multCoordinate();i++){
             sumtemp+=_mat2d[i];
             _repartition[i]=sumtemp/value;
@@ -49,9 +49,9 @@ int DistributionMultiVariateRegularStep::getNbrVariable()const{
     return _xmin.size();
 }
 
-F64 DistributionMultiVariateRegularStep::operator ()(const VecF64&  v)const{
+F32 DistributionMultiVariateRegularStep::operator ()(const VecF32&  v)const{
     if(_xmin.size()==2){
-        Vec2F64 x = (Vec2F64(v(0),v(1))-Vec2F64(_xmin(0),_xmin(1)))/_step;
+        Vec2F32 x = (Vec2F32(v(0),v(1))-Vec2F32(_xmin(0),_xmin(1)))/_step;
         if(_mat2d.isValid(x))
             return _mat2d(x);
         else
@@ -68,19 +68,19 @@ DistributionMultiVariateRegularStep * DistributionMultiVariateRegularStep::clone
     return new DistributionMultiVariateRegularStep(*this);
 }
 
-VecF64 DistributionMultiVariateRegularStep::randomVariable()const {
-    F64 u = this->uni.randomVariable();
-    std::vector<F64>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
+VecF32 DistributionMultiVariateRegularStep::randomVariable()const {
+    F32 u = this->uni.randomVariable();
+    std::vector<F32>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
     I32 indice = I32(low- _repartition.begin()) ;
     if(_xmin.size()==2){
-        Vec2F64 v=VecNIndice<2>::Indice2VecN(_mat2d.getDomain(),indice);
-        VecF64 vv(2);
+        Vec2F32 v=VecNIndice<2>::Indice2VecN(_mat2d.getDomain(),indice);
+        VecF32 vv(2);
         vv(0)=v(0)*_step+_xmin(0);vv(1)=v(1)*_step+_xmin(1);
         return vv;
     }
     else{
         std::cerr<<"work only for two variates";
-        return VecF64();
+        return VecF32();
     }
 
 }
@@ -103,17 +103,17 @@ DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribut
     return new DistributionMultiVariateFromDistribution(*this);
 }
 
-F64 DistributionMultiVariateFromDistribution::operator ()(const VecF64&  value)const{
+F32 DistributionMultiVariateFromDistribution::operator ()(const VecF32&  value)const{
     return _f.operator ()(value(0));
 }
 
-VecF64 DistributionMultiVariateFromDistribution::randomVariable()const {
-    VecF64 v(1);
+VecF32 DistributionMultiVariateFromDistribution::randomVariable()const {
+    VecF32 v(1);
     v(0)=_f.randomVariable();
     return v;
 }
 
-void DistributionMultiVariateFromDistribution::setStep(F64 step)const{
+void DistributionMultiVariateFromDistribution::setStep(F32 step)const{
     return _f.setStep(step);
 }
 void DistributionMultiVariateFromDistribution::fromDistribution(const Distribution &d){
@@ -136,11 +136,11 @@ DistributionMultiVariateNormal::DistributionMultiVariateNormal(const Distributio
 {
     this->fromMeanVecAndCovarianceMatrix(dist.toMeanVecAndCovarianceMatrix());
 }
-F64 DistributionMultiVariateNormal::operator ()(const VecF64&  value)const{
+F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
 
-    VecF64 V= value - _mean;
-    VecF64 V1 = _sigma_minus_one*V;
-    F64 v = -0.5*productInner(V,V1);
+    VecF32 V= value - _mean;
+    VecF32 V1 = _sigma_minus_one*V;
+    F32 v = -0.5*productInner(V,V1);
     v =std::exp(v);
     v/=(std::sqrt(absolute(_determinant_sigma)));
     v/=(std::pow(2*3.141592654,this->getNbrVariable()/2));
@@ -150,8 +150,8 @@ int DistributionMultiVariateNormal::getNbrVariable()const{
     return _mean.size();
 }
 
-VecF64 DistributionMultiVariateNormal::randomVariable()const {
-    VecF64 V(this->getNbrVariable());
+VecF32 DistributionMultiVariateNormal::randomVariable()const {
+    VecF32 V(this->getNbrVariable());
     for(int i = 0;i<this->getNbrVariable();i++){
         V(i)=_standard_normal.randomVariable();
     }
@@ -162,30 +162,31 @@ DistributionMultiVariateNormal * DistributionMultiVariateNormal::clone()const {
     return new DistributionMultiVariateNormal(*this);
 }
 
-void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(VecF64 mean, Mat2F64 covariance){
+void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(VecF32 mean, Mat2F32 covariance){
     _mean = mean;
     _sigma = covariance;
     _sigma_minus_one=LinearAlgebra::inverseGaussianElimination(_sigma);
     _determinant_sigma = _sigma.determinant();
+
     _a = LinearAlgebra::AATransposeEqualMDecomposition(_sigma);
 
 }
 
-void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(std::pair<VecF64, Mat2F64> meanvectorAndcovariancematrix){
+void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(std::pair<VecF32, Mat2F32> meanvectorAndcovariancematrix){
     fromMeanVecAndCovarianceMatrix(meanvectorAndcovariancematrix.first,meanvectorAndcovariancematrix.second);
 }
 
-std::pair<VecF64,Mat2F64> DistributionMultiVariateNormal::toMeanVecAndCovarianceMatrix()const{
+std::pair<VecF32,Mat2F32> DistributionMultiVariateNormal::toMeanVecAndCovarianceMatrix()const{
     return std::make_pair(_mean,_sigma);
 }
 
-F64 DistributionMultiVariateExpression::operator()( const VecF64&  value)const
+F32 DistributionMultiVariateExpression::operator()( const VecF32&  value)const
 {
-    return fparser.Eval(static_cast<const F64*>( &(*(value.begin()))));
+    return fparser.Eval(static_cast<const F32*>( &(*(value.begin()))));
 }
-VecF64 DistributionMultiVariateExpression::randomVariable()const {
+VecF32 DistributionMultiVariateExpression::randomVariable()const {
     std::cerr<<"In distributionMultiVariateArithmetic::randomVariable(), no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
-    return VecF64();
+    return VecF32();
 }
 
 int DistributionMultiVariateExpression::getNbrVariable()const{
@@ -274,14 +275,14 @@ DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(const Dis
     _dim = dist.getDIM();
 }
 
-VecF64 DistributionMultiVariateUnitSphere::randomVariable()const {
-    VecF64 v(_dim);
+VecF32 DistributionMultiVariateUnitSphere::randomVariable()const {
+    VecF32 v(_dim);
     if(_dim==3){
         // Marsaglia 3d method
         bool test=false;
         while(test==false){
-            double x1 =d2.randomVariable();
-            double x2 =d2.randomVariable();
+            F32 x1 =d2.randomVariable();
+            F32 x2 =d2.randomVariable();
             if(x1*x1+x2*x2<1){
                 test=true;
                 v(0)=2*x1*std::sqrt(1-x1*x1-x2*x2);
@@ -290,7 +291,7 @@ VecF64 DistributionMultiVariateUnitSphere::randomVariable()const {
             }
         }
     }else{
-        double theta =d2pi.randomVariable();
+        F32 theta =d2pi.randomVariable();
         v(0)=std::cos(theta);
         v(1)=std::sin(theta);
     }
@@ -316,8 +317,8 @@ DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const Dis
 
 }
 
-VecF64 DistributionMultiVariateUniformInt::randomVariable()const {
-    VecF64 v(_xmin.size());
+VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
+    VecF32 v(_xmin.size());
 
     for(unsigned int i =0;i<v.size();i++){
         v(i)=std::floor(_d.randomVariable()*(_xmax(i)-_xmin(i))+_xmin(i));

@@ -15,7 +15,7 @@
 #include"data/typeF/TypeF.h"
 namespace pop
 {
-DistributionDiscrete::DistributionDiscrete(F64 step)
+DistributionDiscrete::DistributionDiscrete(F32 step)
     :Distribution(),_step(step){
 
 }
@@ -23,14 +23,14 @@ DistributionDiscrete::DistributionDiscrete(const DistributionDiscrete & discrete
     :Distribution(discrete),_step(discrete._step){
 
 }
-void DistributionDiscrete::setStep(F64 step)const{
+void DistributionDiscrete::setStep(F32 step)const{
     _step = step;
 }
 
-F64 DistributionDiscrete::getStep()const{
+F32 DistributionDiscrete::getStep()const{
     return _step;
 }
-bool DistributionDiscrete::isInStepIntervale(F64 value, F64 hitvalue)const{
+bool DistributionDiscrete::isInStepIntervale(F32 value, F32 hitvalue)const{
 
     if(  value>hitvalue-(_step*1.01)*0.5&&value<hitvalue+(_step*0.99)*0.5)
         return true;
@@ -50,7 +50,7 @@ DistributionSign * DistributionSign::clone()const {
     return new DistributionSign;
 }
 
-F64 DistributionSign::operator()(F64 value)const {
+F32 DistributionSign::operator()(F32 value)const {
     if(this->isInStepIntervale(value,-1))
         return  1/(this->getStep()*2);
     else if(this->isInStepIntervale(value,1))
@@ -59,7 +59,7 @@ F64 DistributionSign::operator()(F64 value)const {
         return 0;
 }
 
-F64 DistributionSign::randomVariable()const {
+F32 DistributionSign::randomVariable()const {
     if(irand()%2==1)
         return 1;
     else
@@ -73,7 +73,7 @@ DistributionUniformReal * DistributionUniformReal::clone()const
     return new DistributionUniformReal(_xmin,  _xmax);
 }
 
-DistributionUniformReal::DistributionUniformReal(F64 min, F64 max)
+DistributionUniformReal::DistributionUniformReal(F32 min, F32 max)
     :Distribution(),_xmin(min),_xmax(max)
 {
 }
@@ -84,24 +84,24 @@ DistributionUniformReal::DistributionUniformReal(const DistributionUniformReal &
 
 
 
-F64 DistributionUniformReal::getXmin()const{
+F32 DistributionUniformReal::getXmin()const{
     return _xmin;
 }
-F64 DistributionUniformReal::getXmax()const{
+F32 DistributionUniformReal::getXmax()const{
     return _xmax;
 }
-F64 DistributionUniformReal::operator()(F64 value)const 
+F32 DistributionUniformReal::operator()(F32 value)const 
 {
     if(value>=_xmin&&value<_xmax)return 1/(_xmin-_xmax);
     else return 0;
 }
-F64 DistributionUniformReal::randomVariable()const 
+F32 DistributionUniformReal::randomVariable()const 
 {
-    double value = (_xmax-_xmin)* static_cast<F64>(irand())/ static_cast<F64>(MTRand_int32::maxValue());
+    F32 value = (_xmax-_xmin)* static_cast<F32>(irand())/ static_cast<F32>(MTRand_int32::maxValue());
     return _xmin + value;
 }
 
-void DistributionUniformReal::reset(F64 xmin, F64 xmax){
+void DistributionUniformReal::reset(F32 xmin, F32 xmax){
     this->_xmin =xmin;
     this->_xmax =xmax;
 }
@@ -132,26 +132,26 @@ DistributionUniformInt::DistributionUniformInt(const DistributionUniformInt & di
 }
 
 
-F64 DistributionUniformInt::getXmin()const{
+F32 DistributionUniformInt::getXmin()const{
     return _xmin;
 }
 
-F64 DistributionUniformInt::getXmax()const{
+F32 DistributionUniformInt::getXmax()const{
     return _xmax;
 }
-void DistributionUniformInt::setXmin(F64 xmin){
+void DistributionUniformInt::setXmin(F32 xmin){
     _xmin = xmin;
 }
 
-void DistributionUniformInt::setXmax(F64 xmax){
+void DistributionUniformInt::setXmax(F32 xmax){
     _xmax = xmax;
 }
 
-F64 DistributionUniformInt::randomVariable()const 
+F32 DistributionUniformInt::randomVariable()const 
 {
     return _xmin + irand.operator ()()%(1+_xmax-_xmin);
 }
-F64 DistributionUniformInt::operator()(F64 value)const 
+F32 DistributionUniformInt::operator()(F32 value)const 
 {
     if(value>=_xmin&&value<_xmax+1){
         if(this->isInStepIntervale(value,std::floor(value)))
@@ -176,16 +176,16 @@ DistributionNormal * DistributionNormal::clone()const
     return new DistributionNormal(_mean, _standard_deviation);
 }
 
-F64 DistributionNormal::getMean()const{
+F32 DistributionNormal::getMean()const{
     return _mean;
 }
 
-F64 DistributionNormal::getStandartDeviation()const{
+F32 DistributionNormal::getStandartDeviation()const{
     return _standard_deviation;
 }
 
 
-DistributionNormal::DistributionNormal(F64 mean, F64 standard_deviation)
+DistributionNormal::DistributionNormal(F32 mean, F32 standard_deviation)
     :_mean(mean),_standard_deviation(standard_deviation),_real(0,1)
 {
 }
@@ -195,9 +195,9 @@ DistributionNormal::DistributionNormal(const DistributionNormal & dist)
 }
 
 
-F64 DistributionNormal::randomVariable()const 
+F32 DistributionNormal::randomVariable()const 
 {
-    F64 x1, x2, w;
+    F32 x1, x2, w;
 
     do {
         x1 = 2.0 * _real.randomVariable()- 1.0;
@@ -209,20 +209,20 @@ F64 DistributionNormal::randomVariable()const
     w = std::sqrt( (-2.0 * std::log ( w ) ) / w );
     return (x1 * w)*_standard_deviation + _mean;
 }
-F64 DistributionNormal::operator()(F64 value)const 
+F32 DistributionNormal::operator()(F32 value)const 
 {
 
     return (1/std::sqrt((2*3.141592654*_standard_deviation*_standard_deviation)))*std::exp(-(value-_mean)*(value-_mean)/(2*_standard_deviation*_standard_deviation));
 }
-void DistributionNormal::reset(F64 mean, F64 standard_deviation){
+void DistributionNormal::reset(F32 mean, F32 standard_deviation){
     this->_mean =mean;
     this->_standard_deviation=standard_deviation;
 }
 
-F64 DistributionNormal::getXmin()const{
+F32 DistributionNormal::getXmin()const{
     return _mean - 5 *_standard_deviation;
 }
-F64 DistributionNormal::getXmax()const{
+F32 DistributionNormal::getXmax()const{
     return _mean + 5 *_standard_deviation;
 }
 
@@ -234,7 +234,7 @@ DistributionBinomial * DistributionBinomial::clone()const
     return new DistributionBinomial(_probability, _number_times);
 }
 
-F64 DistributionBinomial::getProbability()const{
+F32 DistributionBinomial::getProbability()const{
     return _probability;
 }
 
@@ -242,7 +242,7 @@ int DistributionBinomial::getNumberTime()const{
     return _number_times;
 }
 
-DistributionBinomial::DistributionBinomial(F64 probability, int number_times)
+DistributionBinomial::DistributionBinomial(F32 probability, int number_times)
     :DistributionDiscrete(1),_probability(probability),_number_times(number_times),distreal01(0,1)
 {
 }
@@ -250,19 +250,19 @@ DistributionBinomial::DistributionBinomial(const DistributionBinomial & dist)
     :DistributionDiscrete(1),_probability(dist.getProbability()),_number_times(dist.getNumberTime()),distreal01(0,1)
 {
 }
-F64 DistributionBinomial::randomVariable()const 
+F32 DistributionBinomial::randomVariable()const 
 {
     int sum =0;
     for(int i=0;i<_number_times;i++)
         if(distreal01.randomVariable()<_probability)sum++;
     return sum;
 }
-F64 DistributionBinomial::operator()(F64 )const 
+F32 DistributionBinomial::operator()(F32 )const 
 {
-    std::cerr<<"In DistributionBinomial::operator()(F64 ), not implemented";
+    std::cerr<<"In DistributionBinomial::operator()(F32 ), not implemented";
     return 1;
 }
-void DistributionBinomial::reset(F64 probability, int number_times){
+void DistributionBinomial::reset(F32 probability, int number_times){
     this->_probability =probability;
     this->_number_times=number_times;
 
@@ -276,12 +276,12 @@ DistributionExponential * DistributionExponential::clone()const
     return new DistributionExponential(_lambda);
 }
 
-F64 DistributionExponential::getLambda()const{
+F32 DistributionExponential::getLambda()const{
     return _lambda;
 }
 
 
-DistributionExponential::DistributionExponential(F64 lambda)
+DistributionExponential::DistributionExponential(F32 lambda)
     :_lambda(lambda),distreal01(0,1)
 {
 }
@@ -289,24 +289,24 @@ DistributionExponential::DistributionExponential(const DistributionExponential &
     :Distribution(),_lambda(dist.getLambda()),distreal01(0,1)
 {
 }
-F64 DistributionExponential::randomVariable()const 
+F32 DistributionExponential::randomVariable()const 
 {
     return -std::log(distreal01.randomVariable())/_lambda;
 }
-F64 DistributionExponential::operator()(F64 value)const 
+F32 DistributionExponential::operator()(F32 value)const 
 {
     if(value>=0)return _lambda*std::exp(-_lambda*value);
     else return 0;
 }
-void DistributionExponential::reset(F64 lambda){
+void DistributionExponential::reset(F32 lambda){
     this->_lambda =lambda;
 
 }
 
-F64 DistributionExponential::getXmin()const{
+F32 DistributionExponential::getXmin()const{
     return 0;
 }
-F64 DistributionExponential::getXmax()const{
+F32 DistributionExponential::getXmax()const{
     return 4/_lambda;
 }
 
@@ -318,7 +318,7 @@ DistributionPoisson * DistributionPoisson::clone()const
     return new DistributionPoisson(_lambda);
 }
 
-F64 DistributionPoisson::getLambda()const{
+F32 DistributionPoisson::getLambda()const{
     return _lambda;
 }
 DistributionPoisson::~DistributionPoisson()
@@ -327,7 +327,7 @@ DistributionPoisson::~DistributionPoisson()
     if(this->flambdalargerest==NULL)delete this->flambdalargerest;
 
 }
-DistributionPoisson::DistributionPoisson(F64 lambda)
+DistributionPoisson::DistributionPoisson(F32 lambda)
     :DistributionDiscrete(1),_lambda(lambda),_maxlambda(200),flambdalargemult(NULL),flambdalargerest(NULL),distreal01(0,1)
 {
     this->init();
@@ -343,11 +343,11 @@ void DistributionPoisson::init()
     if(flambdalargerest!=NULL)delete flambdalargerest;
     if(_lambda<=_maxlambda)
     {
-        F128 lambda = _lambda;
-        F128 presicion=0.999;
+        F64 lambda = _lambda;
+        F64 presicion=0.999;
 
-        F128 probability =std::exp(-lambda);
-        F128 cummulative_distribution=probability;
+        F64 probability =std::exp(-lambda);
+        F64 cummulative_distribution=probability;
         v_table.push_back(cummulative_distribution);
 
         int k=1;
@@ -364,17 +364,17 @@ void DistributionPoisson::init()
     {
         this->flambdalargemult = new DistributionPoisson(_maxlambda);
         this->mult= std::floor(_lambda/_maxlambda);
-        F64 rest = _lambda - this->mult*_maxlambda;
+        F32 rest = _lambda - this->mult*_maxlambda;
         this->flambdalargerest = new DistributionPoisson(rest);
     }
 
 
 }
-F64 DistributionPoisson::randomVariable()const 
+F32 DistributionPoisson::randomVariable()const 
 {
     if(_lambda==0)return 0;
 
-    F64 uni=distreal01.randomVariable();
+    F32 uni=distreal01.randomVariable();
     if(_lambda<=_maxlambda)
     {
         return int(std::lower_bound(v_table.begin(),v_table.end(),uni)-v_table.begin());
@@ -390,13 +390,13 @@ F64 DistributionPoisson::randomVariable()const
     }
 }
 
-F64 DistributionPoisson::randomVariable(F64 lambda)const 
+F32 DistributionPoisson::randomVariable(F32 lambda)const 
 {
 
-    F64 uni=distreal01.randomVariable();
-    F128 _v=lambda;
-    F128 probability =std::exp(-_v);
-    F128 cummulative_distribution=probability;
+    F32 uni=distreal01.randomVariable();
+    F64 _v=lambda;
+    F64 probability =std::exp(-_v);
+    F64 cummulative_distribution=probability;
     if(uni<cummulative_distribution)
     {
         return 0;
@@ -416,7 +416,7 @@ F64 DistributionPoisson::randomVariable(F64 lambda)const
 }
 
 
-F64 DistributionPoisson::operator()(F64 value)const 
+F32 DistributionPoisson::operator()(F32 value)const 
 {
     int index=-1;
     if(value>=0)
@@ -425,8 +425,8 @@ F64 DistributionPoisson::operator()(F64 value)const
         return 0;
     if(index==-1)
         return 0;
-    F128 lambda=this->_lambda;
-    F128 _exp = std::exp(-lambda);
+    F64 lambda=this->_lambda;
+    F64 _exp = std::exp(-lambda);
     for(int k=index;k>=1;k--)
     {
         _exp*= lambda/k;
@@ -435,15 +435,15 @@ F64 DistributionPoisson::operator()(F64 value)const
 
 }
 
-void DistributionPoisson::reset(F64 lambda){
+void DistributionPoisson::reset(F32 lambda){
     this->_lambda =lambda;
     this->init();
 
 }
-F64 DistributionPoisson::getXmin()const{
+F32 DistributionPoisson::getXmin()const{
     return 0;
 }
-F64 DistributionPoisson::getXmax()const{
+F32 DistributionPoisson::getXmax()const{
     return 3*_lambda;
 }
 
@@ -458,15 +458,15 @@ DistributionDirac * DistributionDirac::clone()const
 }
 
 
-F64 DistributionDirac::getX()const{
+F32 DistributionDirac::getX()const{
     return _x;
 }
-void DistributionDirac::reset(F64 x){
+void DistributionDirac::reset(F32 x){
     _x = x;
 }
 
 
-DistributionDirac::DistributionDirac(F64 x)
+DistributionDirac::DistributionDirac(F32 x)
     :_x(x)
 {
 }
@@ -475,11 +475,11 @@ DistributionDirac::DistributionDirac(DistributionDirac &dist)
 {
 }
 
-F64 DistributionDirac::randomVariable()const 
+F32 DistributionDirac::randomVariable()const 
 {
     return _x ;
 }
-F64 DistributionDirac::operator()(F64 value)const 
+F32 DistributionDirac::operator()(F32 value)const 
 {
     if(  value>=_x-this->getStep()/2&&value<_x+this->getStep()/2)
         return 1/this->getStep();
@@ -494,7 +494,7 @@ DistributionTriangle * DistributionTriangle::clone()const
 }
 
 
-DistributionTriangle::DistributionTriangle(F64 xmin,F64 xmax,F64 peak)
+DistributionTriangle::DistributionTriangle(F32 xmin,F32 xmax,F32 peak)
     :_x_min(xmin),_x_max(xmax),_x_peak(peak),_distreal01(0,1)
 {
 }
@@ -503,12 +503,12 @@ DistributionTriangle::DistributionTriangle(const DistributionTriangle &dist)
 {
 }
 
-F64 DistributionTriangle::randomVariable()const 
+F32 DistributionTriangle::randomVariable()const 
 {
-    double x = _distreal01.randomVariable();
+    F32 x = _distreal01.randomVariable();
     return (x-_x_min)*(x-_x_min)/((_x_peak-_x_min)*(_x_max-_x_min)  ) ;
 }
-F64 DistributionTriangle::operator()(F64 value)const 
+F32 DistributionTriangle::operator()(F32 value)const 
 {
     if(value<_x_min||value>_x_max){
         return value;

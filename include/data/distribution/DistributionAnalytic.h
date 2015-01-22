@@ -49,7 +49,7 @@ namespace pop
 class POP_EXPORTS DistributionDiscrete : public Distribution
 {
 private:
-    mutable F64 _step;
+    mutable F32 _step;
     /*!
         \class pop::DistributionDiscrete
         \ingroup Distribution
@@ -65,28 +65,28 @@ private:
     */
 
 public:
-    DistributionDiscrete(F64 step=0.1);
+    DistributionDiscrete(F32 step=0.1);
     DistributionDiscrete(const DistributionDiscrete & discrete);
     /*!
-    \fn  void setStep(F64 step)const;
-    * \param step F64 step
+    \fn  void setStep(F32 step)const;
+    * \param step F32 step
     *
     *  set the step
     *
     */
-    void setStep(F64 step)const;
+    void setStep(F32 step)const;
 
 
     /*!
-    \fn F64 getStep()const;
+    \fn F32 getStep()const;
     * \return step
     *
     *  returns step width
     *
     */
-    F64 getStep()const;
+    F32 getStep()const;
 
-    bool isInStepIntervale(F64 value,F64 hitvalue) const;
+    bool isInStepIntervale(F32 value,F32 hitvalue) const;
 };
 
 
@@ -116,8 +116,8 @@ public:
     DistributionSign();
     DistributionSign(const DistributionSign & dist);
     virtual DistributionSign * clone()const ;
-    F64 operator()(F64 value)const ;
-    virtual F64 randomVariable()const ;
+    F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const ;
 
 };
 
@@ -133,9 +133,9 @@ class POP_EXPORTS DistributionUniformReal:public Distribution
      *  P(X=x)=1/(xmax-xmin) for xmin<=x<=xmax, 0 otherwise
      * \code
         Distribution d1(-1,1,"UNIFORMREAL");
-        double sum1 = 0;
+        F32 sum1 = 0;
         int time = 20000;
-        Mat2F64 mcollect1(time,2);
+        Mat2F32 mcollect1(time,2);
         for(int i=0;i<time;i++){
             mcollect1(i,0)=i;
             mcollect1(i,1)=sum1;
@@ -148,27 +148,27 @@ class POP_EXPORTS DistributionUniformReal:public Distribution
     */
 private:
 
-    F64 _xmin;
-    F64 _xmax;
+    F32 _xmin;
+    F32 _xmax;
 
 public:
 
-    F64 getXmin()const;
-    F64 getXmax()const;
+    F32 getXmin()const;
+    F32 getXmax()const;
     static std::string getKey();
     /*!
-    \fn DistributionUniformReal(F64 xmin, F64 xmax);
+    \fn DistributionUniformReal(F32 xmin, F32 xmax);
     *
     *   constructor the continuous uniform distribution in the intervale (xmin,xmax)
     */
-    DistributionUniformReal(F64 xmin, F64 xmax);
+    DistributionUniformReal(F32 xmin, F32 xmax);
 
     /*!
-    \fn void reset(F64 xmin, F64 xmax);
+    \fn void reset(F32 xmin, F32 xmax);
     *
     *   set the intervalle
     */
-    void reset(F64 xmin, F64 xmax);
+    void reset(F32 xmin, F32 xmax);
     /*!
     \fn DistributionUniformReal(const DistributionUniformReal & dist);
     *
@@ -177,8 +177,8 @@ public:
     DistributionUniformReal(const DistributionUniformReal & dist);
 
     virtual DistributionUniformReal * clone()const ;
-    F64 operator()(F64 value)const ;
-    virtual F64 randomVariable()const ;
+    F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const ;
 };
 class POP_EXPORTS DistributionUniformInt:public DistributionDiscrete
 {
@@ -201,10 +201,10 @@ private:
     int _xmax;
 public:
     static std::string getKey();
-    F64 getXmin()const;
-    F64 getXmax()const;
-    void setXmin(F64 xmin);
-    void setXmax(F64 xmax);
+    F32 getXmin()const;
+    F32 getXmax()const;
+    void setXmin(F32 xmin);
+    void setXmax(F32 xmax);
     /*!
     \fn DistributionUniformInt();
     *
@@ -225,15 +225,15 @@ public:
     */
     DistributionUniformInt(const DistributionUniformInt & dist);
     /*!
-    \fn void reset(F64 xmin, F64 xmax);
+    \fn void reset(F32 xmin, F32 xmax);
     *
     *   set the intervalle
     */
     void reset(int xmin, int xmax);
 
-    F64 randomVariable()const ;
+    F32 randomVariable()const ;
     DistributionUniformInt * clone()const ;
-    F64 operator()(F64 value)const ;
+    F32 operator()(F32 value)const ;
 
 
 };
@@ -254,20 +254,20 @@ class POP_EXPORTS DistributionNormal:public Distribution
       *
     */
 private:
-    F64 _mean;
-    F64 _standard_deviation;
+    F32 _mean;
+    F32 _standard_deviation;
     DistributionUniformReal _real;
 public:
     static std::string getKey();
-    F64 getMean()const;
-    F64 getStandartDeviation()const;
+    F32 getMean()const;
+    F32 getStandartDeviation()const;
     /*!
-    \fn DistributionNormal(F64 mean, F64 standard_deviation);
+    \fn DistributionNormal(F32 mean, F32 standard_deviation);
     *
     *   constructor the continuous  normal distribution with the mean and the standard_deviation
     *
     */
-    DistributionNormal(F64 mean, F64 standard_deviation);
+    DistributionNormal(F32 mean, F32 standard_deviation);
 
     /*!
     \fn DistributionNormal(const DistributionNormal & dist);
@@ -276,17 +276,17 @@ public:
     */
     DistributionNormal(const DistributionNormal & dist);
     /*!
-    \fn void reset(F64 mean, F64 standard_deviation);
+    \fn void reset(F32 mean, F32 standard_deviation);
     *
     *   set the paramters
     */
-    void reset(F64 mean, F64 standard_deviation);
+    void reset(F32 mean, F32 standard_deviation);
 
-    F64 randomVariable()const ;
+    F32 randomVariable()const ;
     DistributionNormal * clone()const ;
-    F64 operator()(F64 value)const ;
-    virtual F64 getXmin()const;
-    virtual F64 getXmax()const;
+    F32 operator()(F32 value)const ;
+    virtual F32 getXmin()const;
+    virtual F32 getXmax()const;
 
 };
 class POP_EXPORTS DistributionBinomial:public DistributionDiscrete
@@ -307,12 +307,12 @@ class POP_EXPORTS DistributionBinomial:public DistributionDiscrete
       *
     */
 private:
-    F64 _probability;
+    F32 _probability;
     int _number_times;
     DistributionUniformReal  distreal01;
 public:
     static std::string getKey();
-    DistributionBinomial(F64 probability, int number_times);
+    DistributionBinomial(F32 probability, int number_times);
     /*!
     \fn DistributionBinomial(const DistributionBinomial & dist);
     *
@@ -320,18 +320,18 @@ public:
     */
     DistributionBinomial(const DistributionBinomial & dist);
     /*!
-    \fn void reset(F64 probability, int number_times);
+    \fn void reset(F32 probability, int number_times);
     *
     *   set the intervalle
     */
-    void reset(F64 probability, int number_times);
+    void reset(F32 probability, int number_times);
 
 
-    F64 getProbability()const;
+    F32 getProbability()const;
     int getNumberTime()const;
-    F64 randomVariable()const ;
+    F32 randomVariable()const ;
     DistributionBinomial * clone()const ;
-    F64 operator()(F64 value)const ;
+    F32 operator()(F32 value)const ;
 };
 
 class POP_EXPORTS DistributionExponential:public Distribution
@@ -353,18 +353,18 @@ class POP_EXPORTS DistributionExponential:public Distribution
         */
 
 private:
-    F64 _lambda;
+    F32 _lambda;
     DistributionUniformReal  distreal01;
 public:
     static std::string getKey();
 
-    F64 getLambda()const;
+    F32 getLambda()const;
     /*!
-    \fn DistributionExponential(F64 lambda);
+    \fn DistributionExponential(F32 lambda);
     *
     * constructor with the exponentiel parameter
     */
-    DistributionExponential(F64 lambda);
+    DistributionExponential(F32 lambda);
 
     /*!
     \fn DistributionExponential(const DistributionExponential& dist);
@@ -373,16 +373,16 @@ public:
     */
     DistributionExponential(const DistributionExponential& dist);
     /*!
-    \fn void reset(F64 lambda);
+    \fn void reset(F32 lambda);
     *
     *   set the exponentiel parameter
     */
-    void reset(F64 lambda);
-    F64 randomVariable()const ;
+    void reset(F32 lambda);
+    F32 randomVariable()const ;
     DistributionExponential * clone()const ;
-    F64 operator()(F64 value)const  ;
-    virtual F64 getXmin()const;
-    virtual F64 getXmax()const;
+    F32 operator()(F32 value)const  ;
+    virtual F32 getXmin()const;
+    virtual F32 getXmax()const;
 };
 
 
@@ -402,8 +402,8 @@ class POP_EXPORTS DistributionPoisson:public DistributionDiscrete
   *
 */
 private:
-    std::vector<F64> v_table;
-    F64 _lambda;
+    std::vector<F32> v_table;
+    F32 _lambda;
     int _maxlambda;
     DistributionPoisson  *flambdalargemult;
     DistributionPoisson  *flambdalargerest;
@@ -411,14 +411,14 @@ private:
     DistributionUniformReal  distreal01;
 public:
     static std::string  getKey();
-    F64 getLambda()const;
+    F32 getLambda()const;
     ~DistributionPoisson();
     /*!
-    \fn DistributionPoisson(F64 lambda);
+    \fn DistributionPoisson(F32 lambda);
     *
     *  contructor with the poisson parameter
     */
-    DistributionPoisson(F64 lambda);
+    DistributionPoisson(F32 lambda);
     /*!
     \fn DistributionPoisson(const DistributionPoisson& dist);
     *
@@ -426,18 +426,18 @@ public:
     */
     DistributionPoisson(const DistributionPoisson& dist);
     /*!
-    \fn void reset(F64 lambda);
+    \fn void reset(F32 lambda);
     *
     *   set he poisson parameter
     */
-    void reset(F64 lambda);
+    void reset(F32 lambda);
     void init();
-    F64 randomVariable()const ;
-    F64 randomVariable(F64 lambda)const ;
+    F32 randomVariable()const ;
+    F32 randomVariable(F32 lambda)const ;
     DistributionPoisson * clone()const ;
-    F64 operator()(F64 value)const ;
-    virtual F64 getXmin()const;
-    virtual F64 getXmax()const;
+    F32 operator()(F32 value)const ;
+    virtual F32 getXmin()const;
+    virtual F32 getXmax()const;
 };
 
 
@@ -462,17 +462,17 @@ class POP_EXPORTS DistributionDirac:public DistributionDiscrete
     */
 
 private:
-    F64 _x;
+    F32 _x;
 public:
     static std::string getKey();
 
-    F64 getX()const;
+    F32 getX()const;
     /*!
-    \fn DistributionDirac(F64 x);
+    \fn DistributionDirac(F32 x);
     *
     *  constructor with the parameter x
     */
-    DistributionDirac(F64 x);
+    DistributionDirac(F32 x);
 
     /*!
     \fn DistributionDirac( DistributionDirac & dist);
@@ -481,14 +481,14 @@ public:
     */
     DistributionDirac( DistributionDirac & dist);
     /*!
-    \fn void reset(F64 x);
+    \fn void reset(F32 x);
     *
     *   set dirac parameter intervalle
     */
-    void reset(F64 x);
-    F64 randomVariable()const ;
+    void reset(F32 x);
+    F32 randomVariable()const ;
     DistributionDirac * clone()const ;
-    F64 operator()(F64 value)const ;
+    F32 operator()(F32 value)const ;
 
 
 };
@@ -508,9 +508,9 @@ class POP_EXPORTS DistributionTriangle:public Distribution
 
 public:
     static std::string getKey();
-    F64 _x_min;
-    F64 _x_max;
-    F64 _x_peak;
+    F32 _x_min;
+    F32 _x_max;
+    F32 _x_peak;
     DistributionUniformReal  _distreal01;
 
 
@@ -518,13 +518,13 @@ public:
     *
     *  constructor
     */
-    DistributionTriangle(F64 xmin,F64 xmax,F64 peak);
+    DistributionTriangle(F32 xmin,F32 xmax,F32 peak);
 
     DistributionTriangle(const DistributionTriangle &dist);
 
-    F64 randomVariable()const ;
+    F32 randomVariable()const ;
     DistributionTriangle * clone()const ;
-    F64 operator()(F64 value)const ;
+    F32 operator()(F32 value)const ;
 };
 
 

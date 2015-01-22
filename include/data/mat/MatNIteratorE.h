@@ -178,7 +178,7 @@ protected:
         _tab.clear();
         VecN ddomain (2*_radius+1);
         VecN r (_radius);
-        double radiuspower2=_radius*_radius;
+        F32 radiuspower2=_radius*_radius;
         MatNIteratorEDomain<VecN> it(ddomain);
         while(it.next())
         {
@@ -192,8 +192,8 @@ protected:
 
 public:
     bool _isball;
-    double _radius;
-    double _norm;
+    F32 _radius;
+    F32 _norm;
     typedef std::pair<VecN,Vec<VecN> > Domain;
 
     MatNIteratorENeighborhood(){
@@ -215,7 +215,7 @@ public:
     MatNIteratorENeighborhood(const VecN &domain,Vec<VecN> v_neighborhood)
         :_domain(domain),_tab(v_neighborhood),_init(true),_isball(false){}
 
-    MatNIteratorENeighborhood(const VecN &domain,  double radius , double norm)
+    MatNIteratorENeighborhood(const VecN &domain,  F32 radius , F32 norm)
         :_domain(domain),_init(true),_isball(true),_radius(radius),_norm(norm){
         initBall();
     }
@@ -227,7 +227,7 @@ public:
     {
         return std::make_pair(_domain,_tab);
     }
-    bool isEqual(const VecN &domain,  double radius , double norm){
+    bool isEqual(const VecN &domain,  F32 radius , F32 norm){
         if(_domain==domain&&_radius==radius&&_norm==norm)
             return true;
         else
@@ -539,17 +539,17 @@ public:
 template< typename Function>
 class MatNIteratorENeighborhoodAmoebas
 {
-    typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F64> >::Result  _grad;
-    typename FunctionTypeTraitsSubstituteF<Function,std::pair<F64,I32 > >::Result    _value_label;
-    double _threshold;
-    double _lambda;
+    typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F32> >::Result  _grad;
+    typename FunctionTypeTraitsSubstituteF<Function,std::pair<F32,I32 > >::Result    _value_label;
+    F32 _threshold;
+    F32 _lambda;
     Vec<typename Function::E > _tab;
     I32  _label;
     Vec<typename Function::E > _x_add;
     int _index;
 
 private:
-    inline F64 distance(const typename Function::E & x1,const typename Function::E & x2 ){
+    inline F32 distance(const typename Function::E & x1,const typename Function::E & x2 ){
 
         for(unsigned int i=0;i<Function::DIM;i++){
             if((x1(i)-x2(i))!=0){
@@ -560,21 +560,21 @@ private:
     }
 
 public:
-    MatNIteratorENeighborhoodAmoebas(const Function& in,double threshold, double lambda);
+    MatNIteratorENeighborhoodAmoebas(const Function& in,F32 threshold, F32 lambda);
 
 
     void init(const typename Function::E & x_init){
         _tab.clear();
         _label++;
-        std::queue<std::pair<typename Function::E,std::pair<F64,typename Function::E >  >  > _queue;
+        std::queue<std::pair<typename Function::E,std::pair<F32,typename Function::E >  >  > _queue;
         _queue.push(std::make_pair(x_init, std::make_pair(0,x_init)));
         while(_queue.empty()==false){
             typename Function::E & x_origin= _queue.front().first;
-            F64  value              = _queue.front().second.first;
+            F32  value              = _queue.front().second.first;
             typename Function::E & x_neigh = _queue.front().second.second;
             value +=(1+_lambda*distance(x_origin,x_neigh));
 
-            F64  value_old          = _value_label(x_neigh).first;
+            F32  value_old          = _value_label(x_neigh).first;
             I32  label              = _value_label(x_neigh).second;
             if( (_label!=label ||  (value< value_old))&&(value<_threshold) ){
                 _value_label(x_neigh)=std::make_pair(value,_label);

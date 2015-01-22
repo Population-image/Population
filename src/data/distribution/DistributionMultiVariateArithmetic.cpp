@@ -12,7 +12,7 @@ DistributionMultiVariateArithmetic::DistributionMultiVariateArithmetic()
 void DistributionMultiVariateArithmetic::setDistributionMultiVariateLeft(const DistributionMultiVariate &f_left){
     _fleft=f_left;
 }
-void DistributionMultiVariateArithmetic::setStep(F64 step)const{
+void DistributionMultiVariateArithmetic::setStep(F32 step)const{
     _fleft.setStep(step);
     _fright.setStep(step);
 }
@@ -34,9 +34,9 @@ DistributionMultiVariate & DistributionMultiVariateArithmetic::getDistributionMu
 const DistributionMultiVariate & DistributionMultiVariateArithmetic::getDistributionMultiVariateRight()const{
     return  _fright;
 }
-VecF64 DistributionMultiVariateArithmetic::randomVariable()const  {
+VecF32 DistributionMultiVariateArithmetic::randomVariable()const  {
     std::cerr<<"In distributionMultiVariateArithmetic::randomVariable(), no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
-    return VecF64();
+    return VecF32();
 }
 
 
@@ -57,7 +57,7 @@ DistributionMultiVariateArithmeticAddition::DistributionMultiVariateArithmeticAd
 DistributionMultiVariateArithmeticAddition * DistributionMultiVariateArithmeticAddition::clone()const {
     return new DistributionMultiVariateArithmeticAddition(*this);
 }
-F64 DistributionMultiVariateArithmeticAddition::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticAddition::operator()(const VecF32&  value)const{
     return this->getDistributionMultiVariateLeft().operator ()(value)+ this->getDistributionMultiVariateRight().operator ()(value);
 }
 
@@ -82,7 +82,7 @@ DistributionMultiVariateArithmeticSubtraction::DistributionMultiVariateArithmeti
 DistributionMultiVariateArithmeticSubtraction * DistributionMultiVariateArithmeticSubtraction::clone()const {
     return new DistributionMultiVariateArithmeticSubtraction(*this);
 }
-F64 DistributionMultiVariateArithmeticSubtraction::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticSubtraction::operator()(const VecF32&  value)const{
     return this->getDistributionMultiVariateLeft().operator ()(value)- this->getDistributionMultiVariateRight().operator ()(value);
 }
 
@@ -104,7 +104,7 @@ DistributionMultiVariateArithmeticMultiplication::DistributionMultiVariateArithm
 DistributionMultiVariateArithmeticMultiplication * DistributionMultiVariateArithmeticMultiplication::clone()const {
     return new DistributionMultiVariateArithmeticMultiplication(*this);
 }
-F64 DistributionMultiVariateArithmeticMultiplication::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticMultiplication::operator()(const VecF32&  value)const{
     return this->getDistributionMultiVariateLeft().operator ()(value)* this->getDistributionMultiVariateRight().operator ()(value);
 }
 
@@ -126,7 +126,7 @@ DistributionMultiVariateArithmeticDivision::DistributionMultiVariateArithmeticDi
 DistributionMultiVariateArithmeticDivision * DistributionMultiVariateArithmeticDivision::clone()const {
     return new DistributionMultiVariateArithmeticDivision(*this);
 }
-F64 DistributionMultiVariateArithmeticDivision::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticDivision::operator()(const VecF32&  value)const{
     return this->getDistributionMultiVariateLeft().operator ()(value)/this->getDistributionMultiVariateRight().operator ()(value);
 }
 
@@ -147,7 +147,7 @@ DistributionMultiVariateArithmeticComposition::DistributionMultiVariateArithmeti
 DistributionMultiVariateArithmeticComposition * DistributionMultiVariateArithmeticComposition::clone()const {
     return new DistributionMultiVariateArithmeticComposition(*this);
 }
-F64 DistributionMultiVariateArithmeticComposition::operator()(const VecF64&  )const{
+F32 DistributionMultiVariateArithmeticComposition::operator()(const VecF32&  )const{
     return 0;
     //    return this->getDistributionMultiVariateLeft().operator ()(this->getDistributionMultiVariateRight().operator ()(value));
 }
@@ -171,7 +171,7 @@ DistributionMultiVariateArithmeticMin::DistributionMultiVariateArithmeticMin(con
 DistributionMultiVariateArithmeticMin * DistributionMultiVariateArithmeticMin::clone()const {
     return new DistributionMultiVariateArithmeticMin(*this);
 }
-F64 DistributionMultiVariateArithmeticMin::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticMin::operator()(const VecF32&  value)const{
     return minimum(this->getDistributionMultiVariateLeft().operator ()(value),this->getDistributionMultiVariateRight().operator ()(value));
 }
 
@@ -192,7 +192,7 @@ DistributionMultiVariateArithmeticMax::DistributionMultiVariateArithmeticMax(con
 DistributionMultiVariateArithmeticMax * DistributionMultiVariateArithmeticMax::clone()const {
     return new DistributionMultiVariateArithmeticMax(*this);
 }
-F64 DistributionMultiVariateArithmeticMax::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateArithmeticMax::operator()(const VecF32&  value)const{
     return maximum(this->getDistributionMultiVariateLeft().operator ()(value),this->getDistributionMultiVariateRight().operator ()(value));
 }
 
@@ -214,20 +214,20 @@ DistributionMultiVariateSeparationProduct::DistributionMultiVariateSeparationPro
 DistributionMultiVariateSeparationProduct * DistributionMultiVariateSeparationProduct::clone()const {
     return new DistributionMultiVariateSeparationProduct(*this);
 }
-F64 DistributionMultiVariateSeparationProduct::operator()(const VecF64&  v)const{
-    VecF64 vleft(this->getDistributionMultiVariateLeft().getNbrVariable());
+F32 DistributionMultiVariateSeparationProduct::operator()(const VecF32&  v)const{
+    VecF32 vleft(this->getDistributionMultiVariateLeft().getNbrVariable());
     for(int i=0;i<this->getDistributionMultiVariateLeft().getNbrVariable();i++)
         vleft(i)=v(i);
 
-    VecF64 vright(this->getDistributionMultiVariateRight().getNbrVariable());
+    VecF32 vright(this->getDistributionMultiVariateRight().getNbrVariable());
     for(int i=0;i<this->getDistributionMultiVariateRight().getNbrVariable();i++)
         vright(i)=v(i+this->getDistributionMultiVariateLeft().getNbrVariable());
 
     return this->getDistributionMultiVariateLeft().operator ()(vleft)*this->getDistributionMultiVariateRight().operator ()(vright);
 }
-VecF64 DistributionMultiVariateSeparationProduct::randomVariable()const {
-    VecF64 vleft = this->getDistributionMultiVariateLeft().randomVariable();
-    VecF64 vright = this->getDistributionMultiVariateRight().randomVariable();
+VecF32 DistributionMultiVariateSeparationProduct::randomVariable()const {
+    VecF32 vleft = this->getDistributionMultiVariateLeft().randomVariable();
+    VecF32 vright = this->getDistributionMultiVariateRight().randomVariable();
 
     int size = vleft.size();
     vleft.resize(vleft.size()+vright.size());
@@ -271,16 +271,16 @@ DistributionMultiVariateCoupled * DistributionMultiVariateCoupled::clone()const 
     return new DistributionMultiVariateCoupled(*this);
 }
 
-F64 DistributionMultiVariateCoupled::operator()(const VecF64&  value)const{
+F32 DistributionMultiVariateCoupled::operator()(const VecF32&  value)const{
     for(unsigned int i=1;i<value.size();i++){
         if(value(1)<value(0)-_step/2 || value(1)>value(0)+_step/2)
             return 0;
     }
     return _single.operator() (value(0));
 }
-VecF64 DistributionMultiVariateCoupled::randomVariable()const {
-    F64 v = _single.randomVariable();
-    VecF64 vout(_nbr_variable_coupled,v);
+VecF32 DistributionMultiVariateCoupled::randomVariable()const {
+    F32 v = _single.randomVariable();
+    VecF32 vout(_nbr_variable_coupled,v);
     return vout;
 }
 

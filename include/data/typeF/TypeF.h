@@ -102,14 +102,14 @@ typedef int I32;
  * * UI32's are mostly used in pixel/voxel type for labelling
  */
 typedef float F32;
-/*! \typedef F64
+/*! \typedef F32
  * \brief float type 64 bits
  * \ingroup BasicType
  *
- * * F64's are mostly used when operations must be done on real numbers
+ * * F32's are mostly used when operations must be done on real numbers
  */
 typedef double F64;
-typedef long double F128; //False definition TODO
+
 }
 
 

@@ -16,7 +16,7 @@ void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution 
         box->setGerm(*g);
         box->radius= distradius.randomVariable();
         box->setAnglePlane( distangle.randomVariable());
-        VecF64 v = distorientation.randomVariable();
+        VecF32 v = distorientation.randomVariable();
         for(int i=0;i<3;i++)
             box->orientation.setAngle_ei(v(i),i);
         (*it) = box;
@@ -37,7 +37,7 @@ void RandomGeometry::cylinder( ModelGermGrain3  & grain,Distribution  distradius
         box->setGerm(*g);
         box->radius = distradius.randomVariable();
         box->height = distheight.randomVariable();
-        VecF64 v = distorientation.randomVariable();
+        VecF32 v = distorientation.randomVariable();
         for(int i=0;i<3;i++)
             box->orientation.setAngle_ei(v(i),i);
         (*it) = box;
@@ -47,7 +47,7 @@ void RandomGeometry::cylinder( ModelGermGrain3  & grain,Distribution  distradius
 
 MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalkers){
     MatN<2,UI8 > in(size,size);
-    in(VecN<2,F64>(in.getDomain())*0.5)=255;
+    in(VecN<2,F32>(in.getDomain())*0.5)=255;
 
     Distribution d(0,1,"UNIFORMINT");
     Distribution dface(0,MatN<2,UI8 >::DIM-1,"UNIFORMINT");
@@ -100,7 +100,7 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
 }
 MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalkers){
     MatN<3,UI8 > in(size,size,size);
-    in(VecN<3,F64>(in.getDomain())*0.5)=255;
+    in(VecN<3,F32>(in.getDomain())*0.5)=255;
 
     Distribution d(0,1,"UNIFORMINT");
     Distribution dface(0,MatN<3,UI8 >::DIM-1,"UNIFORMINT");
@@ -147,9 +147,9 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
     }
     return in;
 }
-Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& correlation,double beta)
+Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& correlation,F32 beta)
 {
-    Mat2F64 autocorrelation(correlation.sizeI() ,1);
+    Mat2F32 autocorrelation(correlation.sizeI() ,1);
 
     for(unsigned int i= 0; i<correlation.sizeI();i++)
     {
@@ -163,7 +163,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
     Distribution f2(equation2.c_str());
     Distribution fintegral = Statistics::integral(f,0,1,0.001);
     Distribution fintegral2 = Statistics::integral(f2,0,1,0.001);
-    Mat2F64 g(correlation.sizeI() ,2);
+    Mat2F32 g(correlation.sizeI() ,2);
     for(unsigned int i= 0; i<correlation.sizeI();i++) {
         g(i,0) = i;
         if(autocorrelation(i,0)>=0)
@@ -172,14 +172,14 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
             g(i,1)=-Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral2,-autocorrelation(i,0),0,1,0.001);
     }
     Distribution(g).display();
-    double pi =3.14159265;
-    double step2 =0.001;
-    double maxrange=2;
-    Mat2F64 rho_k(maxrange/step2,2);
+    F32 pi =3.14159265;
+    F32 step2 =0.001;
+    F32 maxrange=2;
+    Mat2F32 rho_k(maxrange/step2,2);
     for(unsigned int i= 1; i<rho_k.sizeI();i++)
     {
-        double sum=0;
-        double k =step2*i;
+        F32 sum=0;
+        F32 k =step2*i;
         rho_k(i,0)=k;
         for(unsigned int r= 1; r<g.sizeI();r++)//(int)g.proba.size();r++)P(k,1)=
         {
@@ -189,14 +189,14 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
         rho_k(i,1)=sum;
     }
     Distribution(rho_k).display();
-    Mat2F64 P(rho_k.sizeI(),2);
-    double sumnegative=0;
+    Mat2F32 P(rho_k.sizeI(),2);
+    F32 sumnegative=0;
 
-//  double min_value =0;
+//  F32 min_value =0;
 //    for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
 //    {
 //        P(k,0)=rho_k(k,0);
-//        double value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
+//        F32 value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
 //        P(k,1)= value;
 //        min_value = std::min(min_value,P(k,1));
 //    }
@@ -215,7 +215,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
 //                index_neg_max = k;
 //                index_neg_min=index_neg_min-1;
 //                while(sumnegative>0){
-//                    double mini = std::min(P(index_neg_min,1),P(index_neg_max,1));
+//                    F32 mini = std::min(P(index_neg_min,1),P(index_neg_max,1));
 //                    if(mini<0.5*sumnegative){
 //                        P(index_neg_min,1)-=0.5*sumnegative;
 //                        P(index_neg_max,1)-=0.5*sumnegative;
@@ -238,7 +238,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
     for(int k= 0; k<(int)rho_k.sizeI();k++)//(int)g.proba.size();r++)
     {
         P(k,0)=rho_k(k,0);
-        double value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
+        F32 value = rho_k(k,1)*4*pi*rho_k(k,0)*rho_k(k,0);//4*pi*k^2*rho(k)
 
         if(value>0){
             if(sumnegative==0)
@@ -253,7 +253,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F64& c
                 }
 
                 //                int k1=k;
-                //                double sum1=0;
+                //                F32 sum1=0;
                 //                while(k1<(int)rho_k.sizeI()&&rho_k(k,1)>=0){
                 //                    sum1+= rho_k(k1,1)*4*pi*rho_k(k1,0)*rho_k(k1,0);
                 //                    k1++;

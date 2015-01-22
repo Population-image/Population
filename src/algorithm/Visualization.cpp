@@ -797,7 +797,7 @@ std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarch
 
     return vertexList;
 }
-std::vector<Visualization::_vertex > Visualization::_runMarchingCubes2(const MatN<3,F64 > &voxel,F32 isosurface) {
+std::vector<Visualization::_vertex > Visualization::_runMarchingCubes2(const MatN<3,F32 > &voxel,F32 isosurface) {
 
     MatN<3,F32 > voxels(voxel.getDomain()+4);
     voxels=-1;
@@ -884,47 +884,47 @@ std::vector<Visualization::_vertex > Visualization::_runMarchingCubes2(const Mat
     return vertexList;
 }
 
-void Visualization::axis(Scene3d &scene, double length, double width, double trans_minus){
+void Visualization::axis(Scene3d &scene, F32 length, F32 width, F32 trans_minus){
 
     trans_minus = -trans_minus;
     FigureLine * line = new FigureLine;
     line->width =  width;
-    line->x1=Vec3F64(trans_minus,trans_minus,trans_minus);
-    line->x2=Vec3F64(length,trans_minus,trans_minus);
+    line->x1=Vec3F32(trans_minus,trans_minus,trans_minus);
+    line->x2=Vec3F32(length,trans_minus,trans_minus);
     line->setRGB(RGBUI8(255,0,0));
     scene._v_figure.push_back(line);
     FigureCone * cone = new FigureCone;
     cone->setRGB(RGBUI8(255,0,0));
-    cone->x = Vec3F64(length,trans_minus,trans_minus);
-    cone->dir = Vec3F64(1,0,0);
+    cone->x = Vec3F32(length,trans_minus,trans_minus);
+    cone->dir = Vec3F32(1,0,0);
     cone->h = length/4;
     cone->r = width;
     scene._v_figure.push_back(cone);
 
     line = new FigureLine;
     line->width =  width;
-    line->x1=Vec3F64(trans_minus,trans_minus,trans_minus);
-    line->x2=Vec3F64(trans_minus,length,trans_minus);
+    line->x1=Vec3F32(trans_minus,trans_minus,trans_minus);
+    line->x2=Vec3F32(trans_minus,length,trans_minus);
     line->setRGB(RGBUI8(0,255,0));
     scene._v_figure.push_back(line);
     cone = new FigureCone;
     cone->setRGB(RGBUI8(0,255,0));
-    cone->x = Vec3F64(trans_minus,length,trans_minus);
-    cone->dir = Vec3F64(0,1,0);
+    cone->x = Vec3F32(trans_minus,length,trans_minus);
+    cone->dir = Vec3F32(0,1,0);
     cone->h = length/4;
     cone->r = width;
     scene._v_figure.push_back(cone);
 
     line = new FigureLine;
     line->width =  width;
-    line->x1=Vec3F64(trans_minus,trans_minus,trans_minus);
-    line->x2=Vec3F64(trans_minus,trans_minus,length);
+    line->x1=Vec3F32(trans_minus,trans_minus,trans_minus);
+    line->x2=Vec3F32(trans_minus,trans_minus,length);
     line->setRGB(RGBUI8(0,0,255));
     scene._v_figure.push_back(line);
     cone = new FigureCone;
     cone->setRGB(RGBUI8(0,0,255));
-    cone->x = Vec3F64(trans_minus,trans_minus,length);
-    cone->dir = Vec3F64(0,0,1);
+    cone->x = Vec3F32(trans_minus,trans_minus,length);
+    cone->dir = Vec3F32(0,0,1);
     cone->h = length/4;
     cone->r = width;
     scene._v_figure.push_back(cone);

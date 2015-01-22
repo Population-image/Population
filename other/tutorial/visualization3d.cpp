@@ -67,11 +67,11 @@ void visu3DMarchingCube(){
 
     //THE LABEL GRAIN WITH THE GREY-LEVEL 255*0.75
     grain = Processing::labelFromSingleSeed(water,grain);
-    grain=Mat3F64(grain)*0.75;
+    grain=Mat3F32(grain)*0.75;
 
     //THE LABEL OIL WITH THE GREY-LEVEL 255*0.4
     oil = Processing::labelFromSingleSeed(water,oil);
-    oil = Mat3F64(oil)*0.4;
+    oil = Mat3F32(oil)*0.4;
 
     Mat3UI8 grain_oil = grain+oil;
     Scene3d scene;

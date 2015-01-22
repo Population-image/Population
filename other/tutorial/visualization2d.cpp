@@ -27,7 +27,7 @@ void visualizealgorithm(){
     //# label image in foreground of a grey(color) imageto check segmentation or seed localization
     Mat2UI8 img;
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
-    double value;
+    F32 value;
     Mat2UI8 thre = Processing::thresholdOtsuMethod(img,value);
     Mat2RGBUI8 foreground = Visualization::labelForeground (thre,img,0.7);
     foreground.display();

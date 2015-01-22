@@ -513,9 +513,9 @@ struct FunctionTypeTraitsSubstituteF<Mat2x<F1,SIZEI,  SIZEJ>,F2 >
 template<typename Type, int SIZEI, int SIZEJ>
 struct NumericLimits<Mat2x<Type, SIZEI, SIZEJ> >
 {
-    static F64 min() throw()
+    static F32 min() throw()
     { return -NumericLimits<Type>::maximumRange();}
-    static F64 max() throw()
+    static F32 max() throw()
     { return NumericLimits<Type>::maximumRange();}
 };
 template<typename Type, int SIZEI, int SIZEJ>
@@ -1049,17 +1049,17 @@ void FunctionAssert(const Mat2x<Type,2,2> & , const Mat2x<Type,2,2> &  ,std::str
 {
 }
 
-typedef Mat2x<F64,2,2> Mat2x22F64;
-typedef Mat2x<ComplexF64,2,2> Mat2x22ComplexF64;
+typedef Mat2x<F32,2,2> Mat2x22F32;
+typedef Mat2x<ComplexF32,2,2> Mat2x22ComplexF32;
 
 
 
 template<typename Type>
 struct NumericLimits<Mat2x<Type,2,2> >
 {
-    static F64 min() throw()
+    static F32 min() throw()
     { return -NumericLimits<Type>::maximumRange();}
-    static F64 max() throw()
+    static F32 max() throw()
     { return NumericLimits<Type>::maximumRange();}
 };
 template<typename Type>
@@ -1790,8 +1790,8 @@ void FunctionAssert(const Mat2x<Type,3,3> & , const Mat2x<Type,3,3> &  ,std::str
 {
 }
 
-typedef Mat2x<F64,3,3> Mat2x33F64;
-typedef Mat2x<ComplexF64,3,3> Mat2x33ComplexF64;
+typedef Mat2x<F32,3,3> Mat2x33F32;
+typedef Mat2x<ComplexF32,3,3> Mat2x33ComplexF32;
 
 
 
@@ -1799,9 +1799,9 @@ typedef Mat2x<ComplexF64,3,3> Mat2x33ComplexF64;
 template<typename Type>
 struct NumericLimits<Mat2x<Type,3,3> >
 {
-    static F64 min() throw()
+    static F32 min() throw()
     { return -NumericLimits<Type>::maximumRange();}
-    static F64 max() throw()
+    static F32 max() throw()
     { return NumericLimits<Type>::maximumRange();}
 };
 template<typename Type>

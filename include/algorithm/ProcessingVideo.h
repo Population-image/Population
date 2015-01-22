@@ -42,7 +42,7 @@ public:
     TrackingVideoYang(){
         init();
     }
-    MatN<DIM,TypePixel> processFrame( const MatN<DIM,TypePixel>& in,double sigma=2,double Tf=3,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.1,double T=10){
+    MatN<DIM,TypePixel> processFrame( const MatN<DIM,TypePixel>& in,F32 sigma=2,F32 Tf=3,typename MatN<DIM,TypePixel>::F lambda=10,F32 alpha=0.1,F32 T=10){
         MatN<DIM,TypePixel> img(in);
         img = pop::Processing::smoothGaussian(img,sigma);
         if(!(in.getDomain()==_background.getDomain()))
@@ -61,7 +61,7 @@ public:
             MatN<DIM,TypePixel> moving(img.getDomain());
             typename MatN<DIM,TypePixel>::IteratorEDomain it(_background.getIteratorEDomain());
             while(it.next()){
-                if(normValue((double)img(it.x())-_background(it.x()))>T){
+                if(normValue((F32)img(it.x())-_background(it.x()))>T){
                     moving(it.x())=255;
                 }
                 else
@@ -76,7 +76,7 @@ private:
     MatN<DIM,TypePixel> _img_old;
     MatN<DIM,TypePixel> _background;
     bool _first ;
-    void _dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,TypePixel> & frame_timet,const MatN<DIM,TypePixel> & frame_timet_minus_deltat,MatN<DIM,TypePixel> & dynamic_matrix,MatN<DIM,TypePixel> &background,double Tf=10,typename MatN<DIM,TypePixel>::F lambda=10,double alpha=0.2)
+    void _dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,TypePixel> & frame_timet,const MatN<DIM,TypePixel> & frame_timet_minus_deltat,MatN<DIM,TypePixel> & dynamic_matrix,MatN<DIM,TypePixel> &background,F32 Tf=10,typename MatN<DIM,TypePixel>::F lambda=10,F32 alpha=0.2)
     {
 
         //frameToFrameDifferenceImage
@@ -84,9 +84,9 @@ private:
         typename MatN<DIM,TypePixel>::IteratorEDomain it = frametoframefifferenceimage.getIteratorEDomain();
 
         while(it.next()){
-            double value1 = normValue(frame_timet(it.x()));
-            double value2 = normValue(frame_timet_minus_deltat(it.x()));
-            double value = value1 - value2;
+            F32 value1 = normValue(frame_timet(it.x()));
+            F32 value2 = normValue(frame_timet_minus_deltat(it.x()));
+            F32 value = value1 - value2;
             if(absolute(value)>Tf){
                 dynamic_matrix(it.x())=lambda;
             }

@@ -163,15 +163,15 @@ struct POP_EXPORTS Convertor
         \code
         Mat2UI8 img;//2d grey-level image object
         img.load("/home/vincent/Dropbox/MyArticle/PhaseField/lena.pgm");//replace this path by those on your computer
-        Mat2ComplexF64 imgcomplex;
-        Convertor::fromRealImaginary(Mat2F64(img),imgcomplex);
-        Mat2ComplexF64 fft = Representation::FFT(imgcomplex);
-        Mat2ComplexF64 filterlowpass(fft.getDomain());
+        Mat2ComplexF32 imgcomplex;
+        Convertor::fromRealImaginary(Mat2F32(img),imgcomplex);
+        Mat2ComplexF32 fft = Representation::FFT(imgcomplex);
+        Mat2ComplexF32 filterlowpass(fft.getDomain());
         Vec2I32 x(0,0);
-        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF64>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
+        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF32>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
         fft = Processing::mask(fft,filterlowpass);
         imgcomplex = Representation::FFT(fft,-1);
-        Mat2F64 imgd;
+        Mat2F32 imgd;
         Convertor::toRealImaginary(imgcomplex,imgd);
         img = Processing::greylevelRange(imgd,0,255);
         img.display();
@@ -236,9 +236,9 @@ struct POP_EXPORTS Convertor
      * Mat2UI8 img;//2d grey-level image object
      * img.load("../image/Lena.bmp");//replace this path by those on your computer
      * //gradient vector field
-     * MatN<2,Vec2F64> gradient_vector_field = Processing::gradientVecGaussian(img,1);
+     * MatN<2,Vec2F32> gradient_vector_field = Processing::gradientVecGaussian(img,1);
      * //get each gradient in each direction in a
-     * VecN<2,Mat2F64> fields_gradient;
+     * VecN<2,Mat2F32> fields_gradient;
      * pop::Convertor::toVecN(gradient_vector_field,fields_gradient);//gradient_vector_field(x)(coordinate)=fields_gradient(coordinate)(x)
      * fields_gradient(0).display("gradient",false);//gradient in  vertical direction
      * fields_gradient(1).display();//gradient in  horizontal direction

@@ -67,7 +67,7 @@ MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, UI8 > &img){
     _pImpl->display->display(temp);
     return *this;
 }
-MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, F64 > &imgf){
+MatNDisplayCImg & MatNDisplayCImg::display(const MatN<2, F32 > &imgf){
      MatN<2, UI8 > img =Processing::greylevelRange(imgf,0,255);
     cimg_library::CImg<UI8> temp(img.getDomain()(1),img.getDomain()(0));
     for(int i =0;i<img.getDomain()[0];i++)

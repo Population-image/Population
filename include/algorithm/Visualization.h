@@ -165,13 +165,13 @@ struct POP_EXPORTS Visualization
         //        std::cout<<mini<<std::endl;
         RGBUI8 v_init(0);
         std::vector< RGBUI8 > v(maxi+1-mini, v_init);
-        RGBF64 cminf,cmaxf;
+        RGBF32 cminf,cmaxf;
         cminf = cmin;
         cmaxf = cmax;
 
         for(I32 i=0;i<=(I32)maxi-(I32)mini;i++)
         {
-            double dist = i*1.0/(maxi-mini);
+            F32 dist = i*1.0/(maxi-mini);
             v[i]=dist*(cmaxf-cminf)+cminf;
         }
         it.init();
@@ -218,8 +218,8 @@ struct POP_EXPORTS Visualization
     {
         FunctionAssert(label,img,"Visualization::labelAverageRGB");
         typename MatN<DIM,TypePixel1>::IteratorEDomain it (img.getIteratorEDomain());
-        MatN<DIM,typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F64>::Result> in(img);
-        std::vector<typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F64>::Result> vaverage;
+        MatN<DIM,typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F32>::Result> in(img);
+        std::vector<typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F32>::Result> vaverage;
         std::vector<UI32> voccurence;
         it.init();
         while(it.next())
@@ -236,8 +236,8 @@ struct POP_EXPORTS Visualization
         it.init();
         while(it.next())
         {
-            F64 div = (1./voccurence[label(it.x())]);
-            typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,TypePixel2>::F ,F64>::Result value(vaverage[label(it.x())]);
+            F32 div = (1./voccurence[label(it.x())]);
+            typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,TypePixel2>::F ,F32>::Result value(vaverage[label(it.x())]);
             value = value*div;
             average(it.x())=value;
         }
@@ -310,17 +310,17 @@ struct POP_EXPORTS Visualization
         if(min<0){
             std::cerr<<"In Vizualization::labelForegroundBoundary,the label matrix must be possitive";
         }
-        std::vector<RGB<F64> > v(max+1);
+        std::vector<RGB<F32> > v(max+1);
 
         srand ( 1 );
 
         for(I32 i=0;i<(I32)v.size();i++)
         {
-            if(i==1)v[i]=RGB<F64>(255,0,0);
-            else if(i==2)v[i]=RGB<F64>(0,255,0);
-            else if(i==3)v[i]=RGB<F64>(0,0,255);
+            if(i==1)v[i]=RGB<F32>(255,0,0);
+            else if(i==2)v[i]=RGB<F32>(0,255,0);
+            else if(i==3)v[i]=RGB<F32>(0,0,255);
             else
-                v[i]=RGB<F64>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
+                v[i]=RGB<F32>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
 
         }
         MatN<DIM,RGBUI8> foreground(label.getDomain());
@@ -331,7 +331,7 @@ struct POP_EXPORTS Visualization
         {
             if(labelb(it.x())==0)
             {
-                RGB<F64> value(img(it.x()));
+                RGB<F32> value(img(it.x()));
                 foreground(it.x())=value;
             }
             else
@@ -375,7 +375,7 @@ struct POP_EXPORTS Visualization
     */
 
     template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,F64 ratio=0.5)
+    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,F32 ratio=0.5)
     {
         FunctionAssert(label,img,"Visualization::labelForeground");
         typename MatN<DIM,TypePixel1>::IteratorEDomain it (label.getIteratorEDomain());
@@ -391,17 +391,17 @@ struct POP_EXPORTS Visualization
         if(min<0){
             std::cerr<<"In Vizualization::labelForeground, the label matrix must be possitive";
         }
-        std::vector<RGB<F64> > v(max+1);
+        std::vector<RGB<F32> > v(max+1);
 
         srand ( 1 );
 
         for(I32 i=0;i<(I32)v.size();i++)
         {
-            if(i==1)v[i]=RGB<F64>(255,0,0);
-            else if(i==2)v[i]=RGB<F64>(0,255,0);
-            else if(i==3)v[i]=RGB<F64>(0,0,255);
+            if(i==1)v[i]=RGB<F32>(255,0,0);
+            else if(i==2)v[i]=RGB<F32>(0,255,0);
+            else if(i==3)v[i]=RGB<F32>(0,0,255);
             else
-                v[i]=RGB<F64>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
+                v[i]=RGB<F32>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
 
         }
         MatN<DIM,RGBUI8> foreground(label.getDomain());
@@ -412,13 +412,13 @@ struct POP_EXPORTS Visualization
         {
             if(label(it.x())==0)
             {
-                RGB<F64> value(img(it.x()));
+                RGB<F32> value(img(it.x()));
                 foreground(it.x())=value;
             }
             else
             {
-                RGB<F64> value(img(it.x()));
-                RGB<F64> value2 =  value*ratio+ v[label(it.x())]*(1-ratio);
+                RGB<F32> value(img(it.x()));
+                RGB<F32> value2 =  value*ratio+ v[label(it.x())]*(1-ratio);
                 foreground(it.x())=value2;
             }
         }
@@ -456,9 +456,9 @@ struct POP_EXPORTS Visualization
         Visualization::plane(scene,m,0,0,-1);
         Visualization::plane(scene,m,0,1,-1);
         Visualization::plane(scene,m,0,2,-1);
-        Visualization::plane(scene,m,m.getDomain()(0)-1,0,1,Vec3F64(1,0,0));
-        Visualization::plane(scene,m,m.getDomain()(1)-1,1,1,Vec3F64(0,1,0));
-        Visualization::plane(scene,m,m.getDomain()(2)-1,2,1,Vec3F64(0,0,1));
+        Visualization::plane(scene,m,m.getDomain()(0)-1,0,1,Vec3F32(1,0,0));
+        Visualization::plane(scene,m,m.getDomain()(1)-1,1,1,Vec3F32(0,1,0));
+        Visualization::plane(scene,m,m.getDomain()(2)-1,2,1,Vec3F32(0,0,1));
     }
     /*!
      * \brief  add red lines to the opengl scene
@@ -480,14 +480,14 @@ struct POP_EXPORTS Visualization
      * \image html cubeline.png
     */
     template<typename TypePixel>
-    static void lineCube(Scene3d& scene,const MatN<3,TypePixel> & img,double width=2,RGBUI8 RGB=RGBUI8(255,0,0))
+    static void lineCube(Scene3d& scene,const MatN<3,TypePixel> & img,F32 width=2,RGBUI8 RGB=RGBUI8(255,0,0))
     {
 
         int d0 = img.getDomain()(0);
         int d1 = img.getDomain()(1);
         int d2 = img.getDomain()(2);
 
-        VecN<3,F64> x1,x2;
+        VecN<3,F32> x1,x2;
         x1(0)=0;x1(1)=0;x1(2)=0;
 
         x2(0)=d0;x2(1)=0;x2(2)=0;
@@ -656,9 +656,9 @@ struct POP_EXPORTS Visualization
     Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
     Mat3UI8 water = Processing::watershed(seed,gradient);
     grain = Processing::labelFromSingleSeed(water,grain);
-    grain=Mat3F64(grain)*0.75;
+    grain=Mat3F32(grain)*0.75;
     oil = Processing::labelFromSingleSeed(water,oil);
-    oil = Mat3F64(oil)*0.4;
+    oil = Mat3F32(oil)*0.4;
     Mat3UI8 grain_oil = grain + oil;
     Scene3d scene;
     Visualization::marchingCube(scene,grain_oil);
@@ -704,7 +704,7 @@ struct POP_EXPORTS Visualization
      * Marching cube on the level set 0 of the input continious  field
      * \code
         //Generate a random field
-        Mat3F64 img_time_t(100,100,100);
+        Mat3F32 img_time_t(100,100,100);
         DistributionSign sgn;
         ForEachDomain3D(x,img_time_t){
             img_time_t(x)=sgn.randomVariable();
@@ -712,8 +712,8 @@ struct POP_EXPORTS Visualization
         //evolution governed by the diffusion equation
         int dimension = 3;
         unsigned int time=20;
-        double D = 0.25/dimension;//for stability
-        Mat3F64 img_time_t_plus_1(img_time_t);
+        F32 D = 0.25/dimension;//for stability
+        Mat3F32 img_time_t_plus_1(img_time_t);
         FunctorPDE::Laplacien<> laplacien;
         for(unsigned int i =0;i<time;i++){
             std::cout<<"time "<<i<<std::endl;
@@ -730,7 +730,7 @@ struct POP_EXPORTS Visualization
      * \image html spinodal.png
     */
 
-    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied)
+    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F32> & phasefied)
     {
 
 
@@ -778,7 +778,7 @@ struct POP_EXPORTS Visualization
      * dist = Processing::dynamic(dist.opposite()-20,4,0);
      * Mat3UI32 minima = pop::Processing::minimaRegional(dist,0);
      * Mat3UI32 water = pop::Processing::watershed(minima,dist,grain,1);
-     * Mat3F64 phasefield = PDE::allenCahn(grain,5);
+     * Mat3F32 phasefield = PDE::allenCahn(grain,5);
      * phasefield = PDE::getField(grain,phasefield,1,6);
 
      * Scene3d scene;
@@ -789,7 +789,7 @@ struct POP_EXPORTS Visualization
      * \image html graindecomposition.png
     */
 
-    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F64> & phasefied,const MatN<3,RGBUI8>  & RGBfield)
+    static inline void marchingCubeLevelSet(Scene3d& scene,const MatN<3,F32> & phasefied,const MatN<3,RGBUI8>  & RGBfield)
     {
         std::vector<_vertex> vertices = _runMarchingCubes2(phasefied,0);
         while(vertices.empty()==false)
@@ -799,7 +799,7 @@ struct POP_EXPORTS Visualization
             FigureTriangle * triangle = new FigureTriangle();
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
             triangle->x(0)=vert.x-2;triangle->x(1)=vert.y-2;triangle->x(2)=vert.z-2;
-            MatN<3,F64>::E x;
+            MatN<3,F32>::E x;
             x= triangle->x;
 
             MatN<3,RGBUI8>::IteratorENeighborhood itn(RGBfield.getIteratorENeighborhood(1,0));
@@ -904,7 +904,7 @@ struct POP_EXPORTS Visualization
      * \image html cubeExtruded.png
     */
 
-    static void axis(Scene3d &scene, double length =20,double width=3,double trans_minus=2);
+    static void axis(Scene3d &scene, F32 length =20,F32 width=3,F32 trans_minus=2);
 
 
 
@@ -978,7 +978,7 @@ struct POP_EXPORTS Visualization
     */
 
     template<typename TypePixel>
-    static void  plane(Scene3d &scene, const MatN<3,TypePixel> & img,int slice=0, int direction=2,int normal_way=1,Vec3F64 trans = Vec3F64())
+    static void  plane(Scene3d &scene, const MatN<3,TypePixel> & img,int slice=0, int direction=2,int normal_way=1,Vec3F32 trans = Vec3F32())
     {
 
 
@@ -998,23 +998,23 @@ struct POP_EXPORTS Visualization
             hyperff(it_plane.x()) = img(it_plane.x().addCoordinate(direction,slice));
         }
         typename MatN<2,TypePixel>::IteratorEDomain it (hyperff.getIteratorEDomain());
-        VecN<3,F64 > normal;
+        VecN<3,F32 > normal;
         if(normal_way==1)
             normal(direction)=1;
         else
             normal(direction)=-1;
-        VecN<3,F64 > add1;
+        VecN<3,F32 > add1;
         add1=0;
         add1( (direction+1)%3)=1;
-        VecN<3,F64 > add2;
+        VecN<3,F32 > add2;
         add2=0;
         add2( (direction+1)%3)=1;add2( (direction+2)%3)=1;
-        VecN<3,F64 > add3;
+        VecN<3,F32 > add3;
         add3=0;
         add3( (direction+2)%3)=1;
 
-        VecN<3,F64> x;
-        VecN<3,F64> y;
+        VecN<3,F32> x;
+        VecN<3,F32> y;
         x(direction)=slice;
         while(it.next())
         {
@@ -1060,7 +1060,7 @@ struct POP_EXPORTS Visualization
     Mat3UI32 edges = pop::Processing::clusterToLabel(vertex_edge.second,0);
     int tore;
     GraphAdjencyList<Vec3I32> g = Analysis::linkEdgeVertex(verteces,edges,tore);
-    Mat3F64 phasefield = PDE::allenCahn(grain,20);
+    Mat3F32 phasefield = PDE::allenCahn(grain,20);
     phasefield = PDE::getField(grain,phasefield,1,6);
     Scene3d scene;
     Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -1091,7 +1091,7 @@ struct POP_EXPORTS Visualization
         RGB<unsigned char> c1(255,0,0);
         for ( int i =0; i < (int)g.sizeVertex(); i++ ){
             FigureSphere *  sphere =  new FigureSphere;
-            VecF64 v  =g.vertex(i);
+            VecF32 v  =g.vertex(i);
             Vec<F32> vv;
             vv = v;
             sphere->_x=vv;
@@ -1105,11 +1105,11 @@ struct POP_EXPORTS Visualization
         for ( int i =0; i < (int)g.sizeEdge(); i++ ){
             FigureLine * line = new FigureLine;
             std::pair<int,int> p  =g.getLink(i);
-            VecF64 v1  =g.vertex(p.first);
+            VecF32 v1  =g.vertex(p.first);
             Vec<F32> vv;
             vv = v1;
             line->x1= vv;
-            VecF64 v2  =g.vertex(p.second);
+            VecF32 v2  =g.vertex(p.second);
             vv =v2;
             line->x2=vv;
             line->setTransparent(255);
@@ -1127,10 +1127,10 @@ struct POP_EXPORTS Visualization
      * \code
      * DistributionMultiVariate d("-100*(x-0.5)^2*(y-0.5)^2+2","x,y");
 
-     * VecF64 xmin(2),xmax(2);
+     * VecF32 xmin(2),xmax(2);
      * xmin(0)=0;xmin(1)=0;
      * xmax(0)=1;xmax(1)=1;
-     * Mat2F64 m = Statistics::toMatrix(d,xmin,xmax,0.1);
+     * Mat2F32 m = Statistics::toMatrix(d,xmin,xmax,0.1);
      * Scene3d scene;
      * Visualization::topography(scene,m);
      * Visualization::axis(scene,2,0.5,0);
@@ -1150,7 +1150,7 @@ struct POP_EXPORTS Visualization
             if(img.isValid(x2)){
                 x3=x;x3(1)--;
                 if(img.isValid(x3)){
-                    Vec3F64 xx1,xx2,xx3;
+                    Vec3F32 xx1,xx2,xx3;
                     xx1(0)=x1(0);xx1(1)=x1(1);xx1(2)=img(x1);
                     xx2(0)=x2(0);xx2(1)=x2(1);xx2(2)=img(x2);
                     xx3(0)=x3(0);xx3(1)=x3(1);xx3(2)=img(x3);
@@ -1161,7 +1161,7 @@ struct POP_EXPORTS Visualization
                 }
                 x3=x;x3(1)++;
                 if(img.isValid(x3)){
-                    Vec3F64 xx1,xx2,xx3;
+                    Vec3F32 xx1,xx2,xx3;
                     xx1(0)=x1(0);xx1(1)=x1(1);xx1(2)=img(x1);
                     xx2(0)=x2(0);xx2(1)=x2(1);xx2(2)=img(x2);
                     xx3(0)=x3(0);xx3(1)=x3(1);xx3(2)=img(x3);
@@ -1175,7 +1175,7 @@ struct POP_EXPORTS Visualization
             if(img.isValid(x2)){
                 x3=x;x3(1)--;
                 if(img.isValid(x3)){
-                    Vec3F64 xx1,xx2,xx3;
+                    Vec3F32 xx1,xx2,xx3;
                     xx1(0)=x1(0);xx1(1)=x1(1);xx1(2)=img(x1);
                     xx2(0)=x2(0);xx2(1)=x2(1);xx2(2)=img(x2);
                     xx3(0)=x3(0);xx3(1)=x3(1);xx3(2)=img(x3);
@@ -1186,7 +1186,7 @@ struct POP_EXPORTS Visualization
                 }
                 x3=x;x3(1)++;
                 if(img.isValid(x3)){
-                    Vec3F64 xx1,xx2,xx3;
+                    Vec3F32 xx1,xx2,xx3;
                     xx1(0)=x1(0);xx1(1)=x1(1);xx1(2)=img(x1);
                     xx2(0)=x2(0);xx2(1)=x2(1);xx2(2)=img(x2);
                     xx3(0)=x3(0);xx3(1)=x3(1);xx3(2)=img(x3);
@@ -1199,13 +1199,13 @@ struct POP_EXPORTS Visualization
 
         }
 //        std::cout<<maxi<<std::endl;
-//        double sizepeak=maximum(1.,img.getDomain()(0)*0.05);
+//        F32 sizepeak=maximum(1.,img.getDomain()(0)*0.05);
 //        FigureArrow * arrow = new FigureArrow;
-//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F64(0,0,0),Vec3F64(img.getDomain()(0)+2,0,0),sizepeak);scene._v_figure.push_back(arrow);
+//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F32(0,0,0),Vec3F32(img.getDomain()(0)+2,0,0),sizepeak);scene._v_figure.push_back(arrow);
 //        arrow = new FigureArrow;
-//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F64(0,0,0),Vec3F64(0,img.getDomain()(1)+2,0),sizepeak);scene._v_figure.push_back(arrow);
+//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,img.getDomain()(1)+2,0),sizepeak);scene._v_figure.push_back(arrow);
 //        arrow = new FigureArrow;
-//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F64(0,0,0),Vec3F64(0,0,maxi+2),sizepeak);scene._v_figure.push_back(arrow);
+//        arrow->setRGB(RGBUI8(255,0,0));arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,0,maxi+2),sizepeak);scene._v_figure.push_back(arrow);
 
     }
     //@}
@@ -1228,10 +1228,10 @@ struct POP_EXPORTS Visualization
     Mat2UI8 img;
     img.load("../image/outil.bmp");
     img = img.opposite();
-    Mat2Vec2F64 vel;
+    Mat2Vec2F32 vel;
     int dir=0;
     PDE::permeability(img,vel,dir,0.1);
-    vel= GeometricalTransformation::scale(vel,Vec2F64(8));
+    vel= GeometricalTransformation::scale(vel,Vec2F32(8));
     Mat2RGBUI8 c = Visualization::vectorField2DToArrows(vel);
     c.display("velocity",true,false);
     \endcode
@@ -1239,7 +1239,7 @@ struct POP_EXPORTS Visualization
     \image html outilvelocity.gif
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> vectorField2DToArrows(const MatN<DIM,VecN<DIM,TypePixel> > & vectorfield,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0),int step=30,F64 length=90){
+    static MatN<DIM,RGBUI8> vectorField2DToArrows(const MatN<DIM,VecN<DIM,TypePixel> > & vectorfield,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0),int step=30,F32 length=90){
         typename MatN<DIM,TypePixel>::IteratorEDomain it(vectorfield.getIteratorEDomain());
         TypePixel maxi = NumericLimits<TypePixel   >::minimumRange();
         TypePixel mini = NumericLimits<TypePixel   >::maximumRange();
@@ -1249,13 +1249,13 @@ struct POP_EXPORTS Visualization
         }
         RGBUI8 v_init(0);
         std::vector< RGBUI8 > v(maxi+1-mini, v_init);
-        RGBF64 cminf,cmaxf;
+        RGBF32 cminf,cmaxf;
         cminf = cmin;
         cmaxf = cmax;
 
         for(I32 i=0;i<=maxi-mini;i++)
         {
-            double dist = i*1.0/(maxi-mini);
+            F32 dist = i*1.0/(maxi-mini);
             v[i]=dist*(cmaxf-cminf)+cminf;
         }
         MatN<DIM,RGBUI8> fRGB(vectorfield.getDomain());
@@ -1263,10 +1263,10 @@ struct POP_EXPORTS Visualization
         it.init();
         while(it.next()){
             if(it.x()(0)%step==0&&it.x()(1)%step==0){
-                pop::F64 value = vectorfield(it.x()).norm();
+                pop::F32 value = vectorfield(it.x()).norm();
                 if(value!=0){
-                    VecN<DIM,F64> x1 = it.x();
-                    VecN<DIM,F64> x2 = x1 + (value-mini)*1.0/(maxi-mini)*length*vectorfield(it.x())/vectorfield(it.x()).norm();
+                    VecN<DIM,F32> x1 = it.x();
+                    VecN<DIM,F32> x2 = x1 + (value-mini)*1.f/(maxi-mini)*length*vectorfield(it.x())/vectorfield(it.x()).norm();
                     Draw::arrow(fRGB,x1,x2,v[value-mini]);
                 }
             }
@@ -1298,7 +1298,7 @@ private:
     static void _processCubeIso(_Cube cube, std::vector<std::pair<_vertex,RGBUI8 > >& vertexList,RGBUI8 value,unsigned char isolevel);
     static void _processCube(_cubeF cube, std::vector<_vertex>& vertexList,F32 isolevel =0.5,bool diff=false);
     static std::vector<std::pair<_vertex,RGBUI8 > > _runMarchingCubes2(const MatN<3,RGB<UI8 > > &voxel);
-    static std::vector<_vertex > _runMarchingCubes2(const MatN<3,F64 > &phasefield,F32 isosurface) ;
+    static std::vector<_vertex > _runMarchingCubes2(const MatN<3,F32 > &phasefield,F32 isosurface) ;
     static std::vector<std::pair<_vertex,RGBUI8 > > _runMarchingCubesSurfaceContact(const MatN<3,RGB<UI8 > > &voxel);
     static Visualization::_vertex _interpolate(Visualization::_vertex p1, Visualization::_vertex p2, F32 p1value=1, F32 p2value=0 , F32 iso=0.5 );
     static F32 _affectRGB(RGBUI8 c1,RGBUI8 c2);

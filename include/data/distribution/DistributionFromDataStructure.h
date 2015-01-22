@@ -70,12 +70,12 @@ private:
     * \image html stepfunction.png
      *
     */
-    F64 _xmin;
-    F64 _xmax;
-    F64 _spacing;
+    F32 _xmin;
+    F32 _xmax;
+    F32 _spacing;
     DistributionUniformReal uni;
-    std::vector<F64 >_table;
-    std::vector<F64 >_repartition;
+    std::vector<F32 >_table;
+    std::vector<F32 >_repartition;
     void generateRepartition();
 public:
         static std::string getKey();
@@ -87,12 +87,12 @@ public:
     */
     DistributionRegularStep();
     /*!
-    * \fn DistributionRegularStep(const Mat2F64 & matrix);
+    * \fn DistributionRegularStep(const Mat2F32 & matrix);
     *
     *   constructor the regular step distribution from a matrix such that the first column contained the X-values with a regular spacing between successive
     *  value and the second colum Y-values.
     */
-    DistributionRegularStep(const Mat2F64 & matrix);
+    DistributionRegularStep(const Mat2F32 & matrix);
 
     /*!
     \fn DistributionRegularStep(const DistributionRegularStep & dist);
@@ -103,9 +103,9 @@ public:
 
 
 
-    virtual F64 operator ()(F64 value)const ;
+    virtual F32 operator ()(F32 value)const ;
     virtual DistributionRegularStep * clone()const ;
-    virtual F64 randomVariable()const ;
+    virtual F32 randomVariable()const ;
 
 
     /*!
@@ -118,26 +118,26 @@ public:
     * as half of the minumum value of the difference of successive X-values.  X-values width you can define the sampling
     * of the step function with the argument step. Of course,you can define it!
     */
-    void fromMatrix(const Mat2F64 & matrix,F64 step=0);
+    void fromMatrix(const Mat2F32 & matrix,F32 step=0);
 
     /*!
-    \fn Mat2F64 toMatrix()const;
+    \fn Mat2F32 toMatrix()const;
     *
     *  return a two columns matrix where the first row contains the X-values with a regular spacing and the second column
     * the associated Y-values
     */
-    Mat2F64 toMatrix()const;
+    Mat2F32 toMatrix()const;
     /*!
-    \fn F64 fMinusOneForMonotonicallyIncreasing(F64 y)const;
+    \fn F32 fMinusOneForMonotonicallyIncreasing(F32 y)const;
     *
     *
     */
-    F64 fMinusOneForMonotonicallyIncreasing(F64 y)const;
+    F32 fMinusOneForMonotonicallyIncreasing(F32 y)const;
 
-    void smoothGaussian(double sigma);
-    virtual F64 getXmin()const;
-    virtual F64 getXmax()const;
-    virtual F64 getStep()const;
+    void smoothGaussian(F32 sigma);
+    virtual F32 getXmin()const;
+    virtual F32 getXmax()const;
+    virtual F32 getStep()const;
 };
 
 class POP_EXPORTS DistributionIntegerRegularStep:public DistributionDiscrete
@@ -156,11 +156,11 @@ private:
     * \image html stepfunction.png
      *
     */
-    F64 _xmin;
-    F64 _xmax;
+    F32 _xmin;
+    F32 _xmax;
     DistributionUniformReal uni;
-    std::vector<F64 >_table;
-    std::vector<F64 >_repartition;
+    std::vector<F32 >_table;
+    std::vector<F32 >_repartition;
     void generateRepartition();
 public:
         static std::string getKey();
@@ -173,12 +173,12 @@ public:
     */
     DistributionIntegerRegularStep();
     /*!
-    * \fn DistributionIntegerRegularStep(const Mat2F64 & matrix);
+    * \fn DistributionIntegerRegularStep(const Mat2F32 & matrix);
     *
     *   constructor the regular step distribution from a matrix such that the first column contained the X-values with a regular spacing between successive
     *  value equal to 1  and the second colum Y-values.
     */
-    DistributionIntegerRegularStep(const Mat2F64 & matrix);
+    DistributionIntegerRegularStep(const Mat2F32 & matrix);
 
     /*!
     \fn DistributionIntegerRegularStep(const DistributionIntegerRegularStep & dist);
@@ -189,13 +189,13 @@ public:
 
 
 
-    virtual F64 operator ()(F64 value)const ;
+    virtual F32 operator ()(F32 value)const ;
     virtual DistributionIntegerRegularStep * clone()const ;
-    virtual F64 randomVariable()const ;
+    virtual F32 randomVariable()const ;
 
 
     /*!
-    \fn void fromMatrix(const Mat2F64 & matrix)
+    \fn void fromMatrix(const Mat2F32 & matrix)
     *
     *  set the distribution from a matrix such that the first column contained the X-values with a regular spacing between successive
     *  values equal to 1 and the second colum Y-values.\n
@@ -203,19 +203,19 @@ public:
     * as half of the minumum value of the difference of successive X-values.  X-values width you can define the sampling
     * of the step function with the argument step. Of course,you can define it!
     */
-    void fromMatrix(const Mat2F64 & matrix);
+    void fromMatrix(const Mat2F32 & matrix);
 
     /*!
-    \fn Mat2F64 toMatrix()const;
+    \fn Mat2F32 toMatrix()const;
     *
     *  return a two columns matrix where the first row contains the X-values with a regular spacing and the second column
     * the associated Y-values
     */
-    Mat2F64 toMatrix()const;
+    Mat2F32 toMatrix()const;
 
 
-    virtual F64 getXmin()const;
-    virtual F64 getXmax()const;
+    virtual F32 getXmin()const;
+    virtual F32 getXmax()const;
 };
 
 
@@ -248,8 +248,8 @@ public:
     DistributionExpression();
     DistributionExpression(std::string regularexpression);
     DistributionExpression(const DistributionExpression & dist);
-    virtual F64 operator ()(F64 value)const ;
-    F64 randomVariable()const ;
+    virtual F32 operator ()(F32 value)const ;
+    F32 randomVariable()const ;
     virtual DistributionExpression * clone()const ;
     bool fromRegularExpression(std::string expression);
      std::string toRegularExpression()const;

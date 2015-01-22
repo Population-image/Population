@@ -100,7 +100,7 @@ public:
     To facilite its utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
     - Mat2UI8: a 2d matrix with a pixel type coded in 1 byte for an unsigned integer between 0 and 255,
     - Mat2RGBUI8: a 2d matrix with a pixel type coded with a RGB color with 1 byte per channel,
-    - Mat2F64: a 2d matrix with a pixel type coded in float type,
+    - Mat2F32: a 2d matrix with a pixel type coded in float type,
     - Mat2UI32: a 2d matrix with a pixel type coded in unsigned integer in 4 bytes,
     - Mat3UI8: a 3d matrix with a pixel type coded in 1 byte for an unsigned integer between 0 and 255.
 
@@ -216,7 +216,7 @@ public:
     erosion.display();
     \endcode
     -  \a IteratorE: utilisation of the IteratorENeighborhood concept. This class exposes an IteratorENeighborhood model
-    with its definition type, \a MatN::IteratorENeighborhood, and its defintion domain, \a MatN::getIteratorENeighborhood(F64 radius=1,F64 norm=1).
+    with its definition type, \a MatN::IteratorENeighborhood, and its defintion domain, \a MatN::getIteratorENeighborhood(F32 radius=1,F32 norm=1).
     For the IteratorENeighborhood object, the member \a next() advances to the next element in returning a boolean to indicate if the end of the collection is reached,
     the member \a x() returns the current element and the member \a init(const E & x)  initializes the neighborhood on the VecN x. For instance, the erosion code is:
     \code
@@ -361,7 +361,7 @@ public:
     This iterator allows the iteration through the neighborhood of an element
     x of E without any order. The corresponding mathematical object is : \f$\forall x' \in N(x)\f$. This
     iterator plays an important role in algorithms of mathematical morphology and region growing.
-    Its construction requires a domain of definition as argument given by the member getIteratorENeighborhood(F64 radius,F64 norm).
+    Its construction requires a domain of definition as argument given by the member getIteratorENeighborhood(F32 radius,F32 norm).
     \f$N(x) =\{\forall x'    \in \mathcal{D} : \|x'-x\|_{norm} \leq radius \}\f$, for instance for norm=1, radius=1 and dim=2
     N(x=(i,j)) is equal to {(i,j),(i-1,j),(i+1,j),(i,j-1),(i,j+1)} that is the 4-connectivity. Its member next() advances to the next element
     in returning a boolean to indicate if the end of the collection is reached. Its member x() returns the current element x.
@@ -376,8 +376,8 @@ public:
     img.load("../image/Lena.bmp");
     Mat2RGBUI8 img_erosion(img.getDomain());
     Mat2RGBUI8::IteratorEDomain it_total(img.getIteratorEDomain());
-    F64 norm =2;
-    F64 radius =4.5;
+    F32 norm =2;
+    F32 radius =4.5;
     Mat2RGBUI8::IteratorENeighborhood it_neigh(img.getIteratorENeighborhood(radius,norm));
     while(it_total.next()){
       Mat2RGBUI8::F mini(255);
@@ -796,7 +796,7 @@ public:
     img.load("../image/Lena.bmp");
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
-    FunctorF::FunctorAdditionF2<Mat2UI8::F,F64,Mat2UI8::F> op;
+    FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
     while(it.next()){
     img(it.x())=op(img(it.x()),d.randomVariable());//access a VecN, add a random variable and set it
     }
@@ -816,7 +816,7 @@ public:
     img.load("../image/Lena.bmp");
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
-    FunctorF::FunctorAdditionF2<Mat2UI8::F,F64,Mat2UI8::F> op;
+    FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
     while(it.next()){
     img(it.x())=op(img(it.x()),d.randomVariable());//access a VecN, add a random variable and set it
     }
@@ -886,7 +886,7 @@ public:
     *
     * access the interpolated pixel/voxel value at the float position
     */
-    Type interpolationBilinear(const VecN<DIM,F64> xf)const;
+    Type interpolationBilinear(const VecN<DIM,F32> xf)const;
 
     /*!
     * Return a ptr to the first pixel value
@@ -1010,7 +1010,7 @@ public:
     * Mat2UI8 img;
     * img.load("../image/Lena.bmp");
     * img.display();
-    * Mat2F64 gradx(img);
+    * Mat2F32 gradx(img);
     * gradx = pop::Processing::gradientDeriche(gradx,0,0.5);
     * gradx = pop::Processing::greylevelRange(gradx,0,255);//to display the matrix with a float type, the good thing is to translate the grey-level range between [0-255] before
     * gradx.display();
@@ -1060,7 +1060,7 @@ public:
     *
     \sa IteratorENeighborhood
     */
-    IteratorENeighborhood getIteratorENeighborhood(F64 radius=1 ,F64 norm=1 )const;
+    IteratorENeighborhood getIteratorENeighborhood(F32 radius=1 ,F32 norm=1 )const;
     /*!
     * \param structural_element structural element
     * \param dilate number of dilation of the structural element
@@ -1158,7 +1158,7 @@ public:
     * \image html plate_median_classic.jpg "median filter with fixed kernel"
     * \image html plate_median_amoeba.jpg "median filter with ameaba kernel"
     */
-    IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F64 distance_max=4,double lambda_param = 0.01 )const;
+    IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F32 distance_max=4,F32 lambda_param = 0.01 )const;
     //@}
 
     //-------------------------------------
@@ -1291,15 +1291,15 @@ public:
     *  matrix multiplication see http://en.wikipedia.org/wiki/Matrix_multiplication
     *
     *  \code
-    Mat2F64 m1(2,3);
+    Mat2F32 m1(2,3);
     m1(0,0)=1; m1(0,1)=2; m1(0,2)=0;
     m1(1,0)=4; m1(1,1)=3; m1(1,2)=-1;
 
-    Mat2F64 m2(3,2);
+    Mat2F32 m2(3,2);
     m2(0,0)=5; m2(0,1)=1;
     m2(1,0)=2; m2(1,1)=3;
     m2(2,0)=3; m2(2,1)=4;
-    Mat2F64 m3 = m1*m2;
+    Mat2F32 m3 = m1*m2;
     std::cout<<m3<<std::endl;
     *  \endcode
     *
@@ -1461,7 +1461,7 @@ public:
     *
     * the trace of an n-by-n square matrix A is defined to be the sum of the elements on the main diagonal
     \code
-    Mat2F64 m(3,3);
+    Mat2F32 m(3,3);
     m(0,0)=1;m(0,1)=1;m(0,2)=2;
     m(1,0)=2;m(1,1)=1;m(1,2)=2;
     m(2,0)=1;m(2,1)=3;m(2,2)=3;
@@ -1475,12 +1475,12 @@ public:
     *
     *  the inverse of the matrix <a href=http://en.wikipedia.org/wiki/Invertible_matrix>wiki</a>
     \code
-    Mat2F64 m(3,3);
+    Mat2F32 m(3,3);
     m(0,0)=1;m(0,1)=1;m(0,2)=2;
     m(1,0)=2;m(1,1)=1;m(1,2)=2;
     m(2,0)=1;m(2,1)=3;m(2,2)=3;
 
-    Mat2F64 minverse;
+    Mat2F32 minverse;
     minverse = m.inverse();
     std::cout<<minverse<<std::endl;
     std::cout<<m*minverse<<std::endl;
@@ -1515,25 +1515,25 @@ public:
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,UI32>::Range);
     }
-    MatN(const MatN<Dim,F64> &img)
+    MatN(const MatN<Dim,F32> &img)
         :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
-        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,F64>::Range);
+        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,F32>::Range);
     }
     MatN(const MatN<Dim,RGBUI8> &img)
         :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,RGBUI8>::Range);
     }
-    MatN(const MatN<Dim,RGBF64> &img)
+    MatN(const MatN<Dim,RGBF32> &img)
         :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
-        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,RGBF64>::Range);
+        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,RGBF32>::Range);
     }
-    MatN(const MatN<Dim,ComplexF64> &img)
+    MatN(const MatN<Dim,ComplexF32> &img)
         :std::vector<Type>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
-        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,ComplexF64>::Range);
+        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<Type,ComplexF32>::Range);
     }
     Type getValue(int i, int j)const{
         return  this->operator[](j+i*_domain(1));
@@ -1562,24 +1562,22 @@ typedef MatN<2,UI8> Mat2UI8;
 typedef MatN<2,UI16> Mat2UI16;
 typedef MatN<2,UI32> Mat2UI32;
 typedef MatN<2,F32> Mat2F32;
-typedef MatN<2,F64> Mat2F64;
 
 typedef MatN<2,RGBUI8> Mat2RGBUI8;
-typedef MatN<2,RGBF64> Mat2RGBF64;
-typedef MatN<2,ComplexF64> Mat2ComplexF64;
-typedef MatN<2,Vec2F64 >  Mat2Vec2F64;
+typedef MatN<2,RGBF32> Mat2RGBF32;
+typedef MatN<2,ComplexF32> Mat2ComplexF32;
+typedef MatN<2,Vec2F32 >  Mat2Vec2F32;
 
 
 typedef MatN<3,UI8> Mat3UI8;
 typedef MatN<3,UI16> Mat3UI16;
 typedef MatN<3,UI32> Mat3UI32;
 typedef MatN<3,F32> Mat3F32;
-typedef MatN<3,F64> Mat3F64;
 
 typedef MatN<3,RGBUI8> Mat3RGBUI8;
-typedef MatN<3,RGBF64> Mat3RGBF64;
-typedef MatN<3,ComplexF64> Mat3ComplexF64;
-typedef MatN<3,VecN<3,F64> >  Mat3Vec3F64;
+typedef MatN<3,RGBF32> Mat3RGBF32;
+typedef MatN<3,ComplexF32> Mat3ComplexF32;
+typedef MatN<3,VecN<3,F32> >  Mat3Vec3F32;
 
 
 
@@ -1887,7 +1885,7 @@ Type & MatN<Dim,Type>::operator ()(unsigned int index)
     return this->operator[](index);
 }
 template<int Dim, typename Type>
-Type MatN<Dim,Type>::interpolationBilinear(const VecN<DIM,F64> xf)const
+Type MatN<Dim,Type>::interpolationBilinear(const VecN<DIM,F32> xf)const
 {
 
     return MatNInterpolationBiliniear::apply(*this,xf);
@@ -1922,7 +1920,7 @@ typename MatN<Dim,Type>::IteratorEROI MatN<Dim,Type>::getIteratorEROI()const
     return IteratorEROI(*this);
 }
 template<int Dim, typename Type>
-typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(F64 radius ,F64 norm )const
+typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(F32 radius ,F32 norm )const
 {
     return IteratorENeighborhood(getDomain(),radius , norm);
 }
@@ -1932,7 +1930,7 @@ typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeigh
 {
     Vec<E> _tab;
     typename MatN<Dim,Type1>::IteratorEDomain it(structural_element.getDomain());
-    typename MatN<Dim,Type1>::E center = VecN<Dim,F64>(structural_element.getDomain()-1)*0.5;
+    typename MatN<Dim,Type1>::E center = VecN<Dim,F32>(structural_element.getDomain()-1)*0.5;
     while(it.next()){
         if(normValue(structural_element(it.x()))!=0){
             _tab.push_back(it.x()-center);
@@ -1960,7 +1958,7 @@ typename MatN<Dim,Type>::IteratorERectangle MatN<Dim,Type>::getIteratorERectangl
     return IteratorERectangle(std::make_pair(xmin,xmax));
 }
 template<int Dim, typename Type>
-typename MatN<Dim,Type>::IteratorENeighborhoodAmoebas MatN<Dim,Type>::getIteratorENeighborhoodAmoebas(F64 distance_max,double lambda_param )const
+typename MatN<Dim,Type>::IteratorENeighborhoodAmoebas MatN<Dim,Type>::getIteratorENeighborhoodAmoebas(F32 distance_max,F32 lambda_param )const
 {
     return IteratorENeighborhoodAmoebas(*this,distance_max,lambda_param );
 }
@@ -2470,9 +2468,9 @@ void FunctionAssert(const MatN<D1,F1> & f,const MatN<D2,F2> & g ,std::string mes
 template<int DIM,typename Type>
 struct NumericLimits<MatN<DIM,Type> >
 {
-    static F64 min() throw()
+    static F32 min() throw()
     { return -NumericLimits<Type>::maximumRange();}
-    static F64 max() throw()
+    static F32 max() throw()
     { return NumericLimits<Type>::maximumRange();}
 };
 
@@ -2592,7 +2590,7 @@ pop::MatN<Dim, Type>  exp(const pop::MatN<Dim, Type>& f)
 *
 */
 template<int Dim, typename Type>
-pop::MatN<Dim, Type>  pow(const pop::MatN<Dim, Type>& f,double exponant)
+pop::MatN<Dim, Type>  pow(const pop::MatN<Dim, Type>& f,F32 exponant)
 {
     pop::MatN<Dim, Type> h(f.getDomain());
     pop::Private::PowF<Type> op(exponant);
@@ -2611,7 +2609,7 @@ pop::MatN<Dim, Type>  pow(const pop::MatN<Dim, Type>& f,double exponant)
 *
 */
 template<int Dim, typename Type>
-double  normValue(const pop::MatN<Dim, Type>& A,int p=2)
+F32  normValue(const pop::MatN<Dim, Type>& A,int p=2)
 {
     pop::Private::sumNorm<Type> op(p);
     if(p!=0)
@@ -2631,7 +2629,7 @@ double  normValue(const pop::MatN<Dim, Type>& A,int p=2)
 *
 */
 template<int Dim, typename Type>
-double distance(const pop::MatN<Dim, Type>& A, const pop::MatN<Dim, Type>& B,int p=2)
+F32 distance(const pop::MatN<Dim, Type>& A, const pop::MatN<Dim, Type>& B,int p=2)
 {
     return normValue(A-B,p);
 }
@@ -2646,7 +2644,7 @@ double distance(const pop::MatN<Dim, Type>& A, const pop::MatN<Dim, Type>& B,int
 *
 */
 template<int Dim, typename Type>
-double  normPowerValue(const pop::MatN<Dim, Type>& f,int p=2)
+F32  normPowerValue(const pop::MatN<Dim, Type>& f,int p=2)
 {
     pop::Private::sumNorm<Type> op(p);
     return std::accumulate(f.begin(),f.end(),0.,op);

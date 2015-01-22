@@ -177,12 +177,12 @@ public:
     * \param type type of distribution with a Matrix parameter as argument
     *
     *  Contruct a regular step function as piecewise constant function having many regular discrete pieces.
-    *  To define it, we use an input Mat2F64 such that the first column contained the X-values with a regular spacing between successive
+    *  To define it, we use an input Mat2F32 such that the first column contained the X-values with a regular spacing between successive
     *  value and the second column Y-values. For instance, this code
     *
     * \code
-    Mat2F64 m(100,2);
-    F64 step = 0.01;
+    Mat2F32 m(100,2);
+    F32 step = 0.01;
     for(int i =0;i<100;i++)
     {
         m(i,0)= step*i;
@@ -195,7 +195,7 @@ public:
     *
     * \sa DistributionRegularStep
     */
-    Distribution(const Mat2F64& param,std::string type="STEP");
+    Distribution(const Mat2F32& param,std::string type="STEP");
 
 
     /*!
@@ -244,7 +244,7 @@ public:
     * \sa DistributionPoisson DistributionExponential DistributionDirac
     * \sa http://en.wikipedia.org/wiki/Poisson_distribution http://en.wikipedia.org/wiki/Exponential_distribution http://en.wikipedia.org/wiki/Dirac_delta_function
     */
-    Distribution(double param,std::string type="POISSON");
+    Distribution(F32 param,std::string type="POISSON");
 
 
     /*!
@@ -272,7 +272,7 @@ public:
     * \endcode
     * \sa  DistributionUniformReal, DistributionUniformInt, DistributionNormal, DistributionBinomial
     */
-    Distribution(double param1,double param2,std::string type="NORMAL");
+    Distribution(F32 param1,F32 param2,std::string type="NORMAL");
 
 
 
@@ -301,7 +301,7 @@ public:
         std::cout<<f(i)<<" ";
         \endcode
     */
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
     /*!
     * \return X random variable
     *
@@ -311,7 +311,7 @@ public:
     * For instance, in the following code, we simulate random variables followin an exponential probability distribution in two ways: from analytical or from expression.
     * Because DistributionExpression does not have a generator of random number,  we call the procedure pop::Statistics::toProbabilityDistribution .
     \code
-    double lambda=1./10;
+    F32 lambda=1./10;
 
      std::string exp = "std::exp(-"+BasicUtility::Any2String(lambda)+"*x)";
     Distribution fexponentialfromexpression(exp.c_str(), "EXPRESSION");
@@ -321,7 +321,7 @@ public:
     Distribution  fexponentialfromanalytical(lambda,"EXPONENTIAL");//DistributionExponential, has a genrator so you don't need to use  pop::Statistics::toProbabilityDistribution
 
     int nbr_sampling = 500000;
-    F64 sum1=0,sum2=0;
+    F32 sum1=0,sum2=0;
     for(int i =0;i<nbr_sampling;i++){
         sum1+=fexponentialfromexpression.randomVariable();
         sum2+=fexponentialfromanalytical.randomVariable();
@@ -332,14 +332,14 @@ public:
     \endcode
     *
     */
-    virtual F64 randomVariable()const ;
+    virtual F32 randomVariable()const ;
     /*!
     * \return X random variable
     *
     *  Generate random variable, X, following the probability distribution f.\n
     *
     */
-    virtual F64 operator()()const ;
+    virtual F32 operator()()const ;
 
 
     //@}
@@ -365,13 +365,13 @@ public:
     // Display in the x-range [0,10] with this very simple graph editor
     f.display(0,10);//You have to close the windows to execute the rest of the code
     //Another solution, save it in a Matrix format and open it with a nice graph editor
-    Mat2F64 m = pop::Statistics::toMatrix(f,0,10);
+    Mat2F32 m = pop::Statistics::toMatrix(f,0,10);
     m.save("dist.m");
     return 1;
     \endcode
     * \sa pop::Statistics::toMatrix
     */
-    Mat2RGBUI8 display(double xmin=-NumericLimits<double>::maximumRange(),double xmax=NumericLimits<double>::maximumRange(),double ymin=-NumericLimits<double>::maximumRange(),double ymax=NumericLimits<double>::maximumRange(),int sizewidth=800,int sizeheight=600);
+    Mat2RGBUI8 display(F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizewidth=800,int sizeheight=600);
 
     /*!
     * \param vd
@@ -387,7 +387,7 @@ public:
     *  For more extented graph display, you convert it in Matrix with this procedure pop::Statistics::toMatrix, then you save it. This matrix can be open by Matlab or gnuplot (plot 'dist.m' w l)
     \code
     Distribution danalytical( 10,15,"NORMAL");
-    VecF64 v;
+    VecF32 v;
     for(int i=0;i<1000000;i++){
         v.push_back(danalytical.randomVariable());
     }
@@ -400,9 +400,9 @@ public:
     \endcode
     * \sa pop::Statistics::toMatrix
     */
-    static Mat2RGBUI8 multiDisplay( std::vector<Distribution> & vd,double xmin=-NumericLimits<double>::maximumRange(),double xmax=NumericLimits<double>::maximumRange(),double ymin=-NumericLimits<double>::maximumRange(),double ymax=NumericLimits<double>::maximumRange(),int sizex=800,int sizey=600);
-    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,double xmin=-NumericLimits<double>::maximumRange(),double xmax=NumericLimits<double>::maximumRange(),double ymin=-NumericLimits<double>::maximumRange(),double ymax=NumericLimits<double>::maximumRange(),int sizex=800,int sizey=600);
-    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,double xmin=-NumericLimits<double>::maximumRange(),double xmax=NumericLimits<double>::maximumRange(),double ymin=-NumericLimits<double>::maximumRange(),double ymax=NumericLimits<double>::maximumRange(),int sizex=800,int sizey=600);
+    static Mat2RGBUI8 multiDisplay( std::vector<Distribution> & vd,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
+    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
+    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
 
 
     //@}
@@ -506,14 +506,14 @@ public:
     //-------------------------------------
 
     /*!
-    * \param step F64 step
+    * \param step F32 step
     *
     *  You can ignore the implementation of this member in the derived class.
     * This member inform the object that the subinterval of the partition for calculation as a given step
     *
     * \sa IteratorDistributionSamplingRiemann DistributionDiscrete
     */
-    virtual void setStep(F64 step)const;
+    virtual void setStep(F32 step)const;
 
 
     /*!
@@ -522,16 +522,16 @@ public:
     *  f(x)=0 for x<min value by default min_value=-infinity
     *
     */
-    virtual F64 getXmin()const;
+    virtual F32 getXmin()const;
 
     /*!
-    \fn virtual F64 getXmax()const;
+    \fn virtual F32 getXmax()const;
     * \return max_value
     *
     *  f(x)=0 for x>max_value by default min_value=+infinity
     *
     */
-    virtual F64 getXmax()const;
+    virtual F32 getXmax()const;
 
 
 
@@ -541,7 +541,7 @@ public:
     *  partition interval used for approximation calculation (by default 0.01)
     *
     */
-    virtual F64 getStep()const;
+    virtual F32 getStep()const;
 
 
 
@@ -563,7 +563,7 @@ public:
     //@}
 
 
-    virtual F64 randomVariable(F64 param)const ;
+    virtual F32 randomVariable(F32 param)const ;
     Distribution * ___getPointerImplementation();
     const Distribution * ___getPointerImplementation()const ;
     void ___setPointererImplementation(Distribution * d);

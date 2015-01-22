@@ -8,18 +8,18 @@ namespace pop{
 class DistributionIteratorERegularInterval
 {
 private:
-    F64 _xminima;
-    F64 _xmaxima;
-    F64 _step;
+    F32 _xminima;
+    F32 _xmaxima;
+    F32 _step;
     int _nbrstep;
     int _index;
 public:
-    DistributionIteratorERegularInterval( F64 xmin, F64 xmax,F64 step);
+    DistributionIteratorERegularInterval( F32 xmin, F32 xmax,F32 step);
     bool isValid();
     void init();
     bool next();
     int size();
-    F64 x();
+    F32 x();
 };
 class DistributionMultiVariateIteratorE
 {
@@ -29,19 +29,19 @@ private:
     int _nbrstep;
     int _index;
 public:
-    VecF64 _xminima;
-    VecF64 _xmaxima;
-    VecF64 _domain;
-    F64 _step;
+    VecF32 _xminima;
+    VecF32 _xmaxima;
+    VecF32 _domain;
+    F32 _step;
 
-    DistributionMultiVariateIteratorE( const VecF64& xmin, const VecF64& xmax, F64 step);
+    DistributionMultiVariateIteratorE( const VecF32& xmin, const VecF32& xmax, F32 step);
     bool isValid();
     void init();
     bool next();
-    VecF64 x();
-    VecF64 xInteger();
+    VecF32 x();
+    VecF32 xInteger();
 };
-DistributionIteratorERegularInterval::DistributionIteratorERegularInterval(F64 xmin, F64 xmax,F64 step){
+DistributionIteratorERegularInterval::DistributionIteratorERegularInterval(F32 xmin, F32 xmax,F32 step){
     _xminima = xmin;
     if(xmax<xmin)
         xmax=xmin;
@@ -73,11 +73,11 @@ bool DistributionIteratorERegularInterval::next(){
 
 }
 
-F64 DistributionIteratorERegularInterval::x(){
+F32 DistributionIteratorERegularInterval::x(){
     return _xminima + _index*_step;
 }
 
-DistributionMultiVariateIteratorE::DistributionMultiVariateIteratorE(const VecF64& xmin, const VecF64& xmax,F64 step){
+DistributionMultiVariateIteratorE::DistributionMultiVariateIteratorE(const VecF32& xmin, const VecF32& xmax,F32 step){
     _step = step;
     _xminima = xmin;
     _xmaxima = xmax;
@@ -114,9 +114,9 @@ bool DistributionMultiVariateIteratorE::next(){
         return false ;
 }
 
-VecF64 DistributionMultiVariateIteratorE::x(){
+VecF32 DistributionMultiVariateIteratorE::x(){
     int indice = _index;
-    VecF64 xx(_xminima.size());
+    VecF32 xx(_xminima.size());
     for(unsigned int i=0;i<_xminima.size();i++)
     {
         int temp=1;
@@ -128,9 +128,9 @@ VecF64 DistributionMultiVariateIteratorE::x(){
     }
     return xx;
 }
-VecF64 DistributionMultiVariateIteratorE::xInteger(){
+VecF32 DistributionMultiVariateIteratorE::xInteger(){
     int indice = _index;
-    VecF64 xx(_xminima.size());
+    VecF32 xx(_xminima.size());
     for(unsigned int i=0;i<_xminima.size();i++)
     {
         int temp=1;
@@ -141,13 +141,13 @@ VecF64 DistributionMultiVariateIteratorE::xInteger(){
     }
     return xx;
 }
-DistributionRegularStep  Statistics::integral(const Distribution &f, F64 xmin, F64 xmax,F64 step)
+DistributionRegularStep  Statistics::integral(const Distribution &f, F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax+step,step);
 
-    F64 integral=0;
-    Mat2F64 m(it.size(),2);
+    F32 integral=0;
+    Mat2F32 m(it.size(),2);
     int i =0;
     while(it.next()){
         integral+=f.operator ()(it.x())*step;
@@ -160,40 +160,40 @@ DistributionRegularStep  Statistics::integral(const Distribution &f, F64 xmin, F
 }
 
 namespace Private{
-const VecN<2,double> d=VecN<2,double>(1,1)/normValue(VecN<2,double>(1,1));
+const VecN<2,F32> d=VecN<2,F32>(1,1)/normValue(VecN<2,F32>(1,1));
 }
-void Statistics::__inverseVecN(double x,double y, double &x_minus_one, double& y_minus_two){
-    VecN<2,double> vx;
+void Statistics::__inverseVecN(F32 x,F32 y, F32 &x_minus_one, F32& y_minus_two){
+    VecN<2,F32> vx;
     vx(0)=x;
     vx(1)=y;
-    VecN<2,double> p;
+    VecN<2,F32> p;
     p=  pop::productInner(pop::Private::d,vx)*pop::Private::d;
-    VecN<2,double> vx_symmetry_axis;
+    VecN<2,F32> vx_symmetry_axis;
     vx_symmetry_axis = p*2-vx;
     x_minus_one = vx_symmetry_axis(0);
     y_minus_two = vx_symmetry_axis(1);
 }
 
-DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64 xmax,F64 step,F64 error_step){
+DistributionRegularStep Statistics::inverse(const Distribution &f, F32 xmin, F32 xmax,F32 step,F32 error_step){
 
 
-    Mat2F64 m;
-    double x = xmin;
+    Mat2F32 m;
+    F32 x = xmin;
 
-    double xminus;
-    double yminus;
+    F32 xminus;
+    F32 yminus;
     __inverseVecN(x,f(x),xminus,yminus);
-    double  xstep =step;
+    F32  xstep =step;
     while(x<xmax){
         m.resizeInformation(m.sizeI()+1,2);
         m(m.sizeI()-1,0)=xminus;
         m(m.sizeI()-1,1)=yminus;
         //dicotomie method to find the next x (can be based on taylor expansion first order)
         xminus +=step;
-        double xminustemp;
-        double xnextmin=x;
-        double xbefore=x;
-        double xnextmax=xstep+x;
+        F32 xminustemp;
+        F32 xnextmin=x;
+        F32 xbefore=x;
+        F32 xnextmax=xstep+x;
         bool error = false;
         while(error==false){
 
@@ -224,13 +224,13 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F64 xmin, F64
     return DistributionRegularStep(m);
 }
 
-F64 Statistics::moment(const Distribution &f, int moment,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::moment(const Distribution &f, int moment,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 integral=0;
-    F64 normalization=0;
+    F32 integral=0;
+    F32 normalization=0;
     while(it.next()){
 
         integral +=f.operator ()(it.x())*step*std::pow(it.x(),moment);
@@ -239,23 +239,23 @@ F64 Statistics::moment(const Distribution &f, int moment,F64 xmin, F64 xmax,F64 
     return integral/normalization;
 }
 
-F64 Statistics::norm(const Distribution &f, F64 norm,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::norm(const Distribution &f, F32 norm,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 integral=0;
+    F32 integral=0;
     while(it.next()){
         integral +=std::pow(absolute(f.operator ()(it.x())),norm)*step;
     }
     return std::pow(integral,1./norm);
 }
-F64 Statistics::productInner(const Distribution &f,const Distribution &g, F64 xmin, F64 xmax,F64 step)
+F32 Statistics::productInner(const Distribution &f,const Distribution &g, F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
     g.setStep(step);
-    F64 sum=0;
+    F32 sum=0;
     while(it.next()){
         sum +=f.operator ()(it.x())*step*g.operator ()(it.x());
     }
@@ -263,18 +263,18 @@ F64 Statistics::productInner(const Distribution &f,const Distribution &g, F64 xm
 }
 
 
-F64 Statistics::FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &f, F64 y,F64 xmin, F64 xmax,F64 mindiff)
+F32 Statistics::FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &f, F32 y,F32 xmin, F32 xmax,F32 mindiff)
 {
 
     if(const DistributionRegularStep* dist =dynamic_cast<const DistributionRegularStep*>(f.___getPointerImplementation()))
     {
         return dist->fMinusOneForMonotonicallyIncreasing(y);
     }
-    F64 xmincurrent=xmin;
-    F64 xmaxcurrent=xmax;
-    F64 ytemp;
+    F32 xmincurrent=xmin;
+    F32 xmaxcurrent=xmax;
+    F32 ytemp;
     do{
-        F64 step =  (xmaxcurrent - xmincurrent)/2+xmincurrent ;
+        F32 step =  (xmaxcurrent - xmincurrent)/2+xmincurrent ;
         ytemp = f.operator ()(step);
         if(ytemp<y)
             xmincurrent = step;
@@ -284,17 +284,17 @@ F64 Statistics::FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &
     return ytemp;
 }
 
-DistributionRegularStep Statistics::derivate(const Distribution &f, F64 xmin, F64 xmax,F64 step)
+DistributionRegularStep Statistics::derivate(const Distribution &f, F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
 
-    Mat2F64 m(it.size()-1,2);
-    F64 x=NumericLimits<F64>::maximumRange();
+    Mat2F32 m(it.size()-1,2);
+    F32 x=NumericLimits<F32>::maximumRange();
     int i=0;
     while(it.next()){
-        if(x!=NumericLimits<F64>::maximumRange()){
+        if(x!=NumericLimits<F32>::maximumRange()){
             m(i-1,0)=x;
             m(i-1,1)=(f.operator ()(it.x())-f.operator ()(x))/step;
         }
@@ -306,13 +306,13 @@ DistributionRegularStep Statistics::derivate(const Distribution &f, F64 xmin, F6
 
 
 
-F64 Statistics::argMin(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::argMin(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 arg=0;
-    F64 min=NumericLimits<F64>::maximumRange();
+    F32 arg=0;
+    F32 min=NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())<min)
         {
@@ -323,23 +323,23 @@ F64 Statistics::argMin(const Distribution &f,F64 xmin, F64 xmax,F64 step)
     return arg;
 }
 
-std::vector<F64> Statistics::argMaxLocal(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+std::vector<F32> Statistics::argMaxLocal(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
-    std::vector<F64> v_argmax;
+    std::vector<F32> v_argmax;
     it.next();
-    F64 max_minus_1=f.operator ()(it.x());
+    F32 max_minus_1=f.operator ()(it.x());
 
     it.next();
     F32 arg_max=it.x();
-    F64 max=f.operator ()(it.x());
+    F32 max=f.operator ()(it.x());
 
     bool perhaps_max=false;
-    F64 arg_perhaps_max=false;
+    F32 arg_perhaps_max=false;
     while(it.next()){
         F32 arg_max_plus_1=it.x();
-        F64 max_plus_1=f.operator ()(it.x());
+        F32 max_plus_1=f.operator ()(it.x());
         if(perhaps_max==false&&max>max_minus_1&&max>max_plus_1){
             v_argmax.push_back(arg_max);
         }
@@ -362,13 +362,13 @@ std::vector<F64> Statistics::argMaxLocal(const Distribution &f,F64 xmin, F64 xma
 }
 
 
-//F64 Statistics::argMin(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+//F32 Statistics::argMin(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 //{
 
 //    DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-//    F64 arg=0;
-//    F64 min=NumericLimits<F64>::maximumRange();
+//    F32 arg=0;
+//    F32 min=NumericLimits<F32>::maximumRange();
 //    while(it.next()){
 //        if(f.operator ()(it.x())<min)
 //        {
@@ -379,23 +379,23 @@ std::vector<F64> Statistics::argMaxLocal(const Distribution &f,F64 xmin, F64 xma
 //    return arg;
 //}
 
-Vec<F64> Statistics::argMinLocal(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+Vec<F32> Statistics::argMinLocal(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
-    Vec<F64> v_argmin;
+    Vec<F32> v_argmin;
     it.next();
-    F64 min_minus_1=f.operator ()(it.x());
+    F32 min_minus_1=f.operator ()(it.x());
 
     it.next();
     F32 arg_min=it.x();
-    F64 min=f.operator ()(it.x());
+    F32 min=f.operator ()(it.x());
 
     bool perhaps_min=false;
-    F64 arg_perhaps_min=false;
+    F32 arg_perhaps_min=false;
     while(it.next()){
         F32 arg_min_plus_1=it.x();
-        F64 min_plus_1=f.operator ()(it.x());
+        F32 min_plus_1=f.operator ()(it.x());
         if(perhaps_min==false&&min<min_minus_1&&min<min_plus_1){
             v_argmin.push_back(arg_min);
         }
@@ -417,13 +417,13 @@ Vec<F64> Statistics::argMinLocal(const Distribution &f,F64 xmin, F64 xmax,F64 st
     return v_argmin;
 }
 
-F64 Statistics::argMax(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::argMax(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 arg=0;
-    F64 max=-NumericLimits<F64>::maximumRange();
+    F32 arg=0;
+    F32 max=-NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())>max)
         {
@@ -434,12 +434,12 @@ F64 Statistics::argMax(const Distribution &f,F64 xmin, F64 xmax,F64 step)
     return arg;
 }
 
-F64 Statistics::minValue( const Distribution &f,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::minValue( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 min=NumericLimits<F64>::maximumRange();
+    F32 min=NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())<min){
             min = f.operator ()(it.x());
@@ -447,12 +447,12 @@ F64 Statistics::minValue( const Distribution &f,F64 xmin, F64 xmax,F64 step)
     }
     return min;
 }
-F64 Statistics::maxValue( const Distribution &f,F64 xmin, F64 xmax,F64 step)
+F32 Statistics::maxValue( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 max=-NumericLimits<F64>::maximumRange();
+    F32 max=-NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())>max){
             max = f.operator ()(it.x());
@@ -460,18 +460,18 @@ F64 Statistics::maxValue( const Distribution &f,F64 xmin, F64 xmax,F64 step)
     }
     return max;
 }
-DistributionRegularStep Statistics::toProbabilityDistribution( const Distribution &f,F64 xmin, F64 xmax,F64 step)
+DistributionRegularStep Statistics::toProbabilityDistribution( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 sum=0;
+    F32 sum=0;
 
     while(it.next()){
         sum += absolute(f.operator ()(it.x()))*step;
     }
     it.init();
-    Mat2F64 m(it.size(),2);
+    Mat2F32 m(it.size(),2);
     int i =0;
     while(it.next()){
         m(i,0)=it.x();
@@ -481,20 +481,20 @@ DistributionRegularStep Statistics::toProbabilityDistribution( const Distributio
     }
     return DistributionRegularStep(m);
 }
-DistributionRegularStep Statistics::toCumulativeProbabilityDistribution( const Distribution &f,F64 xmin, F64 xmax,F64 step)
+DistributionRegularStep Statistics::toCumulativeProbabilityDistribution( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    F64 sum=0;
+    F32 sum=0;
 
     while(it.next()){
         sum += absolute(f.operator ()(it.x()));
     }
     it.init();
-    Mat2F64 m(it.size(),2);
+    Mat2F32 m(it.size(),2);
     int i =0;
-    F64 sumtemp =0;
+    F32 sumtemp =0;
     while(it.next()){
         m(i,0)=it.x();
         sumtemp += absolute(f.operator ()(it.x()));
@@ -503,12 +503,12 @@ DistributionRegularStep Statistics::toCumulativeProbabilityDistribution( const D
     }
     return DistributionRegularStep(m);
 }
-DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
     it.init();
-    Mat2F64 m(it.size(),2);
+    Mat2F32 m(it.size(),2);
     int i =0;
     while(it.next()){
         m(i,0)=it.x();
@@ -519,12 +519,12 @@ DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F64 xmi
     d.fromMatrix(m);
     return d;
 }
-Mat2F64 Statistics::toMatrix(const Distribution &f,F64 xmin, F64 xmax,F64 step)
+Mat2F32 Statistics::toMatrix(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
     DistributionIteratorERegularInterval it(xmin,xmax,step);
 
     it.init();
-    Mat2F64 m(it.size(),2);
+    Mat2F32 m(it.size(),2);
     int i =0;
     while(it.next()){
         m(i,0)=it.x();
@@ -539,7 +539,7 @@ Mat2F64 Statistics::toMatrix(const Distribution &f,F64 xmin, F64 xmax,F64 step)
 DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v){
     VecI32 vv(v);
     std::sort (vv.begin(), vv.end());
-    Mat2F64 m(vv(vv.size()-1)-vv(0)+1,2);
+    Mat2F32 m(vv(vv.size()-1)-vv(0)+1,2);
 
     for(unsigned int i=0;i<vv.size();i++){
         m(vv(i)-vv(0),1)++;
@@ -552,25 +552,25 @@ DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizat
     return dd;
 
 }
-DistributionRegularStep Statistics::computedStaticticsFromRealRealizationsWithWeight( const VecF64 & v,const VecF64 & weight,F64 step,F64 min,F64 max)
+DistributionRegularStep Statistics::computedStaticticsFromRealRealizationsWithWeight( const VecF32 & v,const VecF32 & weight,F32 step,F32 min,F32 max)
 {
     POP_DbgAssertMessage(v.size()!=0,"Vecs should contain at least one element");
     POP_DbgAssertMessage(v.size()==weight.size(),"Two vectors should have the same size");
-    if(min==NumericLimits<F64>::minimumRange()){
+    if(min==NumericLimits<F32>::minimumRange()){
         min = *std::min_element(v.begin(),v.end());
     }
-    if(max==NumericLimits<F64>::maximumRange()){
+    if(max==NumericLimits<F32>::maximumRange()){
         max = *std::max_element(v.begin(),v.end());
     }
     int nbr_step = std::floor((max-min)/step);
-    Mat2F64 m(nbr_step,2);
+    Mat2F32 m(nbr_step,2);
     for(unsigned int i=0;i<v.size();i++){
         int value = std::floor((v(i)-min)/step);
         if(value<static_cast<int>(m.sizeI())&&value>=0)
             m(value,1)+=weight(i);
     }
-    double sum=0;
-    double incr = min;
+    F32 sum=0;
+    F32 incr = min;
     for(unsigned int i=0;i<m.sizeI();i++){
         m(i,0)=incr;
         sum+=m(i,1);
@@ -582,23 +582,23 @@ DistributionRegularStep Statistics::computedStaticticsFromRealRealizationsWithWe
 
     return DistributionRegularStep(m);
 }
-DistributionRegularStep Statistics::computedStaticticsFromRealRealizations(  const VecF64 & v,F64 step,F64 min,F64 max)
+DistributionRegularStep Statistics::computedStaticticsFromRealRealizations(  const VecF32 & v,F32 step,F32 min,F32 max)
 {
-    if(min==NumericLimits<F64>::minimumRange()){
+    if(min==NumericLimits<F32>::minimumRange()){
         min = *std::min_element(v.begin(),v.end());
     }
-    if(max==NumericLimits<F64>::maximumRange()){
+    if(max==NumericLimits<F32>::maximumRange()){
         max = *std::max_element(v.begin(),v.end());
     }
     int nbr_step = std::floor((max-min)/step);
-    Mat2F64 m(nbr_step,2);
+    Mat2F32 m(nbr_step,2);
     for(unsigned int i=0;i<v.size();i++){
         int value = std::floor((v(i)-min)/step);
         if(value<static_cast<int>(m.sizeI())&&value>=0)
             m(value,1)++;
     }
     int sum=0;
-    double incr = min;
+    F32 incr = min;
     for(unsigned int i=0;i<m.sizeI();i++){
         m(i,0)=incr;
         sum+=m(i,1);
@@ -612,10 +612,10 @@ DistributionRegularStep Statistics::computedStaticticsFromRealRealizations(  con
 }
 
 
-F64  Statistics::maxRangeIntegral(const Distribution & f,F64 integralvalue,F64 min,F64 maxsupremum ,F64 step  ){
+F32  Statistics::maxRangeIntegral(const Distribution & f,F32 integralvalue,F32 min,F32 maxsupremum ,F32 step  ){
     DistributionIteratorERegularInterval it(min,maxsupremum,step);
     it.init();
-    F64 sum=0;
+    F32 sum=0;
     while(it.next()){
         sum+=f.operator ()(it.x())*step;
         if(sum>integralvalue)
@@ -625,16 +625,16 @@ F64  Statistics::maxRangeIntegral(const Distribution & f,F64 integralvalue,F64 m
 }
 
 
-F64 Statistics::moment(const DistributionMultiVariate &f, VecF64 moment,VecF64 xmin, VecF64 xmax,F64 step)
+F32 Statistics::moment(const DistributionMultiVariate &f, VecF32 moment,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    F64 integral=0;
-    F64 normalization=0;
+    F32 integral=0;
+    F32 normalization=0;
 
     while(it.next()){
-        F64 sum=1;
+        F32 sum=1;
         for(unsigned int i =0;i<moment.size();i++)
             sum *= std::pow(it.x()(i),moment(i));
         integral +=f.operator ()(it.x())*sum;
@@ -644,13 +644,13 @@ F64 Statistics::moment(const DistributionMultiVariate &f, VecF64 moment,VecF64 x
 }
 
 
-VecF64 Statistics::argMin(const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step)
+VecF32 Statistics::argMin(const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    VecF64 arg;
-    F64 min=NumericLimits<F64>::maximumRange();
+    VecF32 arg;
+    F32 min=NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())<min)
         {
@@ -660,13 +660,13 @@ VecF64 Statistics::argMin(const DistributionMultiVariate &f,VecF64 xmin, VecF64 
     }
     return arg;
 }
-VecF64 Statistics::argMax(const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step)
+VecF32 Statistics::argMax(const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    VecF64 arg;
-    F64 max=-NumericLimits<F64>::maximumRange();
+    VecF32 arg;
+    F32 max=-NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())>max)
         {
@@ -677,12 +677,12 @@ VecF64 Statistics::argMax(const DistributionMultiVariate &f,VecF64 xmin, VecF64 
     return arg;
 }
 
-F64 Statistics::minValue( const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step)
+F32 Statistics::minValue( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    F64 min=NumericLimits<F64>::maximumRange();
+    F32 min=NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())<min){
             min = f.operator ()(it.x());
@@ -690,12 +690,12 @@ F64 Statistics::minValue( const DistributionMultiVariate &f,VecF64 xmin, VecF64 
     }
     return min;
 }
-F64 Statistics::maxValue( const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step)
+F32 Statistics::maxValue( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    F64 max=-NumericLimits<F64>::maximumRange();
+    F32 max=-NumericLimits<F32>::maximumRange();
     while(it.next()){
         if(f.operator ()(it.x())>max){
             max = f.operator ()(it.x());
@@ -703,15 +703,15 @@ F64 Statistics::maxValue( const DistributionMultiVariate &f,VecF64 xmin, VecF64 
     }
     return max;
 }
-DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMultiVariate &f, VecF64 xmin, VecF64 xmax,F64 step)
+DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMultiVariate &f, VecF32 xmin, VecF32 xmax,F32 step)
 {
     if(f.getNbrVariable()!=2)
         std::cerr<<"Only for two variate distribution";
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
-    Mat2F64 m( Vec2I32(it._domain(0),it._domain(1)));
-    double steppower2 = step*step;
+    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
+    F32 steppower2 = step*step;
     while(it.next()){
-        VecF64 x = it.xInteger();
+        VecF32 x = it.xInteger();
         if(x(0)>0&&x(1)>0)
             m (x(0),x(1)) = f.operator ()(it.x())*steppower2+m (x(0)-1,x(1))+m (x(0),x(1)-1)-m (x(0)-1,x(1)-1);
         else if(x(0)>0)
@@ -724,30 +724,30 @@ DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMult
     DistributionMultiVariateRegularStep d(m,xmin,step);
     return d;
 }
-DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step)
+DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
 
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
-    F64 sum=0;
+    F32 sum=0;
     while(it.next()){
         sum += absolute(f.operator ()(it.x()));
     }
     it.init();
-    Mat2F64 m( Vec2I32(it._domain(0),it._domain(1)));
+    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
     while(it.next()){
-        VecF64 x = it.xInteger();
+        VecF32 x = it.xInteger();
         m (x(0),x(1)) = absolute(f.operator ()(it.x()))/sum;
     }
     DistributionMultiVariateRegularStep d(m,xmin,step);
     return d;
 }
 
-Mat2F64 Statistics::toMatrix( const DistributionMultiVariate &f,VecF64 xmin, VecF64 xmax,F64 step){
+Mat2F32 Statistics::toMatrix( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step){
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
-    Mat2F64 m( Vec2I32(it._domain(0),it._domain(1)));
+    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
     while(it.next()){
-        VecF64 x = it.xInteger();
+        VecF32 x = it.xInteger();
         m (x(0),x(1)) = f.operator ()(it.x());
     }
     return m;

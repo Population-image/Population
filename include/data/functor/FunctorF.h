@@ -514,7 +514,7 @@ struct POP_EXPORTS FunctorF
          * \sa pop::Processing::mean
         */
     private:
-        typedef typename FunctionTypeTraitsSubstituteF<Type,F64>::Result SuperType;
+        typedef typename FunctionTypeTraitsSubstituteF<Type,F32>::Result SuperType;
         SuperType _sum;
         I32 _occurence;
     public:
@@ -550,13 +550,13 @@ struct POP_EXPORTS FunctorF
          * \sa pop::Analysis::standardDeviationValue
         */
     private:
-        typedef typename FunctionTypeTraitsSubstituteF<Type,F64>::Result SuperType;
+        typedef typename FunctionTypeTraitsSubstituteF<Type,F32>::Result SuperType;
         SuperType _sum;
         I32 _occurence;
-        F64 _mean;
+        F32 _mean;
     public:
         typedef SuperType ReturnType;
-        FunctorAccumulatorVariance(F64 mean)
+        FunctorAccumulatorVariance(F32 mean)
             :_sum(0),_occurence(0),_mean(mean)
         {}
         void operator()(Type p)
@@ -665,26 +665,26 @@ class POP_EXPORTS FunctorStatistic
 {
 private:
     std::vector<Value> _v_value;
-    F64 _variance;
-    F64 _mean;
+    F32 _variance;
+    F32 _mean;
 public:
-    typedef F64 ReturnType;
+    typedef F32 ReturnType;
     FunctorStatistic()
     {
         init();
     }
     void init()
     {
-        _variance=NumericLimits<double>::maximumRange();_mean=NumericLimits<double>::maximumRange();_v_value.clear();
+        _variance=NumericLimits<F32>::maximumRange();_mean=NumericLimits<F32>::maximumRange();_v_value.clear();
     }
     template<typename Function>
     void operator()(const Function & f, const typename Function::E & x)
     {
         _v_value.push_back(f(x));
     }
-    F64 mean()
+    F32 mean()
     {
-        if(_mean==NumericLimits<double>::maximumRange())
+        if(_mean==NumericLimits<F32>::maximumRange())
         {
             for(I32 i =0;i<(I32)_v_value.size();i++)
             {
@@ -693,11 +693,11 @@ public:
         }
         return _mean;
     }
-    F64 variance()
+    F32 variance()
     {
-        if(_variance==NumericLimits<double>::maximumRange())
+        if(_variance==NumericLimits<F32>::maximumRange())
         {
-            if(_mean==NumericLimits<double>::maximumRange())this->mean();
+            if(_mean==NumericLimits<F32>::maximumRange())this->mean();
             for(I32 i =0;i<(I32)_v_value.size();i++)
             {
                 _variance+=(_v_value[i]-_mean)*(_v_value[i]-_mean)/(1.*_v_value.size());
@@ -707,8 +707,8 @@ public:
     }
 };
 namespace Private{
-    template< typename T>struct sumNorm{sumNorm(int norm):_norm(norm){}int _norm;double operator()(double p1,T p2){if(_norm!=0)return p1+normPowerValue(p2,_norm);else return  maximum( p1,static_cast<double>(absolute(p2)));}};
-    template<typename T1>struct PowF{double _exponent;PowF(double exponent):_exponent(exponent){}T1 operator()(T1 p1){return pop::ArithmeticsSaturation<T1,T1 >::Range(std::pow(p1,_exponent));}};
+    template< typename T>struct sumNorm{sumNorm(int norm):_norm(norm){}int _norm;F32 operator()(F32 p1,T p2){if(_norm!=0)return p1+normPowerValue(p2,_norm);else return  maximum( p1,static_cast<F32>(absolute(p2)));}};
+    template<typename T1>struct PowF{F32 _exponent;PowF(F32 exponent):_exponent(exponent){}T1 operator()(T1 p1){return pop::ArithmeticsSaturation<T1,T1 >::Range(std::pow(p1,_exponent));}};
 
 
 }

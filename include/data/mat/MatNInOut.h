@@ -179,20 +179,20 @@ inline void  headerPNG(std::ostream & out,Type2Type<PixelType>){
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,UI8> >){return std::make_pair("P2","P5");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,UI16> >){return std::make_pair("P3","PA");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,UI32> >){return std::make_pair("P4","PB");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,F64> >){return std::make_pair("P7","PC");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,F32> >){return std::make_pair("P7","PC");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,RGBUI8 > >){return std::make_pair("P8","P6");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,RGBF64 > >){return std::make_pair("PE","PF");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,ComplexF64 > >){return std::make_pair("PI","PJ");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,Vec2F64 > >){return std::make_pair("Pa","Pb");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,RGBF32 > >){return std::make_pair("PE","PF");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,ComplexF32 > >){return std::make_pair("PI","PJ");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<2,Vec2F32 > >){return std::make_pair("Pa","Pb");}
 
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,UI8> >){return std::make_pair("PK","PL");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,UI16> >){return std::make_pair("PM","PN");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,UI32> >){return std::make_pair("PO","PP");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,F64> >){return std::make_pair("PQ","PR");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,F32> >){return std::make_pair("PQ","PR");}
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,RGBUI8 > >){return std::make_pair("PS","PT");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,RGBF64 > >){return std::make_pair("PU","PV");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,ComplexF64 > >){return std::make_pair("PZ","P1");}
-inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,Vec3F64 > >){return std::make_pair("Pc","Pd");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,RGBF32 > >){return std::make_pair("PU","PV");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,ComplexF32 > >){return std::make_pair("PZ","P1");}
+inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,Vec3F32 > >){return std::make_pair("Pc","Pd");}
 template<int Dim,typename PixelType>
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<Dim,PixelType > >){return std::make_pair("Unknown","Unknown");}
 }

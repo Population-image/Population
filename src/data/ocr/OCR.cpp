@@ -49,7 +49,7 @@ std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_car
     label =  applyClusterFilter(label,v_filter );
 
     pop::Vec<CharacteristicClusterDistance*> v_dist;
-    pop::Vec<double> v_weight;
+    pop::Vec<F32> v_weight;
 
 
     CharacteristicClusterDistanceHeight dist_height;
@@ -94,12 +94,12 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
     }
     else{
 
-        VecF64 vin= _n.inputMatrixToInputNeuron(m);
-        VecF64 vout;
+        VecF32 vin= _n.inputMatrixToInputNeuron(m);
+        VecF32 vout;
         _n.propagateFront(vin,vout);
-        VecF64::iterator itt = std::max_element(vout.begin(),vout.end());
+        VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
         int label_max = std::distance(vout.begin(),itt);
-        double value_max = *itt;
+        F32 value_max = *itt;
         if(value_max<0)
             _isrecognized=false;
         else

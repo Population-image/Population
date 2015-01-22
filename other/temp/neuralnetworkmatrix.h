@@ -28,7 +28,7 @@ public:
         }
     }
 
-    void propagateFront(const pop::VecF64& in , pop::VecF64 &out){
+    void propagateFront(const pop::VecF32& in , pop::VecF32 &out){
         std::cout<<"R "<<Analysis::standardDeviationValue(_R)*std::sqrt(_R.sizeI())<<std::endl;
         //        std::cout<<"R "<<_R<<std::endl;
         for(unsigned int j=0;j<_X.size();j++){
@@ -47,7 +47,7 @@ public:
         std::copy(_X.end()-_output_neurons,_X.end(),out.begin());
     }
 
-    void propagateBackFirstDerivate(const pop::VecF64& in ,const pop::VecF64& desired_output){
+    void propagateBackFirstDerivate(const pop::VecF32& in ,const pop::VecF32& desired_output){
         if(_X_time.size()!=_time+1){
             _X_time.resize(_time+1,_X);
             _Y_time.resize(_time+1,_Y);
@@ -113,15 +113,15 @@ public:
     unsigned int _input_neurons;
     unsigned int _output_neurons;
     unsigned int _hidden_neurons;
-    pop::VecF64  _X;
-    pop::VecF64  _Y;
-    pop::Mat2F64 _R;
-    pop::Mat2F64 _R_delta_error;
+    pop::VecF32  _X;
+    pop::VecF32  _Y;
+    pop::Mat2F32 _R;
+    pop::Mat2F32 _R_delta_error;
 
-    Vec<pop::VecF64> _X_time;
-    Vec<pop::VecF64> _Y_time;
-    pop::VecF64 _X_delta_error;
-    pop::VecF64 _Y_delta_error;
+    Vec<pop::VecF32> _X_time;
+    Vec<pop::VecF32> _Y_time;
+    pop::VecF32 _X_delta_error;
+    pop::VecF32 _Y_delta_error;
 
 };
 
@@ -147,15 +147,15 @@ public:
 
         DistributionNormal n(0,1./std::sqrt(nbr_neurons));
         for(unsigned int time_index=0;time_index<=_time;time_index++){
-            Mat2F64 R(nbr_neurons,nbr_neurons);
+            Mat2F32 R(nbr_neurons,nbr_neurons);
             for(unsigned int i = 0;i<R.size();i++){
                 R[i]=n.randomVariable();
             }
             _R.push_back(R);
         }
     }
-    double max(){
-        double maxi=0;
+    F32 max(){
+        F32 maxi=0;
         for(unsigned int time_index=0;time_index<_R.size();time_index++){
 
             for(unsigned int j=0;j<_X.size();j++){
@@ -167,7 +167,7 @@ public:
         return maxi;
     }
 
-    void propagateFront(const pop::VecF64& in , pop::VecF64 &out){
+    void propagateFront(const pop::VecF32& in , pop::VecF32 &out){
 
 
 
@@ -188,7 +188,7 @@ public:
         }
         std::copy(_X.begin(),_X.begin()+_output_neurons,out.begin());
     }
-    double  error(const pop::VecF64& desired_output){
+    double  error(const pop::VecF32& desired_output){
         double error=0;
         for(unsigned int j=0;j<desired_output.size();j++){
             error += std::abs(_X[j]-desired_output[j]);
@@ -196,13 +196,13 @@ public:
         return error;
     }
 
-    void propagateBackFirstDerivate(const pop::VecF64& in ,const pop::VecF64& desired_output){
+    void propagateBackFirstDerivate(const pop::VecF32& in ,const pop::VecF32& desired_output){
         if(_X_time.size()!=_time+1){
             _X_time.resize(_time+1,_X);
             _Y_time.resize(_time+1,_Y);
             _X_delta_error.resize(_X.size());
             _Y_delta_error.resize(_Y.size());
-            _R_delta_error.resize(_Y.size(),pop::Mat2F64(_R[0].getDomain()));
+            _R_delta_error.resize(_Y.size(),pop::Mat2F32(_R[0].getDomain()));
 
         }
 
@@ -263,16 +263,16 @@ public:
     unsigned int _input_neurons;
     unsigned int _output_neurons;
     unsigned int _hidden_neurons;
-    pop::VecF64  _X;
-    pop::VecF64  _Y;
-    Vec<pop::Mat2F64> _R;
-    Vec<pop::Mat2F64> _R_temp;
-    Vec<pop::Mat2F64>_R_delta_error;
+    pop::VecF32  _X;
+    pop::VecF32  _Y;
+    Vec<pop::Mat2F32> _R;
+    Vec<pop::Mat2F32> _R_temp;
+    Vec<pop::Mat2F32>_R_delta_error;
 
-    Vec<pop::VecF64> _X_time;
-    Vec<pop::VecF64> _Y_time;
-    pop::VecF64 _X_delta_error;
-    pop::VecF64 _Y_delta_error;
+    Vec<pop::VecF32> _X_time;
+    Vec<pop::VecF32> _Y_time;
+    pop::VecF32 _X_delta_error;
+    pop::VecF32 _Y_delta_error;
 
 };
 
@@ -291,14 +291,14 @@ public:
         for(unsigned int i=0;i<v_layer.size();i++){
             int size_layer =v_layer[i];
             if(i!=v_layer.size()-1)
-                _v_X.push_back(VecF64(size_layer+1,1));//add the neuron with constant value 1
+                _v_X.push_back(VecF32(size_layer+1,1));//add the neuron with constant value 1
             else
-                _v_X.push_back(VecF64(size_layer,1));//except for the last one
-            _v_Y.push_back(VecF64(size_layer));
+                _v_X.push_back(VecF32(size_layer,1));//except for the last one
+            _v_Y.push_back(VecF32(size_layer));
 
             if(i!=0){
                 int size_layer_previous = _v_X[i-1].size();
-                Mat2F64  R(size_layer  ,size_layer_previous);
+                Mat2F32  R(size_layer  ,size_layer_previous);
                 DistributionNormal n(0,1./std::sqrt(size_layer_previous));
                 for(unsigned int i = 0;i<R.size();i++){
                     R[i]=n.randomVariable();
@@ -309,7 +309,7 @@ public:
         }
     }
 
-    void propagateFront(const pop::VecF64& in , pop::VecF64 &out){
+    void propagateFront(const pop::VecF32& in , pop::VecF32 &out){
         std::copy(in.begin(),in.end(),_v_X[0].begin());
         for(unsigned int layer_index=0;layer_index<_v_R.size();layer_index++){
             _v_Y[layer_index+1] = _v_R[layer_index] * _v_X[layer_index];
@@ -321,7 +321,7 @@ public:
             out.resize(_v_X.rbegin()->size());
         std::copy(_v_X.rbegin()->begin(),_v_X.rbegin()->begin()+out.size(),out.begin());
     }
-    void propagateBackFirstDerivate(const pop::VecF64& in ,const pop::VecF64& desired_output){
+    void propagateBackFirstDerivate(const pop::VecF32& in ,const pop::VecF32& desired_output){
         if(_v_X_error.size()==0){
             _v_X_error = _v_X;
             _v_Y_error = _v_Y;
@@ -360,13 +360,13 @@ public:
     }
     double _eta;
 
-    Vec<pop::VecF64>  _v_X;
-    Vec<pop::VecF64>  _v_Y;
-    Vec<pop::Mat2F64> _v_R;
-    Vec<pop::VecF64>  _v_X_error;
-    Vec<pop::VecF64>  _v_Y_error;
-    Vec<pop::Mat2F64> _v_R_error;
-    pop::VecF64 _out;
+    Vec<pop::VecF32>  _v_X;
+    Vec<pop::VecF32>  _v_Y;
+    Vec<pop::Mat2F32> _v_R;
+    Vec<pop::VecF32>  _v_X_error;
+    Vec<pop::VecF32>  _v_Y_error;
+    Vec<pop::Mat2F32> _v_R_error;
+    pop::VecF32 _out;
 
 };
 
@@ -383,13 +383,13 @@ void neuralnetwortest(){
     //        v_int.push_back(1);
     //        neural.createNetwork(v_int);
 
-    //        Vec<VecF64> v(4,VecF64(2));
+    //        Vec<VecF32> v(4,VecF32(2));
     //        v(0)(0)=-1;v(0)(1)=-1;
     //        v(1)(0)= 1;v(1)(1)=-1;
     //        v(2)(0)=-1;v(2)(1)= 1;
     //        v(3)(0)= 1;v(3)(1)= 1;
 
-    //        Vec<VecF64> vout(4,VecF64(1));
+    //        Vec<VecF32> vout(4,VecF32(1));
     //        vout(0)(0)=-1;
     //        vout(1)(0)= 1;
     //        vout(2)(0)= 1;
@@ -406,7 +406,7 @@ void neuralnetwortest(){
     //            for(unsigned int K=0;K<v_global_rand.size();K++)
     //            {
     //                int i = v_global_rand[K];
-    //                VecF64 out;
+    //                VecF32 out;
     //                std::cout<<i<<std::endl;
     //                neural.propagateFront(v(i),out);
     //                std::cout<<out<<std::endl;
@@ -451,8 +451,8 @@ void neuralnetwortest(){
     network.createNetwork(v_layer);
     network._eta = 0.001;
 
-    Vec<VecF64> vtraining_in;
-    Vec<VecF64> vtraining_out;
+    Vec<VecF32> vtraining_in;
+    Vec<VecF32> vtraining_out;
 
 
     double ratio = 1;
@@ -461,8 +461,8 @@ void neuralnetwortest(){
 
 
 
-    Vec<VecF64> vtest_in;
-    Vec<VecF64> vtest_out;
+    Vec<VecF32> vtest_in;
+    Vec<VecF32> vtest_out;
     TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne,1);
 
 
@@ -484,7 +484,7 @@ void neuralnetwortest(){
         int error_training=0,error_test=0,error_intermediaire=0;
 
         for(unsigned int j=0;j<v_global_rand.size();j++){
-            VecF64 vout(10);
+            VecF32 vout(10);
             //            double error_previous,error_after;
             //            network.propagateFront(vtraining_in(v_global_rand[j]),vout);
             //            error_previous = network.error(vtraining_out(v_global_rand[j]));
@@ -510,7 +510,7 @@ void neuralnetwortest(){
         int k=rand()%vtest_in.size();
         for(unsigned int j=0;j<vtest_in.size();j++){
 
-            VecF64 vout(10);
+            VecF32 vout(10);
             network.propagateFront(vtest_in(j),vout);
             int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
             int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
@@ -528,7 +528,7 @@ void neuralnetwortest(){
 
 
 
-    //    Vec<VecF64> v_in(4,VecF64(2));//v2(2),v3(2),v4(2);
+    //    Vec<VecF32> v_in(4,VecF32(2));//v2(2),v3(2),v4(2);
     //    v_in(0)(0)=-1;v_in(0)(1)=-1;
     //    v_in(1)(0)= 1;v_in(1)(1)=-1;
     //    v_in(2)(0)=-1;v_in(2)(1)= 1;
@@ -540,7 +540,7 @@ void neuralnetwortest(){
     //    //    v_in(2)(0)= 0;v_in(2)(1)= 1;
     //    //    v_in(3)(0)= 1;v_in(3)(1)= 1;
 
-    //    Vec<VecF64> v_out(4,VecF64(1));//v2_out(1),v3_out(1),v4_out(1);
+    //    Vec<VecF32> v_out(4,VecF32(1));//v2_out(1),v3_out(1),v4_out(1);
     //    v_out(0)(0)= -1;
     //    v_out(1)(0)= 1;
     //    v_out(2)(0)= 1;
@@ -567,7 +567,7 @@ void neuralnetwortest(){
     //        for(unsigned int j=0;j<v_global_rand.size();j++){
     //            int i = v_global_rand[j];
     //            std::cout<<v_in(i)<<std::endl;
-    //            VecF64 v_out_test(1);
+    //            VecF32 v_out_test(1);
     //            network.propagateFront(v_in(i), v_out_test);
     //            std::cout<<"before neural : "<<v_out_test(0)<<std::endl;
 
@@ -589,7 +589,7 @@ void neuralnetwortest(){
 
 
 
-    //    VecF64 Xin(size_in);
+    //    VecF32 Xin(size_in);
     //    DistributionNormal n(0,1);
     //    std::cout<<n.randomVariable()<<std::endl;
     //    for(unsigned int i = 0;i<Xin.size();i++){
@@ -597,7 +597,7 @@ void neuralnetwortest(){
     //    }
 
 
-    //    VecF64 Xout(2);
+    //    VecF32 Xout(2);
     //    network.propagateFront(Xin,Xout);
 
     //    std::cout<<Xout<<std::endl;

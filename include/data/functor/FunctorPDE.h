@@ -50,11 +50,11 @@ namespace pop
 * \code
     Mat2UI8 img;
     img.load("../image/Lena.bmp");
-    Mat2F64 img_timet(img);//operation on float
-    Mat2F64 img_timet_plus_one(img);
+    Mat2F32 img_timet(img);//operation on float
+    Mat2F32 img_timet_plus_one(img);
     FunctorPDE::Laplacien<> laplacien;
 
-    double D=0.25;//diffusion coefficient
+    F32 D=0.25;//diffusion coefficient
     MatNDisplay disp;
     for(unsigned int index_time=0;index_time<300;index_time++){
         std::cout<<index_time<<std::endl;
@@ -81,11 +81,11 @@ public:
      * \code
     Mat2UI8 img;
     img.load("../image/Lena.bmp");
-    Mat2F64 img_timet(img);//operation on float
-    Mat2F64 img_timet_plus_one(img);
+    Mat2F32 img_timet(img);//operation on float
+    Mat2F32 img_timet_plus_one(img);
     FunctorPDE::Laplacien<> laplacien;
 
-    double D=0.25;//diffusion coefficient
+    F32 D=0.25;//diffusion coefficient
     MatNDisplay disp;
     for(unsigned int index_time=0;index_time<300;index_time++){
         std::cout<<index_time<<std::endl;
@@ -115,7 +115,7 @@ public:
     class POP_EXPORTS PartialDerivateCentered
     {
     public:
-        static const double DIV_INVERSE;
+        static const F32 DIV_INVERSE;
         /*!
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
@@ -1069,8 +1069,8 @@ public:
         *
         */
         template<int DIM,typename TypePixel>
-        inline Mat2x<F64,DIM,DIM> operator()(const MatN<DIM,TypePixel> & f, const typename MatN<DIM,TypePixel>::E & x){
-            typedef Mat2x<F64,DIM,DIM> Mat2x22f;
+        inline Mat2x<F32,DIM,DIM> operator()(const MatN<DIM,TypePixel> & f, const typename MatN<DIM,TypePixel>::E & x){
+            typedef Mat2x<F32,DIM,DIM> Mat2x22f;
             Mat2x22f m;
             for(int i = 0;i<DIM;i++){
                 for(int j = 0;j<DIM;j++){
@@ -1121,7 +1121,7 @@ public:
         * Construct the functor
         *
         */
-        DiffusionMalikPerona(F64 K)
+        DiffusionMalikPerona(F32 K)
             :_kpower2(K*K/(80))
         {
         }
@@ -1150,7 +1150,7 @@ public:
 
     /*!
     \class pop::FunctorPDE::FreeEnergy
-    \brief  the opposite of the derivative of the double well potential \f$−\phi^2/2 + \phi^4/4\f$,
+    \brief  the opposite of the derivative of the F32 well potential \f$−\phi^2/2 + \phi^4/4\f$,
     *
     *
     */

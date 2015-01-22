@@ -56,17 +56,17 @@ For instance, the noise can be seen as fluctuation with a short length correlati
 \code
 Mat2UI8 img;//2d grey-level image object
 img.load("../image/Lena.bmp");//replace this path by those on your computer
-Mat2F64 noisemap;
+Mat2F32 noisemap;
 Distribution d(DistributionNormal(0,20));
 Processing::randomField(img.getDomain(),d,noisemap);
-img = Mat2F64(img) +noisemap;
+img = Mat2F32(img) +noisemap;
 img.save("../doc/image2/lenanoise.jpg");
-Mat2ComplexF64 imgcomplex;
+Mat2ComplexF32 imgcomplex;
 Convertor::fromRealImaginary(img,imgcomplex);
-Mat2ComplexF64 fft = Representation::FFT(imgcomplex,1);
+Mat2ComplexF32 fft = Representation::FFT(imgcomplex,1);
 Mat2UI8 filterlowpass = Representation::lowPass(fft,60);
 imgcomplex = Representation::FFT(filterlowpass,-1);
-Mat2F64 imgd;
+Mat2F32 imgd;
 Convertor::toRealImaginary(imgcomplex,imgd);
 img = Processing::greylevelRange(imgd,0,255);
 img.display();
@@ -98,7 +98,7 @@ struct POP_EXPORTS Representation
     //-------------------------------------
 
     /*!
-         * \param f input matrix with ComplexF64 as pixel/voxel type
+         * \param f input matrix with ComplexF32 as pixel/voxel type
          * \param direction for direction =1 direct FFT, otherwise inverse FFT
          * \return return the fft
         * \brief Apply the FFT on the input matrix
@@ -107,15 +107,15 @@ struct POP_EXPORTS Representation
          \code
         Mat2UI8 img;//2d grey-level image object
         img.load("/home/vincent/Dropbox/MyArticle/PhaseField/lena.pgm");//replace this path by those on your computer
-        Mat2ComplexF64 imgcomplex;
+        Mat2ComplexF32 imgcomplex;
         Convertor::fromRealImaginary(img,imgcomplex);
-        Mat2ComplexF64 fft = Representation::FFT(imgcomplex);
-        Mat2ComplexF64 filterlowpass(fft.getDomain());
+        Mat2ComplexF32 fft = Representation::FFT(imgcomplex);
+        Mat2ComplexF32 filterlowpass(fft.getDomain());
         Vec2I32 x(0,0);
-        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF64>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
+        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF32>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
         fft = Processing::mask(fft,filterlowpass);
         imgcomplex = Representation::FFT(fft,-1);
-        Mat2F64 imgd;
+        Mat2F32 imgd;
         Convertor::toRealImaginary(imgcomplex,imgd);
         img = Processing::greylevelRange(imgd,0,255);
         img.display();
@@ -123,25 +123,25 @@ struct POP_EXPORTS Representation
          *
         */
     template<int DIM>
-    static MatN<DIM,ComplexF64>  FFT(const MatN<DIM,ComplexF64> & f ,int direction=1)
+    static MatN<DIM,ComplexF32>  FFT(const MatN<DIM,ComplexF32> & f ,int direction=1)
     {
-        MatN<DIM,ComplexF64> in;
+        MatN<DIM,ComplexF32> in;
         if(isPowerOfTwo(f.getDomain()(0))==false||isPowerOfTwo(f.getDomain()(1))==false){
             in =truncateMulitple2(f);
         }else{
             in =f;
         }
 
-        typename MatN<DIM-1,ComplexF64>::E x;
-        MatN<DIM,ComplexF64>  F (in);
+        typename MatN<DIM-1,ComplexF32>::E x;
+        MatN<DIM,ComplexF32>  F (in);
 
         for(int fixed_coordinate=0;fixed_coordinate<DIM;fixed_coordinate++){
             x = in.getDomain().removeCoordinate(fixed_coordinate);
-            typename MatN<DIM-1,ComplexF64>::IteratorEDomain it(x);
-            MatN<1,ComplexF64> lign(in.getDomain()(fixed_coordinate));
-            MatN<1,ComplexF64> lign2(in.getDomain()(fixed_coordinate));
+            typename MatN<DIM-1,ComplexF32>::IteratorEDomain it(x);
+            MatN<1,ComplexF32> lign(in.getDomain()(fixed_coordinate));
+            MatN<1,ComplexF32> lign2(in.getDomain()(fixed_coordinate));
             while(it.next()){
-                typename MatN<DIM,ComplexF64>::E xx;
+                typename MatN<DIM,ComplexF32>::E xx;
                 for(int i=0;i<DIM;i++){
                     if(i<fixed_coordinate)
                         xx(i) =it.x()(i);
@@ -159,7 +159,7 @@ struct POP_EXPORTS Representation
 
             }
         }
-        typename MatN<DIM,ComplexF64>::IteratorEDomain b(F.getDomain());
+        typename MatN<DIM,ComplexF32>::IteratorEDomain b(F.getDomain());
         if(direction!=1)
         {
             while(b.next())
@@ -178,7 +178,7 @@ struct POP_EXPORTS Representation
          \code
     Mat2UI8 img;
     img.load("../image/eutel.bmp");
-    Mat2ComplexF64 imgc;
+    Mat2ComplexF32 imgc;
     imgc.fromRealImaginary(img);
     imgc = Representation::FFT(imgc,1);
     img = Representation::FFTDisplay(imgc);
@@ -186,23 +186,23 @@ struct POP_EXPORTS Representation
     \endcode
         */
     template<int DIM>
-    static MatN<DIM,UI8> FFTDisplay(const MatN<DIM,ComplexF64> & fft)
+    static MatN<DIM,UI8> FFTDisplay(const MatN<DIM,ComplexF32> & fft)
     {
 
 
-        MatN<DIM,F64> imgf(fft.getDomain());
+        MatN<DIM,F32> imgf(fft.getDomain());
         MatN<DIM,UI8> img(fft.getDomain());
-        typename MatN<DIM,ComplexF64>::IteratorEDomain it(img.getIteratorEDomain());
+        typename MatN<DIM,ComplexF32>::IteratorEDomain it(img.getIteratorEDomain());
         while(it.next()){
-            double v = std::log(normValue(fft(it.x()))+1)/std::log(10.);
+            F32 v = std::log(normValue(fft(it.x()))+1)/std::log(10.);
             imgf(it.x())=v;
         }
         FunctorF::FunctorAccumulatorMin<F32 > funcmini;
         it.init();
-        F64 mini = forEachFunctorAccumulator(imgf,funcmini,it);
-        FunctorF::FunctorAccumulatorMax<F64 > funcmaxi;
+        F32 mini = forEachFunctorAccumulator(imgf,funcmini,it);
+        FunctorF::FunctorAccumulatorMax<F32 > funcmaxi;
         it.init();
-        F64 maxi = forEachFunctorAccumulator(imgf,funcmaxi,it);
+        F32 maxi = forEachFunctorAccumulator(imgf,funcmaxi,it);
         it.init();
         while(it.next())
             img(it.x()) = ((imgf(it.x())-mini)*255/(maxi-mini));
@@ -233,7 +233,7 @@ struct POP_EXPORTS Representation
      \code
     Mat2UI8 img;
     img.load("/home/vincent/Desktop/bin/Population/doc/html/lena.bmp");
-    Mat2ComplexF64 imgc;
+    Mat2ComplexF32 imgc;
     imgc.fromRealImaginary(img);
     imgc = Representation::FFT(imgc,1);
     imgc = Representation::lowPass(imgc,7);
@@ -244,9 +244,9 @@ struct POP_EXPORTS Representation
         */
 
     template<int DIM>
-    static MatN<DIM,ComplexF64> lowPass(const MatN<DIM,ComplexF64> & f,double frenquency_threshold){
-        MatN<DIM,ComplexF64> filter(f.getDomain());
-        typename MatN<DIM,ComplexF64>::IteratorENeighborhoodPeriodic it(filter.getIteratorENeighborhood(frenquency_threshold,2));
+    static MatN<DIM,ComplexF32> lowPass(const MatN<DIM,ComplexF32> & f,F32 frenquency_threshold){
+        MatN<DIM,ComplexF32> filter(f.getDomain());
+        typename MatN<DIM,ComplexF32>::IteratorENeighborhoodPeriodic it(filter.getIteratorENeighborhood(frenquency_threshold,2));
         it.init(0);
         while(it.next()){
             filter(it.x())=f(it.x());
@@ -261,7 +261,7 @@ struct POP_EXPORTS Representation
      \code
     Mat2UI8 img;
     img.load("/home/vincent/Desktop/bin/Population/doc/html/lena.bmp");
-    Mat2ComplexF64 imgc;
+    Mat2ComplexF32 imgc;
     imgc.fromRealImaginary(img);
     imgc = Representation::FFT(imgc,1);
     imgc = Representation::highPass(imgc,7);
@@ -271,9 +271,9 @@ struct POP_EXPORTS Representation
     \endcode
         */
     template<int DIM>
-    static MatN<DIM,ComplexF64> highPass(const MatN<DIM,ComplexF64> & f,double frenquency_threshold){
-        MatN<DIM,ComplexF64> filter(f);
-        typename MatN<DIM,ComplexF64>::IteratorENeighborhoodPeriodic it(filter.getIteratorENeighborhood(frenquency_threshold,2));
+    static MatN<DIM,ComplexF32> highPass(const MatN<DIM,ComplexF32> & f,F32 frenquency_threshold){
+        MatN<DIM,ComplexF32> filter(f);
+        typename MatN<DIM,ComplexF32>::IteratorENeighborhoodPeriodic it(filter.getIteratorENeighborhood(frenquency_threshold,2));
         it.init(0);
         while(it.next()){
             filter(it.x())=0;
@@ -332,7 +332,7 @@ private:
             MatN<DIM,TypePixel> out (in.getDomain());
             int half = in.getDomain()(0)/2;
 
-            ComplexF64  w1,w;
+            ComplexF32  w1,w;
             w1.real() = std::cos(2*PI/in.getDomain()(0) );
             if(direction==1)
                 w1.img() = -std::sin(2*PI/in.getDomain()(0) );
@@ -343,8 +343,8 @@ private:
 
             for(int i =0; i< Fodd.getDomain()(0);i++)
             {
-                (out)(i)=1/2.0 * ((Fodd)(i) +w* (Feven)(i)) ;
-                (out)(i+half)=1/2.0 * ((Fodd)(i) -w* (Feven)(i));
+                (out)(i)=0.5f * ((Fodd)(i) +w* (Feven)(i)) ;
+                (out)(i+half)=0.5f * ((Fodd)(i) -w* (Feven)(i));
                 w = w*w1;
             }
             return out;

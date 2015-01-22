@@ -159,7 +159,7 @@ namespace FUNCTIONPARSERTYPES
         union
         {
             unsigned index;
-            pop::F64 value;
+            pop::F32 value;
         };
 
         NameData(DataType t, const std::string& n): type(t), name(n) {}
@@ -229,8 +229,8 @@ struct FunctionParser::Data
     std::vector<FuncPtrData> FuncParsers;
 
     std::vector<unsigned> ByteCode;
-    std::vector<pop::F64> Immed;
-    std::vector<pop::F64> Stack;
+    std::vector<pop::F32> Immed;
+    std::vector<pop::F32> Stack;
     unsigned StackSize;
 
     Data(): referenceCounter(1),

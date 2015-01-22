@@ -195,13 +195,13 @@ private:
 
 public:
     template<typename FunctionMultiphase>
-    RegionGrowingMultiPhaseField(FunctionPhaseField & field,FunctionMultiphase & multiphase, F64 treshold)
+    RegionGrowingMultiPhaseField(FunctionPhaseField & field,FunctionMultiphase & multiphase, F32 treshold)
         :_itn(field.getIteratorENeighborhood()),_pop(field.getDomain(),_funczero,field.getIteratorENeighborhood()),_it(_pop,field,treshold)
     {
        initField(_pop,multiphase,field);
     }
     template<typename FunctionMultiphase,typename FunctionBulk>
-    RegionGrowingMultiPhaseField(FunctionPhaseField & field,FunctionMultiphase & multiphase,F64 treshold,FunctionBulk & bulk)
+    RegionGrowingMultiPhaseField(FunctionPhaseField & field,FunctionMultiphase & multiphase,F32 treshold,FunctionBulk & bulk)
         :_itn(field.getIteratorENeighborhood()),_pop(field.getDomain(),_funczero,field.getIteratorENeighborhood()),_it(_pop,field,treshold)
     {
         initField(_pop,multiphase,field,bulk);

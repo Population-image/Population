@@ -20,34 +20,34 @@ public:
     int _mass;
     Vec2I32 _min;
     Vec2I32 _max;
-    Vec2F64 _barycentre;
+    Vec2F32 _barycentre;
 };
 
 
 
 struct POP_EXPORTS CharacteristicClusterDistance{
     virtual ~CharacteristicClusterDistance();
-    virtual double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b)=0;
+    virtual F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b)=0;
 };
 struct POP_EXPORTS CharacteristicClusterDistanceMass : public CharacteristicClusterDistance{
-    double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
+    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
 };
 struct POP_EXPORTS CharacteristicClusterDistanceHeight : public CharacteristicClusterDistance{
-    double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
+    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
 };
 struct POP_EXPORTS CharacteristicClusterDistanceWidth : public CharacteristicClusterDistance{
-    double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
+    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
 };
 struct POP_EXPORTS CharacteristicClusterDistanceWidthInterval : public CharacteristicClusterDistance{
-    double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
+    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
 };
 struct POP_EXPORTS CharacteristicClusterDistanceHeightInterval : public CharacteristicClusterDistance{
-    double operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
+    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
 };
 
 struct POP_EXPORTS CharacteristicClusterFilter{
-    double _min;
-    double _max;
+    F32 _min;
+    F32 _max;
     CharacteristicClusterFilter();
     virtual ~CharacteristicClusterFilter();
     virtual bool operator ()(const CharacteristicCluster& a);
@@ -69,14 +69,14 @@ struct POP_EXPORTS CharacteristicClusterFilterAsymmetryHeightPerWidth : public C
     bool operator ()(const CharacteristicCluster& a);
 };
 namespace Private{
-    bool sortMyFunction (std::pair<double,int> i,std::pair<double,int> j);
+    bool sortMyFunction (std::pair<F32,int> i,std::pair<F32,int> j);
     bool sortMyFunctionLeft (std::pair<int,int>  i,std::pair<int,int> j) ;
 }
 
 Vec<CharacteristicCluster> applyCharacteristicClusterFilter(const Vec<CharacteristicCluster>& v_cluster, CharacteristicClusterFilter * filter);
 
 pop::Mat2UI32 POP_EXPORTS applyClusterFilter(const pop::Mat2UI32& labelled_image,const Vec<CharacteristicClusterFilter*> v_filter  );
-Vec<Vec<Mat2UI8> > POP_EXPORTS applyGraphCluster(const pop::Mat2UI32& labelled_image, pop::Vec<CharacteristicClusterDistance*> v_dist,  pop::Vec<double> v_weight,double threshold  );
+Vec<Vec<Mat2UI8> > POP_EXPORTS applyGraphCluster(const pop::Mat2UI32& labelled_image, pop::Vec<CharacteristicClusterDistance*> v_dist,  pop::Vec<F32> v_weight,F32 threshold  );
 
 
 
@@ -127,8 +127,8 @@ public:
     Position getMin()const{
         return _min;
     }
-    double getAsymmetryHeighPerWidth()const{
-        return static_cast<double>(getSize()(0))/getSize()(1);
+    F32 getAsymmetryHeighPerWidth()const{
+        return static_cast<F32>(getSize()(0))/getSize()(1);
     }
 
 };
@@ -137,9 +137,9 @@ class CharacteristicGreyLevel
 {
     const Function * _m;
         int _nbr_point;
-    double  _mean;
-    double  _variance;
-    mutable double  _standart_deviation;
+    F32  _mean;
+    F32  _variance;
+    mutable F32  _standart_deviation;
 
 public:
     CharacteristicGreyLevel()
@@ -154,10 +154,10 @@ public:
         _m = m;
     }
 
-    double getMean()const{
+    F32 getMean()const{
         return _mean;
     }
-    double getStandartDeviation()const{
+    F32 getStandartDeviation()const{
         if(_standart_deviation==0)
             _standart_deviation = std::sqrt(_variance);
         return _standart_deviation;
@@ -177,43 +177,43 @@ public:
 
 template<typename TypeCharacteristic >
 struct DistanceCharacteristic{
-    virtual double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b)=0;
+    virtual F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b)=0;
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicMass : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<double>(std::max(a.getMass(),b.getMass()))/std::min(a.getMass(),b.getMass()))-1;
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return (static_cast<F32>(std::max(a.getMass(),b.getMass()))/std::min(a.getMass(),b.getMass()))-1;
     }
 };
 
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicGreyLevel : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
         return std::abs(a.getMean()-b.getMean())/std::min(a.getStandartDeviation(),b.getStandartDeviation());
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicHeigh : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<double>(std::max(a.getSize()(0),b.getSize()(0))))/std::min(a.getSize()(0),b.getSize()(0))-1;
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return (static_cast<F32>(std::max(a.getSize()(0),b.getSize()(0))))/std::min(a.getSize()(0),b.getSize()(0))-1;
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicWidth : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<double>(std::max(a.getSize()(1),b.getSize()(1))))/std::min(a.getSize()(1),b.getSize()(1))-1;
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return (static_cast<F32>(std::max(a.getSize()(1),b.getSize()(1))))/std::min(a.getSize()(1),b.getSize()(1))-1;
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicWidthInterval : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return static_cast<double>(std::abs(a.getCenter()(1)-b.getCenter()(1)))/ std::min(a.getSize()(1),b.getSize()(1));
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return static_cast<F32>(std::abs(a.getCenter()(1)-b.getCenter()(1)))/ std::min(a.getSize()(1),b.getSize()(1));
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicHeightInterval : public DistanceCharacteristic<TypeCharacteristic>{
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return static_cast<double>(std::abs(a.getCenter()(0)-b.getCenter()(0)))/  std::min(a.getSize()(0),b.getSize()(0));
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return static_cast<F32>(std::abs(a.getCenter()(0)-b.getCenter()(0)))/  std::min(a.getSize()(0),b.getSize()(0));
     }
 };
 template<typename TypeCharacteristic>
@@ -228,8 +228,8 @@ struct DistanceSumCharacteristic  : public DistanceCharacteristic<TypeCharacteri
         _v_carac.push_back(dist);
     }
 
-    double operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        double sum=0;
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        F32 sum=0;
         for(unsigned int index = 0; index<_v_dist.size(); index++){
             sum+=_v_dist[index]->operator()(_v_carac[index]->operator()(a,b));
         }

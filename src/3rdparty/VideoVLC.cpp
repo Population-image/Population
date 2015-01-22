@@ -18,7 +18,7 @@ struct ConvertRV32ToGrey{
             for(unsigned int i=0;i<256;i++){
                 for(unsigned int j=0;j<256;j++){
                     for(unsigned int k=0;k<256;k++){
-                        _look_up_table[i][j][k]=ArithmeticsSaturation<pop::UI8,F64>::Range(0.299*i + 0.587*j + 0.114*k+0.000001);
+                        _look_up_table[i][j][k]=ArithmeticsSaturation<pop::UI8,F32>::Range(0.299*i + 0.587*j + 0.114*k+0.000001);
                     }
                 }
             }

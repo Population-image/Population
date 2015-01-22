@@ -85,7 +85,7 @@ class VecN;
 
 
 /*! \ingroup Vector
-* \defgroup Vec Vec{I32,F64}
+* \defgroup Vec Vec{I32,F32}
 * \brief  template class for tuple of numbers of variable size
 */
 template<typename Type>
@@ -101,12 +101,12 @@ private:
      *
      * Vec is an extension of the std::vector to include classical arithmetic operations of linear algebra.
      * \code
-        VecF64 v1(3),v2(3);//VecF64=Vec<double>
+        VecF32 v1(3),v2(3);//VecF32=Vec<F32>
         v1(0)= 1;v1(1)= 0.5;v1(2)=3.5;
         v2(0)=-1;v2(1)=-0.5;v2(2)=2.5;
         v1 = (v1+v2)/normValue(v1+v2);//add two vector and normalized by the norm
         std::cout<<v1<<std::endl;//0,0,1
-        Mat2F64 m =GeometricalTransformation::rotation3D(PI/2,1);//rotation along the y-axis
+        Mat2F32 m =GeometricalTransformation::rotation3D(PI/2,1);//rotation along the y-axis
         v1 = m*v1;//multiply the matrix by the vector
         std::cout<<v1<<std::endl;//-1,0,0
      * \endcode
@@ -415,7 +415,7 @@ public:
     *
     *  return \f$ (\sum_i |v(i)| ^p)^{1/p}\f$
     */
-    F64 norm(int p=2)const;
+    F32 norm(int p=2)const;
 
     /*!
     * \param p norm  (2=euclidean)
@@ -423,7 +423,7 @@ public:
     *
     *  return \f$ \sum_i |v(i)|^p)\f$
     */
-    F64 normPower(int p=2)const;
+    F32 normPower(int p=2)const;
 
     /*!
     * \return the multiplication of all elements
@@ -469,8 +469,7 @@ public:
     }
 
 };
-typedef Vec<ComplexF64> VecComplexF64;
-typedef Vec<F64> VecF64;
+typedef Vec<ComplexF32> VecComplexF32;
 typedef Vec<F32> VecF32;
 typedef Vec<I32> VecI32;
 template<typename Type>
@@ -546,7 +545,7 @@ void Vec<Type>::save(std::string file)const {
     }
 }
 template<typename Type>
-F64 Vec<Type>::norm(int p)const{
+F32 Vec<Type>::norm(int p)const{
     Private::sumNorm<Type> op(p);
     if(p==0||p==1)
         return std::accumulate(this->begin(),this->end(),0.,op);
@@ -556,7 +555,7 @@ F64 Vec<Type>::norm(int p)const{
         return std::pow(std::accumulate(this->begin(),this->end(),0.,op),1./p);
 }
 template<typename Type>
-F64 Vec<Type>::normPower(int p)const{
+F32 Vec<Type>::normPower(int p)const{
     Private::sumNorm<Type> op(p);
     return std::accumulate(this->begin(),this->end(),0.,op);
 
@@ -756,7 +755,7 @@ pop::Vec<T1> floor(const pop::Vec<T1>& v1){
 *
 */
 template<typename T1>
-double normValue(const pop::Vec<T1>& v1,int p=2){
+F32 normValue(const pop::Vec<T1>& v1,int p=2){
     return v1.norm(p);
 }
 /*!
@@ -768,7 +767,7 @@ double normValue(const pop::Vec<T1>& v1,int p=2){
 *
 */
 template<typename T1>
-double normPowerValue(const pop::Vec<T1>& v1,int p=2){
+F32 normPowerValue(const pop::Vec<T1>& v1,int p=2){
     return v1.normPower(p);
 }
 /*!
@@ -781,7 +780,7 @@ double normPowerValue(const pop::Vec<T1>& v1,int p=2){
 *
 */
 template<typename Type1>
-double distance(const pop::Vec<Type1>& u, const pop::Vec<Type1>&  v,int p=2)
+F32 distance(const pop::Vec<Type1>& u, const pop::Vec<Type1>&  v,int p=2)
 {
     return normValue(u-v,p);
 }
@@ -846,7 +845,7 @@ pop::Vec<T1> minimum(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2){
 
 
 template<typename T1>
-double  productInner(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
+F32  productInner(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
 {
     POP_DbgAssert( v1.size()==v2.size());
 

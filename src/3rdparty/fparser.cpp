@@ -178,25 +178,25 @@ namespace
         return *endPtr == '\0';
     }
 
-    inline int float64ToInt(pop::F64 d)
+    inline int float64ToInt(pop::F32 d)
     {
         return d<0 ? -int((-d)+.5) : int(d+.5);
     }
 
-    inline pop::F64 Min(pop::F64 d1, pop::F64 d2)
+    inline pop::F32 Min(pop::F32 d1, pop::F32 d2)
     {
         return d1<d2 ? d1 : d2;
     }
-    inline pop::F64 Max(pop::F64 d1, pop::F64 d2)
+    inline pop::F32 Max(pop::F32 d1, pop::F32 d2)
     {
         return d1>d2 ? d1 : d2;
     }
 
-    inline pop::F64 DegreesToRadians(pop::F64 degrees)
+    inline pop::F32 DegreesToRadians(pop::F32 degrees)
     {
         return degrees*(M_PI/180.0);
     }
-    inline pop::F64 RadiansToDegrees(pop::F64 radians)
+    inline pop::F32 RadiansToDegrees(pop::F32 radians)
     {
         return radians*(180.0/M_PI);
     }
@@ -309,7 +309,7 @@ void FunctionParser::ForceDeepCopy()
 //=========================================================================
 // User-defined constant and function addition
 //=========================================================================
-bool FunctionParser::AddConstant(const std::string& name, pop::F64 value)
+bool FunctionParser::AddConstant(const std::string& name, pop::F32 value)
 {
     if(!containsOnlyValidNameChars(name)) return false;
 
@@ -319,7 +319,7 @@ bool FunctionParser::AddConstant(const std::string& name, pop::F64 value)
     return addNewNameData(data->nameData, data->namePtrs, newData);
 }
 
-bool FunctionParser::AddUnit(const std::string& name, pop::F64 value)
+bool FunctionParser::AddUnit(const std::string& name, pop::F32 value)
 {
     if(!containsOnlyValidNameChars(name)) return false;
 
@@ -679,7 +679,7 @@ const char* FunctionParser::CompileElement(const char* function)
     if(isdigit(c) || c=='.') // Number
     {
         char* endPtr;
-        const pop::F64 val = strtod(function, &endPtr);
+        const pop::F32 val = strtod(function, &endPtr);
         if(endPtr == function) return SetErrorType(SYNTAX_ERROR, function);
 
         data->Immed.push_back(val);
@@ -1032,10 +1032,10 @@ const char* FunctionParser::CompileExpression(const char* function)
 //===========================================================================
 // Function evaluation
 //===========================================================================
-pop::F64 FunctionParser::Eval(const pop::F64* Vars)
+pop::F32 FunctionParser::Eval(const pop::F32* Vars)
 {
     const unsigned* const ByteCode = &(data->ByteCode[0]);
-    const pop::F64* const Immed = data->Immed.empty() ? 0 : &(data->Immed[0]);
+    const pop::F32* const Immed = data->Immed.empty() ? 0 : &(data->Immed[0]);
     const unsigned ByteCodeSize = unsigned(data->ByteCode.size());
     unsigned IP, DP=0;
     int SP=-1;
@@ -1044,10 +1044,10 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
 #ifdef FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
     float64* const Stack = (float64*)alloca(data->StackSize*sizeof(float64));
 #else
-    std::vector<pop::F64> Stack(data->StackSize);
+    std::vector<pop::F32> Stack(data->StackSize);
 #endif
 #else
-    std::vector<pop::F64>& Stack = data->Stack;
+    std::vector<pop::F32>& Stack = data->Stack;
 #endif
 
     for(IP=0; IP<ByteCodeSize; ++IP)
@@ -1096,7 +1096,7 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
 
           case   cCot:
               {
-                  const pop::F64 t = tan(Stack[SP]);
+                  const pop::F32 t = tan(Stack[SP]);
 #               ifndef FP_NO_EVALUATION_CHECKS
                   if(t == 0) { evalErrorType=1; return 0; }
 #               endif
@@ -1105,7 +1105,7 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
 
           case   cCsc:
               {
-                  const pop::F64 s = sin(Stack[SP]);
+                  const pop::F32 s = sin(Stack[SP]);
 #               ifndef FP_NO_EVALUATION_CHECKS
                   if(s == 0) { evalErrorType=1; return 0; }
 #               endif
@@ -1191,7 +1191,7 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
 
           case   cSec:
               {
-                  const pop::F64 c = cos(Stack[SP]);
+                  const pop::F32 c = cos(Stack[SP]);
 #               ifndef FP_NO_EVALUATION_CHECKS
                   if(c == 0) { evalErrorType=1; return 0; }
 #               endif
@@ -1301,7 +1301,7 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
               {
                   unsigned index = ByteCode[++IP];
                   unsigned params = data->FuncPtrs[index].params;
-                  pop::F64 retVal =
+                  pop::F32 retVal =
                       data->FuncPtrs[index].funcPtr(&Stack[SP-params+1]);
                   SP -= int(params)-1;
                   Stack[SP] = retVal;
@@ -1312,7 +1312,7 @@ pop::F64 FunctionParser::Eval(const pop::F64* Vars)
               {
                   unsigned index = ByteCode[++IP];
                   unsigned params = data->FuncParsers[index].params;
-                  pop::F64 retVal =
+                  pop::F32 retVal =
                       data->FuncParsers[index].parserPtr->Eval
                       (&Stack[SP-params+1]);
                   SP -= int(params)-1;

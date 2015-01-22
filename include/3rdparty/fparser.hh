@@ -38,13 +38,13 @@ public:
     const char* ErrorMsg() const;
     inline ParseErrorType GetParseErrorType() const { return parseErrorType; }
 
-    pop::F64 Eval(const pop::F64* Vars);
+    pop::F32 Eval(const pop::F32* Vars);
     inline pop::I32 EvalError() const { return evalErrorType; }
 
-    bool AddConstant(const std::string& name, pop::F64 value);
-    bool AddUnit(const std::string& name, pop::F64 value);
+    bool AddConstant(const std::string& name, pop::F32 value);
+    bool AddUnit(const std::string& name, pop::F32 value);
 
-    typedef pop::F64 (*FunctionPtr)(const pop::F64*);
+    typedef pop::F32 (*FunctionPtr)(const pop::F32*);
 
     bool AddFunction(const std::string& name,
                      FunctionPtr, unsigned paramsAmount);

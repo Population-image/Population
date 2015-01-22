@@ -10,20 +10,20 @@ DistributionRegularStep::DistributionRegularStep()
     :uni(0,1),_table(1)
 {
 }
-DistributionRegularStep::DistributionRegularStep(const Mat2F64 & m)
+DistributionRegularStep::DistributionRegularStep(const Mat2F32 & m)
     :uni(0,1)
 {
     this->fromMatrix(m);
 }
-F64 DistributionRegularStep::getXmin() const{
+F32 DistributionRegularStep::getXmin() const{
     return _xmin;
 }
 
-F64 DistributionRegularStep::getXmax()const{
+F32 DistributionRegularStep::getXmax()const{
     return _xmax;
 }
 
-F64 DistributionRegularStep::getStep()const{
+F32 DistributionRegularStep::getStep()const{
     return this->_spacing;
 }
 
@@ -34,21 +34,21 @@ DistributionRegularStep::DistributionRegularStep(const DistributionRegularStep &
 }
 
 
-F64  DistributionRegularStep::fMinusOneForMonotonicallyIncreasing(F64 y)const{
-    std::vector<F64>::const_iterator low=std::lower_bound (this->_table.begin(), this->_table.end(), y);
+F32  DistributionRegularStep::fMinusOneForMonotonicallyIncreasing(F32 y)const{
+    std::vector<F32>::const_iterator low=std::lower_bound (this->_table.begin(), this->_table.end(), y);
     return this->_spacing*     int(low- this->_table.begin())+this->_xmin ;
 }
 
-void DistributionRegularStep::smoothGaussian(double sigma){
+void DistributionRegularStep::smoothGaussian(F32 sigma){
 
-    std::vector<F64 > _table_temp;
+    std::vector<F32 > _table_temp;
     _table_temp = this->_table;
-    std::vector<F64> v_value_one_dimension;
+    std::vector<F32> v_value_one_dimension;
     int radius_kernel=2*sigma;
     //initialisation one-dimension
-    double sum=0;
+    F32 sum=0;
     for(int i=0;i<2*radius_kernel+1;i++){
-        F64  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+        F32  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
         v_value_one_dimension.push_back(value);
         sum+=value;
     }
@@ -62,7 +62,7 @@ void DistributionRegularStep::smoothGaussian(double sigma){
         for(I32 j = 0;j<(I32)v_value_one_dimension.size();j++)
         {
             int k= j- radius_kernel;
-            double value;
+            F32 value;
             if((i+k)<0)
                 value=_table_temp[-(i+k)-1];
             else if((i+k)>=(int)this->_table.size())
@@ -76,7 +76,7 @@ void DistributionRegularStep::smoothGaussian(double sigma){
     }
 }
 
-F64 DistributionRegularStep::operator ()(F64 value)const 
+F32 DistributionRegularStep::operator ()(F32 value)const 
 {
     int index = std::floor((value-_xmin)/_spacing);
     if(index<0||index>=(int)_table.size())
@@ -90,7 +90,7 @@ DistributionRegularStep * DistributionRegularStep::clone()const
 }
 
 
-void DistributionRegularStep::fromMatrix(const Mat2F64 &matrix,F64 step) {
+void DistributionRegularStep::fromMatrix(const Mat2F32 &matrix,F32 step) {
     if(matrix.sizeI()>=2&& matrix.sizeJ()>=2){
         this->_spacing = matrix(1,0)-matrix(0,0);
         bool constant_step=true;
@@ -115,7 +115,7 @@ void DistributionRegularStep::fromMatrix(const Mat2F64 &matrix,F64 step) {
             this->_xmin =  matrix(0,0);
             this->_xmax =  matrix(matrix.sizeI()-1,0)+(matrix(matrix.sizeI()-1,0)-matrix(matrix.sizeI()-2,0)) ;
             this->_table.resize((this->_xmax-this->_xmin)/this->_spacing);
-            F64 x=this->_xmin;
+            F32 x=this->_xmin;
             unsigned int index = 0;
             for(I32 i = 0;i<(I32)this->_table.size();i++,x+=this->_spacing){
                 if(index<matrix.sizeI()-1){
@@ -130,8 +130,8 @@ void DistributionRegularStep::fromMatrix(const Mat2F64 &matrix,F64 step) {
     }
 }
 
-Mat2F64 DistributionRegularStep::toMatrix()const{
-    Mat2F64 m((I32)this->_table.size(),2);
+Mat2F32 DistributionRegularStep::toMatrix()const{
+    Mat2F32 m((I32)this->_table.size(),2);
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         m(i,0)=this->_xmin+i*this->_spacing;
@@ -142,12 +142,12 @@ Mat2F64 DistributionRegularStep::toMatrix()const{
 void DistributionRegularStep::generateRepartition(){
     _repartition.clear();
 
-    F64 sum=0;
+    F32 sum=0;
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         sum +=this->_table[i] ;
     }
-    F64 sumtemp =0;
+    F32 sumtemp =0;
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         sumtemp +=this->_table[i] ;
@@ -155,10 +155,10 @@ void DistributionRegularStep::generateRepartition(){
     }
 
 }
-F64 DistributionRegularStep::randomVariable()const 
+F32 DistributionRegularStep::randomVariable()const 
 {
-    F64 u = this->uni.randomVariable();
-    std::vector<F64>::const_iterator  low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
+    F32 u = this->uni.randomVariable();
+    std::vector<F32>::const_iterator  low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
     I32 indice = I32(low- _repartition.begin()) ;
     return _xmin+indice*_spacing;
 }
@@ -172,16 +172,16 @@ DistributionIntegerRegularStep::DistributionIntegerRegularStep()
     :uni(0,1),_table(1)
 {
 }
-DistributionIntegerRegularStep::DistributionIntegerRegularStep(const Mat2F64 & m)
+DistributionIntegerRegularStep::DistributionIntegerRegularStep(const Mat2F32 & m)
     :uni(0,1)
 {
     this->fromMatrix(m);
 }
-F64 DistributionIntegerRegularStep::getXmin() const{
+F32 DistributionIntegerRegularStep::getXmin() const{
     return _xmin;
 }
 
-F64 DistributionIntegerRegularStep::getXmax()const{
+F32 DistributionIntegerRegularStep::getXmax()const{
     return _xmax;
 }
 DistributionIntegerRegularStep::DistributionIntegerRegularStep(const DistributionIntegerRegularStep & dist)
@@ -192,7 +192,7 @@ DistributionIntegerRegularStep::DistributionIntegerRegularStep(const Distributio
 
 
 
-F64 DistributionIntegerRegularStep::operator ()(F64 value)const 
+F32 DistributionIntegerRegularStep::operator ()(F32 value)const 
 {
     if(value>=_xmin&&value<_xmax+1){
         if(this->isInStepIntervale(value,std::floor(value))){
@@ -213,10 +213,10 @@ DistributionIntegerRegularStep * DistributionIntegerRegularStep::clone()const
 }
 
 
-void DistributionIntegerRegularStep::fromMatrix(const Mat2F64 &matrix)
+void DistributionIntegerRegularStep::fromMatrix(const Mat2F32 &matrix)
 {
     if(matrix.sizeI()<2|| matrix.sizeJ()<2)
-        std::cerr<<"In DistributionIntegerRegularStep::fromMatrix(const Mat2F64 & matrix,F64 step), input matrix must have at least 2 columns and 2 rows";
+        std::cerr<<"In DistributionIntegerRegularStep::fromMatrix(const Mat2F32 & matrix,F32 step), input matrix must have at least 2 columns and 2 rows";
     this->_xmin =  matrix(0,0);
     this->_xmax = matrix(matrix.sizeI()-1,0);
     this->_table.resize(matrix.sizeI());
@@ -226,8 +226,8 @@ void DistributionIntegerRegularStep::fromMatrix(const Mat2F64 &matrix)
     generateRepartition();
 }
 
-Mat2F64 DistributionIntegerRegularStep::toMatrix()const{
-    Mat2F64 m((I32)this->_table.size(),2);
+Mat2F32 DistributionIntegerRegularStep::toMatrix()const{
+    Mat2F32 m((I32)this->_table.size(),2);
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         m(i,0)=this->_xmin+i*1;
@@ -238,12 +238,12 @@ Mat2F64 DistributionIntegerRegularStep::toMatrix()const{
 void DistributionIntegerRegularStep::generateRepartition(){
     _repartition.clear();
 
-    F64 sum=0;
+    F32 sum=0;
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         sum +=this->_table[i] ;
     }
-    F64 sumtemp =0;
+    F32 sumtemp =0;
     for(I32 i = 0;i<(I32)this->_table.size();i++)
     {
         sumtemp +=this->_table[i] ;
@@ -251,21 +251,21 @@ void DistributionIntegerRegularStep::generateRepartition(){
     }
 
 }
-F64 DistributionIntegerRegularStep::randomVariable()const 
+F32 DistributionIntegerRegularStep::randomVariable()const 
 {
-    F64 u = this->uni.randomVariable();
-    std::vector<F64>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
+    F32 u = this->uni.randomVariable();
+    std::vector<F32>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
     I32 indice = I32(low- _repartition.begin()) ;
     return _xmin+indice;
 }
 
 
 std::string DistributionExpression::getKey(){return "EXPRESSION";}
-F64 DistributionExpression::operator()(F64 value)const 
+F32 DistributionExpression::operator()(F32 value)const 
 {
     return fparser.Eval(& value);
 }
-F64 DistributionExpression::randomVariable()const {
+F32 DistributionExpression::randomVariable()const {
     std::cerr<<"In DistributionExpression::randomVariable(),  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
     return 0;
 }

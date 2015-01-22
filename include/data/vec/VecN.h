@@ -44,7 +44,7 @@ in the Software.
 namespace pop
 {
 /*! \ingroup Vector
-* \defgroup VecN Vec{2,3}{I32,F64}
+* \defgroup VecN Vec{2,3}{I32,F32}
 * \brief template class for tuple of numbers of fixed size for representing a point or a vector
 */
 template <int D=2, class  Type=int>
@@ -71,8 +71,8 @@ class  POP_EXPORTS VecN
        To facilitate its utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
         -  Vec2I32: an integer pair (x(0),x(1)) \f$\in\mathbf{Z}^2\f$
         -  Vec3I32: an integer triplet (x(0),x(1),x(2)) \f$\in\mathbf{Z}^3\f$
-        -  Vec2F64: a float pair (x(0),x(1)) \f$\in\mathbf{R}^2\f$
-        -  Vec3F64: a float triplet (x(0),x(1),x(2)) \f$\in\mathbf{R}^3\f$
+        -  Vec2F32: a float pair (x(0),x(1)) \f$\in\mathbf{R}^2\f$
+        -  Vec3F32: a float triplet (x(0),x(1),x(2)) \f$\in\mathbf{R}^3\f$
 
 
 
@@ -618,16 +618,16 @@ public:
         return value;
     }
     /*!
-    \fn  F64  norm(int p)const
+    \fn  F32  norm(int p)const
     \ param p norm
     * \return p-norm
     *
     * returns the p-norm of this vector for instance for x = (7,-2), we have x.norm(1)=abs(7)+abs(-2)=9
     *
     */
-    F64 norm(int p=2)const
+    F32 norm(int p=2)const
     {
-        F64 value =0;
+        F32 value =0;
         if(p==0){
             for(int i = 0;i<D;i++)
             {
@@ -648,7 +648,7 @@ public:
         }else{
             for(int i = 0;i<D;i++)
             {
-                value+=std::pow(static_cast<double>(absolute(this->_dat[i])),static_cast<double>(p));
+                value+=std::pow(static_cast<F32>(absolute(this->_dat[i])),static_cast<F32>(p));
             }
             value = std::pow(value,1./p);
         }
@@ -656,15 +656,15 @@ public:
     }
 
     /*!
-    \fn  F64 normPower(int p)const
+    \fn  F32 normPower(int p)const
     * \return p-norm power p
     *
     * returns the p-norm at power 2pof this VecN for instance for x = (7,-2), we have x.normPower(2)=7*7+-2*-2=53
     *
     */
-    F64 normPower(int p=2)const
+    F32 normPower(int p=2)const
     {
-        F64 value =0;
+        F32 value =0;
         if(p==0){
             for(int i = 0;i<D;i++)
             {
@@ -684,7 +684,7 @@ public:
         }else{
             for(int i = 0;i<D;i++)
             {
-                value+=std::pow(absolute(this->_dat[i]),static_cast<double>(p));
+                value+=std::pow(absolute(this->_dat[i]),static_cast<F32>(p));
             }
         }
         return value;
@@ -867,12 +867,10 @@ inline VecN<D, Type1>   operator/( Type1  value,const VecN<D, Type1>&  x)
 typedef VecN<2,I32> Vec2I32;
 typedef VecN<3,I32> Vec3I32;
 typedef VecN<4,I32> Vec4I32;
-typedef VecN<2,F64> Vec2F64;
-typedef VecN<3,F64> Vec3F64;
-typedef VecN<4,F64> Vec4F64;
 typedef VecN<2,F32> Vec2F32;
 typedef VecN<3,F32> Vec3F32;
 typedef VecN<4,F32> Vec4F32;
+
 
 
 
@@ -938,13 +936,13 @@ struct ArithmeticsSaturation<UI32,VecN<DIM,T> >
     }
 };
 template<int DIM, typename T>
-struct ArithmeticsSaturation<F64,VecN<DIM,T> >
+struct ArithmeticsSaturation<F32,VecN<DIM,T> >
 {
-    static F64 Range(VecN<DIM,T> p)
+    static F32 Range(VecN<DIM,T> p)
     {
         T t = p.norm();
-        if(t>=NumericLimits<F64>::maximumRange())return NumericLimits<F64>::maximumRange();
-        else if(t<NumericLimits<F64>::minimumRange())return NumericLimits<F64>::minimumRange();
+        if(t>=NumericLimits<F32>::maximumRange())return NumericLimits<F32>::maximumRange();
+        else if(t<NumericLimits<F32>::minimumRange())return NumericLimits<F32>::minimumRange();
         else return t;
     }
 };
@@ -997,9 +995,9 @@ struct NumericLimits<pop::VecN<DIM,Type> >
 * \return output VecN
 *
 * \code
-* pop::Vec2F64 x1(2.5,4.5);
-* pop::Vec2F64 x2(6.3,2.5);
-* pop::Vec2F64 x = maximum(x1,x2);//x=(6.3,2.5)
+* pop::Vec2F32 x1(2.5,4.5);
+* pop::Vec2F32 x2(6.3,2.5);
+* pop::Vec2F32 x = maximum(x1,x2);//x=(6.3,2.5)
 * \endcode
 *
 */
@@ -1036,9 +1034,9 @@ pop::VecN<4,Type1> maximum(const pop::VecN<4,Type1>&  p1, const pop::VecN<4,Type
 *
 *
 * \code
-* pop::Vec2F64 x1(2.5,4.5);
-* pop::Vec2F64 x2(6.3,2.5);
-* pop::Vec2F64 x = minimum(x1,x2);//x=(2.5,2.5)
+* pop::Vec2F32 x1(2.5,4.5);
+* pop::Vec2F32 x2(6.3,2.5);
+* pop::Vec2F32 x = minimum(x1,x2);//x=(2.5,2.5)
 * \endcode
 */
 template<int DIM,typename Type1>
@@ -1072,8 +1070,8 @@ pop::VecN<4,Type1> minimum(const pop::VecN<4,Type1>&  p1, const pop::VecN<4,Type
 * \return output VecN
 *
 * \code
-* pop::Vec2F64 x1(2.5,-4.5);
-* pop::Vec2F64 x = absolute(x1);//x=(2.5,2.5)
+* pop::Vec2F32 x1(2.5,-4.5);
+* pop::Vec2F32 x = absolute(x1);//x=(2.5,2.5)
 * \endcode
 */
 template<int DIM,typename Type1>
@@ -1141,7 +1139,7 @@ pop::VecN<4,Type1> floor(const pop::VecN<4,Type1>&  p1)
 *
 */
 template<int DIM,typename Type1>
-double normValue(const pop::VecN<DIM,Type1>&  x, int p=2)
+F32 normValue(const pop::VecN<DIM,Type1>&  x, int p=2)
 {
     return x.norm(p);
 }
@@ -1155,7 +1153,7 @@ double normValue(const pop::VecN<DIM,Type1>&  x, int p=2)
 *
 */
 template<int DIM,typename Type1>
-double distance(const pop::VecN<DIM,Type1>&  u, const pop::VecN<DIM,Type1>&  v,int p=2)
+F32 distance(const pop::VecN<DIM,Type1>&  u, const pop::VecN<DIM,Type1>&  v,int p=2)
 {
     return normValue(u-v,p);
 }
@@ -1168,7 +1166,7 @@ double distance(const pop::VecN<DIM,Type1>&  u, const pop::VecN<DIM,Type1>&  v,i
 *
 */
 template<int DIM,typename Type1>
-double normPowerValue(const pop::VecN<DIM,Type1>&  p1, int p=2)
+F32 normPowerValue(const pop::VecN<DIM,Type1>&  p1, int p=2)
 {
     return p1.normPower(p);
 }

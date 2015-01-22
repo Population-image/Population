@@ -380,7 +380,7 @@ template<int Dim, typename Type>
 void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automaticresize)const {
 
     MatN<Dim,Type>  img(*this);
-    VecN<DIM,pop::F64> scale;
+    VecN<DIM,pop::F32> scale;
     scale =1;
     if(automaticresize ==true&&Dim==2){
         scale = scale*(600./img.getDomain()(0));

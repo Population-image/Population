@@ -17,14 +17,14 @@ class Topology
 private:
     static bool _lock_up_table2d[256];
     static std::vector<bool> _lock_up_table3d;
-    static double  _euler_tab[];
+    static F32  _euler_tab[];
 public:
 
     Topology(std::string inlockup=""){
         if(DIM==3&&_lock_up_table3d.size()==0&&inlockup.size()!=0)
             load(inlockup.c_str(),_lock_up_table3d);//1<<26,
     }
-    double eulerPoincare(const MatN<3,UI8> & img,const VecN<3,int>& x){
+    F32 eulerPoincare(const MatN<3,UI8> & img,const VecN<3,int>& x){
         VecN<3,int> xx;
         int value=0;
         for(int ii=0;ii<=1;ii++){
@@ -43,7 +43,7 @@ public:
         }
         return _euler_tab[value];
     }
-    double eulerPoincare(const MatN<2,UI8> & img,const VecN<2,int>& x){
+    F32 eulerPoincare(const MatN<2,UI8> & img,const VecN<2,int>& x){
         VecN<2,int> xx;
         int value=0;
         for(int ii=0;ii<=1;ii++){
@@ -104,7 +104,7 @@ public:
 template<int DIM>
 bool Topology<DIM>::_lock_up_table2d[]={1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,0,0,1,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,1};
 template<int DIM>
-double Topology<DIM>::_euler_tab[]={0,0.125,0.125,0,0.125,0,-0.25,-0.125,0.125,-0.25,0,-0.125,0,-0.125,-0.125,0,0.125,0,-0.25,-0.125,-0.25,-0.125,-0.125,-0.25,-0.75,-0.375,-0.375,-0.25,-0.375,-0.25,0,-0.125,0.125,-0.25,0,-0.125,-0.75,-0.375,-0.375,-0.25,-0.25,-0.125,-0.125,-0.25,-0.375,0,-0.25,-0.125,0,-0.125,-0.125,0,-0.375,-0.25,0,-0.125,-0.375,0,-0.25,-0.125,0,0.125,0.125,0,0.125,-0.25,-0.75,-0.375,0,-0.125,-0.375,-0.25,-0.25,-0.125,-0.375,0,-0.125,-0.25,-0.25,-0.125,0,-0.125,-0.375,-0.25,-0.125,0,0,-0.125,-0.375,0,0,0.125,-0.25,-0.125,0.125,0,-0.25,-0.125,-0.375,0,-0.375,0,0,0.125,-0.125,0.5,0,0.375,0,0.375,0.125,0.25,-0.125,-0.25,-0.25,-0.125,-0.25,-0.125,0.125,0,0,0.375,0.125,0.25,0.125,0.25,0.25,0.125,0.125,-0.75,-0.25,-0.375,-0.25,-0.375,-0.125,0,0,-0.375,-0.125,-0.25,-0.125,-0.25,-0.25,-0.125,-0.25,-0.375,-0.125,0,-0.125,0,0.5,0.375,-0.375,0,0,0.125,0,0.125,0.375,0.25,0,-0.375,-0.125,-0.25,-0.375,0,0,0.125,-0.125,0,0,-0.125,-0.25,0.125,-0.125,0,-0.125,-0.25,-0.25,-0.125,0,0.125,0.375,0.25,-0.25,0.125,-0.125,0,0.125,0.25,0.25,0.125,0,-0.375,-0.375,0,-0.125,-0.25,0,0.125,-0.125,0,-0.25,0.125,0,-0.125,-0.125,0,-0.125,-0.25,0,0.125,-0.25,-0.125,0.375,0.25,-0.25,0.125,0.125,0.25,-0.125,0,0.25,0.125,-0.125,0,-0.25,0.125,-0.25,0.125,0.125,0.25,-0.25,0.375,-0.125,0.25,-0.125,0.25,0,0.125,0,-0.125,-0.125,0,-0.125,0,0.25,0.125,-0.125,0.25,0,0.125,0,0.125,0.125,0};
+F32 Topology<DIM>::_euler_tab[]={0,0.125,0.125,0,0.125,0,-0.25,-0.125,0.125,-0.25,0,-0.125,0,-0.125,-0.125,0,0.125,0,-0.25,-0.125,-0.25,-0.125,-0.125,-0.25,-0.75,-0.375,-0.375,-0.25,-0.375,-0.25,0,-0.125,0.125,-0.25,0,-0.125,-0.75,-0.375,-0.375,-0.25,-0.25,-0.125,-0.125,-0.25,-0.375,0,-0.25,-0.125,0,-0.125,-0.125,0,-0.375,-0.25,0,-0.125,-0.375,0,-0.25,-0.125,0,0.125,0.125,0,0.125,-0.25,-0.75,-0.375,0,-0.125,-0.375,-0.25,-0.25,-0.125,-0.375,0,-0.125,-0.25,-0.25,-0.125,0,-0.125,-0.375,-0.25,-0.125,0,0,-0.125,-0.375,0,0,0.125,-0.25,-0.125,0.125,0,-0.25,-0.125,-0.375,0,-0.375,0,0,0.125,-0.125,0.5,0,0.375,0,0.375,0.125,0.25,-0.125,-0.25,-0.25,-0.125,-0.25,-0.125,0.125,0,0,0.375,0.125,0.25,0.125,0.25,0.25,0.125,0.125,-0.75,-0.25,-0.375,-0.25,-0.375,-0.125,0,0,-0.375,-0.125,-0.25,-0.125,-0.25,-0.25,-0.125,-0.25,-0.375,-0.125,0,-0.125,0,0.5,0.375,-0.375,0,0,0.125,0,0.125,0.375,0.25,0,-0.375,-0.125,-0.25,-0.375,0,0,0.125,-0.125,0,0,-0.125,-0.25,0.125,-0.125,0,-0.125,-0.25,-0.25,-0.125,0,0.125,0.375,0.25,-0.25,0.125,-0.125,0,0.125,0.25,0.25,0.125,0,-0.375,-0.375,0,-0.125,-0.25,0,0.125,-0.125,0,-0.25,0.125,0,-0.125,-0.125,0,-0.125,-0.25,0,0.125,-0.25,-0.125,0.375,0.25,-0.25,0.125,0.125,0.25,-0.125,0,0.25,0.125,-0.125,0,-0.25,0.125,-0.25,0.125,0.125,0.25,-0.25,0.375,-0.125,0.25,-0.125,0.25,0,0.125,0,-0.125,-0.125,0,-0.125,0,0.25,0.125,-0.125,0.25,0,0.125,0,0.125,0.125,0};
 template<int DIM>
 std::vector<bool> Topology<DIM>::_lock_up_table3d;
 }
@@ -178,26 +178,26 @@ struct AnalysisAdvanced
     }
 
     template<typename Function1,typename Iterator>
-    static typename FunctionTypeTraitsSubstituteF<typename Function1::F,F64>::Result meanValue(const Function1 & f, Iterator & it)
+    static typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result meanValue(const Function1 & f, Iterator & it)
     {
         FunctorF::FunctorAccumulatorMean<typename Function1::F> func;
         return forEachFunctorAccumulator(f,func,it);
     }
 
     template<typename Function1,typename Iterator>
-    static F64 standardDeviationValue(const Function1 & f, Iterator & it)
+    static F32 standardDeviationValue(const Function1 & f, Iterator & it)
     {
 
-        F64 mean = meanValue(f,it);
+        F32 mean = meanValue(f,it);
         it.init();
         FunctorF::FunctorAccumulatorVariance<typename Function1::F> func(mean);
         return std::sqrt(forEachFunctorAccumulator(f,func,it));
     }
 
     template<typename Function,typename IteratorGlobal>
-    static Mat2F64 histogram(const Function & f, IteratorGlobal & itg)
+    static Mat2F32 histogram(const Function & f, IteratorGlobal & itg)
     {
-        Mat2F64 m;
+        Mat2F32 m;
         while(itg.next()){
             int value = normValue(f(itg.x()));
             if(value>=static_cast<int>(m.sizeI())){
@@ -217,9 +217,9 @@ struct AnalysisAdvanced
         return m;
     }
     template<typename Function,typename IteratorGlobal>
-    static Mat2F64 area(const Function & f, IteratorGlobal & itg)
+    static Mat2F32 area(const Function & f, IteratorGlobal & itg)
     {
-        Mat2F64 m(maxValue(f,itg)+1,2);
+        Mat2F32 m(maxValue(f,itg)+1,2);
         itg.init();
         while(itg.next()){
             m(f(itg.x()),1) ++;
@@ -230,9 +230,9 @@ struct AnalysisAdvanced
         return m;
     }
     template<typename Function,typename IteratorGlobal, typename IteratorNeighborhood>
-    static Mat2F64 perimeter(const Function & f, IteratorGlobal & itg, IteratorNeighborhood itn)
+    static Mat2F32 perimeter(const Function & f, IteratorGlobal & itg, IteratorNeighborhood itn)
     {
-        Mat2F64 m;
+        Mat2F32 m;
         while(itg.next()){
             if(f(itg.x())>=(typename Function::F)m.sizeI()){
                 m.resizeInformation(f(itg.x())+1,2);
@@ -250,12 +250,12 @@ struct AnalysisAdvanced
     }
 
     template<int DIM>
-    static inline F64 eulerPoincare(const MatN<DIM,UI8> & img)
+    static inline F32 eulerPoincare(const MatN<DIM,UI8> & img)
     {
 
         Private::Topology<DIM> topo;
 
-        F64 e_p=0;
+        F32 e_p=0;
         typename MatN<DIM,UI8>::IteratorEDomain it(img.getDomain()+1);
         while(it.next()==true){
             e_p+=topo.eulerPoincare(img,it.x());

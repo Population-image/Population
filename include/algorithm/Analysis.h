@@ -75,7 +75,7 @@ in the Software.
      * \endcode
      * Most of the algorithms return a matrix containing the information. To plot this information, you can convert it in Distribution and display it as follows:
      * \code
-     * Mat2F64 mverpore = Analysis::REVPorosity(grain,VecN<3,F64>(grain.getDomain())*0.5,200);
+     * Mat2F32 mverpore = Analysis::REVPorosity(grain,VecN<3,F32>(grain.getDomain())*0.5,200);
      * Distribution dverpor(mverpore);
      * dverpor.display();
      * mverpore.saveAscii("ver.txt");
@@ -91,15 +91,15 @@ in the Software.
      * \image html spinodal.png "Spinodal structure (see pop::Visualization::marchingCubeLevelSet)"
      * \code
      * //############ Representative Elementary Volume CHECKING ###########################
-     * Mat2F64 mverpore = Analysis::REVPorosity(porespace,VecN<3,F64>(porespace.getDomain())*0.5,200);
+     * Mat2F32 mverpore = Analysis::REVPorosity(porespace,VecN<3,F32>(porespace.getDomain())*0.5,200);
      * mverpore.saveAscii("spinodal_VER.m");
      * \endcode
      * \image html spinodal_VER.png "The sample size is twice time larger than the stablilzation of the porosity measurement -> so REV oke"
      * \code
      * //############ METRIC ###################
-     * Mat2F64 mhisto = Analysis::histogram(porespace);
+     * Mat2F32 mhisto = Analysis::histogram(porespace);
      * std::cout<<"porespace fraction:"<<mhisto(1,1)<<std::endl;
-     * Mat2F64 mchord = Analysis::chord(porespace);
+     * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
      * mchord.deleteCol(1);
      * Distribution dchord_solid(mchord);
@@ -107,13 +107,13 @@ in the Software.
      * \endcode
      * \image html spinodal_chord.png "Peak following by exponantial decrease (for the meaning of this signature see Chap 2, p 37. In Handbook of Porous Media. P. Levitz)"
      * \code
-     * Mat2F64 mcorre= Analysis::correlation(porespace);
+     * Mat2F32 mcorre= Analysis::correlation(porespace);
      * mcorre.saveAscii("spinodal_corre.m");
      * \endcode
      * \image html spinodal_corr.png "No long-range oscillion=No periodic structure and REV oke as in REVPorosity"
      * \code
-     * Mat3F64 corre= Analysis::correlationDirectionByFFT(porespace);
-     * Mat3F64 corre= Analysis::correlationDirectionByFFT(porespace);
+     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
+     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
      * corre = GeometricalTransformation::translate(corre,corre.getDomain()/2);//centered
      * corre = corre(corre.getDomain()/2-Vec3I32(20,20,20),corre.getDomain()/2+Vec3I32(20,20,20));//take only the core (the correlation length is near 20)
      * Mat3UI8 dcorre;
@@ -129,7 +129,7 @@ in the Software.
      * \image html spinodal_corr3d.png "We observe an isotropic 2-point correlation function->structure is istropic"
      * \code
      * Mat3UI8 fdistance;
-     * Mat2F64 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
+     * Mat2F32 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
      * mldistance.saveAscii("spinodal_ldistance.m");
      * Mat3RGBUI8 dcorregrad=Visualization::labelToRandomRGB(fdistance);//random color
      * Scene3d scene;
@@ -143,7 +143,7 @@ in the Software.
      * \code
      * Mat3UI8 fgranulo;
      * //granulo of the solid space
-     * Mat2F64 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
+     * Mat2F32 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
      * mlgranulo.saveAscii("spinodal_granulo.m");
      * Mat3RGBUI8 dcorregrad=Visualization::labelToRandomRGB(fgranulo);//random color
      * Scene3d scene;
@@ -155,19 +155,19 @@ in the Software.
      * \endcode
      * \image html spinodal_granulo.png "see X-ray microtomography characterisation of the changes in statistical homogeneity of an unsaturated sand during imbibitions"
      * \code
-     * Mat2F64 mgeometrical = Analysis::geometricalTortuosity(porespace);
+     * Mat2F32 mgeometrical = Analysis::geometricalTortuosity(porespace);
      * mgeometrical.saveAscii("spinodal_geometrical.m");
      * \endcode
      * We get  1.19465 in 3 directions // see Jeulin's paper estimation of tortuosity and reconstruction of geodesic paths in 3d
      * \code
      * //############ TOPOLOGY #######################
-     * double euler = Analysis::eulerPoincare(porespace);
+     * F32 euler = Analysis::eulerPoincare(porespace);
      * std::ofstream out("spinodal_euler.m");
      * out<<euler;//euler
      * out.close();
-     * Mat2F64 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
+     * Mat2F32 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
      * mpercolationopening.saveAscii("spinodal_percolationopening.m");//output is 6 in three direction-> the structure sill percolates after an opening of ball of radius of 6 but not with a radius of size 7
-     * Mat2F64 mpercolationerosion = Analysis::percolationErosion(porespace,2);
+     * Mat2F32 mpercolationerosion = Analysis::percolationErosion(porespace,2);
      * mpercolationerosion.saveAscii("spinodal_percolationerosion.m");//output is 5 in three direction-> the structure sill percolates after an erosion of ball of radius of 5 but not with a radius of size 6
 
 
@@ -201,23 +201,23 @@ in the Software.
      * std::cout<<euler/g.sizeVertex()<<std::endl;//N_3/alpha_0 normalised topogical characteristic (connectivity number in my phd)
 
      * //############ PHYSICAL ###################
-     * Mat2F64 mdiffusion = PDE::randomWalk(porespace);
+     * Mat2F32 mdiffusion = PDE::randomWalk(porespace);
      * mdiffusion.saveAscii("spinodal_self_diffusion.m");
      * \endcode
      * \image html spinodal_self_diffusion.png "Coefficient of self diffusion"
      * \code
-     * MatN<3,Vec3F64> velocityfield;
-     * Mat2F64 K(3,3);
-     * VecF64 kx = PDE::permeability(porespace,velocityfield,0,0.05);//permeability in x-direction
-     * VecF64 ky = PDE::permeability(porespace,velocityfield,1,0.05);//permeability in y-direction
-     * VecF64 kz = PDE::permeability(porespace,velocityfield,2,0.05);//permeability in z-direction
+     * MatN<3,Vec3F32> velocityfield;
+     * Mat2F32 K(3,3);
+     * VecF32 kx = PDE::permeability(porespace,velocityfield,0,0.05);//permeability in x-direction
+     * VecF32 ky = PDE::permeability(porespace,velocityfield,1,0.05);//permeability in y-direction
+     * VecF32 kz = PDE::permeability(porespace,velocityfield,2,0.05);//permeability in z-direction
      * //merge the results in the permeability matrix
      * K.setCol(0,kx);
      * K.setCol(1,ky);
      * K.setCol(2,kz);
 
      * //display the norm of the last valocity field
-     * Mat3F64 velocityfield_norm(velocityfield);
+     * Mat3F32 velocityfield_norm(velocityfield);
      * ForEachDomain3D(x,velocityfield)
      * {
      *     velocityfield_norm(x)=normValue(velocityfield(x));
@@ -267,7 +267,7 @@ struct POP_EXPORTS Analysis
      * \endcode
      * Most of the algorithms return a matrix containing the information. To plot this information, you can convert it in Distribution and display it as follows:
      * \code
-     * Mat2F64 mverpore = Analysis::REVPorosity(grain,VecN<3,F64>(grain.getDomain())*0.5,200);
+     * Mat2F32 mverpore = Analysis::REVPorosity(grain,VecN<3,F32>(grain.getDomain())*0.5,200);
      * Distribution dverpor(mverpore);
      * dverpor.display();
      * mverpore.saveAscii("ver.txt");
@@ -283,15 +283,15 @@ struct POP_EXPORTS Analysis
      * \image html spinodal.png "Spinodal structure (see pop::Visualization::marchingCubeLevelSet)"
      * \code
      * //############ Representative Elementary Volume CHECKING ###########################
-     * Mat2F64 mverpore = Analysis::REVPorosity(porespace,VecN<3,F64>(porespace.getDomain())*0.5,200);
+     * Mat2F32 mverpore = Analysis::REVPorosity(porespace,VecN<3,F32>(porespace.getDomain())*0.5,200);
      * mverpore.saveAscii("spinodal_VER.m");
      * \endcode
      * \image html spinodal_VER.png "The sample size is twice time larger than the size when the porosity measurement is stable->so REV oke"
      * \code
      * //############ METRIC ###################
-     * Mat2F64 mhisto = Analysis::histogram(porespace);
+     * Mat2F32 mhisto = Analysis::histogram(porespace);
      * std::cout<<"porespace fraction:"<<mhisto(1,1)<<std::endl;
-     * Mat2F64 mchord = Analysis::chord(porespace);
+     * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
      * mchord.deleteCol(1);
      * Distribution dchord_solid(mchord);
@@ -299,13 +299,13 @@ struct POP_EXPORTS Analysis
      * \endcode
      * \image html spinodal_chord.png "Peak following by exponantial decrease (for the meaning of this signature see Chap 2, p 37. In Handbook of Porous Media. P. Levitz)"
      * \code
-     * Mat2F64 mcorre= Analysis::correlation(porespace);
+     * Mat2F32 mcorre= Analysis::correlation(porespace);
      * mcorre.saveAscii("spinodal_corre.m");
      * \endcode
      * \image html spinodal_corr.png "No long-range oscillion=No periodic structure and REV oke as in REVPorosity"
      * \code
-     * Mat3F64 corre= Analysis::correlationDirectionByFFT(porespace);
-     * Mat3F64 corre= Analysis::correlationDirectionByFFT(porespace);
+     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
+     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
      * corre = GeometricalTransformation::translate(corre,corre.getDomain()/2);//centered
      * corre = corre(corre.getDomain()/2-Vec3I32(20,20,20),corre.getDomain()/2+Vec3I32(20,20,20));//take only the core (the correlation length is near 20)
      * Mat3UI8 dcorre;
@@ -321,7 +321,7 @@ struct POP_EXPORTS Analysis
      * \image html spinodal_corr3d.png "We observe an isotropic 2-point correlation function->structure is istropic"
      * \code
      * Mat3UI8 fdistance;
-     * Mat2F64 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
+     * Mat2F32 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
      * mldistance.saveAscii("spinodal_ldistance.m");
      * Mat3RGBUI8 dcorregrad=Visualization::labelToRandomRGB(fdistance);//random color
      * Scene3d scene;
@@ -335,7 +335,7 @@ struct POP_EXPORTS Analysis
      * \code
      * Mat3UI8 fgranulo;
      * //granulo of the solid space
-     * Mat2F64 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
+     * Mat2F32 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
      * mlgranulo.saveAscii("spinodal_granulo.m");
      * Mat3RGBUI8 dcorregrad=Visualization::labelToRandomRGB(fgranulo);//random color
      * Scene3d scene;
@@ -347,19 +347,19 @@ struct POP_EXPORTS Analysis
      * \endcode
      * \image html spinodal_granulo.png "see X-ray microtomography characterisation of the changes in statistical homogeneity of an unsaturated sand during imbibitions"
      * \code
-     * Mat2F64 mgeometrical = Analysis::geometricalTortuosity(porespace);
+     * Mat2F32 mgeometrical = Analysis::geometricalTortuosity(porespace);
      * mgeometrical.saveAscii("spinodal_geometrical.m");
      * \endcode
      * We get  1.19465 in 3 directions // see Jeulin's paper estimation of tortuosity and reconstruction of geodesic paths in 3d
      * \code
      * //############ TOPOLOGY #######################
-     * double euler = Analysis::eulerPoincare(porespace);
+     * F32 euler = Analysis::eulerPoincare(porespace);
      * std::ofstream out("spinodal_euler.m");
      * out<<euler;//euler
      * out.close();
-     * Mat2F64 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
+     * Mat2F32 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
      * mpercolationopening.saveAscii("spinodal_percolationopening.m");//output is 6 in three direction-> the structure sill percolates after an opening of ball of radius of 6 but not with a radius of size 7
-     * Mat2F64 mpercolationerosion = Analysis::percolationErosion(porespace,2);
+     * Mat2F32 mpercolationerosion = Analysis::percolationErosion(porespace,2);
      * mpercolationerosion.saveAscii("spinodal_percolationerosion.m");//output is 5 in three direction-> the structure sill percolates after an erosion of ball of radius of 5 but not with a radius of size 6
 
 
@@ -393,23 +393,23 @@ struct POP_EXPORTS Analysis
      * std::cout<<euler/g.sizeVertex()<<std::endl;//N_3/alpha_0 normalised topogical characteristic (connectivity number in my phd)
 
      * //############ PHYSICAL ###################
-     * Mat2F64 mdiffusion = PDE::randomWalk(porespace);
+     * Mat2F32 mdiffusion = PDE::randomWalk(porespace);
      * mdiffusion.saveAscii("spinodal_self_diffusion.m");
      * \endcode
      * \image html spinodal_self_diffusion.png "Coefficient of self diffusion"
      * \code
-     * MatN<3,Vec3F64> velocityfield;
-     * Mat2F64 K(3,3);
-     * VecF64 kx = PDE::permeability(porespace,velocityfield,0,0.05);//permeability in x-direction
-     * VecF64 ky = PDE::permeability(porespace,velocityfield,1,0.05);//permeability in y-direction
-     * VecF64 kz = PDE::permeability(porespace,velocityfield,2,0.05);//permeability in z-direction
+     * MatN<3,Vec3F32> velocityfield;
+     * Mat2F32 K(3,3);
+     * VecF32 kx = PDE::permeability(porespace,velocityfield,0,0.05);//permeability in x-direction
+     * VecF32 ky = PDE::permeability(porespace,velocityfield,1,0.05);//permeability in y-direction
+     * VecF32 kz = PDE::permeability(porespace,velocityfield,2,0.05);//permeability in z-direction
      * //merge the results in the permeability matrix
      * K.setCol(0,kx);
      * K.setCol(1,ky);
      * K.setCol(2,kz);
 
      * //display the norm of the last valocity field
-     * Mat3F64 velocityfield_norm(velocityfield);
+     * Mat3F32 velocityfield_norm(velocityfield);
      * ForEachDomain3D(x,velocityfield)
      * {
      *     velocityfield_norm(x)=normValue(velocityfield(x));
@@ -425,12 +425,12 @@ struct POP_EXPORTS Analysis
      * \image html spinodal_permeability.png "Amplitude of the velocity field"
      * For an extented analysis, you can decompose the structure in term of elmentary parts and to analyse statiscally this elements as follows:
      * \code
-     * double porosity=0.2;
+     * F32 porosity=0.2;
      * Distribution dnormal(10,0.1,"NORMAL");//Poisson generator
-     * double moment_order_2 = pop::Statistics::moment(dnormal,2,0,1024);
-     * double surface_expectation = moment_order_2*3.14159265;
-     * Vec2F64 domain(2048);//2d field domain
-     * double N=-std::log(porosity)/std::log(2.718)/surface_expectation;
+     * F32 moment_order_2 = pop::Statistics::moment(dnormal,2,0,1024);
+     * F32 surface_expectation = moment_order_2*3.14159265;
+     * Vec2F32 domain(2048);//2d field domain
+     * F32 N=-std::log(porosity)/std::log(2.718)/surface_expectation;
      * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson VecNd process
      * RandomGeometry::sphere(grain,dnormal);
      * Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
@@ -440,7 +440,7 @@ struct POP_EXPORTS Analysis
      * porespace = lattice;
      * Mat2UI8 inverse(porespace);
      * inverse = inverse.opposite();
-     * Mat2F64 dist = pop::Processing::distanceEuclidean(inverse);
+     * Mat2F32 dist = pop::Processing::distanceEuclidean(inverse);
      * Mat2UI16 distl;
      * distl= dist;
      * distl = distl.opposite();
@@ -451,17 +451,17 @@ struct POP_EXPORTS Analysis
      * //ANALYSE THE PORE SPACE
      * PDE::allenCahn(water,porespace,5000);
      * water=pop::Processing::greylevelRemoveEmptyValue(water);
-     * VecF64 varea = Analysis::areaByLabel(water);
+     * VecF32 varea = Analysis::areaByLabel(water);
      * Distribution dvarea = pop::Statistics::computedStaticticsFromRealRealizations(varea,0.1);
-     * Mat2F64 mvarea = pop::Statistics::toMatrix(dvarea,dvarea.getXmin(),dvarea.getXmax(),dvarea.getStep());
+     * Mat2F32 mvarea = pop::Statistics::toMatrix(dvarea,dvarea.getXmin(),dvarea.getXmax(),dvarea.getStep());
      * mvarea.saveAscii("label_area.m");
-     * VecF64 vcontact = Analysis::perimeterContactBetweenLabel(water);
+     * VecF32 vcontact = Analysis::perimeterContactBetweenLabel(water);
      * Distribution dcontact = pop::Statistics::computedStaticticsFromRealRealizations(vcontact,0.1);
-     * Mat2F64 mcontact = pop::Statistics::toMatrix(dcontact,dcontact.getXmin(),dcontact.getXmax(),dcontact.getStep());
+     * Mat2F32 mcontact = pop::Statistics::toMatrix(dcontact,dcontact.getXmin(),dcontact.getXmax(),dcontact.getStep());
      * mcontact.saveAscii("label_contact.m");
-     * VecF64 vferet = Analysis::feretDiameterByLabel(water);
+     * VecF32 vferet = Analysis::feretDiameterByLabel(water);
      * Distribution dferet = pop::Statistics::computedStaticticsFromRealRealizations(vferet,0.1);
-     * Mat2F64 mferet = pop::Statistics::toMatrix(dferet,dferet.getXmin(),dferet.getXmax(),dferet.getStep());
+     * Mat2F32 mferet = pop::Statistics::toMatrix(dferet,dferet.getXmin(),dferet.getXmax(),dferet.getStep());
      * mferet.saveAscii("label_feret.m");
      * \endcode
      *
@@ -484,11 +484,11 @@ struct POP_EXPORTS Analysis
      * \endcode
      */
     template<int DIM,typename Type>
-    static Mat2F64 profile(const MatN<DIM,Type> f, const VecN<DIM,int>& x1,const VecN<DIM,int>& x2){
-        double dist = (x2-x1).norm();
-        VecN<DIM,F64> direction = VecN<DIM,F64>(x2-x1)/dist;
-        VecN<DIM,F64> x=x1;
-        Mat2F64 profile(std::floor(dist),2);
+    static Mat2F32 profile(const MatN<DIM,Type> f, const VecN<DIM,int>& x1,const VecN<DIM,int>& x2){
+        F32 dist = (x2-x1).norm();
+        VecN<DIM,F32> direction = VecN<DIM,F32>(x2-x1)/dist;
+        VecN<DIM,F32> x=x1;
+        Mat2F32 profile(std::floor(dist),2);
         for(int i =0;i<profile.getDomain()(0);i++){
             profile(i,0)=i;
             if(f.isValid(x)){
@@ -512,7 +512,7 @@ struct POP_EXPORTS Analysis
      * \param x center point
      * \param rmax max radius
      * \param norm distance norm
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * Calculate the grey-level histogram inside the ball centered in x by progressively increased the radius from 0 to rmax\n
      * M(i,0)=i and M(i,j) = \f$\frac{|X_{j-1}\cap B(x,i)|}{|B(x,i)|}\f$ where \f$ B(x,i)=\{x': |x'-x|<i \}\f$ the ball centered in x of radius i
@@ -520,27 +520,27 @@ struct POP_EXPORTS Analysis
      * \code
     Mat2UI8 iex;
     iex.load("../image/iex.pgm");
-    Mat2F64 mverpore = Analysis::REVHistogram(iex,VecN<2,F64>(iex.getDomain())*0.5,250);
+    Mat2F32 mverpore = Analysis::REVHistogram(iex,VecN<2,F32>(iex.getDomain())*0.5,250);
 
-    VecF64 vindex = mverpore.getCol(0);//get the first column containing the grey-level range
-    VecF64 v100 = mverpore.getCol(100);//get the col containing the histogram for r=100
-    VecF64 v150 = mverpore.getCol(150);
-    VecF64 v200 = mverpore.getCol(200);
-    VecF64 v250 = mverpore.getCol(250);
+    VecF32 vindex = mverpore.getCol(0);//get the first column containing the grey-level range
+    VecF32 v100 = mverpore.getCol(100);//get the col containing the histogram for r=100
+    VecF32 v150 = mverpore.getCol(150);
+    VecF32 v200 = mverpore.getCol(200);
+    VecF32 v250 = mverpore.getCol(250);
 
-    Mat2F64 mhistoradius100(v100.size(),2);
+    Mat2F32 mhistoradius100(v100.size(),2);
     mhistoradius100.setCol(0,vindex);
     mhistoradius100.setCol(1,v100);
 
-    Mat2F64 mhistoradius150(v150.size(),2);
+    Mat2F32 mhistoradius150(v150.size(),2);
     mhistoradius150.setCol(0,vindex);
     mhistoradius150.setCol(1,v150);
 
-    Mat2F64 mhistoradius200(v200.size(),2);
+    Mat2F32 mhistoradius200(v200.size(),2);
     mhistoradius200.setCol(0,vindex);
     mhistoradius200.setCol(1,v200);
 
-    Mat2F64 mhistoradius250(v250.size(),2);
+    Mat2F32 mhistoradius250(v250.size(),2);
     mhistoradius250.setCol(0,vindex);
     mhistoradius250.setCol(1,v250);
 
@@ -556,7 +556,7 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM,typename TypePixel>
-    static  Mat2F64 REVHistogram(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::E x, int rmax=10000,int norm=2 )
+    static  Mat2F32 REVHistogram(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::E x, int rmax=10000,int norm=2 )
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain ittotal(f.getIteratorEDomain());
         int max_value = Analysis::maxValue(f);
@@ -567,7 +567,7 @@ struct POP_EXPORTS Analysis
         if(rmax>maxsize/2)
             rmax=maxsize/2;
 
-        Mat2F64 m(max_value+1,1);
+        Mat2F32 m(max_value+1,1);
         for(unsigned int i =0;i<m.sizeI();i++)
             m(i,0)=i;
 
@@ -609,7 +609,7 @@ struct POP_EXPORTS Analysis
      * \param x center point
      * \param rmax max radius
       * \param norm distance norm
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      *
      *  M(i,0)=i, M(i,1)=\f$\frac{|X^c\cap B(x,i)|}{|B(x,i)|}\f$ such that  \f$X^c=\{x:bin(x)=0\}\f$ is the pore space and \f$B(x,i)\f$
@@ -617,10 +617,10 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static  Mat2F64 REVPorosity(const MatN<DIM,UI8> & bin, typename MatN<DIM,UI8>::E x, int rmax=10000,int norm=2)
+    static  Mat2F32 REVPorosity(const MatN<DIM,UI8> & bin, typename MatN<DIM,UI8>::E x, int rmax=10000,int norm=2)
     {
 
-        Mat2F64 m;
+        Mat2F32 m;
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
             maxsize = minimum(maxsize,bin.getDomain()(i));
@@ -630,7 +630,7 @@ struct POP_EXPORTS Analysis
 
 
         for(int r =1;r<rmax;r++){
-            F64 rr = r*r;
+            F32 rr = r*r;
             m.resizeInformation(m.sizeI()+1,2);
             m(r-1,0) = r;
             typename MatN<DIM,UI8>::E R( r*2+1);
@@ -642,7 +642,7 @@ struct POP_EXPORTS Analysis
             typename MatN<DIM,UI8>::E add =x- r;
             while(it.next()&&inside==true){
                 typename MatN<DIM,UI8>::E xprime = it.x()-r;
-                F64 rrcurent = xprime.norm(norm);
+                F32 rrcurent = xprime.norm(norm);
                 if(rrcurent<=rr){
                     typename MatN<DIM,UI8>::E xxprime = it.x()+add;
                     if(bin.isValid(xxprime)){
@@ -724,12 +724,12 @@ struct POP_EXPORTS Analysis
      * \code
     Mat2UI8 lena;
     lena.load("../image/Lena.bmp");
-    F64 mean = Analysis::meanValue(lena);
+    F32 mean = Analysis::meanValue(lena);
     std::cout<<mean<<std::endl;
     \endcode
     */
     template<int DIM,typename TypePixel>
-    static F64 meanValue(const MatN<DIM,TypePixel> & f)
+    static F32 meanValue(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::meanValue( f,it);
@@ -744,13 +744,13 @@ struct POP_EXPORTS Analysis
      * \code
     Mat2UI8 lena;
     lena.load("../image/Lena.bmp");
-    F64 mean = Analysis::meanValue(lena);
+    F32 mean = Analysis::meanValue(lena);
     std::cout<<mean<<std::endl;
     \endcode
 
     */
     template<int DIM,typename TypePixel>
-    static F64 standardDeviationValue(const MatN<DIM,TypePixel> & f)
+    static F32 standardDeviationValue(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::standardDeviationValue( f,it);
@@ -758,7 +758,7 @@ struct POP_EXPORTS Analysis
 
     /*!
      * \param f input grey-level matrix
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      *
      *  M(i,0)=i, M(i,1)=P(f(x)=i)
@@ -766,14 +766,14 @@ struct POP_EXPORTS Analysis
      * Mat2UI8 img;
      * img.load("../image/Lena.bmp");
      * Analysis analysis;
-     * Mat2F64 m = analysis.histogram(img);
+     * Mat2F32 m = analysis.histogram(img);
      * Distribution d(m);
      * d.display();
      * \endcode
      * \sa Matrix Distribution
     */
     template<int DIM,typename TypePixel>
-    static Mat2F64 histogram(const MatN<DIM,TypePixel> & f)
+    static Mat2F32 histogram(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::histogram(f,it);
@@ -781,7 +781,7 @@ struct POP_EXPORTS Analysis
 
     /*!
      * \param f input matrix
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * M(i,0)=i and M(i,1) = \f$|X_{i}|\f$ where
      *  \f$X_{j}=\{x:f(x)=j \}\f$ is the level set of f and \f$|X|\f$  is the cardinal of the set
@@ -789,21 +789,21 @@ struct POP_EXPORTS Analysis
      * Mat2UI8 img;
      * img.load("../image/Lena.bmp");
      * Analysis analysis;
-     * Mat2F64 m = analysis.area(img);
+     * Mat2F32 m = analysis.area(img);
      * Distribution d(m);
      * d.display();
      * \endcode
 
     */
     template<int DIM,typename TypePixel>
-    static Mat2F64 area(const MatN<DIM,TypePixel> & f)
+    static Mat2F32 area(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::area(f,it);
     }
     /*!
      * \param f input matrixE
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * M(i,0)=i and M(i,1) = \f$|\partial X_{i}|\f$ where
      * \f$X_{j}=\{x:f(x)=j \}\f$ the level set of f and \f$ \partial X\f$  the set boundary. We count the number of edges where one adjacent pixel is occupied by the phase ''i''
@@ -811,7 +811,7 @@ struct POP_EXPORTS Analysis
      * \f[s_i=\frac{\sum_{x\in\Omega}\sum_{y\in N(x)}1_{f(x)=i}1_{f(y)\neq i}   }{2|\Omega|}\f] where N(x) is the 4-connex pixel  of x in 2D,  the 6-connex voxel  of x in 3D.
      */
     template<int DIM,typename TypePixel>
-    static Mat2F64 perimeter(const MatN<DIM,TypePixel> & f)
+    static Mat2F32 perimeter(const MatN<DIM,TypePixel> & f)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(f.getIteratorENeighborhood(1,1));
@@ -820,14 +820,14 @@ struct POP_EXPORTS Analysis
 
     /*!
      * \param bin input binary matrix
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
-     *  Allow the evaluation of the fractal dimension that is the slot of the graph defined by the first column of the Mat2F64 for X-axis and the second one for the Y-axis \n
+     *  Allow the evaluation of the fractal dimension that is the slot of the graph defined by the first column of the Mat2F32 for X-axis and the second one for the Y-axis \n
      *  M(i,0)=log(r), M(i,1) =log(N(r)), where N(r) is the number of boxes of a size r needed to cover the binary set.
      * \code
      * Mat2UI8 img = RandomGeometry::diffusionLimitedAggregation2D(1024,30000);
      * img.display();
-     * Mat2F64 m=  Analysis::fractalBox(img);
+     * Mat2F32 m=  Analysis::fractalBox(img);
      * m.saveAscii("fractal.m","#log(r)\tlog(N)");
      * return 0;
      * \endcode
@@ -837,12 +837,12 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static  Mat2F64 fractalBox(const MatN<DIM,UI8> & bin )
+    static  Mat2F32 fractalBox(const MatN<DIM,UI8> & bin )
     {
         int mini=NumericLimits<int>::maximumRange();
         for(int i = 0; i<DIM;i++)
             mini=minimum(mini,bin.getDomain()(i));
-        Mat2F64 m;
+        Mat2F32 m;
         int i = mini/10;
         while(i>1)
         {
@@ -870,7 +870,7 @@ struct POP_EXPORTS Analysis
                 if(touch==true)
                     count++;
             }
-            F64 vv = std::log(i*1.0)/std::log(2.);
+            F32 vv = std::log(i*1.0)/std::log(2.);
             m(m.sizeI()-1,0)=vv;
             m(m.sizeI()-1,1)=std::log(count*1.0)/std::log(2.);
             //            std::cout<<m<<std::endl;
@@ -887,14 +887,14 @@ struct POP_EXPORTS Analysis
      * \param f input labelled matrix
      * \param nbrtest nbrtest for sampling
      * \param length max length for the correlation
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      *
      *  M(i<length,0)=i, M(i,j) =P(f(x)=j and f(x+r)=j) with r any vector of size i. To estimate this value, we sample nbrtest*length*dim times.
     */
 
     template<int DIM,typename TypePixel>
-    static  Mat2F64 correlation(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
+    static  Mat2F32 correlation(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
     {
         if(nbrtest<100)
             nbrtest=100;
@@ -909,7 +909,7 @@ struct POP_EXPORTS Analysis
 
         TypePixel value = Analysis::maxValue(f);
 
-        Mat2F64 m(length+1,value+2),mcount(length+1,value+2);
+        Mat2F32 m(length+1,value+2),mcount(length+1,value+2);
         std::vector<DistributionUniformInt> dist;
         for(int i=0;i<DIM;i++)
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
@@ -963,13 +963,13 @@ struct POP_EXPORTS Analysis
      * \param f input grey-level matrix
      * \param nbrtest nbrtest for sampling
      * \param length max length for the correlation
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      *
      *  M(i<length,0)=i, M(i,1)=\f$ \frac{\operatorname{E}[(f(x) - \mu)(f(x+i) - \mu)]}{\sigma^2}\f$ with \f$\mu\f$ the mean value and \f$\sigma\f$ the standard deviation see http://en.wikipedia.org/wiki/Autocorrelation. To estimate this value, we sample nbrtest*length*dim times.
     */
     template<int DIM,typename TypePixel>
-    static  Mat2F64 autoCorrelationFunctionGreyLevel(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
+    static  Mat2F32 autoCorrelationFunctionGreyLevel(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         int maxsize = NumericLimits<int>::maximumRange();
@@ -980,9 +980,9 @@ struct POP_EXPORTS Analysis
             length=maxsize/2;
         if(length>maxsize)
             length=maxsize-1;
-        F64 mu = meanValue(f);
-        F64 sigma = standardDeviationValue(f);
-        Mat2F64 m(length+1,2),mcount(length+1,2);
+        F32 mu = meanValue(f);
+        F32 sigma = standardDeviationValue(f);
+        Mat2F32 m(length+1,2),mcount(length+1,2);
         std::vector<DistributionUniformInt> dist;
         for(int i=0;i<DIM;i++)
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
@@ -1027,28 +1027,28 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> correlationDirectionByFFT(const MatN<DIM,TypePixel> & f){
+    static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,TypePixel> & f){
 
         MatN<DIM,TypePixel> bint;
         bint = pop::Representation::truncateMulitple2(f);
-        MatN<DIM,F64> binfloat(bint);
+        MatN<DIM,F32> binfloat(bint);
         typename MatN<DIM,TypePixel>::IteratorEDomain it (binfloat.getIteratorEDomain());
         binfloat = pop::ProcessingAdvanced::greylevelRange(binfloat,it,0,1);
 
 
-        MatN<DIM,ComplexF64>  bin_complex(bint.getDomain());
+        MatN<DIM,ComplexF32>  bin_complex(bint.getDomain());
         Convertor::fromRealImaginary(binfloat,bin_complex);
-        MatN<DIM,ComplexF64>  fft = pop::Representation::FFT(bin_complex,1);
+        MatN<DIM,ComplexF32>  fft = pop::Representation::FFT(bin_complex,1);
 
         it.init();
         while(it.next()){
-            ComplexF64 c = fft(it.x());
-            ComplexF64 c1 = fft(it.x());
+            ComplexF32 c = fft(it.x());
+            ComplexF32 c1 = fft(it.x());
             fft(it.x()).real() = (c*c1.conjugate()).real();
             fft(it.x()).img() =0;
         }
         fft  = pop::Representation::FFT(fft,0);
-        MatN<DIM,F64>  fout(bint.getDomain());
+        MatN<DIM,F32>  fout(bint.getDomain());
         Convertor::toRealImaginary(fft,fout);
         return  fout;
 
@@ -1056,14 +1056,14 @@ struct POP_EXPORTS Analysis
     /*!
      * \param f input matrix
      * \param nbrchord  number of sampling
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * P(i,0)=i and P(i,1) = Proba(|c|=i) with c a random chord, To estimate it, we random n chords\n
     */
     template<int DIM,typename TypePixel>
-    static Mat2F64 chord(const MatN<DIM,TypePixel> & f, int nbrchord=20000000)
+    static Mat2F32 chord(const MatN<DIM,TypePixel> & f, int nbrchord=20000000)
     {
-        Mat2F64 m;
+        Mat2F32 m;
         std::vector<DistributionUniformInt> random_dist;
         for(int i=0;i<DIM;i++)
             random_dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
@@ -1146,7 +1146,7 @@ struct POP_EXPORTS Analysis
      * \param bin input binary matrix
      * \param norm norm of the ball
      * \param distance distance map
-     * \return Mat2F64 M
+     * \return Mat2F32 M
      *
      *  ldistance allows the evaluation of the size distribution between any VecNd and the complementary space
      *  This algorithm works in any dimension and in any norms (in particular the euclidean norm for norm=2)\n
@@ -1154,7 +1154,7 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static Mat2F64 ldistance(const MatN<DIM,UI8> & bin,int norm,MatN<DIM,UI8> & distance){
+    static Mat2F32 ldistance(const MatN<DIM,UI8> & bin,int norm,MatN<DIM,UI8> & distance){
         MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin_minus.getIteratorEDomain());
         while(it.next()){
@@ -1169,7 +1169,7 @@ struct POP_EXPORTS Analysis
             distance =pop::ProcessingAdvanced::voronoiTesselationEuclidean(bin_minus).second;
         }
         it.init();
-        Mat2F64 m;
+        Mat2F32 m;
         while(it.next()==true){
             if(static_cast<int>(distance(it.x()))>=m.sizeI()){
                 m.resizeInformation(distance(it.x())+1,2);
@@ -1190,7 +1190,7 @@ struct POP_EXPORTS Analysis
      * \param bin input binary matrix
      * \param norm norm of the ball
      * \param fgranulo granulometric map
-     * \return granulometric Mat2F64 M
+     * \return granulometric Mat2F32 M
      *
      *  Granulometry allows the evaluation of the size distribution of grains in binary matrixs (<a href=http://en.wikipedia.org/wiki/Granulometry_%28morphology%29>wiki</a> ).
      *  This algorithm works in any dimension and in any norms (in particular the euclidean norm for norm=2)\n
@@ -1200,16 +1200,16 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static Mat2F64 granulometryMatheron(const MatN<DIM,UI8> & bin, F64 norm ,MatN<DIM,UI8> & fgranulo){
+    static Mat2F32 granulometryMatheron(const MatN<DIM,UI8> & bin, F32 norm ,MatN<DIM,UI8> & fgranulo){
       FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
         MatN<DIM,UI8> bin2(bin.getDomain());
         fgranulo.resize(bin.getDomain());
 
         forEachFunctorUnaryF(bin,bin2,func);
         int size = bin2.getDomain().multCoordinate();
-        Mat2F64 marea = Analysis::area(bin2);
+        Mat2F32 marea = Analysis::area(bin2);
         int area = size - marea(0,1);
-        Mat2F64 m(1,3);
+        Mat2F32 m(1,3);
         m(0,0) = 0;
         m(0,1) = area;
         m(0,2) = 0;
@@ -1244,17 +1244,17 @@ struct POP_EXPORTS Analysis
      *
      * \param bin input binary matrix
      * \param norm norm of the ball (1=4-connectivity, 0=8-connectivity in 2D)
-     * \return Mat2F64 containing the geometrical tortuosity following each coordinate
+     * \return Mat2F32 containing the geometrical tortuosity following each coordinate
      *
      *  Calculated the geometrical tortuosity (geodesical path) following each coordinate
      *
      */
 
     template<int DIM>
-    static Mat2F64 geometricalTortuosity( const MatN<DIM,UI8> & bin, int norm=1)
+    static Mat2F32 geometricalTortuosity( const MatN<DIM,UI8> & bin, int norm=1)
     {
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
-        Mat2F64 m(DIM,2);
+        Mat2F32 m(DIM,2);
         for(int i=0;i<DIM;i++){
             int count=0;
             int sum=0;
@@ -1359,7 +1359,7 @@ struct POP_EXPORTS Analysis
      * \brief percolation (1=yes, 0=no) in the given coordinate
      * \param bin input binary matrix
      * \param norm norm of the ball
-     * \return Mat2F64 M
+     * \return Mat2F32 M
      *
      *  A(i,0)=i and A(i,1) = r if it exists  path included in the binary set eroded touching the two opposites faces for the i-coordinate, 0 otherwise\n
      * Numerically, we compute the max cluster of the binary test and we test if it touch the opposite direction for each coordinate
@@ -1367,9 +1367,9 @@ struct POP_EXPORTS Analysis
     */
 
     template<int DIM>
-    static Mat2F64 percolation(const MatN<DIM,UI8> & bin,int norm=1){
+    static Mat2F32 percolation(const MatN<DIM,UI8> & bin,int norm=1){
         MatN<DIM,UI8> max_cluster = pop::ProcessingAdvanced::clusterMax( bin,   bin.getIteratorENeighborhood(1,norm));
-        Mat2F64 m(DIM,2);
+        Mat2F32 m(DIM,2);
         for(int i = 0;i<DIM;i++)
             m(i,0)=i;
         for(int i =0;i<DIM;i++)
@@ -1405,7 +1405,7 @@ struct POP_EXPORTS Analysis
      * \brief Percolation until the erosion with a ball of radius r (diameter 2*r+1) in the given coordinate, -1 means no percolation for the original binary matrix
      * \param bin input binary matrix
      * \param norm norm of the ball
-     * \return Mat2F64 M
+     * \return Mat2F32 M
      *
      *  A(i,0)=i and A(i,1) = R for the maximum erosion of the binary set with tha ball of radius R such that it exists  path included
      * in the eroded binary set touching the two opposites faces for the i-coordinate
@@ -1413,7 +1413,7 @@ struct POP_EXPORTS Analysis
      * \sa percolation(const MatN<DIM,TypePixel> & bin,int norm,MatN<DIM,TypePixel> & max_cluster) pop::Processing::clusterMax(const FunctionBinary & bin, int norm)
     */
     template<int DIM>
-    static Mat2F64 percolationErosion(const  MatN<DIM,UI8>   & bin,int norm=1){
+    static Mat2F32 percolationErosion(const  MatN<DIM,UI8>   & bin,int norm=1){
        MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         while(it.next()){
@@ -1428,7 +1428,7 @@ struct POP_EXPORTS Analysis
             dist = pop::ProcessingAdvanced::voronoiTesselation(bin_minus, bin_minus.getIteratorENeighborhood(1,norm)).second;
         else
             dist = pop::ProcessingAdvanced::voronoiTesselationEuclidean(bin_minus).second;
-        Mat2F64 m(DIM,2);
+        Mat2F32 m(DIM,2);
         for(int i = 0;i<DIM;i++){
             m(i,0)=i;
             m(i,1)=-1;
@@ -1438,7 +1438,7 @@ struct POP_EXPORTS Analysis
         while(ispercol==true){
             it.init();
             erosion = pop::ProcessingAdvanced::threshold(dist,radius+1,NumericLimits<UI16>::maximumRange(),it);
-            Mat2F64 mradius =  Analysis::percolation(erosion, norm);
+            Mat2F32 mradius =  Analysis::percolation(erosion, norm);
             ispercol=false;
             for(int i = 0;i<DIM;i++){
                 if(mradius(i,1)==1){
@@ -1456,7 +1456,7 @@ struct POP_EXPORTS Analysis
      * \brief Percolation until the opening with a ball of radius r (diameter 2*r+1) in the given coordinate, -1 means no percolation for the original binary matrix
      * \param bin input binary matrix
      * \param norm norm of the ball
-     * \return Mat2F64 M
+     * \return Mat2F32 M
      *
      *  A(i,0)=i and A(i,1) = R for the maximum opening of the binary set with tha ball of radius R such that it exists  path included
      * in the opened binary set touching the two opposites faces for the i-coordinate
@@ -1464,7 +1464,7 @@ struct POP_EXPORTS Analysis
      * \sa clusterMax
     */
     template<int DIM>
-    static Mat2F64 percolationOpening(const MatN<DIM,UI8> & bin,int norm=1){
+    static Mat2F32 percolationOpening(const MatN<DIM,UI8> & bin,int norm=1){
         MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         while(it.next()){
@@ -1481,7 +1481,7 @@ struct POP_EXPORTS Analysis
         else
             dist = pop::ProcessingAdvanced::voronoiTesselationEuclidean(bin_minus).second;
 
-        Mat2F64 m(DIM,2);
+        Mat2F32 m(DIM,2);
         for(int i = 0;i<DIM;i++){
             m(i,0)=i;
             m(i,1)=-1;
@@ -1492,7 +1492,7 @@ struct POP_EXPORTS Analysis
             it.init();
             opening = pop::ProcessingAdvanced::threshold(dist,radius+1,NumericLimits<UI16>::maximumRange(),it);
             opening = pop::ProcessingAdvanced::dilationRegionGrowing(opening,radius,norm);
-            Mat2F64 mradius =  Analysis::percolation(opening, norm);
+            Mat2F32 mradius =  Analysis::percolation(opening, norm);
             ispercol=false;
             for(int i = 0;i<DIM;i++){
                 if(mradius(i,1)==1){
@@ -1513,12 +1513,12 @@ struct POP_EXPORTS Analysis
      * Mat2UI8 img;
      * img.load("../image/outil.bmp");
      * img = pop::Processing::threshold(img,120);
-     * double euler = Analysis::eulerPoincare(img);
+     * F32 euler = Analysis::eulerPoincare(img);
      * std::cout<<euler<<std::endl;
      * \endcode
     */
     template<int DIM>
-    static F64 eulerPoincare(const MatN<DIM,UI8> & bin ){
+    static F32 eulerPoincare(const MatN<DIM,UI8> & bin ){
             return AnalysisAdvanced::eulerPoincare(bin);
     }
     /*!
@@ -1542,17 +1542,17 @@ struct POP_EXPORTS Analysis
     }
 
     template<int DIM>
-    static MatN<DIM,UI8>  thinningAtConstantTopologyWire( const MatN<DIM,UI8> & bin,double ratio_filter=0.5,int length_edge=3)
+    static MatN<DIM,UI8>  thinningAtConstantTopologyWire( const MatN<DIM,UI8> & bin,F32 ratio_filter=0.5,int length_edge=3)
     {
         MatN<DIM,UI8>  img(bin);
         img = img.opposite();
         MatN<DIM,UI8>  dist = pop::ProcessingAdvanced::voronoiTesselation(img,img.getIteratorENeighborhood(1,0)).second;;
         img = img.opposite();
         MatN<DIM,UI8>  granulo;
-        MatN<DIM,F64> m = Analysis::granulometryMatheron(img,0,granulo);
+        MatN<DIM,F32> m = Analysis::granulometryMatheron(img,0,granulo);
         m.deleteCol(1);
         DistributionRegularStep d(m);
-        double mean = Statistics::moment(d,1,d.getXmin(),d.getXmax(),1);
+        F32 mean = Statistics::moment(d,1,d.getXmin(),d.getXmax(),1);
         typename MatN<DIM,UI8>::IteratorEDomain it(dist.getIteratorEDomain());
         MatN<DIM,UI8> fixed_VecNd(img.getDomain());
         while(it.next()){
@@ -1775,7 +1775,7 @@ struct POP_EXPORTS Analysis
     }
     /*!
      * \param label input label matrix
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * V(i)=Perimter({x:f(x)=i-1}) where we count the perimeters of each label
     */
@@ -1803,7 +1803,7 @@ struct POP_EXPORTS Analysis
     }
     /*!
      * \param label input label matrix
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      * we count the perimemter between contact labels
     */
@@ -1834,12 +1834,12 @@ struct POP_EXPORTS Analysis
     /*!
      * \param label input label matrix
      * \param norm norm
-     * \return  Mat2F64 M
+     * \return  Mat2F32 M
      *
      *  We count the feret dimater for each label where for norm=1 , D= 1/n*sum_i diameter(i) and otherwise D= (mult_i diameter(i))^{1/n}
     */
     template<int DIM,typename TypePixel>
-    static VecF64 feretDiameterByLabel(const MatN<DIM,TypePixel> & label, int norm=1)
+    static VecF32 feretDiameterByLabel(const MatN<DIM,TypePixel> & label, int norm=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
         std::vector<typename MatN<DIM,TypePixel>::E> v_xmin;
@@ -1856,7 +1856,7 @@ struct POP_EXPORTS Analysis
             }
 
         }
-        VecF64 v;
+        VecF32 v;
         for(int index=0; index<(int)v_xmin.size();index++){
             if( v_xmin[index]!=label.getDomain() ){
                 if(norm==0){

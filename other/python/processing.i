@@ -17,7 +17,7 @@ ALL_IMAGE_DIM_TYPE(Processing,thresholdToggleMappingMorphologicalFabrizio,thresh
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI8>;
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI16>;
 %template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::UI32>;
-%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::F64>;
+%template(thresholdNiblackMethod) pop::Processing::thresholdNiblackMethod<pop::F32>;
 ALL_IMAGE_DIM_TYPE(Processing,edgeDetectorCanny,edgeDetectorCanny)
 
 ALL_IMAGE_SCALAR_TYPE(Processing,fofx)

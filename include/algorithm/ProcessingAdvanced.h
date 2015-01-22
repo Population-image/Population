@@ -58,22 +58,17 @@ struct ProcessingAdvanced
         Function s (f.getDomain());
         Function out(f.getDomain());
         for(int i=0;i<f.getDomain()(0);i++){
-
             for(int j=0;j<f.getDomain()(1);j++){
-                if(j==0)
-                {
+                if(j==0){
                     s(i,j)=f(i,j);
                 }
-                else
-                {
+                else{
                     s(i,j)=f(i,j)+s(i,j-1);
                 }
-                if(i==0)
-                {
+                if(i==0){
                     out(i,j)=s(i,j);
                 }
-                else
-                {
+                else{
                     out(i,j)=s(i,j)+out(i-1,j);
                 }
             }
@@ -87,32 +82,24 @@ struct ProcessingAdvanced
         Function integral2d (f.getDomain());
         Function out(f.getDomain());
         for(int i=0;i<f.getDomain()(0);i++){
-
             for(int j=0;j<f.getDomain()(1);j++){
-
                 for(int k=0;k<f.getDomain()(2);k++){
-                    if(k==0)
-                    {
+                    if(k==0){
                         s(i,j,k)=f(i,j,k);
                     }
-                    else
-                    {
+                    else{
                         s(i,j,k)=f(i,j,k)+s(i,j,k-1);
                     }
-                    if(j==0)
-                    {
+                    if(j==0){
                         integral2d(i,j,k)=s(i,j,k);
                     }
-                    else
-                    {
+                    else{
                         integral2d(i,j,k)=s(i,j,k)+integral2d(i,j-1,k);
                     }
-                    if(i==0)
-                    {
+                    if(i==0){
                         out(i,j,k)=integral2d(i,j,k);
                     }
-                    else
-                    {
+                    else{
                         out(i,j,k)=integral2d(i,j,k)+out(i-1,j,k);
                     }
                 }
@@ -123,16 +110,16 @@ struct ProcessingAdvanced
 
 
     template<typename Function>
-    static Function  nonMaximumSuppression(const Function & img,double sigma, typename FunctionTypeTraitsSubstituteF<Function,F64>::Result &gradnorm)
+    static Function  nonMaximumSuppression(const Function & img,F32 sigma, typename FunctionTypeTraitsSubstituteF<Function,F32>::Result &gradnorm)
     {
 
-        typedef typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F64> >::Result FunctionVecFloat;
-        typedef typename FunctionTypeTraitsSubstituteF<Function,F64>::Result FunctionFloat;
+        typedef typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F32> >::Result FunctionVecFloat;
+        typedef typename FunctionTypeTraitsSubstituteF<Function,F32>::Result FunctionFloat;
         typedef typename FunctionTypeTraitsSubstituteF<Function,UI8 >::Result FunctionBinary;
-        gradnorm= ProcessingAdvanced::gradNormGaussian(FunctionFloat(img),sigma,std::min(9.,sigma*3),img.getIteratorEDomain());
+        gradnorm= ProcessingAdvanced::gradNormGaussian(FunctionFloat(img),sigma,std::min(9.f,sigma*3),img.getIteratorEDomain());
         FunctionVecFloat grad= ProcessingAdvanced::gradientVecGaussian(FunctionFloat(img),sigma);
 
-        std::vector<double> vtan;
+        std::vector<F32> vtan;
         vtan.push_back(std::tan(-3*PI/8));
         vtan.push_back(std::tan(-PI/8));
         vtan.push_back(std::tan( PI/8));
@@ -143,7 +130,7 @@ struct ProcessingAdvanced
         while(it.next())
         {
             Mat2UI8::E x = it.x();
-            double slop=-grad(x)(1)/grad(x)(0);
+            F32 slop=-grad(x)(1)/grad(x)(0);
             int direction = (int)(std::lower_bound (vtan.begin(), vtan.end(), slop)-vtan.begin());
             if(direction==2){
                 if(gradnorm(x(0),x(1))>=gradnorm(x(0)-1,x(1))&&gradnorm(x(0),x(1))>=gradnorm(x(0)+1,x(1))){
@@ -313,10 +300,10 @@ struct ProcessingAdvanced
         return out;
     }
     template<typename Function,typename Iterator>
-    static Function greylevelScaleContrast(const Function & f,F64 scale, Iterator & it){
+    static Function greylevelScaleContrast(const Function & f,F32 scale, Iterator & it){
 
         Function out(f.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result FloatF;
+        typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F32>::Result FloatF;
         FunctorF::FunctorAccumulatorMean<typename Function::F> func;
         it.init();
         FloatF mean = forEachFunctorAccumulator(f,func,it);
@@ -339,11 +326,11 @@ struct ProcessingAdvanced
         it.init();
         FunctorF::FunctorAccumulatorMax<typename Function::F > funcmaxi;
         typename Function::F maxi = forEachFunctorAccumulator(f,funcmaxi,it);
-        typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F64>::Result FloatType;
+        typedef typename FunctionTypeTraitsSubstituteF<typename Function::F,F32>::Result FloatType;
         FloatType ratio;
         if(maxi!=mini){
             Function h(f.getDomain());
-            ratio= 1.0*(max-min)/(maxi-mini);
+            ratio= F32(1.0)*(max-min)/(maxi-mini);
             it.init();
             while(it.next()){
                 h(it.x())=ArithmeticsSaturation<typename Function::F,FloatType>::Range(FloatType(f(it.x())-FloatType(mini))*ratio);
@@ -384,20 +371,20 @@ struct ProcessingAdvanced
     static MatN<DIM,UI8> greylevelTranslateMeanValue(const MatN<DIM,UI8>& f, UI8 mean )
     {
         typename MatN<DIM,UI8>::IteratorEDomain it(f.getIteratorEDomain());
-        Mat2F64 m = AnalysisAdvanced::histogram(f,it);
+        Mat2F32 m = AnalysisAdvanced::histogram(f,it);
 
-        F64 pow_min=0;
-        F64 pow_max=1000;
-        F64 pow_current=1;
-        F64 error_max=0.1;
-        F64 error_current=1;
+        F32 pow_min=0;
+        F32 pow_max=1000;
+        F32 pow_current=1;
+        F32 error_max=0.1;
+        F32 error_current=1;
         int number=0;
         bool test=false;
         while(test==false){
             number++;
-            F64 meantemp=0;
+            F32 meantemp=0;
             for(unsigned int i=0;i<m.sizeI();i++){
-                meantemp  +=  std::pow(static_cast<double>(m(i,0))/256,pow_current)*256*m(i,1);
+                meantemp  +=  std::pow(static_cast<F32>(m(i,0))/256,pow_current)*256*m(i,1);
             }
             error_current = absolute(meantemp-mean);
             if(error_current<error_max)
@@ -689,7 +676,7 @@ struct ProcessingAdvanced
     template<int DIM, typename Type,typename IteratorE>
     static MatN<DIM,Type> gradSobel(const MatN<DIM,Type> & f, I32 direction, IteratorE it)
     {
-        pop::Vec<F64> der (3),smooth(3);
+        pop::Vec<F32> der (3),smooth(3);
         der(0)=1; der(1)=0; der(2)=-1;
         smooth(0)=1;smooth(1)=2;smooth(2)=1;
         MatN<DIM,Type> fout(f);
@@ -707,10 +694,10 @@ struct ProcessingAdvanced
     template<int DIM, typename Type,typename Iterator>
     static MatN<DIM,Type> gradNormSobel(const MatN<DIM,Type> & f, Iterator it)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<Type,F64>::Result TypeF64;
-        MatN<DIM,TypeF64> ffloat(f);
-        MatN<DIM,TypeF64> fdir(f.getDomain());
-        MatN<DIM,TypeF64> fsum(f.getDomain());
+        typedef typename FunctionTypeTraitsSubstituteF<Type,F32>::Result TypeF32;
+        MatN<DIM,TypeF32> ffloat(f);
+        MatN<DIM,TypeF32> fdir(f.getDomain());
+        MatN<DIM,TypeF32> fsum(f.getDomain());
 
         for(I32 i=0;i <DIM;i++)
         {
@@ -718,31 +705,31 @@ struct ProcessingAdvanced
             fdir = ProcessingAdvanced::gradSobel(ffloat,i,it);
             fsum+= fdir.multTermByTerm(fdir);
         }
-        MatN<DIM,TypeF64> grad(f.getDomain());
+        MatN<DIM,TypeF32> grad(f.getDomain());
         it.init();
         while(it.next())
         {
-            TypeF64 value = pop::squareRoot(fsum(it.x()));
-            grad(it.x())=ArithmeticsSaturation<Type,TypeF64>::Range(value);
+            TypeF32 value = pop::squareRoot(fsum(it.x()));
+            grad(it.x())=ArithmeticsSaturation<Type,TypeF32>::Range(value);
         }
         return grad;
     }
     template<int DIM,typename PixelType,typename IteratorE>
-    static MatN<DIM,PixelType> gradGaussian(const MatN<DIM,PixelType> & f, I32 direction,F64 sigma, int size_kernel, IteratorE it)
+    static MatN<DIM,PixelType> gradGaussian(const MatN<DIM,PixelType> & f, I32 direction,F32 sigma, int size_kernel, IteratorE it)
     {
         return FunctorMatN::convolutionGaussianDerivate(f,it,direction,sigma,size_kernel);
     }
     template<int DIM,typename PixelType,typename IteratorE>
-    static MatN<DIM,PixelType> smoothGaussian(const MatN<DIM,PixelType> & f, F64 sigma, int size_kernel,IteratorE it){
+    static MatN<DIM,PixelType> smoothGaussian(const MatN<DIM,PixelType> & f, F32 sigma, int size_kernel,IteratorE it){
         return FunctorMatN::convolutionGaussian(f,it,sigma,size_kernel);
     }
     template<class Function1,typename Iterator>
-    static  Function1 gradNormGaussian(const Function1 & f, F64 sigma,int size_kernel,Iterator it)
+    static  Function1 gradNormGaussian(const Function1 & f, F32 sigma,int size_kernel,Iterator it,F32 factor_mult)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<typename Function1::F,F64>::Result Type_F64;
-        typename FunctionTypeTraitsSubstituteF<Function1,Type_F64>::Result ffloat(f);
-        typename FunctionTypeTraitsSubstituteF<Function1,Type_F64>::Result fdir(f.getDomain());
-        typename FunctionTypeTraitsSubstituteF<Function1,Type_F64>::Result fsum(f.getDomain());
+        typedef typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result Type_F32;
+        typename FunctionTypeTraitsSubstituteF<Function1,Type_F32>::Result ffloat(f);
+        typename FunctionTypeTraitsSubstituteF<Function1,Type_F32>::Result fdir(f.getDomain());
+        typename FunctionTypeTraitsSubstituteF<Function1,Type_F32>::Result fsum(f.getDomain());
 
         for(I32 i=0;i <Function1::DIM;i++)
         {
@@ -754,19 +741,19 @@ struct ProcessingAdvanced
         it.init();
         while(it.next())
         {
-            g(it.x())=ArithmeticsSaturation<typename Function1::F,Type_F64>::Range(squareRoot(fsum(it.x())));
+            g(it.x())=ArithmeticsSaturation<typename Function1::F,Type_F32>::Range(squareRoot(fsum(it.x()))*factor_mult);
         }
         return g;
     }
     template<class Function1>
-    static typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F64> >::Result gradientVecGaussian(const Function1  & f,double sigma=1)
+    static typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result gradientVecGaussian(const Function1  & f,F32 sigma=1)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<Function1,F64 >::Result  FunctionFloat;
+        typedef typename FunctionTypeTraitsSubstituteF<Function1,F32 >::Result  FunctionFloat;
         VecN<Function1::DIM,FunctionFloat> v_der;
         for(int i =0;i<Function1::DIM;i++){
             v_der[i]= ProcessingAdvanced::gradGaussian(f,i,sigma,3*sigma,f.getIteratorEDomain());
         }
-        typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F64> >::Result f_grad(f.getDomain());
+        typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result f_grad(f.getDomain());
         Convertor::fromVecN(v_der,f_grad);
         return f_grad;
     }
@@ -1641,7 +1628,7 @@ struct ProcessingAdvanced
         }while(atleastonegrowth==true);
         return std::make_pair(pop.getRegion(),dist);
     }
-    /*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
+    /*! \fn std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F32>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
       * \param seed input seed
       * \param region ouput region
       * \param dist distunce function
@@ -1651,7 +1638,7 @@ struct ProcessingAdvanced
     */
 
     template<typename FunctionRegion>
-    static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
+    static std::pair<FunctionRegion,typename FunctionTypeTraitsSubstituteF<FunctionRegion,F32>::Result >  voronoiTesselationEuclidean(const FunctionRegion & seed)
     {
         typename FunctionRegion::IteratorENeighborhood itn(seed.getIteratorENeighborhood(1,0));
         FunctorZero f;
@@ -1660,7 +1647,7 @@ struct ProcessingAdvanced
 
 
         FunctionRegion region(seed.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion,F64>::Result FunctionDistance;
+        typedef typename FunctionTypeTraitsSubstituteF<FunctionRegion,F32>::Result FunctionDistance;
         FunctionDistance dist(seed.getDomain());
         std::vector<typename FunctionRegion::E > vrand;
         typename FunctionRegion::IteratorEDomain it(seed.getIteratorEDomain());
@@ -1702,7 +1689,7 @@ struct ProcessingAdvanced
             while(pop.next())
             {
                 typename FunctionRegion::E diff = pop.x().second-x;
-                F64 disttemp = diff.normPower();
+                F32 disttemp = diff.normPower();
                 if(disttemp<= dist(pop.x().second))
                 {
                     pop.growth(pop.x().first,pop.x().second);
@@ -1718,12 +1705,12 @@ struct ProcessingAdvanced
             if(dist(it.x())==NumericLimits<typename FunctionDistance::F>::maximumRange())
                 dist(it.x()) =0;
             else
-                dist(it.x()) =std::sqrt(static_cast<double>(dist(it.x())));
+                dist(it.x()) =std::sqrt(static_cast<F32>(dist(it.x())));
         }
         return std::make_pair(region,dist);
     }
 
-    /*! \fn static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
+    /*! \fn static Function  erosionRegionGrowing(const Function & f,F32 radius, int norm=1)
           * \param bin input binary matrix
           * \param radius radius
           * \param norm norm
@@ -1732,12 +1719,12 @@ struct ProcessingAdvanced
           *  erosion(x) =  \min_{x'\in B(x,r,n)}f(x') \f$, where \f$B(x,norm)=\{x':|x'-x|_n\leq r\}\f$ the ball centered in 0 of radius r and the norm n
         */
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm=1)
+    static Function  erosionRegionGrowing(const Function & f,F32 radius, int norm=1)
     {
         return erosionRegionGrowing(f,radius,  norm, Int2Type<isVectoriel<typename Function::F>::value > ());
     }
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<true>)
+    static Function  erosionRegionGrowing(const Function & f,F32 radius, int norm,Int2Type<true>)
     {
         typedef typename Identity<typename Function::F>::Result::F TypeScalar;
         VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
@@ -1751,7 +1738,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<false>)
+    static Function  erosionRegionGrowing(const Function & f,F32 radius, int norm,Int2Type<false>)
     {
         if(norm<=1){
             FunctorSwitch func;
@@ -1793,7 +1780,7 @@ struct ProcessingAdvanced
             while(it.next()){
                 pop.growth(f(it.x()),it.x(),it.x());
             }
-            double radiuspower2= radius*radius;
+            F32 radiuspower2= radius*radius;
             int distancevalue=0;
             bool atleastonegrowth=true;
             while(atleastonegrowth==true&&distancevalue<radius)
@@ -1804,7 +1791,7 @@ struct ProcessingAdvanced
                 atleastonegrowth=false;
                 while(pop.next()){
                     typename Function::E diff = pop.x().first.second-pop.x().second;
-                    F64 disttemp = diff.normPower();
+                    F32 disttemp = diff.normPower();
                     if(disttemp<= radiuspower2)
                     {
                         atleastonegrowth=true;
@@ -1819,7 +1806,7 @@ struct ProcessingAdvanced
             return pop.getRegion();
         }
     }
-    /*! \fn static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
+    /*! \fn static Function  dilationRegionGrowing(const Function & f,F32 radius, int norm=1)
           * \param bin input binary matrix
           * \param radius radius
           * \param norm norm
@@ -1828,12 +1815,12 @@ struct ProcessingAdvanced
           *  dilation(x) =  \max_{x'\in B(x,r,n)}f(x') \f$, where \f$B(x,norm)=\{x':|x'-x|_n\leq r\}\f$ the ball centered in 0 of radius r and the norm n
         */
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm=1)
+    static Function  dilationRegionGrowing(const Function & f,F32 radius, int norm=1)
     {
         return dilationRegionGrowing(f,radius,  norm, Int2Type<isVectoriel<typename Function::F>::value > ());
     }
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<true>)
+    static Function  dilationRegionGrowing(const Function & f,F32 radius, int norm,Int2Type<true>)
     {
         typedef typename Identity<typename Function::F>::Result::F TypeScalar;
         VecN<Function::F::DIM,typename FunctionTypeTraitsSubstituteF<Function,TypeScalar>::Result > V;
@@ -1847,7 +1834,7 @@ struct ProcessingAdvanced
     }
 
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,F64 radius, int norm,Int2Type<false>)
+    static Function  dilationRegionGrowing(const Function & f,F32 radius, int norm,Int2Type<false>)
     {
         if(norm<=1){
             FunctorSwitch func;
@@ -1889,7 +1876,7 @@ struct ProcessingAdvanced
             while(it.next()){
                 pop.growth(f(it.x()),it.x(),it.x());
             }
-            double radiuspower2= radius*radius;
+            F32 radiuspower2= radius*radius;
             int distancevalue=0;
             bool atleastonegrowth=true;
             while(atleastonegrowth==true&&distancevalue<radius)
@@ -1900,7 +1887,7 @@ struct ProcessingAdvanced
                 atleastonegrowth=false;
                 while(pop.next()){
                     typename Function::E diff = pop.x().first.second-pop.x().second;
-                    F64 disttemp = diff.normPower();
+                    F32 disttemp = diff.normPower();
                     if(disttemp<= radiuspower2)
                     {
                         atleastonegrowth=true;
@@ -1916,7 +1903,7 @@ struct ProcessingAdvanced
         }
     }
     template<typename Function>
-    static Function  erosionRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
+    static Function  erosionRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,F32 radius)
     {
         FunctorSwitch func;
         Population<Function,FunctorSwitch,RestrictedSetWithoutSuperiorLabel> pop(f.getDomain(),func,itneigh);
@@ -1946,7 +1933,7 @@ struct ProcessingAdvanced
         return pop.getRegion();
     }
     template<typename Function>
-    static Function  dilationRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,double radius)
+    static Function  dilationRegionGrowing(const Function & f,const typename Function::IteratorENeighborhood & itneigh,F32 radius)
     {
         FunctorSwitch func;
         Population<Function,FunctorSwitch,RestrictedSetWithoutInferiorLabel> pop(f.getDomain(),func,itneigh);
@@ -1976,14 +1963,14 @@ struct ProcessingAdvanced
         return pop.getRegion();
     }
     template<typename Function>
-    static Function  closingRegionGrowing(const Function & f,F64 radius, int norm=1)
+    static Function  closingRegionGrowing(const Function & f,F32 radius, int norm=1)
     {
         Function temp(f.getDomain());
         temp = dilationRegionGrowing(f,radius,norm);
         return erosionRegionGrowing(temp,radius,norm);
     }
     template<typename Function>
-    static Function  openingRegionGrowing(const Function & f,F64 radius, int norm=1)
+    static Function  openingRegionGrowing(const Function & f,F32 radius, int norm=1)
     {
         Function temp(f.getDomain());
         temp = erosionRegionGrowing(f,radius,norm);

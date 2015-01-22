@@ -56,8 +56,8 @@ protected:
 public:
     void setDistributionLeft(const Distribution & f_left);
     void setDistributionRight(const Distribution & f_right);
-    F64 randomVariable()const ;
-    void setStep(F64 step)const;
+    F32 randomVariable()const ;
+    void setStep(F32 step)const;
 
     Distribution & getDistributionLeft();
     Distribution & getDistributionRight();
@@ -74,7 +74,7 @@ public:
     DistributionArithmeticAddition();
     DistributionArithmeticAddition(const DistributionArithmeticAddition & dist);
     virtual DistributionArithmeticAddition * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
     ;
  };
  class DistributionArithmeticSubtraction : public DistributionArithmetic
@@ -84,7 +84,7 @@ public:
     DistributionArithmeticSubtraction();
     DistributionArithmeticSubtraction(const DistributionArithmeticSubtraction & dist);
     virtual DistributionArithmeticSubtraction * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
  class DistributionArithmeticMultiplication : public DistributionArithmetic
@@ -94,7 +94,7 @@ public:
     DistributionArithmeticMultiplication();
     DistributionArithmeticMultiplication(const DistributionArithmeticMultiplication & dist);
     virtual DistributionArithmeticMultiplication * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
  class DistributionArithmeticDivision : public DistributionArithmetic
@@ -104,7 +104,7 @@ public:
     DistributionArithmeticDivision();
     DistributionArithmeticDivision(const DistributionArithmeticDivision & dist);
     virtual DistributionArithmeticDivision * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
  class DistributionArithmeticComposition : public DistributionArithmetic
@@ -114,7 +114,7 @@ public:
     DistributionArithmeticComposition();
     DistributionArithmeticComposition(const DistributionArithmeticComposition & dist);
     virtual DistributionArithmeticComposition * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
  class DistributionArithmeticMax : public DistributionArithmetic
@@ -124,7 +124,7 @@ public:
     DistributionArithmeticMax();
     DistributionArithmeticMax(const DistributionArithmeticMax & dist);
     virtual DistributionArithmeticMax * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
  class DistributionArithmeticMin : public DistributionArithmetic
@@ -134,7 +134,7 @@ public:
     DistributionArithmeticMin();
     DistributionArithmeticMin(const DistributionArithmeticMin & dist);
     virtual DistributionArithmeticMin * clone()const ;
-    virtual F64 operator()(F64 value)const ;
+    virtual F32 operator()(F32 value)const ;
 
  };
 /// @endcond

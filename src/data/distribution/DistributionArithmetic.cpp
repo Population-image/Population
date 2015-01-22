@@ -8,7 +8,7 @@ DistributionArithmetic::DistributionArithmetic()
 void DistributionArithmetic::setDistributionLeft(const Distribution &f_left){
     _fleft=f_left;
 }
-void DistributionArithmetic::setStep(F64 step)const{
+void DistributionArithmetic::setStep(F32 step)const{
     _fleft.setStep(step);
     _fright.setStep(step);
 }
@@ -30,7 +30,7 @@ Distribution & DistributionArithmetic::getDistributionRight(){
 const Distribution & DistributionArithmetic::getDistributionRight()const{
     return  _fright;
 }
-F64 DistributionArithmetic::randomVariable()const 
+F32 DistributionArithmetic::randomVariable()const 
 {
     std::cerr<<"In DistributionArithmetic::randomVariable()const ,  no  probability distribution, you have to use pop::Statistics::toProbabilityDistribution";
     return 0;
@@ -52,7 +52,7 @@ DistributionArithmeticAddition::DistributionArithmeticAddition(const Distributio
 DistributionArithmeticAddition * DistributionArithmeticAddition::clone()const {
     return new DistributionArithmeticAddition(*this);
 }
-F64 DistributionArithmeticAddition::operator ()( F64  value)const {
+F32 DistributionArithmeticAddition::operator ()( F32  value)const {
     return this->getDistributionLeft().operator ()(value)+ this->getDistributionRight().operator ()(value);
 }
 
@@ -74,7 +74,7 @@ DistributionArithmeticSubtraction::DistributionArithmeticSubtraction(const Distr
 DistributionArithmeticSubtraction * DistributionArithmeticSubtraction::clone()const {
     return new DistributionArithmeticSubtraction(*this);
 }
-F64 DistributionArithmeticSubtraction::operator ()( F64  value)const {
+F32 DistributionArithmeticSubtraction::operator ()( F32  value)const {
     return this->getDistributionLeft().operator ()(value)- this->getDistributionRight().operator ()(value);
 }
 
@@ -95,7 +95,7 @@ DistributionArithmeticMultiplication::DistributionArithmeticMultiplication(const
 DistributionArithmeticMultiplication * DistributionArithmeticMultiplication::clone()const {
     return new DistributionArithmeticMultiplication(*this);
 }
-F64 DistributionArithmeticMultiplication::operator ()( F64  value)const {
+F32 DistributionArithmeticMultiplication::operator ()( F32  value)const {
     return this->getDistributionLeft().operator ()(value)* this->getDistributionRight().operator ()(value);
 }
 
@@ -115,7 +115,7 @@ DistributionArithmeticDivision::DistributionArithmeticDivision(const Distributio
 DistributionArithmeticDivision * DistributionArithmeticDivision::clone()const {
     return new DistributionArithmeticDivision(*this);
 }
-F64 DistributionArithmeticDivision::operator ()( F64  value)const {
+F32 DistributionArithmeticDivision::operator ()( F32  value)const {
     return this->getDistributionLeft().operator ()(value)/this->getDistributionRight().operator ()(value);
 }
 
@@ -137,7 +137,7 @@ DistributionArithmeticComposition::DistributionArithmeticComposition(const Distr
 DistributionArithmeticComposition * DistributionArithmeticComposition::clone()const {
     return new DistributionArithmeticComposition(*this);
 }
-F64 DistributionArithmeticComposition::operator ()( F64  value)const {
+F32 DistributionArithmeticComposition::operator ()( F32  value)const {
     return this->getDistributionLeft().operator ()(this->getDistributionRight().operator ()(value));
 }
 
@@ -157,7 +157,7 @@ DistributionArithmeticMax::DistributionArithmeticMax(const DistributionArithmeti
 DistributionArithmeticMax * DistributionArithmeticMax::clone()const {
     return new DistributionArithmeticMax(*this);
 }
-F64 DistributionArithmeticMax::operator ()( F64  value)const {
+F32 DistributionArithmeticMax::operator ()( F32  value)const {
     return maximum(this->getDistributionLeft().operator ()(value),this->getDistributionRight().operator ()(value));
 }
 
@@ -177,7 +177,7 @@ DistributionArithmeticMin::DistributionArithmeticMin( const DistributionArithmet
 DistributionArithmeticMin * DistributionArithmeticMin::clone()const {
     return new DistributionArithmeticMin(*this);
 }
-F64 DistributionArithmeticMin::operator ()( F64  value)const {
+F32 DistributionArithmeticMin::operator ()( F32  value)const {
     return minimum(this->getDistributionLeft().operator ()(value),this->getDistributionRight().operator ()(value));
 }
 }

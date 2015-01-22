@@ -12,7 +12,7 @@ void test0(){
 }
 void test1(){
     std::cout<<"\ntest1"<<std::endl;
-    Mat2F64 m(4,3);//create a 2d matrix with 4-row and the 3-columns and with float pixel type
+    Mat2F32 m(4,3);//create a 2d matrix with 4-row and the 3-columns and with float pixel type
     Vec2I32 x(2,1);
     m(x) = 2.45;//set the pixel value at 2.45
     std::cout<<m<<std::endl;

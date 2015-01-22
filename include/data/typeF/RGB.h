@@ -59,7 +59,7 @@ namespace pop
 */
 
 /*! \ingroup TypeF
-* \defgroup RGB  RGB{UI8,F64}
+* \defgroup RGB  RGB{UI8,F32}
 * \brief template class for red green blue color
 */
 template<class Type>
@@ -76,7 +76,7 @@ class POP_EXPORTS RGB
     * This is an additive RGB model in which red, green, and blue light are added together in various ways to reproduce a broad array of colors \n
 	* To facilitate its utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
     *        - RGBUI8: each channel is one byte representing an integer between 0 and 255, classical type for pixel/voxel of a colour pop::MatN (image) 
-    *        - RGBF64: each channel is a float.
+    *        - RGBF32: each channel is a float.
 	*
     * \code
     * RGBUI8 c1(100,200,30);
@@ -473,7 +473,7 @@ public:
     *
     * return the luminance of this RGB  (0.299*this->r() + 0.587*this->g() + 0.114*this->b())
     */
-    F64 lumi()const{
+    F32 lumi()const{
         return 0.299*this->r() + 0.587*this->g() + 0.114*this->b()+0.000001;
     }
 
@@ -487,9 +487,9 @@ public:
     */
     template<typename Type1>
     void fromYUV(Type1 y,Type1 u,Type1 v){
-        _data[0] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  0*u     +  1.13983*v);
-        _data[1] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+ -0.39465*u -0.58060*v);
-        _data[2] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  2.03211*u+  0*v);
+        _data[0] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  0*u     +  1.13983*v);
+        _data[1] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+ -0.39465*u -0.58060*v);
+        _data[2] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  2.03211*u+  0*v);
     }
     /*!
     * \param y luma
@@ -501,9 +501,9 @@ public:
     */
     template<typename Type1>
     void toYUV(Type1& y,Type1& u,Type1& v)const{
-        y = ArithmeticsSaturation<Type,double >::Range(0.299*_data[0]  + 0.587 *_data[1]+  0.114*_data[2]+0.0000001);//to avoid the float
-        u = ArithmeticsSaturation<Type,double >::Range(-0.14713*_data[0]  + -0.28886*_data[1]+  0.436*_data[2]);
-        v=  ArithmeticsSaturation<Type,double >::Range(0.615*_data[0]  + -0.51499*_data[1]+ -0.10001*_data[2]);
+        y = ArithmeticsSaturation<Type,F32 >::Range(0.299*_data[0]  + 0.587 *_data[1]+  0.114*_data[2]+0.0000001);//to avoid the float
+        u = ArithmeticsSaturation<Type,F32 >::Range(-0.14713*_data[0]  + -0.28886*_data[1]+  0.436*_data[2]);
+        v=  ArithmeticsSaturation<Type,F32 >::Range(0.615*_data[0]  + -0.51499*_data[1]+ -0.10001*_data[2]);
     }
 
     /*!
@@ -515,10 +515,10 @@ public:
     * \sa http://en.wikipedia.org/wiki/YUV
     */
 
-    void fromYUV(double y,double u,double v){
-        _data[0] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  0*u     +  1.13983*v);
-        _data[1] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+ -0.39465*u -0.58060*v);
-        _data[2] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  2.03211*u+  0*v);
+    void fromYUV(F32 y,F32 u,F32 v){
+        _data[0] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  0*u     +  1.13983*v);
+        _data[1] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+ -0.39465*u -0.58060*v);
+        _data[2] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  2.03211*u+  0*v);
     }
     /*!
     * \param h luma
@@ -529,9 +529,9 @@ public:
     * \sa http://en.wikipedia.org/wiki/YUV
     *
     */
-    void toHSL(double& h,double& s,double& l)const{
-        double Max_value= pop::NumericLimits<Type>::maximumRange();
-        double var_R, var_G, var_B , var_min, var_max, var_delta;
+    void toHSL(F32& h,F32& s,F32& l)const{
+        F32 Max_value= pop::NumericLimits<Type>::maximumRange();
+        F32 var_R, var_G, var_B , var_min, var_max, var_delta;
 
         var_R = 1.*this->r()/Max_value;
         var_G = 1.*this->g()/Max_value;
@@ -562,9 +562,9 @@ public:
                 s = var_delta / (2 - var_max - var_min);
             }
 
-            double del_R = (((var_max - var_R)/6.) + (var_delta/2.)) / var_delta;
-            double del_G = (((var_max - var_G)/6.) + (var_delta/2.)) / var_delta;
-            double del_B = (((var_max - var_B)/6.) + (var_delta/2.)) / var_delta;
+            F32 del_R = (((var_max - var_R)/6.) + (var_delta/2.)) / var_delta;
+            F32 del_G = (((var_max - var_G)/6.) + (var_delta/2.)) / var_delta;
+            F32 del_B = (((var_max - var_B)/6.) + (var_delta/2.)) / var_delta;
 
 
             //calcul de la teinte
@@ -733,34 +733,34 @@ public:
     *
     * return the norm as the luminance of the RGB colour by default
     */
-    double  norm(int p=-1)const
+    F32  norm(int p=-1)const
     {
         if(p==-1)
 			return lumi();
 		else if(p==0)
-            return maximum(maximum(absolute(static_cast<double>(this->_data[0])),absolute(static_cast<double>(this->_data[1]))),absolute(static_cast<double>(this->_data[2])));
+            return maximum(maximum(absolute(static_cast<F32>(this->_data[0])),absolute(static_cast<F32>(this->_data[1]))),absolute(static_cast<F32>(this->_data[2])));
         else if(p==1)
-            return absolute(static_cast<double>(this->_data[0]))+absolute(static_cast<double>(this->_data[1]))+absolute(static_cast<double>(this->_data[2]));
+            return absolute(static_cast<F32>(this->_data[0]))+absolute(static_cast<F32>(this->_data[1]))+absolute(static_cast<F32>(this->_data[2]));
 
         else if(p==2)
-            return std::sqrt(static_cast<double>(this->_data[0]*this->_data[0]+this->_data[1]*this->_data[1]+this->_data[2]*this->_data[2]));
+            return std::sqrt(static_cast<F32>(this->_data[0]*this->_data[0]+this->_data[1]*this->_data[1]+this->_data[2]*this->_data[2]));
         else{
-            F64 value = std::pow(absolute(static_cast<double>(this->_data[0])),static_cast<double>(p))+std::pow(absolute(static_cast<double>(this->_data[1])),static_cast<double>(p))+std::pow(absolute(static_cast<double>(this->_data[2])),static_cast<double>(p));
+            F32 value = std::pow(absolute(static_cast<F32>(this->_data[0])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[1])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[2])),static_cast<F32>(p));
             return std::pow(value,1.0/p);
 			}
     }
-	F64 normPower(int p=-1)const{
+	F32 normPower(int p=-1)const{
         if(p==-1)
             return lumi();
         else if(p==0)
-            return maximum(maximum(absolute(static_cast<double>(this->_data[0])),absolute(static_cast<double>(this->_data[1]))),absolute(static_cast<double>(this->_data[2])));
+            return maximum(maximum(absolute(static_cast<F32>(this->_data[0])),absolute(static_cast<F32>(this->_data[1]))),absolute(static_cast<F32>(this->_data[2])));
         else if(p==1)
-            return absolute(static_cast<double>(this->_data[0]))+absolute(static_cast<double>(this->_data[1]))+absolute(static_cast<double>(this->_data[2]));
+            return absolute(static_cast<F32>(this->_data[0]))+absolute(static_cast<F32>(this->_data[1]))+absolute(static_cast<F32>(this->_data[2]));
 
         else if(p==2)
-            return static_cast<double>(this->_data[0]*this->_data[0]+this->_data[1]*this->_data[1]+this->_data[2]*this->_data[2]);
+            return static_cast<F32>(this->_data[0]*this->_data[0]+this->_data[1]*this->_data[1]+this->_data[2]*this->_data[2]);
         else{
-            F64 value = std::pow(absolute(static_cast<double>(this->_data[0])),static_cast<double>(p))+std::pow(absolute(static_cast<double>(this->_data[1])),static_cast<double>(p))+std::pow(absolute(static_cast<double>(this->_data[2])),static_cast<double>(p));
+            F32 value = std::pow(absolute(static_cast<F32>(this->_data[0])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[1])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[2])),static_cast<F32>(p));
             return value;
             }
     }
@@ -843,7 +843,7 @@ RGB<T1>  operator/(T1 v, const RGB<T1>&  c1){
 
 
 typedef RGB<UI8> RGBUI8;
-typedef RGB<F64> RGBF64;
+typedef RGB<F32> RGBF32;
 template<typename Type>
 struct isVectoriel<RGB<Type> >{
     enum { value =true};
@@ -926,7 +926,7 @@ pop::RGB<T1>  maximum(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2)
 * scalar product of the two RGB \f$ u\cdot v=\sum_{i=0}^{n-1} u_i v_i = u_0 v_0 + u_1 v_1 + \cdots + u_{n-1} v_{n-1}.\f$
 */
 template <class T1>
-inline double  productInner(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2)
+inline F32  productInner(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2)
 {
     return productInner(x1(0),x2(0))+productInner(x1(1),x2(1))+productInner(x1(2),x2(2));
 }
@@ -940,7 +940,7 @@ inline double  productInner(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2)
 *
 */
 template <class T1>
-double  normValue(const pop::RGB<T1>&  x1,int p=-1)
+F32  normValue(const pop::RGB<T1>&  x1,int p=-1)
 {
     return x1.norm(p);
 }
@@ -953,7 +953,7 @@ double  normValue(const pop::RGB<T1>&  x1,int p=-1)
 *
 */
 template <class T1>
-double  normPowerValue(const pop::RGB<T1>&  x1,int p=-1)
+F32  normPowerValue(const pop::RGB<T1>&  x1,int p=-1)
 {
     return x1.normPower(p);
 }
@@ -968,7 +968,7 @@ double  normPowerValue(const pop::RGB<T1>&  x1,int p=-1)
 *
 */
 template <class T1>
-double  distance(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2,int p=-1)
+F32  distance(const pop::RGB<T1>&  x1,const pop::RGB<T1>&  x2,int p=-1)
 {
     return norm(x1-x2,p);
 }
@@ -1070,7 +1070,7 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 
 //        To facilitate its utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
 //            - RGBAUI8: each channel is one byte representing an integer between 0 and 255, this type is the classical one for pixel/voxel RGBA
-//            - RGBAF64: each channel is a float.
+//            - RGBAF32: each channel is a float.
 
 //        \code
 //        RGBAUI8 c1(100,200,30,100);
@@ -1478,7 +1478,7 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 //    *
 //    * return the luminance of this RGBA  (0.299*this->r() + 0.587*this->g() + 0.114*this->b())
 //    */
-//    F64 lumi()const{
+//    F32 lumi()const{
 //        return 0.299*this->r() + 0.587*this->g() + 0.114*this->b()+0.000001;
 //    }
 
@@ -1492,9 +1492,9 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 //    */
 //    template<typename Type1>
 //    void fromYUV(Type1 y,Type1 u,Type1 v){
-//        _data[0] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  0*u     +  1.13983*v);
-//        _data[1] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+ -0.39465*u -0.58060*v);
-//        _data[2] = pop::ArithmeticsSaturation<Type,double >::Range(1.0*y+  2.03211*u+  0*v);
+//        _data[0] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  0*u     +  1.13983*v);
+//        _data[1] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+ -0.39465*u -0.58060*v);
+//        _data[2] = pop::ArithmeticsSaturation<Type,F32 >::Range(1.0*y+  2.03211*u+  0*v);
 //    }
 //    /*!
 //    * \param y luma
@@ -1506,9 +1506,9 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 //    */
 //    template<typename Type1>
 //    void toYUV(Type1& y,Type1& u,Type1& v)const{
-//        y = ArithmeticsSaturation<Type,double >::Range(0.299*_data[0]  + 0.587 *_data[1]+  0.114*_data[2]+0.0000001);//to avoid the float
-//        u = ArithmeticsSaturation<Type,double >::Range(-0.14713*_data[0]  + -0.28886*_data[1]+  0.436*_data[2]);
-//        v=  ArithmeticsSaturation<Type,double >::Range(0.615*_data[0]  + -0.51499*_data[1]+ -0.10001*_data[2]);
+//        y = ArithmeticsSaturation<Type,F32 >::Range(0.299*_data[0]  + 0.587 *_data[1]+  0.114*_data[2]+0.0000001);//to avoid the float
+//        u = ArithmeticsSaturation<Type,F32 >::Range(-0.14713*_data[0]  + -0.28886*_data[1]+  0.436*_data[2]);
+//        v=  ArithmeticsSaturation<Type,F32 >::Range(0.615*_data[0]  + -0.51499*_data[1]+ -0.10001*_data[2]);
 //    }
 //    /*!
 //    * \param file input file
@@ -1645,7 +1645,7 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 //    *
 //    * return the norm as the luminance of the RGBA RGBA
 //    */
-//    double  norm()
+//    F32  norm()
 //    {
 //        return lumi();
 //    }
@@ -1732,7 +1732,7 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 
 
 //typedef RGBA<UI8> RGBAUI8;
-//typedef RGBA<F64> RGBAF64;
+//typedef RGBA<F32> RGBAF32;
 //template<typename Type>
 //struct isVectoriel<RGBA<Type> >{
 //    enum { value =true};
@@ -1864,7 +1864,7 @@ const bool NumericLimits<pop::RGB<T> >::is_integer = NumericLimits<T>::is_intege
 //*
 //*/
 //template <class T1>
-//double  normValue(const pop::RGBA<T1>&  x1)
+//F32  normValue(const pop::RGBA<T1>&  x1)
 //{
 //    return x1.lumi();
 //}

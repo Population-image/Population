@@ -238,15 +238,15 @@ struct POP_EXPORTS Processing
     template<int DIM,typename TypePixel>
     static MatN<DIM,UI8>  thresholdKMeansVariation(const MatN<DIM,TypePixel>& f){
 
-        Mat2F64 m = Analysis::histogram(f);
+        Mat2F32 m = Analysis::histogram(f);
         int value_threshold_step_i    = 0;
         int value_threshold_step_i_plus1=m(m.sizeI()/2,0);
         while(value_threshold_step_i_plus1!=value_threshold_step_i){
             value_threshold_step_i = value_threshold_step_i_plus1;
-            double mean_min=0;
-            double mean_max=0;
-            double sum_min=0;
-            double sum_max=0;
+            F32 mean_min=0;
+            F32 mean_max=0;
+            F32 sum_min=0;
+            F32 sum_max=0;
             for(unsigned int i=0;i<m.sizeI();i++){
                 if(m(i,0)<value_threshold_step_i){
                     mean_min += m(i,0)*m(i,1);
@@ -279,17 +279,17 @@ struct POP_EXPORTS Processing
       \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,TypePixel>& f,double & thresholdvalue){
+    static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,TypePixel>& f,F32 & thresholdvalue){
 
-        Mat2F64 m = Analysis::histogram(f);
-        double variane_between_class_max=0;
+        Mat2F32 m = Analysis::histogram(f);
+        F32 variane_between_class_max=0;
         int threshold_max =0;
-        double mean = 0;
+        F32 mean = 0;
         for (unsigned int i=0 ; i<m.sizeI() ; i++)
             mean += m(i,0) * m(i,1);
-        double sumB = 0;
-        double wB = 0;
-        double wF = 0;
+        F32 sumB = 0;
+        F32 wB = 0;
+        F32 wF = 0;
         for(unsigned int i=0;i<m.sizeI();i++){
             wB += m(i,1);               // Weight Background
             if (wB == 0) continue;
@@ -299,11 +299,11 @@ struct POP_EXPORTS Processing
 
             sumB += m(i,0) * m(i,1);
 
-            double meanB = sumB / wB;            // Mean Background
-            double meanF = (mean - sumB) / wF;    // Mean Foreground
+            F32 meanB = sumB / wB;            // Mean Background
+            F32 meanF = (mean - sumB) / wF;    // Mean Foreground
 
             // Calculate Between Class Variance
-            double variane_between_class = wB * wF * (meanB - meanF) * (meanB - meanF);
+            F32 variane_between_class = wB * wF * (meanB - meanF) * (meanB - meanF);
 
             // Check if new maximum found
             if (variane_between_class > variane_between_class_max) {
@@ -333,7 +333,7 @@ struct POP_EXPORTS Processing
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdToggleMappingMorphological(const MatN<DIM,TypePixel> & f,int radius=2,double norm=0){
+    static MatN<DIM,UI8>  thresholdToggleMappingMorphological(const MatN<DIM,TypePixel> & f,int radius=2,F32 norm=0){
         MatN<DIM,TypePixel> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
         MatN<DIM,TypePixel> dilation = Processing::dilationRegionGrowing(f,radius,norm);
         MatN<DIM,UI8> s(f.getDomain());
@@ -365,16 +365,16 @@ struct POP_EXPORTS Processing
      * \image html vitrinethresholdTMMS2.jpg
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8> thresholdToggleMappingMorphologicalFabrizio(const MatN<DIM,TypePixel>& f,double c=16,double p=0.8,int radius=2,double norm=1){
+    static MatN<DIM,UI8> thresholdToggleMappingMorphologicalFabrizio(const MatN<DIM,TypePixel>& f,F32 c=16,F32 p=0.8,int radius=2,F32 norm=1){
     MatN<DIM,TypePixel> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
     MatN<DIM,TypePixel> dilation = Processing::dilationRegionGrowing(f,radius,norm);
 
     MatN<DIM,UI8> label(erosion.getDomain());
     typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
     while(it.next()){
-        double v_d = normValue(dilation(it.x()));
-        double v_e = normValue(erosion(it.x()));
-        double v = normValue(f(it.x()));
+        F32 v_d = normValue(dilation(it.x()));
+        F32 v_e = normValue(erosion(it.x()));
+        F32 v = normValue(f(it.x()));
 
         if(std::abs(v_d-v_e)<c){
             label(it.x())=255;
@@ -438,25 +438,25 @@ struct POP_EXPORTS Processing
      * \image html vitrinethresholdNiblack.jpg
     */
     template<typename TypePixel>
-    static MatN<2,UI8>  thresholdNiblackMethod(const MatN<2,TypePixel> & f,double k=0.2,int radius=5,double offset_value=0  ){
+    static MatN<2,UI8>  thresholdNiblackMethod(const MatN<2,TypePixel> & f,F32 k=0.2,int radius=5,F32 offset_value=0  ){
         MatN<2,TypePixel> fborder(f);
         Draw::addBorder(fborder,radius,typename MatN<2,TypePixel>::F(0),MATN_BOUNDARY_CONDITION_MIRROR);
-        MatN<2,F64> f_double(fborder);
-        MatN<2,F64> integral = Processing::integral(f_double);
-        MatN<2,F64> integralpower2 = Processing::integralPower2(f_double);
+        MatN<2,F32> f_F32(fborder);
+        MatN<2,F32> integral = Processing::integral(f_F32);
+        MatN<2,F32> integralpower2 = Processing::integralPower2(f_F32);
 
 
-        typename MatN<2,F64>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_double.getDomain()-1-Vec2I32(radius)));
-        F64 area_minus1 = 1./((2*radius+1)*(2*radius+1));
+        typename MatN<2,F32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
+        F32 area_minus1 = 1./((2*radius+1)*(2*radius+1));
         while(it.next()){
             Vec2I32 xadd1=it.x()+Vec2I32(radius);
             Vec2I32 xadd2=it.x()+Vec2I32(-radius);
             Vec2I32 xsub1=it.x()-Vec2I32(radius,-radius);
             Vec2I32 xsub2=it.x()-Vec2I32(-radius,radius);
-            F64 mean = integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
+            F32 mean = integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
             mean*=area_minus1;
 
-            F64 standartdeviation =integralpower2(xadd1)+integralpower2(xadd2)-integralpower2(xsub1)-integralpower2(xsub2);
+            F32 standartdeviation =integralpower2(xadd1)+integralpower2(xadd2)-integralpower2(xsub1)-integralpower2(xsub2);
             standartdeviation*=area_minus1;
             standartdeviation =standartdeviation-mean*mean;
 
@@ -464,7 +464,7 @@ struct POP_EXPORTS Processing
                 standartdeviation = std::sqrt( standartdeviation);
             else
                 standartdeviation =1;
-            if(f(it.x()-radius)>ArithmeticsSaturation<TypePixel,F64>::Range( mean+k*standartdeviation)-offset_value)
+            if(f(it.x()-radius)>ArithmeticsSaturation<TypePixel,F32>::Range( mean+k*standartdeviation)-offset_value)
                 fborder(it.x())=255;
             else
                 fborder(it.x())=0;
@@ -488,16 +488,16 @@ struct POP_EXPORTS Processing
 
 
     template<int DIM>
-    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,UI8>& f,double dynamic=0.001){
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,UI8>& f,F32 dynamic=0.001){
         MatN<DIM,UI8>  ff(f);
-        Mat2F64 mm =Analysis::histogram(ff);
-        Mat2F64 mmm(mm);
+        Mat2F32 mm =Analysis::histogram(ff);
+        Mat2F32 mmm(mm);
         mmm.deleteCol(0);
         mmm = Processing::dynamicNoRegionGrowing(mmm,dynamic);
         mm.setCol(1,mmm.getCol(0));
         DistributionRegularStep step(mm);
-        std::vector<F64> vmin=Statistics::argMinLocal(step,0,255,1);
-        std::vector<F64> vmax=Statistics::argMaxLocal(step,0,255,1);
+        std::vector<F32> vmin=Statistics::argMinLocal(step,0,255,1);
+        std::vector<F32> vmax=Statistics::argMaxLocal(step,0,255,1);
         for(unsigned int i=0;i<vmin.size();i++){
             if(vmin[i]<*vmax.begin()|| vmin[i]>*vmax.rbegin()){
                 vmin.erase(vmin.begin()+i);
@@ -508,12 +508,12 @@ struct POP_EXPORTS Processing
         for( int i =(static_cast<int>(vmin.size())-1);i>=0;i--){
             typename MatN<DIM,UI8>::IteratorEDomain it(f.getIteratorEDomain());
             if(i==(static_cast<int>(vmin.size())-1)){
-                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],255,255);
+                FunctorF::FunctorThreshold<UI8,F32,UI8> func(vmin[i],255,255);
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
             }else{
-                FunctorF::FunctorThreshold<UI8,double,UI8> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
+                FunctorF::FunctorThreshold<UI8,F32,UI8> func(vmin[i],vmin[i+1],255-  255/(1.0*vmin.size())*(vmin.size()-1-i));
                 while(it.next())
                     if(ff(it.x())==0)
                         ff(it.x())=func( f(it.x()));
@@ -523,7 +523,7 @@ struct POP_EXPORTS Processing
 
     }
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,double dynamic=0.001){
+    static MatN<DIM,UI8>  thresholdMultiValley(const MatN<DIM,TypePixel>& f,F32 dynamic=0.001){
         return thresholdMultiValley(MatN<DIM,UI8>(Processing::greylevelRange(f,TypePixel(0),TypePixel(255))),dynamic);
     }
     /*!
@@ -576,7 +576,7 @@ struct POP_EXPORTS Processing
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  greylevelScaleContrast(const MatN<DIM,TypePixel>& f,double scale){
+    static MatN<DIM,TypePixel>  greylevelScaleContrast(const MatN<DIM,TypePixel>& f,F32 scale){
 
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return ProcessingAdvanced::greylevelScaleContrast(f,scale,it);
@@ -635,7 +635,7 @@ struct POP_EXPORTS Processing
                 img.load("../image/Lena.bmp");
                 Mat2UI8 bin =Processing::threshold(img,100);
                 bin =Processing::greylevelRemoveEmptyValue(bin);
-                Mat2F64 m = Analysis::histogram(bin);
+                Mat2F32 m = Analysis::histogram(bin);
                 m.display();
         \endcode
         produces this output :\n
@@ -752,7 +752,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -768,14 +768,14 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  local minima of the input matrix
      * \code
     Mat2UI8 lena("../image/Lena.bmp");
-    Mat2F64 grad = Processing::gradientMagnitudeDeriche(Mat2F64(lena),0.5);
+    Mat2F32 grad = Processing::gradientMagnitudeDeriche(Mat2F32(lena),0.5);
     Mat2UI32 minima= Processing::minimaLocalMap(grad);//minima
     Mat2UI32 water = Processing::watershed(minima,Mat2UI8(grad));//watershed transformation
     Visualization::labelToRandomRGB(water).display("watershed transformation",true,false);//well-over segmentation of watershed transformation
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -803,7 +803,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -819,12 +819,12 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  local maxima of the input matrix
      * \code
         Mat2UI8 img("/home/vincent/Desktop/500x.bmp");
-        Mat2F64 grad = Processing::gradientMagnitudeDeriche(Mat2F64(img),1);
+        Mat2F32 grad = Processing::gradientMagnitudeDeriche(Mat2F32(img),1);
         Visualization::labelToRandomRGB(Processing::maximaLocalMap(grad)).display();
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -851,7 +851,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -867,12 +867,12 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  local maxima of the input matrix
      * \code
         Mat2UI8 img("/home/vincent/Desktop/500x.bmp");
-        Mat2F64 grad = Processing::smoothGaussian(Mat2F64(img),1);
+        Mat2F32 grad = Processing::smoothGaussian(Mat2F32(img),1);
         Visualization::labelToRandomRGB(Processing::extremaLocalMap(grad)).display();
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,double radius=1,double norm=0)
+    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -898,7 +898,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -960,7 +960,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1021,7 +1021,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1082,7 +1082,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1143,7 +1143,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1205,7 +1205,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> opening(const MatN<DIM,TypePixel> & f,double radius,double norm=2)
+    static MatN<DIM,TypePixel> opening(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1344,7 +1344,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
         Mat2UI8 img;
         img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/outil.bmp");
-        img = GeometricalTransformation::scale(img,Vec2F64(6,6));
+        img = GeometricalTransformation::scale(img,Vec2F32(6,6));
         img = Processing::threshold(img,150);
         Mat2UI8 C_1(3,3),D_1(3,3);
         Mat2UI8 C_2(3,3),D_2(3,3);
@@ -1408,25 +1408,25 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     \todo implementation for RGB matrix
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> meanShiftFilter(const MatN<DIM,TypePixel> & in, double radius_E=10,double radius_F=20,int nbr_loop_max=5){
+    static MatN<DIM,TypePixel> meanShiftFilter(const MatN<DIM,TypePixel> & in, F32 radius_E=10,F32 radius_F=20,int nbr_loop_max=5){
         typename MatN<DIM,TypePixel>::IteratorEDomain itd(in.getIteratorEDomain());
 
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(in.getIteratorENeighborhood(radius_E,2));
         MatN<DIM,TypePixel> out(in);
 
         while(itd.next()){
-            std::vector<double> caracteristic(normValue(NumericLimits<TypePixel>::maximumRange())+1);
+            std::vector<F32> caracteristic(normValue(NumericLimits<TypePixel>::maximumRange())+1);
             itn.init(itd.x());
             while(itn.next()){
                 caracteristic[normValue(in(itn.x()))]++;
             }
             ;
             int current_index=0;
-            double move=0;
+            F32 move=0;
             do{
-                double value = normValue(out(itd.x()));
-                double mean=0;
-                double sum=0;
+                F32 value = normValue(out(itd.x()));
+                F32 mean=0;
+                F32 sum=0;
                 for(int v=value-radius_F;v<=value+radius_F;v++){
                     if(v<0||v>=(int)caracteristic.size()){
                         continue;
@@ -1460,7 +1460,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html windsurf_enhance.jpg
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> enhanceContrastToggleMapping(const MatN<DIM,TypePixel>& f,int radius=2,double norm=2){
+    static MatN<DIM,TypePixel> enhanceContrastToggleMapping(const MatN<DIM,TypePixel>& f,int radius=2,F32 norm=2){
         MatN<DIM,TypePixel> erosion  = Processing::erosion(f,radius,norm);
         MatN<DIM,TypePixel> dilation = Processing::dilation(f,radius,norm);
         typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
@@ -1492,13 +1492,13 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * to every pixel of the window itself.\n
      * For instance, the convolution with a home-made kernel:
      \code
-    double d[]=
+    F32 d[]=
     {
         0.5, 1, 0.5,
         1  , 2,   1,
         0.5, 1, 0.5
     };
-    Mat2F64 kernel(Vec2I32(3,3),d);
+    Mat2F32 kernel(Vec2I32(3,3),d);
     kernel = kernel/normValue(kernel,1);
     Mat2RGBUI8 lena;
     lena.load(POP_PROJECT_SOURCE_DIR+std::string("/image/lena.bmp"));
@@ -1515,7 +1515,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     }
 
     template<int DIM,typename TypePixel,typename BoundaryCondition>
-    static MatN<DIM,TypePixel> convolutionSeperable(const MatN<DIM,TypePixel> & f, const Vec<F64> & kernel,int direction,BoundaryCondition condition)
+    static MatN<DIM,TypePixel> convolutionSeperable(const MatN<DIM,TypePixel> & f, const Vec<F32> & kernel,int direction,BoundaryCondition condition)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         return FunctorMatN::convolutionSeperable(f,kernel,direction,itg,condition);
@@ -1549,12 +1549,12 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
         Mat2UI8 img;
         img.load("/home/vtariel/Bureau/Lena.png");
-        Mat2F64 gradx = Processing::gradientSobel(img,0);
+        Mat2F32 gradx = Processing::gradientSobel(img,0);
         gradx.display();
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> gradientSobel(const MatN<DIM,TypePixel> & f,int direction)
+    static MatN<DIM,F32> gradientSobel(const MatN<DIM,TypePixel> & f,int direction)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         if(NumericLimits<TypePixel>::is_integer==false){
@@ -1562,7 +1562,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
         else
         {
-            MatN<DIM,F64> ffloat(f);
+            MatN<DIM,F32> ffloat(f);
             return ProcessingAdvanced::gradSobel(ffloat,direction, itg);
         }
     }
@@ -1575,19 +1575,19 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
     Mat2UI8 lena("../image/Lena.bmp");
     lena = Processing::smoothDeriche(lena,0.3);
-    Mat2Vec2F64 grad = Processing::gradientVecSobel(lena);
+    Mat2Vec2F32 grad = Processing::gradientVecSobel(lena);
     Visualization::vectorField2DToArrows(grad,RGBUI8(0,0,255),RGBUI8(255,0,0),16).display();
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,VecN<DIM,F64> > gradientVecSobel(const MatN<DIM,TypePixel>  & f)
+    static MatN<DIM,VecN<DIM,F32> > gradientVecSobel(const MatN<DIM,TypePixel>  & f)
     {
-        VecN<DIM,MatN<DIM,F64> > v_der;
+        VecN<DIM,MatN<DIM,F32> > v_der;
         for(int i =0;i<DIM;i++){
             v_der[i]=  gradientSobel(f,i);
 
         }
-        MatN<DIM,VecN<DIM,F64> > f_grad(f.getDomain());
+        MatN<DIM,VecN<DIM,F32> > f_grad(f.getDomain());
         Convertor::fromVecN(v_der,f_grad);
         return f_grad;
     }
@@ -1595,6 +1595,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \brief Magnitude of the gaussian gradient
      * \param f input function
      * \param sigma standard deviation
+     * \param multiply each term by this factor
      * \return h output function
      *
      *  Magnitude of the gaussian
@@ -1607,10 +1608,10 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> gradientMagnitudeGaussian(const MatN<DIM,TypePixel> & f,F64 sigma=1)
+    static MatN<DIM,TypePixel> gradientMagnitudeGaussian(const MatN<DIM,TypePixel> & f,F32 sigma=1,F32 factor_mult=4)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
-        return ProcessingAdvanced::gradNormGaussian(f, sigma,sigma*3,itg);
+        return ProcessingAdvanced::gradNormGaussian(f, sigma,sigma*3,itg,factor_mult);
     }
     /*!
      *  \brief Gaussian gradient
@@ -1623,7 +1624,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     \code
         Mat2RGBUI8 img;
         img.load("../image/Lena.bmp");
-        Mat2RGBF64 imgf;
+        Mat2RGBF32 imgf;
         imgf=img;
         imgf = Processing::gradientGaussian(imgf,0,2);
         img = Processing::greylevelRange(imgf,0,255);
@@ -1631,7 +1632,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> gradientGaussian(const MatN<DIM,TypePixel> & f, int direction,F64 sigma=1)
+    static MatN<DIM,F32> gradientGaussian(const MatN<DIM,TypePixel> & f, int direction,F32 sigma=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         if(NumericLimits<TypePixel>::is_integer==false){
@@ -1639,7 +1640,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
         else
         {
-            MatN<DIM,F64> ffloat(f);
+            MatN<DIM,F32> ffloat(f);
             return ProcessingAdvanced::gradGaussian(ffloat,direction, sigma,sigma*3,itg);
         }
     }
@@ -1652,18 +1653,18 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Gaussian gradient
      * \code
     Mat2UI8 lena("../image/Lena.bmp");
-    Mat2Vec2F64 grad = Processing::gradientVecGaussian(Mat2F64(lena),8);
+    Mat2Vec2F32 grad = Processing::gradientVecGaussian(Mat2F32(lena),8);
     Visualization::vectorField2DToArrows(grad,RGBUI8(0,0,255),RGBUI8(255,0,0),16).display();
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,VecN<DIM,F64> > gradientVecGaussian(const MatN<DIM,TypePixel>  & f,double sigma=1)
+    static MatN<DIM,VecN<DIM,F32> > gradientVecGaussian(const MatN<DIM,TypePixel>  & f,F32 sigma=1)
     {
         if(NumericLimits<TypePixel>::is_integer==false){
             return ProcessingAdvanced::gradientVecGaussian(f,sigma);
         }
         else{
-            MatN<DIM,F64> ffloat(f);
+            MatN<DIM,F32> ffloat(f);
             return Processing::gradientVecGaussian(ffloat,sigma);
         }
     }
@@ -1683,7 +1684,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     \endcode
      */
     template<int DIM, typename TypePixel>
-    static MatN<DIM,TypePixel> smoothGaussian(const MatN<DIM,TypePixel> & f, F64 sigma=1)
+    static MatN<DIM,TypePixel> smoothGaussian(const MatN<DIM,TypePixel> & f, F32 sigma=1)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         return ProcessingAdvanced::smoothGaussian(f, sigma,sigma*2.5,itg);
@@ -1714,7 +1715,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \endcode
      */
     template<int DIM, typename TypePixel>
-    static MatN<DIM,TypePixel> smoothDeriche(const MatN<DIM,TypePixel> & f, F64 alpha=1){
+    static MatN<DIM,TypePixel> smoothDeriche(const MatN<DIM,TypePixel> & f, F32 alpha=1){
         return FunctorMatN::smoothDeriche(f,alpha);
     }
 
@@ -1729,7 +1730,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
         Mat2RGBUI8 img;
         img.load("../image/Lena.bmp");
-        Mat2RGBF64 gradx(img);
+        Mat2RGBF32 gradx(img);
         gradx = Processing::gradientDeriche(gradx,0,1);//Calculate the gradient in the direction 0
         img = Processing::greylevelRange(gradx,0,255);//to display the matrix with a float type, the
         img.display();
@@ -1737,7 +1738,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html LenaGradDeriche.jpg
      */
     template<int DIM, typename TypePixel>
-    static MatN<DIM,F64>  gradientDeriche(const MatN<DIM,TypePixel> & f, I32 direction, F64 alpha=1)
+    static MatN<DIM,F32>  gradientDeriche(const MatN<DIM,TypePixel> & f, I32 direction, F32 alpha=1)
     {
         return FunctorMatN::gradientDeriche( f, direction, alpha);
     }
@@ -1751,19 +1752,19 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
     Mat2UI8 img;
     img.load("/usr/share/doc/opencv-doc/examples/c/lena.jpg");
-    Mat2Vec2F64 gradx = Processing::gradientVecDeriche(img);
+    Mat2Vec2F32 gradx = Processing::gradientVecDeriche(img);
     Visualization::vectorField2DToArrows(gradx,RGBUI8(0,0,255),RGBUI8(255,0,0),8).display();
      *  \endcode
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,VecN<DIM,F64> > gradientVecDeriche(const MatN<DIM,TypePixel>  & f,double alpha=1)
+    static MatN<DIM,VecN<DIM,F32> > gradientVecDeriche(const MatN<DIM,TypePixel>  & f,F32 alpha=1)
     {
-        VecN<DIM,MatN<DIM,F64> > v_der;
+        VecN<DIM,MatN<DIM,F32> > v_der;
         for(int i =0;i<DIM;i++){
             v_der[i]= gradientDeriche(f,i,alpha);
 
         }
-        MatN<DIM,VecN<DIM,F64> > f_grad(f.getDomain());
+        MatN<DIM,VecN<DIM,F32> > f_grad(f.getDomain());
         Convertor::fromVecN(v_der,f_grad);
         return f_grad;
     }
@@ -1782,11 +1783,11 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \endcode
      */
     template<int DIM, typename TypePixel>
-    static MatN<DIM,TypePixel> gradientMagnitudeDeriche(const MatN<DIM,TypePixel> & f, F64 alpha=1)
+    static MatN<DIM,TypePixel> gradientMagnitudeDeriche(const MatN<DIM,TypePixel> & f, F32 alpha=1)
     {
 
-        MatN<DIM,F64> fdir(f.getDomain());
-        MatN<DIM,F64> fsum(f.getDomain());
+        MatN<DIM,F32> fdir(f.getDomain());
+        MatN<DIM,F32> fsum(f.getDomain());
         for(I32 i=0;i <DIM;i++){
             fdir=f;
             fdir = Processing::gradientDeriche(fdir,i,alpha);
@@ -1796,7 +1797,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         typename MatN<DIM,TypePixel>::IteratorEDomain it (f.getIteratorEDomain());
         while(it.next())
         {
-            g(it.x())=ArithmeticsSaturation<TypePixel,F64>::Range(squareRoot(fsum(it.x())));
+            g(it.x())=ArithmeticsSaturation<TypePixel,F32>::Range(squareRoot(fsum(it.x())));
         }
         return g;
     }
@@ -1900,7 +1901,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \code
      * Mat2UI8 m;
      * m.load("/home/vincent/Desktop/plaque/plate.jpg");
-     * double scale = 1;
+     * F32 scale = 1;
      * Mat2UI8 maxima = Processing::edgeDetectorCanny(m,scale,2/scale,20/scale);
      * m.save("../doc/image/platecanny.jpg");
      * maxima.display();
@@ -1909,8 +1910,8 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html platecanny.jpg "edge"
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  edgeDetectorCanny(const MatN<DIM,TypePixel>& f,double sigma_gaussian=1,double low =2,double high=20){
-        MatN<DIM,F64> grad;
+    static MatN<DIM,UI8>  edgeDetectorCanny(const MatN<DIM,TypePixel>& f,F32 sigma_gaussian=1,F32 low =2,F32 high=20){
+        MatN<DIM,F32> grad;
         MatN<DIM,UI8> maxima = ProcessingAdvanced::nonMaximumSuppression(f,sigma_gaussian,grad);
         MatN<DIM,UI8> seed = minimum(maxima,Processing::threshold(grad,high));
         MatN<DIM,UI8> propagation =minimum(maxima,Processing::threshold(grad,low));
@@ -2154,12 +2155,12 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      * Watershed transformation on the topographic surface initialiased by the seeds restricted by the mask
      * \code
-     * double porosity=0.3;
+     * F32 porosity=0.3;
      * Distribution dnormal(10,5,"NORMAL");//Poisson generator
-     * double moment_order_2 = Statistics::moment(dnormal,2,0,50);
-     * double surface_expectation = moment_order_2*3.14159265;
-     * Vec2F64 domain(512);//2d field domain
-     * double N=-std::log(porosity)/std::log(2.718)/surface_expectation;
+     * F32 moment_order_2 = Statistics::moment(dnormal,2,0,50);
+     * F32 surface_expectation = moment_order_2*3.14159265;
+     * Vec2F32 domain(512);//2d field domain
+     * F32 N=-std::log(porosity)/std::log(2.718)/surface_expectation;
      * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson VecNd process
      * RandomGeometry::sphere(grain,dnormal);
      * Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
@@ -2169,7 +2170,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * porespace = lattice;
      * Mat2UI8 inverse(porespace);
      * inverse = inverse.opposite();
-     * Mat2F64 dist = Processing::distanceEuclidean(inverse);
+     * Mat2F32 dist = Processing::distanceEuclidean(inverse);
      * Mat2UI16 distl;
      * distl= dist;
      * distl = distl.opposite();
@@ -2337,8 +2338,8 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       * \code
                 Mat2UI32 field(512,512);
 
-                F64 densityVecNprocess=0.001;
-                F64 lambda = densityVecNprocess*field.getDomain().multCoordinate();
+                F32 densityVecNprocess=0.001;
+                F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
                 Distribution d(lambda,"POISSON");
                 int nbrVecNs = d.randomVariable();
@@ -2383,8 +2384,8 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       * \code
                 Mat2UI32 field(512,512);
 
-                F64 densityVecNprocess=0.001;
-                F64 lambda = densityVecNprocess*field.getDomain().multCoordinate();
+                F32 densityVecNprocess=0.001;
+                F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
                 Distribution d(lambda,"POISSON");
                 int nbrVecNs = d.randomVariable();
@@ -2434,8 +2435,8 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      * \code
      * Mat2UI32 field(512,512);
-     * F64 densityVecNprocess=0.0001;
-     * F64 lambda = densityVecNprocess*field.getDomain().multCoordinate();
+     * F32 densityVecNprocess=0.0001;
+     * F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
      * Distribution d(lambda,"POISSON");
      * int nbrVecNs = d.randomVariable();
@@ -2463,7 +2464,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      * The distance function based on the seeds \f$ d(x) = \min_{'x\in \cup_{s_i}} d(x' ,x) \f$
      * \code
-     * Vec3F64 domain(200,200,200);
+     * Vec3F32 domain(200,200,200);
      * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.00001);
      * DistributionNormal d(15,10);
      * RandomGeometry::sphere(grain,d);
@@ -2478,7 +2479,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> distanceEuclidean(const MatN<DIM,TypePixel> & seed)
+    static MatN<DIM,F32> distanceEuclidean(const MatN<DIM,TypePixel> & seed)
     {
         return ProcessingAdvanced::voronoiTesselationEuclidean(seed).second;
     }
@@ -2495,7 +2496,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  dilationRegionGrowing(const MatN<DIM,TypePixel> & f,F64 radius, int norm=1)
+    static MatN<DIM,TypePixel>  dilationRegionGrowing(const MatN<DIM,TypePixel> & f,F32 radius, int norm=1)
     {
         return ProcessingAdvanced::dilationRegionGrowing(f,radius,norm);
     }
@@ -2526,7 +2527,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * element_structurant_vertical(1,1)=1;
      * element_structurant_vertical(1,2)=1;
      * cluster = Processing::erosionRegionGrowingStructuralElement(cluster,element_structurant_vertical,20);//big structural element
-     * double value;
+     * F32 value;
      * cluster = Processing::thresholdOtsuMethod(cluster,value);
      * cluster.display();
      * cluster.save("../doc/image2/plateextraction.png");
@@ -2535,7 +2536,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html plateextraction.png
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  erosionRegionGrowing(const MatN<DIM,TypePixel> & f,F64 radius, int norm=1)
+    static MatN<DIM,TypePixel>  erosionRegionGrowing(const MatN<DIM,TypePixel> & f,F32 radius, int norm=1)
     {
         return ProcessingAdvanced::erosionRegionGrowing(f,radius,norm);
     }
@@ -2549,7 +2550,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosionRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
+    static MatN<DIM,TypePixel> erosionRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,F32 radius=1)
     {
         return ProcessingAdvanced::erosionRegionGrowing(f,f.getIteratorENeighborhood(structural_element),radius);
     }
@@ -2563,7 +2564,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilationRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
+    static MatN<DIM,TypePixel> dilationRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,F32 radius=1)
     {
         return ProcessingAdvanced::dilationRegionGrowing(f,f.getIteratorENeighborhood(structural_element),radius);
     }
@@ -2577,7 +2578,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  closingRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
+    static MatN<DIM,TypePixel>  closingRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,F32 radius=1)
     {
         MatN<DIM,TypePixel> temp(f.getDomain());
         temp = dilationRegionGrowingStructuralElement(f,structural_element,radius);
@@ -2593,7 +2594,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa Processing::erosionRegionGrowing()
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  openingRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,double radius=1)
+    static MatN<DIM,TypePixel>  openingRegionGrowingStructuralElement(const MatN<DIM,TypePixel> & f,const MatN<DIM,UI8> & structural_element,F32 radius=1)
     {
         MatN<DIM,TypePixel> temp(f.getDomain());
         temp = erosionRegionGrowingStructuralElement(f,structural_element,radius);
@@ -2614,7 +2615,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         \endcode
         */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  closingRegionGrowing(const MatN<DIM,TypePixel> & f,F64 radius, int norm=1)
+    static MatN<DIM,TypePixel>  closingRegionGrowing(const MatN<DIM,TypePixel> & f,F32 radius, int norm=1)
     {
         return ProcessingAdvanced::closingRegionGrowing(f,radius,norm);
     }
@@ -2633,7 +2634,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         \endcode
         */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>  openingRegionGrowing(const MatN<DIM,TypePixel> & f,F64 radius, int norm=1)
+    static MatN<DIM,TypePixel>  openingRegionGrowing(const MatN<DIM,TypePixel> & f,F32 radius, int norm=1)
     {
         return ProcessingAdvanced::openingRegionGrowing(f,radius,norm);
     }
@@ -2655,15 +2656,15 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     *
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> rotateAtHorizontal(const MatN<DIM,TypePixel> & f,double &angle_rot_radian,double sigma_filter=2){
+    static MatN<DIM,TypePixel> rotateAtHorizontal(const MatN<DIM,TypePixel> & f,F32 &angle_rot_radian,F32 sigma_filter=2){
 
         int border =5;
-        MatN<DIM,F64> imgf(f);
-        MatN<DIM,F64> img_gradx= ProcessingAdvanced::gradGaussian(imgf,1,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
-        MatN<DIM,F64> img_grady= ProcessingAdvanced::gradGaussian(imgf,0,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
-        Vec<double> angles;
-            Vec<double> weight;
-        typename MatN<DIM,F64>::IteratorERectangle it(img_gradx.getIteratorERectangle(border,img_gradx.getDomain()-1-border));
+        MatN<DIM,F32> imgf(f);
+        MatN<DIM,F32> img_gradx= ProcessingAdvanced::gradGaussian(imgf,1,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
+        MatN<DIM,F32> img_grady= ProcessingAdvanced::gradGaussian(imgf,0,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
+        Vec<F32> angles;
+            Vec<F32> weight;
+        typename MatN<DIM,F32>::IteratorERectangle it(img_gradx.getIteratorERectangle(border,img_gradx.getDomain()-1-border));
         while(it.next()){
             angles.push_back(std::atan2(img_grady(it.x()),img_gradx(it.x()))*180/PI);
             weight.push_back(std::sqrt(img_grady(it.x())*img_grady(it.x())+img_gradx(it.x())*img_gradx(it.x())));
@@ -2678,14 +2679,14 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 #ifdef HAVE_SWIG
     template<int DIM,typename Type>
     static pop::MatN<DIM,UI8>  _thresholdOtsuMethod(const pop::MatN<DIM,Type>& f){
-        double thresholdvalue;
+        F32 thresholdvalue;
         return thresholdOtsuMethod(f,thresholdvalue);
     }
 #endif
 };
 /** @}*/
 template<typename Function>
-MatNIteratorENeighborhoodAmoebas<Function >::MatNIteratorENeighborhoodAmoebas(const Function& in,double threshold, double lambda)
+MatNIteratorENeighborhoodAmoebas<Function >::MatNIteratorENeighborhoodAmoebas(const Function& in,F32 threshold, F32 lambda)
     :_value_label(in.getDomain()),_threshold(threshold),_lambda(lambda)
 {
     _label=0;

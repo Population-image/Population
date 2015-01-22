@@ -45,13 +45,13 @@ namespace pop {
     // ( 1,-1)-> 1
     // (-1, 1)-> 1
     // ( 1, 1)->-1
-    Vec<VecF64> v_in(4,VecF64(2));//4 vector of two scalar values
+    Vec<VecF32> v_in(4,VecF32(2));//4 vector of two scalar values
     v_in(0)(0)=-1;v_in(0)(1)=-1; // (-1,-1)
     v_in(1)(0)= 1;v_in(1)(1)=-1; // ( 1,-1)
     v_in(2)(0)=-1;v_in(2)(1)= 1; // (-1, 1)
     v_in(3)(0)= 1;v_in(3)(1)= 1; // ( 1, 1)
 
-    Vec<VecF64> v_out(4,VecF64(1));//4 vector of one scalar value
+    Vec<VecF32> v_out(4,VecF32(1));//4 vector of one scalar value
     v_out(0)(0)=-1;// -1
     v_out(1)(0)= 1;//  1
     v_out(2)(0)= 1;//  1
@@ -60,7 +60,7 @@ namespace pop {
     TrainingNeuralNetwork::trainingFirstDerivative(n,v_in,v_out,0.01,1000);
     //test the training
     for(int j=0;j<4;j++){
-        VecF64 vout;
+        VecF32 vout;
         n.propagateFront(v_in(j),vout);
         std::cout<<vout<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
     }
@@ -81,7 +81,7 @@ class POP_EXPORTS NNWeight
      * \endif
     */
 public:
-    NNWeight(double Wn = 0.0,double eta=0.001 );
+    NNWeight(F32 Wn = 0.0,F32 eta=0.001 );
 
     /*!
      *  learning following this formula Wn <- Wn - eta*dErr_dWn
@@ -91,19 +91,19 @@ public:
     /**
      *  weight
     */
-    double _Wn;
+    F32 _Wn;
     /**
      *  learning rate
     */
-    double _eta;
+    F32 _eta;
     /**
      *   first derivate of the error function over the weight
     */
-    double _dE_dWn;
+    F32 _dE_dWn;
     /**
      *  second derivate of the error function over the weight
     */
-    double _d2E_dWn2;
+    F32 _d2E_dWn2;
 
 };
 
@@ -236,27 +236,27 @@ public:
     /*!
     *  propagation value \f$Y^n_i = \sum_{j\in V_i} W^{n}_{j\rightarrow i}  X^{n-1}_j   \f$
     */
-    double _Yn;
+    F32 _Yn;
     /*!
     *  output value \f$X^n_i = f_{act}(Y^n_i )  \f$
     */
-    double _Xn;
+    F32 _Xn;
     /*!
     * partial derivated of the error function over the output value
     */
-    double _dErr_dXn;
+    F32 _dErr_dXn;
     /*!
     * partial derivated of the error function over the propagation value
     */
-    double _dErr_dYn;
+    F32 _dErr_dYn;
     /*!
     * second partial derivated of the error function over the output value
     */
-    double _d2Err_dXn2;
+    F32 _d2Err_dXn2;
     /*!
     * second partial derivated of the error function over the propagation value
     */
-    double _d2Err_dYn2;
+    F32 _d2Err_dYn2;
 }
 #if defined(HAVE_OPENMP)
 #ifdef __GNUC__
@@ -303,7 +303,7 @@ public:
     *
     * set this learning rate for all weights
     */
-    void setLearningRate(double eta=0.01);
+    void setLearningRate(F32 eta=0.01);
     /*!
     *
     * Front propagation of all neurons in this layer \sa NNNeuron::propagateFront()
@@ -384,7 +384,7 @@ public:
 
 
 
-    void setLearningRate(double eta=0.01);
+    void setLearningRate(F32 eta=0.01);
 
     /*!
     * the neurons NNLayer::_neurons are organised in a collection  of matrices (maps)
@@ -393,7 +393,7 @@ public:
 
 
     template<typename TypeScalarPixel>
-    static VecF64 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix,Vec2I32 domain,NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization = ZeroToOne);
+    static VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix,Vec2I32 domain,NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization = ZeroToOne);
 
     CenteringMethod _method;
     NormalizationValue _normalization_value;
@@ -544,7 +544,7 @@ public:
      * the output values with the outputs of the neurons of the output layer.
      *
      */
-    void propagateFront(const pop::VecF64& in , pop::VecF64 &out);
+    void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
 
     /*!
      * \param  desired_output desired output value
@@ -560,7 +560,7 @@ public:
      *
      *
      */
-    void propagateBackFirstDerivate(const pop::VecF64& desired_output);
+    void propagateBackFirstDerivate(const pop::VecF32& desired_output);
 
     /*!
      *
@@ -580,7 +580,7 @@ public:
      *
      *
      */
-    void setLearningRate(double eta=0.01);
+    void setLearningRate(F32 eta=0.01);
     /*!
      *
      * Back propagation of the second derivated of the mean square error function layer-by-layer
@@ -606,7 +606,7 @@ public:
      * add a fully connected layer
      *
      */
-    void addLayerFullyConnected(unsigned int nbr_neuron,double standart_deviation_weight=1);
+    void addLayerFullyConnected(unsigned int nbr_neuron,F32 standart_deviation_weight=1);
     /*!
      * \param height number of rows
      * \param width number of columns
@@ -628,7 +628,7 @@ public:
      * add input a convolutionnal layer with Feature maps and a sub scaling
      *
      */
-    void addLayerConvolutionalPlusSubScaling( unsigned int nbr_map, unsigned int kernelsize=5/*5*5 convolutional pattern*/,unsigned int sub_scale_sampling=2,double standart_deviation_weight=1);
+    void addLayerConvolutionalPlusSubScaling( unsigned int nbr_map, unsigned int kernelsize=5/*5*5 convolutional pattern*/,unsigned int sub_scale_sampling=2,F32 standart_deviation_weight=1);
 
     /*!
      * \param nbr_map number of maps (matrices)
@@ -639,7 +639,7 @@ public:
      * add input a convolutionnal layer with Feature maps
      *
      */
-    void addLayerConvolutional( unsigned int nbr_map, unsigned int kernelsize=5/*5*5 convolutional pattern*/,double standart_deviation_weight=1);
+    void addLayerConvolutional( unsigned int nbr_map, unsigned int kernelsize=5/*5*5 convolutional pattern*/,F32 standart_deviation_weight=1);
     /*!
      * \param sub_scale_factor sub scale factor
      * \param standart_deviation_weight initialiasisation of the weigh with random variable following a centered normal probability distribution with this standart deviation
@@ -648,9 +648,9 @@ public:
      * add subscale layer
      *
      */
-    void addLayerSubScaling(unsigned int sub_scale_factor,double standart_deviation_weight=1);
+    void addLayerSubScaling(unsigned int sub_scale_factor,F32 standart_deviation_weight=1);
     void addLayerMaxPooling(unsigned int sub_scale_factor);
-    void addLayerIntegral(unsigned int nbr_integral,double standart_deviation_weight=1);
+    void addLayerIntegral(unsigned int nbr_integral,F32 standart_deviation_weight=1);
 
 
     /*!
@@ -709,12 +709,12 @@ public:
     *  crop the image in a bounding box, scale the image to fit the domain of the input layer, scale the pixels values to the range [-1,1],
     */
     template<typename TypeScalarPixel>
-    VecF64 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix){
+    VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix){
         if(NNLayerMatrix * layermatrix = dynamic_cast<NNLayerMatrix*>(this->_layers[0]) ) {
             return layermatrix->inputMatrixToInputNeuron(matrix,(layermatrix->_neurons_matrix)(0).getDomain(),layermatrix->_method,layermatrix->_normalization_value);
         }else{
             std::cerr<<"The input of this neural network is not neuron matrix!"<<std::endl;
-            return VecF64();
+            return VecF32();
         }
     }
 
@@ -779,13 +779,13 @@ struct POP_EXPORTS TrainingNeuralNetwork
     // ( 1,-1)-> 1
     // (-1, 1)-> 1
     // ( 1, 1)->-1
-    Vec<VecF64> v_in(4,VecF64(2));//4 vector of two scalar values
+    Vec<VecF32> v_in(4,VecF32(2));//4 vector of two scalar values
     v_in(0)(0)=-1;v_in(0)(1)=-1; // (-1,-1)
     v_in(1)(0)= 1;v_in(1)(1)=-1; // ( 1,-1)
     v_in(2)(0)=-1;v_in(2)(1)= 1; // (-1, 1)
     v_in(3)(0)= 1;v_in(3)(1)= 1; // ( 1, 1)
 
-    Vec<VecF64> v_out(4,VecF64(1));//4 vector of one scalar value
+    Vec<VecF32> v_out(4,VecF32(1));//4 vector of one scalar value
     v_out(0)(0)=-1;// -1
     v_out(1)(0)= 1;//  1
     v_out(2)(0)= 1;//  1
@@ -794,15 +794,15 @@ struct POP_EXPORTS TrainingNeuralNetwork
     TrainingNeuralNetwork::trainingFirstDerivative(n,v_in,v_out,0.01,1000);
     //test the training
     for(int j=0;j<4;j++){
-        VecF64 vout;
+        VecF32 vout;
         n.propagateFront(v_in(j),vout);
         std::cout<<vout<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
     }
      * \endcode
     */
 
-    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF64>& trainingins,const Vec<VecF64>& trainingouts,double eta=0.001,unsigned int nbr_epoch=100,bool display_error_classification=false);
-    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF64>& trainingins,const Vec<VecF64>& trainingouts,const Vec<VecF64>& testins,const Vec<VecF64>& testouts,double eta=0.001,unsigned int nbr_epoch=20,bool display_error_classification=true);
+    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta=0.001,unsigned int nbr_epoch=100,bool display_error_classification=false);
+    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,const Vec<VecF32>& testins,const Vec<VecF32>& testouts,F32 eta=0.001,unsigned int nbr_epoch=20,bool display_error_classification=true);
     //@}
     //-------------------------------------
     //
@@ -836,7 +836,7 @@ struct POP_EXPORTS TrainingNeuralNetwork
                                                                            "/home/vincent/t10k-labels.idx1-ubyte",1);
     * \endcode
     */
-    static  void neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard=1,double elastic_distortion=0);
+    static  void neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard=1,F32 elastic_distortion=0);
 
 
 
@@ -846,15 +846,15 @@ struct POP_EXPORTS TrainingNeuralNetwork
     static Vec<Vec<pop::Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
     static Vec<pop::Mat2UI8>   geometricalTransformationDataBaseMatrix(Vec<pop::Mat2UI8>  number_training,
                                                                             unsigned int number=10,
-                                                                            double sigma_elastic_distortion_min=5,
-                                                                            double sigma_elastic_distortion_max=6,
-                                                                            double alpha_elastic_distortion_min=36,
-                                                                            double alpha_elastic_distortion_max=38,
-                                                                            double beta_angle_degree_rotation=15,
-                                                                            double beta_angle_degree_shear=15,
-                                                                            double gamma_x_scale=15,
-                                                                            double gamma_y_scale=15);
-    static void  convertMatrixToInputValueNeuron(Vec<VecF64> &v_neuron_in, Vec<VecF64> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, double ratio=1);
+                                                                            F32 sigma_elastic_distortion_min=5,
+                                                                            F32 sigma_elastic_distortion_max=6,
+                                                                            F32 alpha_elastic_distortion_min=36,
+                                                                            F32 alpha_elastic_distortion_max=38,
+                                                                            F32 beta_angle_degree_rotation=15,
+                                                                            F32 beta_angle_degree_shear=15,
+                                                                            F32 gamma_x_scale=15,
+                                                                            F32 gamma_y_scale=15);
+    static void  convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, F32 ratio=1);
 
 
 private:
@@ -862,7 +862,7 @@ private:
 };
 
 template<typename TypeScalarPixel>
-VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & img,Vec2I32 domain,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
+VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & img,Vec2I32 domain,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
 
     if(method==NNLayerMatrix::BoundingBox){
         //cropping
@@ -873,21 +873,21 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
                 xmax=maximum(xmax,x);
             }
         }
-        Mat2F64 m = img(xmin,xmax+1);
+        Mat2F32 m = img(xmin,xmax+1);
         //downsampling the input matrix
         int index;
-        double scale_factor;
-        if(double(domain(0))/m.getDomain()(0)<double(domain(1))/m.getDomain()(1)){
+        F32 scale_factor;
+        if(F32(domain(0))/m.getDomain()(0)<F32(domain(1))/m.getDomain()(1)){
             index = 0;
-            scale_factor = double(domain(0))/m.getDomain()(0);
+            scale_factor = F32(domain(0))/m.getDomain()(0);
         }
         else{
             index = 1;
-            scale_factor = double(domain(1))/m.getDomain()(1);
+            scale_factor = F32(domain(1))/m.getDomain()(1);
         }
 
-        Mat2F64 mr = GeometricalTransformation::scale(m,Vec2F64(scale_factor,scale_factor),MATN_INTERPOLATION_BILINEAR);
-        Mat2F64 mrf(domain);
+        Mat2F32 mr = GeometricalTransformation::scale(m,Vec2F32(scale_factor,scale_factor),MATN_INTERPOLATION_BILINEAR);
+        Mat2F32 mrf(domain);
         Vec2I32 trans(0,0);
         if(index==0){
             trans(0)=0;
@@ -898,8 +898,8 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         }
 
 
-        double maxi=pop::NumericLimits<double>::minimumRange();
-        double mini=pop::NumericLimits<double>::maximumRange();
+        F32 maxi=pop::NumericLimits<F32>::minimumRange();
+        F32 mini=pop::NumericLimits<F32>::maximumRange();
 
         ForEachDomain2D(xx,mr){
             maxi=std::max(maxi,mr(xx));
@@ -907,26 +907,26 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             mrf(xx+trans)=mr(xx);
         }
         if(normalization_value==0){
-            double diff = (maxi-mini)/2.;
+            F32 diff = (maxi-mini)/2.;
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff-1;
             }
         }else{
-            double diff = (maxi-mini);
+            F32 diff = (maxi-mini);
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff;
             }
         }
-        return VecF64(mrf);
+        return VecF32(mrf);
     }else{
 
         //center of gravity
         pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
 
-        pop::Vec2F64 center_gravity(0,0);
-        double weight_sum=0;
+        pop::Vec2F32 center_gravity(0,0);
+        F32 weight_sum=0;
         ForEachDomain2D(x,img){
-            center_gravity += static_cast<double>(img(x))*pop::Vec2F64(x);
+            center_gravity += static_cast<F32>(img(x))*pop::Vec2F32(x);
             weight_sum +=img(x);
             if(img(x)!=0){
                 xmin=minimum(xmin,x);
@@ -935,39 +935,39 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         }
         center_gravity = center_gravity/weight_sum;
 
-        double max_i= std::max(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
-        double max_j= std::max(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
+        F32 max_i= std::max(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
+        F32 max_j= std::max(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
 
 
-        double homo = std::max(max_i/domain(0),max_j/domain(1));
+        F32 homo = std::max(max_i/domain(0),max_j/domain(1));
 
 
 
         //    ForEachDomain2D(xx,mr){
 
         //         mrf(xx+trans)=mr(xx);
-        double maxi=pop::NumericLimits<double>::minimumRange();
-        double mini=pop::NumericLimits<double>::maximumRange();
-        Mat2F64 mrf(domain);
+        F32 maxi=pop::NumericLimits<F32>::minimumRange();
+        F32 mini=pop::NumericLimits<F32>::maximumRange();
+        Mat2F32 mrf(domain);
         ForEachDomain2D(xx,mrf){
-            pop::Vec2F64 xxx(xx);
-            xxx = (xxx-Vec2F64(domain)/2.)*homo + center_gravity;
+            pop::Vec2F32 xxx(xx);
+            xxx = (xxx-Vec2F32(domain)/2.)*homo + center_gravity;
             mrf(xx)=img.interpolationBilinear(xxx);
             maxi=std::max(maxi,mrf(xx));
             mini=std::min(mini,mrf(xx));
         }
         if(normalization_value==0){
-            double diff = (maxi-mini)/2.;
+            F32 diff = (maxi-mini)/2.;
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff-1;
             }
         }else{
-            double diff = (maxi-mini);
+            F32 diff = (maxi-mini);
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff;
             }
         }
-        return VecF64(mrf);
+        return VecF32(mrf);
     }
 }
 
@@ -975,10 +975,10 @@ VecF64 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
 //class POP_EXPORTS NeuralNetworkFeedForwardMerge
 //{
 //public:
-//    void propagateFront(const pop::VecF64& in , pop::VecF64 &out);
-//    void propagateBackFirstDerivate(const pop::VecF64& desired_output);
+//    void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
+//    void propagateBackFirstDerivate(const pop::VecF32& desired_output);
 //    void learningFirstDerivate();
-//    void setLearningRate(double eta=0.01);
+//    void setLearningRate(F32 eta=0.01);
 //    void addLayerFullyConnected(int nbr_output_neuron,NeuralNetworkFeedForward * n1,NeuralNetworkFeedForward* n2);
 //private:
 //    NeuralNetworkFeedForward * n1;

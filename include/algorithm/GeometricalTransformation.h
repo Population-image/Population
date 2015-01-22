@@ -22,9 +22,9 @@ namespace pop
     Mat2UI8 m;
     m.load("../image/Lena.bmp");
     MatNDisplay disp;
-    Mat2x33F64 maffine2 = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
+    Mat2x33F32 maffine2 = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
     maffine2 *= GeometricalTransformation::rotation2DHomogeneousCoordinate(0.1);//rotate
-    maffine2 *= GeometricalTransformation::scale2DHomogeneousCoordinate(Vec2F64(1.3,1.1));//scale the image
+    maffine2 *= GeometricalTransformation::scale2DHomogeneousCoordinate(Vec2F32(1.3,1.1));//scale the image
     maffine2 *= GeometricalTransformation::translation2DHomogeneousCoordinate(-m.getDomain()/2);//from to the buttom left corner (origin), go to the center of the image
 
     int i=0;
@@ -122,7 +122,7 @@ struct POP_EXPORTS GeometricalTransformation
      * Mat2RGBUI8 img;
      * img.load("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lena.bmp");
      * std::cout<<img.getDomain()<<std::endl;
-     * img = GeometricalTransformation::scale(img,Vec2F64(0.5,2));
+     * img = GeometricalTransformation::scale(img,Vec2F32(0.5,2));
      * img.save("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lenascale.png");
      * \endcode
      *  the initial domain is (256,,256) and then (128,512)
@@ -130,15 +130,15 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lenascale.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> scale(const MatN<DIM,TypePixel> & f,const VecN<DIM,F64> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_NEAREST)
+    static MatN<DIM,TypePixel> scale(const MatN<DIM,TypePixel> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {
-        typename MatN<DIM,TypePixel>::Domain domain (scale*VecN<DIM,F64>(f.getDomain()));
+        typename MatN<DIM,TypePixel>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
         MatN<DIM,TypePixel> temp(domain);
-        VecN<DIM,F64> alpha = VecN<DIM,F64>(1)/scale;
+        VecN<DIM,F32> alpha = VecN<DIM,F32>(1)/scale;
         typename MatN<DIM,TypePixel>::IteratorEDomain it (temp.getIteratorEDomain());
         while(it.next()){
-            VecN<DIM,F64> x;
-            x=VecN<DIM,F64>(it.x())*alpha;
+            VecN<DIM,F32> x;
+            x=(VecN<DIM,F32>(it.x())-0.5)*alpha;
             if(interpolation.isValid(f.getDomain(),x)){
                     temp(it.x())=interpolation.apply(f,x);
             }
@@ -195,17 +195,17 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lenarotpi6.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> rotate(const MatN<DIM,TypePixel> & f,double angle)
+    static MatN<DIM,TypePixel> rotate(const MatN<DIM,TypePixel> & f,F32 angle)
     {
         if(DIM==2){
-            Mat2x22F64 rot22 = GeometricalTransformation::rotation2D(angle);
+            Mat2x22F32 rot22 = GeometricalTransformation::rotation2D(angle);
             typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
 
             MatN<DIM,TypePixel> g(f.getDomain());
-            Vec2F64 c(f.getDomain()/2);
+            Vec2F32 c(f.getDomain()/2);
             it.init();
             while(it.next()){
-                Vec2F64 y =Vec2F64(it.x()(0),it.x()(1))-c;
+                Vec2F32 y =Vec2F32(it.x()(0),it.x()(1))-c;
                 y= (rot22*y)+c;
                 if(f.isValid(y))
                     g(it.x())= f.interpolationBilinear(y);
@@ -253,7 +253,7 @@ struct POP_EXPORTS GeometricalTransformation
      * \sa pop::Representation::FFTDisplay
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> translate(const MatN<DIM,TypePixel> & f,const typename MatN<DIM,TypePixel>::E &trans,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_MIRROR)
+    static MatN<DIM,TypePixel> translate(const MatN<DIM,TypePixel> & f,const typename MatN<DIM,TypePixel>::E &trans,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_PERIODIC)
     {
         MatN<DIM,TypePixel> temp(f.getDomain());
         typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
@@ -285,10 +285,10 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lenaED.png
     */
     template<int DIM, typename Type>
-    static MatN<DIM,Type> elasticDeformation(const MatN<DIM,Type> & Img,double sigma=10,double alpha=8)
+    static MatN<DIM,Type> elasticDeformation(const MatN<DIM,Type> & Img,F32 sigma=10,F32 alpha=8)
     {
 
-        VecN<DIM,Mat2F64> dist(Mat2F64(Img.getDomain()));
+        VecN<DIM,Mat2F32> dist(Mat2F32(Img.getDomain()));
         DistributionSign d;
         typename MatN<DIM,Type>::IteratorEDomain it = Img.getIteratorEDomain();
         while(it.next()){
@@ -308,7 +308,7 @@ struct POP_EXPORTS GeometricalTransformation
         MatN<DIM,Type> mdist(Img.getDomain());
         it.init();
         while(it.next()){
-            VecN<DIM,F64> xx(it.x());
+            VecN<DIM,F32> xx(it.x());
             for(unsigned int i=0;i<DIM;i++)
                 xx(i)+=dist(i)(it.x());
             if(Img.isValid(xx)){
@@ -333,7 +333,7 @@ struct POP_EXPORTS GeometricalTransformation
      * \f[ R(\theta) = \left( \begin{array}{cc} \cos \theta & -\sin \theta \\\sin \theta & \cos \theta \end{array} \right)\f].
      *
     */
-    static pop::Mat2x22F64 rotation2D(F64 theta_radian);
+    static pop::Mat2x22F32 rotation2D(F32 theta_radian);
 
     /*!
      * \brief 3D rotation matrix
@@ -356,7 +356,7 @@ struct POP_EXPORTS GeometricalTransformation
      *  \sin \theta & \cos \theta & 0\\
      *  0 & 0 & 1\\ \end{array}\right) \f$
      */
-    static pop::Mat2x33F64 rotation3D(F64 theta_radian,int coordinate);
+    static pop::Mat2x33F32 rotation3D(F32 theta_radian,int coordinate);
     /*!
      * \brief rotation around an axis
      * \param u  unit vector indicating the direction of an axis of rotation
@@ -364,24 +364,24 @@ struct POP_EXPORTS GeometricalTransformation
      * \return  rotation matrix
      *
      * \code
-     * Vec3F64 axis(1,1,1);
+     * Vec3F32 axis(1,1,1);
      * axis/=axis.norm();
-     * Vec3F64 v(1,1,0);
+     * Vec3F32 v(1,1,0);
      * v/=v.norm();
 
-     * Mat2x33F64 mrot = GeometricalTransformation::rotationFromAxis(axis,0.1);
+     * Mat2x33F32 mrot = GeometricalTransformation::rotationFromAxis(axis,0.1);
 
      * Scene3d scene;
      * scene.addGeometricalFigure(FigureArrow::referencielEuclidean());
 
      * FigureArrow * arrowaxis= new FigureArrow;
      * arrowaxis->setRGB(RGBUI8(255,255,255));
-     * arrowaxis->setArrow(Vec3F64(0,0,0),axis,0.1);
+     * arrowaxis->setArrow(Vec3F32(0,0,0),axis,0.1);
      * scene._v_figure.push_back(arrowaxis);
 
      * FigureArrow * arrow = new FigureArrow;
      * arrow->setRGB(RGBUI8(0,0,255));
-     * arrow->setArrow(Vec3F64(0,0,0),v,0.1);
+     * arrow->setArrow(Vec3F32(0,0,0),v,0.1);
      * scene._v_figure.push_back(arrow);
 
      * int i=0;
@@ -389,14 +389,14 @@ struct POP_EXPORTS GeometricalTransformation
      * while(1==1){
      *     scene.lock();
      *     v= mrot*v;
-     *     arrow->setArrow(Vec3F64(0,0,0),v,0.1);
+     *     arrow->setArrow(Vec3F32(0,0,0),v,0.1);
      *     scene.unlock();
      *     scene.snapshot(std::string("rotateaxis"+BasicUtility::IntFixedDigit2String(i++,4)+".png").c_str());
      * }
      * \endcode
      * \image html rotateaxis.gif
     */
-    static Mat2x33F64 rotationFromAxis(Vec3F64 u,double angle_radian);
+    static Mat2x33F32 rotationFromAxis(Vec3F32 u,F32 angle_radian);
 
     /*!
      * \brief rotation from vector to another vector
@@ -405,12 +405,12 @@ struct POP_EXPORTS GeometricalTransformation
      * \return  rotation matrix
      *
     */
-    static Mat2x33F64 rotationFromVectorToVector(const Vec3F64 & s, const Vec3F64 &  t);
+    static Mat2x33F32 rotationFromVectorToVector(const Vec3F32 & s, const Vec3F32 &  t);
     /*!
      * \brief 3D rotation matrix in homogeneous coordinate
      * \param theta_radian angle in radian
      * \param coordinate axis
-     * \return  Rotation Mat2F64
+     * \return  Rotation Mat2F32
      *
      *  Generate the 3D rotation matrix from the rotation of angle \a theta_radian about the axis at the given coordinate  in homogeneous coordinates:\n
      *  For coordinatte=0 we have,\f$R_x(\theta) = \left(\begin{array}{cccc}
@@ -420,12 +420,12 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 & 0 & 1
      *  \end{array}\right)\f$, and so one
     */
-    static Mat2F64 rotation3DHomogeneousCoordinate(F64 theta_radian,int coordinate);
+    static Mat2F32 rotation3DHomogeneousCoordinate(F32 theta_radian,int coordinate);
 
     /*!
      * \brief 2D rotation matrix in homogeneous coordinate
      * \param theta_radian angle in radian
-     * \return  Rotation Mat2F64
+     * \return  Rotation Mat2F32
      *
      *  Generate the 2D rotation matrix from the rotation of angle \a theta_radian  in homogeneous coordinates:\n
      *  For coordinatte=0 we have,\f$R_x(\theta) = \left(\begin{array}{ccc}
@@ -434,7 +434,7 @@ struct POP_EXPORTS GeometricalTransformation
      *   0 & 0 & 1
      *  \end{array}\right)\f$, and so one
     */
-    static pop::Mat2x33F64 rotation2DHomogeneousCoordinate(F64 theta_radian);
+    static pop::Mat2x33F32 rotation2DHomogeneousCoordinate(F32 theta_radian);
 
     /*!
      * \brief 2D translation matrix in homogeneous coordinate
@@ -449,7 +449,7 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 & 0 & 1
      *  \end{array}\right)\f$
     */
-    static Mat2F64 translation3DHomogeneousCoordinate(const Vec3F64 &t );
+    static Mat2F32 translation3DHomogeneousCoordinate(const Vec3F32 &t );
 
     /*!
      * \brief 2D translation matrix in homogeneous coordinates
@@ -463,7 +463,7 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 & 1
      *  \end{array}\right)\f$
     */
-    static pop::Mat2x33F64 translation2DHomogeneousCoordinate(const Vec2F64 &t );
+    static pop::Mat2x33F32 translation2DHomogeneousCoordinate(const Vec2F32 &t );
     /*!
      * \brief 3d scale matrix in homogeneous coordinate
      * \param s  scale vector
@@ -477,7 +477,7 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 & 0 & 1
      *  \end{array}\right)\f$
     */
-    static Mat2F64         scale3DHomogeneousCoordinate(const Vec3F64 &s);
+    static Mat2F32         scale3DHomogeneousCoordinate(const Vec3F32 &s);
 
     /*!
      * \brief 2d scale matrix in homogeneous coordinate
@@ -491,11 +491,11 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 &  1
      *  \end{array}\right)\f$
     */
-    static pop::Mat2x33F64 scale2DHomogeneousCoordinate(const Vec2F64 &s);
+    static pop::Mat2x33F32 scale2DHomogeneousCoordinate(const Vec2F32 &s);
     /*!
      * \brief 3d scale matrix
      * \param s  scale vector
-     * \return  Scale Mat2F64
+     * \return  Scale Mat2F32
      *
      *  Generate the 3D scale matrix :\n
      *  We have\f$S( s=(sx,sy,sz)) = \left(\begin{array}{ccc}
@@ -504,11 +504,11 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & 0 & sz
      *  \end{array}\right)\f$
  */
-    static pop::Mat2x33F64 scale3D(const Vec3F64 &s);
+    static pop::Mat2x33F32 scale3D(const Vec3F32 &s);
     /*!
      * \brief 2d scale matrix
      * \param s  scale vector
-     * \return  Scale Mat2F64
+     * \return  Scale Mat2F32
      *
      *  Generate the 2D scale matrix :\n
      *  We have\f$S( s=(sx,sy)) = \left(\begin{array}{cc}
@@ -516,7 +516,7 @@ struct POP_EXPORTS GeometricalTransformation
      *  0 & sy
      *  \end{array}\right)\f$
     */
-    static pop::Mat2x22F64 scale2D(const Vec2F64 &s);
+    static pop::Mat2x22F32 scale2D(const Vec2F32 &s);
 
 
 
@@ -531,22 +531,22 @@ struct POP_EXPORTS GeometricalTransformation
         Mat2UI8 m;
         m.load("/usr/share/doc/opencv-doc/examples/c/lena.jpg");
 
-        Vec2F64 src[3];
-        Vec2F64 dst[3];
+        Vec2F32 src[3];
+        Vec2F32 dst[3];
 
-        src[0]=Vec2F64(0,0);
-        src[1]=Vec2F64(m.getDomain()(0),0);
-        src[2]=Vec2F64(0,m.getDomain()(1));
+        src[0]=Vec2F32(0,0);
+        src[1]=Vec2F32(m.getDomain()(0),0);
+        src[2]=Vec2F32(0,m.getDomain()(1));
 
-        dst[0]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
-        dst[1]=Vec2F64(m.getDomain()(0)*0.8,m.getDomain()(1)*0.1);
-        dst[2]=Vec2F64(m.getDomain()(0)*0.4,m.getDomain()(1)*0.6);
-        Mat2x33F64 maffine = affine2D(src,dst);
+        dst[0]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
+        dst[1]=Vec2F32(m.getDomain()(0)*0.8,m.getDomain()(1)*0.1);
+        dst[2]=Vec2F32(m.getDomain()(0)*0.4,m.getDomain()(1)*0.6);
+        Mat2x33F32 maffine = affine2D(src,dst);
 
         transformAffine2D(m,maffine).display();
      \endcode
     */
-    static pop::Mat2x33F64 affine2D(const Vec2F64 src[3], const Vec2F64 dst[3],bool isfastinversion=true);
+    static pop::Mat2x33F32 affine2D(const Vec2F32 src[3], const Vec2F32 dst[3],bool isfastinversion=true);
 
 
     /*!
@@ -559,17 +559,17 @@ struct POP_EXPORTS GeometricalTransformation
      * \code
     Mat2RGBUI8 m;
     m.load("../image/Lena.bmp");
-    Vec2F64 src[4];
-    Vec2F64 dst[4];
-    src[0]=Vec2F64(0,0);
-    src[1]=Vec2F64(m.getDomain()(0),0);
-    src[2]=Vec2F64(0,m.getDomain()(1));
-    src[3]=Vec2F64(m.getDomain()(0),m.getDomain()(1));
-    dst[0]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
-    dst[1]=Vec2F64(m.getDomain()(0)*0.9,m.getDomain()(1)*0.1);
-    dst[2]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.9);
-    dst[3]=Vec2F64(m.getDomain()(0)*0.8,m.getDomain()(1)*0.7);
-    Mat2x33F64 mproj = GeometricalTransformation::projective2D(src,dst);
+    Vec2F32 src[4];
+    Vec2F32 dst[4];
+    src[0]=Vec2F32(0,0);
+    src[1]=Vec2F32(m.getDomain()(0),0);
+    src[2]=Vec2F32(0,m.getDomain()(1));
+    src[3]=Vec2F32(m.getDomain()(0),m.getDomain()(1));
+    dst[0]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
+    dst[1]=Vec2F32(m.getDomain()(0)*0.9,m.getDomain()(1)*0.1);
+    dst[2]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.9);
+    dst[3]=Vec2F32(m.getDomain()(0)*0.8,m.getDomain()(1)*0.7);
+    Mat2x33F32 mproj = GeometricalTransformation::projective2D(src,dst);
     m =GeometricalTransformation::transformHomogeneous2D(mproj,m);
     Draw::circle(m,dst[0],10,RGBUI8::randomRGB(),2);
     Draw::circle(m,dst[1],10,RGBUI8::randomRGB(),2);
@@ -580,14 +580,14 @@ struct POP_EXPORTS GeometricalTransformation
      * \endcode
      * \image html lenaprojective.png
     */
-    static pop::Mat2x33F64 projective2D(const Vec2F64 src[4], const Vec2F64 dst[4],bool isfastinversion=true);
+    static pop::Mat2x33F32 projective2D(const Vec2F32 src[4], const Vec2F32 dst[4],bool isfastinversion=true);
 
 
     /*!
      * \brief 2D shear matrix
      * \param theta_radian angle in radian
      * \param coordinate shear-axis
-     * \return  Shear Mat2x22F64
+     * \return  Shear Mat2x22F32
      *
      *  Generate the 2D shear matrix from the shear of angle \a theta_radian \n
      *  For coordinate=0 we have,\f$S_x(\theta) = \left(\begin{array}{cc}
@@ -595,13 +595,13 @@ struct POP_EXPORTS GeometricalTransformation
      *   0  & 1 \\
      *  \end{array}\right)\f$, and so one
     */
-    static pop::Mat2x22F64 shear2D(F64 theta_radian, int coordinate);
+    static pop::Mat2x22F32 shear2D(F32 theta_radian, int coordinate);
 
     /*!
      * \brief 2D shear matrix in homogeneous coordinates
      * \param theta_radian angle in radian
      * \param coordinate shear-axis
-     * \return  Shear Mat2x33F64
+     * \return  Shear Mat2x33F32
      *
      *  Generate the 2D shear matrix from the rotation of angle \a theta_radian  in homogeneous coordinates:\n
      *  For coordinate=0 we have,\f$S_x(\theta) = \left(\begin{array}{ccc}
@@ -610,7 +610,7 @@ struct POP_EXPORTS GeometricalTransformation
      *   0 & 0 & 1
      *  \end{array}\right)\f$, and so one
     */
-     static pop::Mat2x33F64 shear2DHomogeneousCoordinate(F64 theta_radian, int coordinate);
+     static pop::Mat2x33F32 shear2DHomogeneousCoordinate(F32 theta_radian, int coordinate);
 
 
     //@}
@@ -630,15 +630,15 @@ struct POP_EXPORTS GeometricalTransformation
      * \code
     Mat2RGBUI8 m;
     m.load("../image/Lena.bmp");
-    Vec2F64 src[3];
-    Vec2F64 dst[3];
-    src[0]=Vec2F64(0,0);
-    src[1]=Vec2F64(m.getDomain()(0),0);
-    src[2]=Vec2F64(0,m.getDomain()(1));
-    dst[0]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
-    dst[1]=Vec2F64(m.getDomain()(0)*0.8,m.getDomain()(1)*0.3);
-    dst[2]=Vec2F64(m.getDomain()(0)*0.4,m.getDomain()(1)*0.8);
-    Mat2x33F64 mproj = GeometricalTransformation::affine2D(src,dst);
+    Vec2F32 src[3];
+    Vec2F32 dst[3];
+    src[0]=Vec2F32(0,0);
+    src[1]=Vec2F32(m.getDomain()(0),0);
+    src[2]=Vec2F32(0,m.getDomain()(1));
+    dst[0]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
+    dst[1]=Vec2F32(m.getDomain()(0)*0.8,m.getDomain()(1)*0.3);
+    dst[2]=Vec2F32(m.getDomain()(0)*0.4,m.getDomain()(1)*0.8);
+    Mat2x33F32 mproj = GeometricalTransformation::affine2D(src,dst);
      std::cout<<mproj<<std::endl;
     std::cout<<mproj.inverse()<<std::endl;
     m =GeometricalTransformation::transformAffine2D(mproj,m);
@@ -651,16 +651,16 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lenaffine.png
     */
     template< typename Type>
-    static MatN<2,Type> transformAffine2D(const pop::Mat2x33F64 & maffine,const MatN<2,Type> & f,bool automaticsize=false)
+    static MatN<2,Type> transformAffine2D(const pop::Mat2x33F32 & maffine,const MatN<2,Type> & f,bool automaticsize=false)
     {
-        Vec2F64 domain(f.getDomain());
-        Vec2F64 xmin(NumericLimits<F64>::maximumRange());
-        Vec2F64 xmax(-NumericLimits<F64>::maximumRange());
+        Vec2F32 domain(f.getDomain());
+        Vec2F32 xmin(NumericLimits<F32>::maximumRange());
+        Vec2F32 xmax(-NumericLimits<F32>::maximumRange());
         if(automaticsize==true){
-            Vec2F64 x(0,0); x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(f.getDomain()(0),0); x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(0,f.getDomain()(1));x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(f.getDomain()(0),f.getDomain()(1)); x = GeometricalTransformation::transformAffine2D(maffine,x); xmin=minimum(xmin,x); xmax=maximum(xmax,x);
+            Vec2F32 x(0,0); x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
+            x = Vec2F32(f.getDomain()(0),0); x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
+            x = Vec2F32(0,f.getDomain()(1));x = GeometricalTransformation::transformAffine2D(maffine,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
+            x = Vec2F32(f.getDomain()(0),f.getDomain()(1)); x = GeometricalTransformation::transformAffine2D(maffine,x); xmin=minimum(xmin,x); xmax=maximum(xmax,x);
             domain  = xmax - xmin;
         }else{
             xmin = 0;
@@ -668,10 +668,10 @@ struct POP_EXPORTS GeometricalTransformation
         }
         MatN<2,Type> g(domain);
         typename MatN<2,Type>::IteratorEDomain it(g.getIteratorEDomain());
-        Mat2x33F64 maffine_inverse;
+        Mat2x33F32 maffine_inverse;
         maffine_inverse = maffine.inverse();//inverse of affine matrix is still affine matrix !
         while(it.next()){
-            Vec2F64 x(it.x()+xmin);
+            Vec2F32 x(it.x()+xmin);
             x =  GeometricalTransformation::transformAffine2D(maffine_inverse,x);
             if(f.isValid(x))
                 g(it.x())=f.interpolationBilinear(x);
@@ -682,24 +682,23 @@ struct POP_EXPORTS GeometricalTransformation
      * \brief Projective transformation on matrix
      * \param f input matrix
      * \param mproj projection transformation matrix
-     * \param automaticsize resize the image to include the whole initial image in the destination domain
      * \return output matrix with same domain as input matrix
      *
      *
      * \code
      * Mat2RGBUI8 m;
      * m.load("../image/Lena.bmp");
-     * Vec2F64 src[4];
-     * Vec2F64 dst[4];
-     * src[0]=Vec2F64(0,0);
-     * src[1]=Vec2F64(m.getDomain()(0),0);
-     * src[2]=Vec2F64(0,m.getDomain()(1));
-     * src[3]=Vec2F64(m.getDomain()(0),m.getDomain()(1));
-     * dst[0]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
-     * dst[1]=Vec2F64(m.getDomain()(0)*0.9,m.getDomain()(1)*0.1);
-     * dst[2]=Vec2F64(m.getDomain()(0)*0.1,m.getDomain()(1)*0.9);
-     * dst[3]=Vec2F64(m.getDomain()(0)*0.8,m.getDomain()(1)*0.7);
-     * Mat2x33F64 mproj = GeometricalTransformation::projective2D(src,dst);
+     * Vec2F32 src[4];
+     * Vec2F32 dst[4];
+     * src[0]=Vec2F32(0,0);
+     * src[1]=Vec2F32(m.getDomain()(0),0);
+     * src[2]=Vec2F32(0,m.getDomain()(1));
+     * src[3]=Vec2F32(m.getDomain()(0),m.getDomain()(1));
+     * dst[0]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.1);
+     * dst[1]=Vec2F32(m.getDomain()(0)*0.9,m.getDomain()(1)*0.1);
+     * dst[2]=Vec2F32(m.getDomain()(0)*0.1,m.getDomain()(1)*0.9);
+     * dst[3]=Vec2F32(m.getDomain()(0)*0.8,m.getDomain()(1)*0.7);
+     * Mat2x33F32 mproj = GeometricalTransformation::projective2D(src,dst);
      * m =GeometricalTransformation::transformHomogeneous2D(mproj,m);
      * Draw::circle(m,dst[0],10,RGBUI8::randomRGB(),2);
      * Draw::circle(m,dst[1],10,RGBUI8::randomRGB(),2);
@@ -711,27 +710,14 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html lenaprojective.png
     */
     template< typename Type>
-    static MatN<2,Type> transformHomogeneous2D(const pop::Mat2x33F64 & mproj,const MatN<2,Type> & f,bool automaticsize=false)
+    static MatN<2,Type> transformHomogeneous2D(const pop::Mat2x33F32 & mproj,const MatN<2,Type> & f)
     {
-        Vec2F64 domain(f.getDomain());
-        Vec2F64 xmin(NumericLimits<F64>::maximumRange());
-        Vec2F64 xmax(-NumericLimits<F64>::maximumRange());
-        if(automaticsize==true){
-            Vec2F64 x(0,0); x = GeometricalTransformation::transformHomogeneous2D(mproj,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(f.getDomain()(0),0); x = GeometricalTransformation::transformHomogeneous2D(mproj,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(0,f.getDomain()(1));x = GeometricalTransformation::transformHomogeneous2D(mproj,x);xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            x = Vec2F64(f.getDomain()(0),f.getDomain()(1)); x = GeometricalTransformation::transformHomogeneous2D(mproj,x); xmin=minimum(xmin,x); xmax=maximum(xmax,x);
-            domain  = xmax - xmin;
-        }else{
-            xmin = 0;
-            xmax = f.getDomain();
-        }
-        MatN<2,Type> gtransform(domain);
+        MatN<2,Type> gtransform(f.getDomain());
         typename MatN<2,Type>::IteratorEDomain it(gtransform.getIteratorEDomain());
-        Mat2x33F64 mproj_inverse;
+        Mat2x33F32 mproj_inverse;
         mproj_inverse = mproj.inverse();
         while(it.next()){
-            Vec2F64 x(it.x()+xmin);
+            Vec2F32 x(Vec2F32(it.x()));
             x =  GeometricalTransformation::transformHomogeneous2D(mproj_inverse,x);
             if(f.isValid(x))
                 gtransform(it.x())=f.interpolationBilinear(x);
@@ -748,11 +734,11 @@ struct POP_EXPORTS GeometricalTransformation
     * with output=\f$(x'_0/x'_2 ,x'_1/x'_2 )\f$ and x=\f$(x_0,x_1)\f$
     *
     */
-    static inline Vec2F64 transformHomogeneous2D(const pop::Mat2x33F64 & mhom,const Vec2F64 & x)
+    static inline Vec2F32 transformHomogeneous2D(const pop::Mat2x33F32 & mhom,const Vec2F32 & x)
     {
         //fast implementation
-        const double norm = mhom._dat[6]*x(0) + mhom._dat[7]*x(1)+mhom._dat[8];
-        return Vec2F64(    (mhom._dat[0]*x(0) + mhom._dat[1]*x(1)+mhom._dat[2])/norm,(mhom._dat[3]*x(0) + mhom._dat[4]*x(1)+mhom._dat[5])/norm);
+        const F32 norm = mhom._dat[6]*x(0) + mhom._dat[7]*x(1)+mhom._dat[8];
+        return Vec2F32(    (mhom._dat[0]*x(0) + mhom._dat[1]*x(1)+mhom._dat[2])/norm,(mhom._dat[3]*x(0) + mhom._dat[4]*x(1)+mhom._dat[5])/norm);
     }
     /*!
     * \brief Affine transformation on a 2d vector
@@ -763,9 +749,9 @@ struct POP_EXPORTS GeometricalTransformation
     * \f$\begin{bmatrix} x'_0 \\ x'_1 \\ 1 \end{bmatrix} = \begin{bmatrix} a_{0,0} & a_{0,1} & a_{0,2} \\ a_{1,0} & a_{1,1} & a_{1,2} \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x_0 \\ y_1 \\ 1 \end{bmatrix}.\f$
     * with output=\f$(x'_0,x'_1)\f$ and x=\f$(x_0,x_1)\f$
     */
-    static inline Vec2F64 transformAffine2D(const pop::Mat2x33F64 & maffine,const Vec2F64 & x)
+    static inline Vec2F32 transformAffine2D(const pop::Mat2x33F32 & maffine,const Vec2F32 & x)
     {
-        return Vec2F64(    (maffine._dat[0]*x(0) + maffine._dat[1]*x(1)+maffine._dat[2]),(maffine._dat[3]*x(0) + maffine._dat[4]*x(1)+maffine._dat[5]));
+        return Vec2F32(    (maffine._dat[0]*x(0) + maffine._dat[1]*x(1)+maffine._dat[2]),(maffine._dat[3]*x(0) + maffine._dat[4]*x(1)+maffine._dat[5]));
     }
 
     /*!
@@ -800,31 +786,31 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html panoramic.png
     */
     template< typename Type>
-    static MatN<2,Type> mergeTransformHomogeneous2D(const pop::Mat2x33F64 & mhom,const MatN<2,Type> & f,const MatN<2,Type> & g,Vec2F64& trans)
+    static MatN<2,Type> mergeTransformHomogeneous2D(const pop::Mat2x33F32 & mhom,const MatN<2,Type> & f,const MatN<2,Type> & g,Vec2F32& trans)
     {
-        Vec2F64 xmax(f.getDomain());
-        pop::Mat2x33F64  mhominverse;
+        Vec2F32 xmax(f.getDomain());
+        pop::Mat2x33F32  mhominverse;
         mhominverse = mhom.inverse();
-        Vec2F64 x(0,0);
+        Vec2F32 x(0,0);
         x = GeometricalTransformation::transformHomogeneous2D(mhominverse,x);
         trans=minimum(trans,x); xmax=maximum(xmax,x);
 
-        x = Vec2F64(g.getDomain()(0),0);
+        x = Vec2F32(g.getDomain()(0),0);
         x = GeometricalTransformation::transformHomogeneous2D(mhominverse,x);
         trans=minimum(trans,x); xmax=maximum(xmax,x);
 
-        x = Vec2F64(0,g.getDomain()(1));
+        x = Vec2F32(0,g.getDomain()(1));
         x = GeometricalTransformation::transformHomogeneous2D(mhominverse,x);
         trans=minimum(trans,x); xmax=maximum(xmax,x);
 
-        x = Vec2F64(g.getDomain()(0),g.getDomain()(1));
+        x = Vec2F32(g.getDomain()(0),g.getDomain()(1));
         x = GeometricalTransformation::transformHomogeneous2D(mhominverse,x);
         trans=minimum(trans,x); xmax=maximum(xmax,x);
 
         MatN<2,Type> panoramic(xmax-trans);
         ForEachDomain2D(xit,panoramic){
-            Vec2F64 x_trans = Vec2F64(xit)+trans;
-            Vec2F64 xx  =  GeometricalTransformation::transformHomogeneous2D(mhom,x_trans);
+            Vec2F32 x_trans = Vec2F32(xit)+trans;
+            Vec2F32 xx  =  GeometricalTransformation::transformHomogeneous2D(mhom,x_trans);
             if(f.isValid(x_trans)==true)
                 panoramic(xit) = f(x_trans);
             if(g.isValid(xx)==true)

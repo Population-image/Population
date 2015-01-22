@@ -70,21 +70,21 @@ struct POP_EXPORTS FunctorMatN
     {
 
         MatN<DIM,TypePixel1> h(f.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F32>::Result Type_F32;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F32>::Result Type2_F32;
         int radius = (kernel.size()-1)/2;
         while(itglobal.next()){
             typename MatN<DIM,TypePixel1>::E x = itglobal.x()  ;
-            Type_F64 value(0);
+            Type_F32 value(0);
             for(unsigned int k=0;k<kernel.size();k++){
                 x(direction)= itglobal.x()(direction)+(radius-k);
                 if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
                     BoundaryCondition::apply(f.getDomain(),x,direction);
-                    value+=Type_F64(f(x))*Type2_F64(kernel(k));
+                    value+=Type_F32(f(x))*Type2_F32(kernel(k));
                 }
             }
 
-            h(itglobal.x())=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+            h(itglobal.x())=ArithmeticsSaturation<TypePixel1,Type_F32>::Range (value);
         }
         return h;
     }
@@ -93,12 +93,12 @@ struct POP_EXPORTS FunctorMatN
     {
 
         MatN<2,TypePixel1> h(f.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F32>::Result Type_F32;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F32>::Result Type2_F32;
         int radius;
         int i,j,k;
         int dir;
-        Type_F64 value;
+        Type_F32 value;
         Vec2I32 x;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
@@ -117,10 +117,10 @@ struct POP_EXPORTS FunctorMatN
                         x(direction)= dir+(radius-k);
                         if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
                             BoundaryCondition::apply(f.getDomain(),x,direction);
-                            value+=Type_F64(f(x))*Type2_F64(kernel(k));
+                            value+=Type_F32(f(x))*Type2_F32(kernel(k));
                         }
                     }
-                    h(i,j)=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+                    h(i,j)=ArithmeticsSaturation<TypePixel1,Type_F32>::Range (value);
                 }
             }
         }
@@ -131,11 +131,11 @@ struct POP_EXPORTS FunctorMatN
     {
 
         MatN<3,TypePixel1> h(f.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F32>::Result Type_F32;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F32>::Result Type2_F32;
         int radius;
         int i,j,z,k,dir;
-        Type_F64 value;
+        Type_F32 value;
         Vec3I32 x;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j,z,k,dir,value,x,radius)
@@ -155,10 +155,10 @@ struct POP_EXPORTS FunctorMatN
                             x(direction)= dir+(radius-k);
                             if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
                                 BoundaryCondition::apply(f.getDomain(),x,direction);
-                                value+=Type_F64(f(x))*Type2_F64(kernel(k));
+                                value+=Type_F32(f(x))*Type2_F32(kernel(k));
                             }
                         }
-                        h(i,j,z)=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+                        h(i,j,z)=ArithmeticsSaturation<TypePixel1,Type_F32>::Range (value);
                     }
                 }
             }
@@ -169,22 +169,22 @@ struct POP_EXPORTS FunctorMatN
     static MatN<DIM,TypePixel1> convolution(const MatN<DIM,TypePixel1> & f, const MatN<DIM,TypePixel2> & kernel,IteratorE itglobal,BoundaryCondition)
     {
         MatN<DIM,TypePixel1> h(f.getDomain());
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F64>::Result Type_F64;
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F64>::Result Type2_F64;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel1,F32>::Result Type_F32;
+        typedef typename FunctionTypeTraitsSubstituteF<TypePixel2,F32>::Result Type2_F32;
         typename MatN<DIM,TypePixel2>::IteratorEDomain itlocal(kernel.getIteratorEDomain());
         typename MatN<DIM,TypePixel2>::E center = (kernel.getDomain()-1)/2;
 
         while(itglobal.next()){
             itlocal.init();
-            Type_F64 value(0);
+            Type_F32 value(0);
             while(itlocal.next()){
                 typename MatN<DIM,TypePixel2>::E x = itglobal.x()-itlocal.x()+center;
                 if(BoundaryCondition::isValid(f.getDomain(),x)){
                     BoundaryCondition::apply(f.getDomain(),x);
-                    value+=Type_F64(f(x))*Type2_F64(kernel(itlocal.x()));
+                    value+=Type_F32(f(x))*Type2_F32(kernel(itlocal.x()));
                 }
             }
-            h(itglobal.x())=ArithmeticsSaturation<TypePixel1,Type_F64>::Range (value);
+            h(itglobal.x())=ArithmeticsSaturation<TypePixel1,Type_F32>::Range (value);
         }
         return h;
     }
@@ -196,12 +196,12 @@ struct POP_EXPORTS FunctorMatN
     //@{
     //-------------------------------------
 
-    static Vec<F64> createGaussianKernelOneDimension(double sigma,int radius_kernel){
-        Vec<F64> gaussian_kernel(2*radius_kernel+1);
+    static Vec<F32> createGaussianKernelOneDimension(F32 sigma,int radius_kernel){
+        Vec<F32> gaussian_kernel(2*radius_kernel+1);
         //initialisation one-dimension
-        double sum=0;
+        F32 sum=0;
         for(int i=0;i<static_cast<int>(gaussian_kernel.size());i++){
-            F64  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+            F32  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
             gaussian_kernel[i]=value;
             sum+=value;
         }
@@ -215,14 +215,14 @@ struct POP_EXPORTS FunctorMatN
 
 
     template< int DIM>
-    static MatN<DIM,F64> createGaussianKernelMultiDimension(double sigma,int radius_kernel){
+    static MatN<DIM,F32> createGaussianKernelMultiDimension(F32 sigma,int radius_kernel){
         VecN<DIM,int> domain(2*radius_kernel+1);
-        MatN<DIM,F64> gaussian_kernel(domain);
-        typename MatN<DIM,F64>::IteratorEDomain it = gaussian_kernel.getIteratorEDomain();
-        double sum=0;
+        MatN<DIM,F32> gaussian_kernel(domain);
+        typename MatN<DIM,F32>::IteratorEDomain it = gaussian_kernel.getIteratorEDomain();
+        F32 sum=0;
         while(it.next()){
-            double dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
-            F64  value = std::exp(-0.5*dist/(sigma*sigma));
+            F32 dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
+            F32  value = std::exp(-0.5*dist/(sigma*sigma));
             gaussian_kernel(it.x())=value;
             sum+=pop::absolute(value);
         }
@@ -233,16 +233,16 @@ struct POP_EXPORTS FunctorMatN
         }
         return gaussian_kernel;
     }
-    static Mat2F64 createGaussianKernelTwoDimension(double sigma,int radius_kernel){
+    static Mat2F32 createGaussianKernelTwoDimension(F32 sigma,int radius_kernel){
         return createGaussianKernelMultiDimension<2>(sigma,radius_kernel);
     }
 
-    static Vec<F64> createGaussianDerivateKernelOneDimension(double sigma,int radius_kernel){
-        Vec<F64> gaussian_kernel(2*radius_kernel+1);
+    static Vec<F32> createGaussianDerivateKernelOneDimension(F32 sigma,int radius_kernel){
+        Vec<F32> gaussian_kernel(2*radius_kernel+1);
         //initialisation one-dimension
-        double sum=0;
+        F32 sum=0;
         for(int i=0;i<static_cast<int>(gaussian_kernel.size());i++){
-            F64  value =(radius_kernel-i)*std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+            F32  value =(radius_kernel-i)*std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
             gaussian_kernel[i]=value;
             if(value>=0)
                 sum+=value;
@@ -256,14 +256,14 @@ struct POP_EXPORTS FunctorMatN
     }
 
     template< int DIM>
-    static MatN<DIM,F64> createGaussianDerivateKernelMultiDimension(int direction,double sigma,int radius_kernel){
+    static MatN<DIM,F32> createGaussianDerivateKernelMultiDimension(int direction,F32 sigma,int radius_kernel){
         VecN<DIM,int> domain(2*radius_kernel+1);
-        MatN<DIM,F64> gaussian_kernel(domain);
-        typename MatN<DIM,F64>::IteratorEDomain it = gaussian_kernel.getIteratorEDomain();
-        double sum=0;
+        MatN<DIM,F32> gaussian_kernel(domain);
+        typename MatN<DIM,F32>::IteratorEDomain it = gaussian_kernel.getIteratorEDomain();
+        F32 sum=0;
         while(it.next()){
-            double dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
-            F64  value = (it.x()-VecN<DIM,int>(radius_kernel))(direction)*std::exp(-0.5*dist/(sigma*sigma));
+            F32 dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
+            F32  value = (it.x()-VecN<DIM,int>(radius_kernel))(direction)*std::exp(-0.5*dist/(sigma*sigma));
             gaussian_kernel(it.x())=value;
             sum+=value;
         }
@@ -274,13 +274,13 @@ struct POP_EXPORTS FunctorMatN
         }
         return gaussian_kernel;
     }
-    static Mat2F64 createGaussianDerivateKernelTwoDimension(int direction,double sigma,int radius_kernel){
+    static Mat2F32 createGaussianDerivateKernelTwoDimension(int direction,F32 sigma,int radius_kernel){
         return createGaussianDerivateKernelMultiDimension<2>(direction,sigma,radius_kernel);
     }
 
     template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType> convolutionGaussian(const MatN<DIM,PixelType>& in, double sigma,int radius_kernel){
-        VecF64 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
+    static MatN<DIM,PixelType> convolutionGaussian(const MatN<DIM,PixelType>& in, F32 sigma,int radius_kernel){
+        VecF32 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
         MatN<DIM,PixelType> out(in);
         typename MatN<DIM,PixelType>::IteratorEDomain it=out.getIteratorEDomain();
         for(unsigned int i=0;i<DIM;i++){
@@ -290,8 +290,8 @@ struct POP_EXPORTS FunctorMatN
         return out;
     }
     template<int DIM,typename PixelType,typename IteratorE>
-    static MatN<DIM,PixelType> convolutionGaussian(const MatN<DIM,PixelType>& in,IteratorE &it, double sigma,int radius_kernel){
-        VecF64 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
+    static MatN<DIM,PixelType> convolutionGaussian(const MatN<DIM,PixelType>& in,IteratorE &it, F32 sigma,int radius_kernel){
+        VecF32 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
         MatN<DIM,PixelType> out(in);
         for(unsigned int i=0;i<DIM;i++){
             it.init();
@@ -302,9 +302,9 @@ struct POP_EXPORTS FunctorMatN
 
 
     template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType> convolutionGaussianDerivate(const MatN<DIM,PixelType>& in,int direction, double sigma,int radius_kernel){
-        VecF64 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
-        VecF64 kernel_derivate = createGaussianDerivateKernelOneDimension(sigma,radius_kernel);
+    static MatN<DIM,PixelType> convolutionGaussianDerivate(const MatN<DIM,PixelType>& in,int direction, F32 sigma,int radius_kernel){
+        VecF32 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
+        VecF32 kernel_derivate = createGaussianDerivateKernelOneDimension(sigma,radius_kernel);
         MatN<DIM,PixelType> out(in);
         typename MatN<DIM,PixelType>::IteratorEDomain it=out.getIteratorEDomain();
         for(unsigned int i=0;i<DIM;i++){
@@ -317,9 +317,9 @@ struct POP_EXPORTS FunctorMatN
         return out;
     }
     template<int DIM,typename PixelType,typename IteratorE>
-    static MatN<DIM,PixelType> convolutionGaussianDerivate(const MatN<DIM,PixelType>& in,IteratorE& it,int direction, double sigma,int radius_kernel){
-        VecF64 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
-        VecF64 kernel_derivate = createGaussianDerivateKernelOneDimension(sigma,radius_kernel);
+    static MatN<DIM,PixelType> convolutionGaussianDerivate(const MatN<DIM,PixelType>& in,IteratorE& it,int direction, F32 sigma,int radius_kernel){
+        VecF32 kernel = createGaussianKernelOneDimension(sigma,radius_kernel);
+        VecF32 kernel_derivate = createGaussianDerivateKernelOneDimension(sigma,radius_kernel);
         MatN<DIM,PixelType> out(in);
         for(unsigned int i=0;i<DIM;i++){
             it.init();
@@ -375,10 +375,10 @@ struct POP_EXPORTS FunctorMatN
     static Function1 recursiveAllDirections(const Function1 & f, FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal )
     {
         typename Function1::IteratorEOrder itorder (f.getIteratorEOrder());
-        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F64>::Result TypeF64;
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fprevious(f);
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fcausal(f.getDomain());
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fanticausal(f.getDomain());
+        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result TypeF32;
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fprevious(f);
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fcausal(f.getDomain());
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fanticausal(f.getDomain());
         fprevious = f;
         for(I32 i=0;i <Function1::DIM;i++)
         {
@@ -415,10 +415,10 @@ struct POP_EXPORTS FunctorMatN
     static Function1 recursiveAllDirections(const Function1 & f, I32 direction,FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal ,FunctorCausalDirection & funccausaldirection, FunctorAntiCausalDirection & funcanticausaldirection)
     {
         typename Function1::IteratorEOrder itorder (f.getIteratorEOrder());
-        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F64>::Result TypeF64;
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fprevious(f);
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fcausal(f.getDomain());
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF64>::Result fanticausal(f.getDomain());
+        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result TypeF32;
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fprevious(f);
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fcausal(f.getDomain());
+        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fanticausal(f.getDomain());
         for(I32 i=0;i <Function1::DIM;i++)
         {
             itorder.setLastLoop(i);
@@ -480,14 +480,14 @@ struct POP_EXPORTS FunctorMatN
     */
     private:
 
-        F64 _a0;
-        F64 _a1;
-        F64 _b1;
-        F64 _a0border0;
+        F32 _a0;
+        F32 _a1;
+        F32 _b1;
+        F32 _a0border0;
     public:
-        FunctorRecursiveOrder1(F64 a0,F64 a1,
-                               F64 b1,
-                               F64 a0border0)
+        FunctorRecursiveOrder1(F32 a0,F32 a1,
+                               F32 b1,
+                               F32 a0border0)
             :_a0(a0),_a1(a1),_b1(b1),_a0border0(a0border0)
         {}
         template<typename Function1,typename Function2>
@@ -516,22 +516,22 @@ struct POP_EXPORTS FunctorMatN
      *
      *
     */
-        F64 _a0;
-        F64 _a1;
-        F64 _a2;
-        F64 _b1;
-        F64 _b2;
+        F32 _a0;
+        F32 _a1;
+        F32 _a2;
+        F32 _b1;
+        F32 _b2;
 
-        F64 _a0border0;
+        F32 _a0border0;
 
-        F64 _a0border1;
-        F64 _a1border1;
-        F64 _b1border1;
+        F32 _a0border1;
+        F32 _a1border1;
+        F32 _b1border1;
     public:
-        FunctorRecursiveOrder2(F64 a0,F64 a1,F64 a2,
-                               F64 b1,F64 b2,
-                               F64 a0border0,
-                               F64 a0border1,F64 a1border1,F64 b1border1)
+        FunctorRecursiveOrder2(F32 a0,F32 a1,F32 a2,
+                               F32 b1,F32 b2,
+                               F32 a0border0,
+                               F32 a0border1,F32 a1border1,F32 b1border1)
             :_a0(a0),_a1(a1),_a2(a2),
               _b1(b1),_b2(b2),
               _a0border0(a0border0),
@@ -588,32 +588,32 @@ struct POP_EXPORTS FunctorMatN
      * \endcode
      */
     template<typename Function1>
-    static Function1 smoothDeriche(const Function1 & f, F64 alpha=1)
+    static Function1 smoothDeriche(const Function1 & f, F32 alpha=1)
     {
-        F64 e_a = std::exp(- alpha);
-        F64 e_2a = std::exp(- 2.0 * alpha);
-        F64 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
+        F32 e_a = std::exp(- alpha);
+        F32 e_2a = std::exp(- 2.0 * alpha);
+        F32 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
 
-        F64 a0_c= k;
-        F64 a1_c=  k * e_a * (alpha - 1.0);
-        F64 a2_c=  0;
-        F64 a0_ac= 0;
-        F64 a1_ac=  k * e_a * (alpha + 1.0);
-        F64 a2_ac=  - k * e_2a;
+        F32 a0_c= k;
+        F32 a1_c=  k * e_a * (alpha - 1.0);
+        F32 a2_c=  0;
+        F32 a0_ac= 0;
+        F32 a1_ac=  k * e_a * (alpha + 1.0);
+        F32 a2_ac=  - k * e_2a;
 
-        F64 b1= 2 * e_a;
-        F64 b2 = - e_2a;
+        F32 b1= 2 * e_a;
+        F32 b2 = - e_2a;
 
 
-        F64 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
-        F64 a0_c_border1 = a0_c ;
-        F64 a1_c_border1 = a1_c ;
+        F32 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
+        F32 a0_c_border1 = a0_c ;
+        F32 a1_c_border1 = a1_c ;
 
-        F64 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
-        F64 a0_ac_border1 = 0 ;
-        F64 a1_ac_border1 = a1_ac + a2_ac ;
+        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
+        F32 a0_ac_border1 = 0 ;
+        F32 a1_ac_border1 = a1_ac + a2_ac ;
 
-        F64 b1_border1 = b1 + b2 ;
+        F32 b1_border1 = b1 + b2 ;
 
         FunctorMatN::FunctorRecursiveOrder2 funccausal
                 (a0_c,a1_c,a2_c,
@@ -630,7 +630,7 @@ struct POP_EXPORTS FunctorMatN
         return FunctorMatN::recursiveAllDirections(f,funccausal,funcanticausal);
     }
 
-    /*! \fn Function1 gradientDeriche(const Function1 & f, F64 alpha,I32 direction)
+    /*! \fn Function1 gradientDeriche(const Function1 & f, F32 alpha,I32 direction)
      * \brief Deriche's smooth filter
      * \param f input matrix used float type as pixel/voxel type
      * \param alpha inverse scale parameter
@@ -641,7 +641,7 @@ struct POP_EXPORTS FunctorMatN
      * \code
         Mat2RGBUI8 img;
         img.load("../image/Lena.bmp");
-        Mat2RGBF64 gradx(img);
+        Mat2RGBF32 gradx(img);
         gradx = Processing::gradientDeriche(gradx,0,1);//Calculate the gradient in the direction 0
         img = Processing::greylevelRange(gradx,0,255);//to display the matrix with a float type, the
         img.display();
@@ -649,55 +649,55 @@ struct POP_EXPORTS FunctorMatN
      * \image html LenaGradDeriche.jpg
      */
     template<typename Function1>
-    static typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F64 >::Result >::Result  gradientDeriche(const Function1 & f, I32 direction, F64 alpha=1)
+    static typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32 >::Result >::Result  gradientDeriche(const Function1 & f, I32 direction, F32 alpha=1)
     {
         if(NumericLimits<typename Function1::F>::is_integer==true){
-            typedef typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F64 >::Result >::Result FunctionFloat;
+            typedef typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32 >::Result >::Result FunctionFloat;
             FunctionFloat ffloat(f);
             return gradientDeriche(ffloat, direction,alpha);
         }
-        F64 e_a = std::exp(- alpha);
-        F64 e_2a = std::exp(- 2.0 * alpha);
-        F64 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
+        F32 e_a = std::exp(- alpha);
+        F32 e_2a = std::exp(- 2.0 * alpha);
+        F32 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
 
-        F64 a0_c= k;
-        F64 a1_c=  k * e_a * (alpha - 1.0);
-        F64 a2_c=  0;
-        F64 a0_ac= 0;
-        F64 a1_ac=  k * e_a * (alpha + 1.0);
-        F64 a2_ac=  - k * e_2a;
+        F32 a0_c= k;
+        F32 a1_c=  k * e_a * (alpha - 1.0);
+        F32 a2_c=  0;
+        F32 a0_ac= 0;
+        F32 a1_ac=  k * e_a * (alpha + 1.0);
+        F32 a2_ac=  - k * e_2a;
 
-        F64 b1= 2 * e_a;
-        F64 b2 = - e_2a;
-
-
-        F64 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
-        F64 a0_c_border1 = a0_c ;
-        F64 a1_c_border1 = a1_c ;
-
-        F64 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
-        F64 a0_ac_border1 = 0 ;
-        F64 a1_ac_border1 = a1_ac + a2_ac ;
+        F32 b1= 2 * e_a;
+        F32 b2 = - e_2a;
 
 
-        F64 b1_border1 = b1 + b2 ;
+        F32 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
+        F32 a0_c_border1 = a0_c ;
+        F32 a1_c_border1 = a1_c ;
+
+        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
+        F32 a0_ac_border1 = 0 ;
+        F32 a1_ac_border1 = a1_ac + a2_ac ;
 
 
-        F64 kp = - (1.0 - e_a) * (1.0 - e_a) / e_a;
-        F64 a0_c_d= 0;
-        F64 a1_c_d=  kp * e_a;
-        F64 a2_c_d=  0;
-        F64 a0_ac_d= 0;
-        F64 a1_ac_d= - kp * e_a;
-        F64 a2_ac_d= 0;
+        F32 b1_border1 = b1 + b2 ;
 
-        F64 a0_c_border0_d = ((a0_c_d + a1_c_d) / (1.0 - b1 - b2));
-        F64 a0_c_border1_d = a0_c_d ;
-        F64 a1_c_border1_d = a1_c_d ;
 
-        F64 a0_ac_border0_d = ((a1_ac_d + a2_ac_d) / (1.0 - b1 - b2));
-        F64 a0_ac_border1_d = 0 ;
-        F64 a1_ac_border1_d = a1_ac_d + a2_ac_d ;
+        F32 kp = - (1.0 - e_a) * (1.0 - e_a) / e_a;
+        F32 a0_c_d= 0;
+        F32 a1_c_d=  kp * e_a;
+        F32 a2_c_d=  0;
+        F32 a0_ac_d= 0;
+        F32 a1_ac_d= - kp * e_a;
+        F32 a2_ac_d= 0;
+
+        F32 a0_c_border0_d = ((a0_c_d + a1_c_d) / (1.0 - b1 - b2));
+        F32 a0_c_border1_d = a0_c_d ;
+        F32 a1_c_border1_d = a1_c_d ;
+
+        F32 a0_ac_border0_d = ((a1_ac_d + a2_ac_d) / (1.0 - b1 - b2));
+        F32 a0_ac_border1_d = 0 ;
+        F32 a1_ac_border1_d = a1_ac_d + a2_ac_d ;
 
         FunctorMatN::FunctorRecursiveOrder2 funccausalsmooth
                 (a0_c,a1_c,a2_c,
@@ -735,20 +735,20 @@ struct POP_EXPORTS FunctorMatN
      * \code
     Mat2UI8 img;
     img.load("/usr/share/doc/opencv-doc/examples/c/lena.jpg");
-    Mat2Vec2F64 gradx = Processing::gradientVecDeriche(img);
+    Mat2Vec2F32 gradx = Processing::gradientVecDeriche(img);
     Visualization::vectorField2DToArrows(gradx,RGBUI8(0,0,255),RGBUI8(255,0,0),8).display();
      *  \endcode
     */
     template<class Function1>
-    static typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F64> >::Result gradientVecDeriche(const Function1  & f,double alpha=1)
+    static typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result gradientVecDeriche(const Function1  & f,F32 alpha=1)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<Function1,F64 >::Result  FunctionFloat;
+        typedef typename FunctionTypeTraitsSubstituteF<Function1,F32 >::Result  FunctionFloat;
         VecN<Function1::DIM,FunctionFloat> v_der;
         for(int i =0;i<Function1::DIM;i++){
             v_der[i]= gradientDeriche(f,i,alpha);
 
         }
-        typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F64> >::Result f_grad(f.getDomain());
+        typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result f_grad(f.getDomain());
         Convertor::fromVecN(v_der,f_grad);
         return f_grad;
     }

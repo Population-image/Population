@@ -55,13 +55,13 @@ struct PDEAdvanced
         *
     */
     template<typename FunctionScalar,typename FunctionLabel,typename Iterator,typename FunctorLaplacien>
-    static void allenCahnInMutliPhaseField( FunctionScalar & field,FunctionLabel & labelfield,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,double width=2 )
+    static void allenCahnInMutliPhaseField( FunctionScalar & field,FunctionLabel & labelfield,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,F32 width=2 )
     {
         FunctionScalar fieldtimetdelatt(field);
         typename FunctionLabel::IteratorENeighborhood itn(labelfield.getIteratorENeighborhood());
 
         FunctorPDE::FreeEnergy free;
-        double witdhpowerminus1=1/(width*width);
+        F32 witdhpowerminus1=1/(width*width);
         DistributionUniformInt d(0,256);
 
         for(int i=0;i<nbrstep;i++)
@@ -92,11 +92,11 @@ struct PDEAdvanced
         }
     }
     template<typename FunctionScalar,typename Iterator,typename FunctorLaplacien>
-    static void allenCahnInSinglePhaseField( FunctionScalar & field,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,double width=2 )
+    static void allenCahnInSinglePhaseField( FunctionScalar & field,int nbrstep, Iterator & it,FunctorLaplacien& laplacien,F32 width=2 )
     {
         FunctionScalar fieldtimetdelatt(field);
         FunctorPDE::FreeEnergy free;
-        double witdhpowerminus1=1/(width*width);
+        F32 witdhpowerminus1=1/(width*width);
 
         for(int i=0;i<nbrstep;i++)
         {
@@ -124,12 +124,12 @@ struct PDEAdvanced
     */
 
     template<int DIM>
-    static void permeability(const  MatN<DIM,UI8> & pore,int direction, F64 errorpressuremax,F64 relaxationSOR, F64 relaxationpressure, MatN<DIM,VecN<DIM,F64> > & velocity, VecN<DIM,F64> & permeability )
+    static void permeability(const  MatN<DIM,UI8> & pore,int direction, F32 errorpressuremax,F32 relaxationSOR, F32 relaxationpressure, MatN<DIM,VecN<DIM,F32> > & velocity, VecN<DIM,F32> & permeability )
     {
-        F64 BOUNDARYVALUE = -10;
+        F32 BOUNDARYVALUE = -10;
         velocity = createVelocityFieldMAKGrid(pore,direction,BOUNDARYVALUE);
 
-        MatN<DIM,F64>  pressure(pore.getDomain());
+        MatN<DIM,F32>  pressure(pore.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain ittotal (pressure.getIteratorEDomain());
         while(ittotal.next()){
             if(pore(ittotal.x())!=0)
@@ -140,14 +140,14 @@ struct PDEAdvanced
 
         typename MatN<DIM,UI8>::IteratorEDomain it (velocity.getIteratorEDomain());
         typename MatN<DIM,UI8>::IteratorEDomain itp (pressure.getIteratorEDomain());
-        typedef  FunctorGaussSeidelStockes<MatN<DIM,F64>,MatN<DIM,VecN<DIM,F64> >  > FunctorGausss;
+        typedef  FunctorGaussSeidelStockes<MatN<DIM,F32>,MatN<DIM,VecN<DIM,F32> >  > FunctorGausss;
         FunctorGausss func(pressure,velocity,direction,velocity.getDomain()(direction)-1,BOUNDARYVALUE);
 
         FunctorGaussSeidelSOR<FunctorGausss > ff(relaxationSOR,func);
-        FunctorRelaxationPressure<MatN<DIM,F64>,MatN<DIM,VecN<DIM,F64> > > div(pressure,velocity,BOUNDARYVALUE);
-        FunctorEvolution<FunctorRelaxationPressure<MatN<DIM,F64>,MatN<DIM,VecN<DIM,F64> > > > func_evol(div);
+        FunctorRelaxationPressure<MatN<DIM,F32>,MatN<DIM,VecN<DIM,F32> > > div(pressure,velocity,BOUNDARYVALUE);
+        FunctorEvolution<FunctorRelaxationPressure<MatN<DIM,F32>,MatN<DIM,VecN<DIM,F32> > > > func_evol(div);
         func_evol.relaxationpressure = relaxationpressure;
-//        double errorpressurecurrent;
+//        F32 errorpressurecurrent;
         int tour =0;
         do{
             forEachFunctorBinaryFunctionE(velocity, velocity,ff);
@@ -192,8 +192,8 @@ private:
 
         }
 
-        static double error;
-        double relaxationpressure;
+        static F32 error;
+        F32 relaxationpressure;
         template<int DIM,typename PixelType>
         PixelType operator()(const MatN<DIM,PixelType> & pressure, const VecN<DIM,int> & x){
             PixelType temp = pressure(x);
@@ -210,10 +210,10 @@ private:
         Function1 & _pressure;
         Function2 & _velocity;
         int _direction;
-        F64 _pressureboundary;
-        F64 _velocityboundary;
+        F32 _pressureboundary;
+        F32 _velocityboundary;
     public:
-        FunctorGaussSeidelStockes(Function1 & pressure, Function2 & velocity,int direction,F64 pressureboundary, F64 velocityboundary)
+        FunctorGaussSeidelStockes(Function1 & pressure, Function2 & velocity,int direction,F32 pressureboundary, F32 velocityboundary)
             :_pressure(pressure),_velocity(velocity),_direction(direction),_pressureboundary(pressureboundary),_velocityboundary(velocityboundary)
         {}
         VecN<Function1::DIM, typename Function1::F> operator()( typename Function1::E x){
@@ -303,9 +303,9 @@ private:
     private:
         Function1 & _pressure;
         Function2 & _velocity;
-        F64 _velocityboundary;
+        F32 _velocityboundary;
     public:
-        FunctorRelaxationPressure(Function1 & pressure, Function2 & velocity, F64 velocityboundary)
+        FunctorRelaxationPressure(Function1 & pressure, Function2 & velocity, F32 velocityboundary)
             :_pressure(pressure),_velocity(velocity),_velocityboundary(velocityboundary)
         {}
         typename Function1::F operator()( typename Function1::E  x){
@@ -335,10 +335,10 @@ private:
     class FunctorGaussSeidelSOR
     {
     private:
-        const F64 _ratio;
+        const F32 _ratio;
         FunctorGaussSeidelLocal & _func;
     public:
-        FunctorGaussSeidelSOR(F64 ratio,FunctorGaussSeidelLocal & func)
+        FunctorGaussSeidelSOR(F32 ratio,FunctorGaussSeidelLocal & func)
             :_ratio(ratio),_func(func)
         {}
         template<typename Function>
@@ -350,12 +350,12 @@ private:
 
 
     template<typename Function>
-    static typename FunctionTypeTraitsSubstituteF<Function, VecN<Function::DIM,F64> >::Result createVelocityFieldMAKGrid(Function porespace, int direction, F64 velocityboundary)
+    static typename FunctionTypeTraitsSubstituteF<Function, VecN<Function::DIM,F32> >::Result createVelocityFieldMAKGrid(Function porespace, int direction, F32 velocityboundary)
     {
 
         typename Function::E domain;
         domain= porespace.getDomain()+1;
-        typename FunctionTypeTraitsSubstituteF<Function, VecN<Function::DIM,F64> >::Result velocity(domain);
+        typename FunctionTypeTraitsSubstituteF<Function, VecN<Function::DIM,F32> >::Result velocity(domain);
         typename Function::IteratorEDomain it (velocity.getIteratorEDomain());
         while(it.next()){
             velocity(it.x())=velocityboundary;
@@ -385,6 +385,6 @@ private:
     }
 };
 template<typename Functor>
-double PDEAdvanced::FunctorEvolution<Functor>::error=0;
+F32 PDEAdvanced::FunctorEvolution<Functor>::error=0;
 }
 #endif // PDEADVANCED_H

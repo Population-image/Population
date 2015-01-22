@@ -242,7 +242,7 @@ int BasicUtility::editDistance(std::string s1,std::string s2){
         return s2.size();
     if(s2.size()==0)
         return s1.size();
-    pop::Mat2F64 m(s1.size(),s2.size());
+    pop::Mat2F32 m(s1.size(),s2.size());
     for(unsigned int i =0;i<m.sizeI();i++){
         m(i,0)=i;
     }

@@ -25,7 +25,7 @@ public:
     */
     enum{DIM=Function::DIM};
     typedef typename Function::E Feature;
-    typedef typename FunctionTypeTraitsSubstituteF<typename Function::E,double>::Result VecNDouble;
+    typedef typename FunctionTypeTraitsSubstituteF<typename Function::E,F32>::Result VecNDouble;
 
 
     /*!
@@ -55,7 +55,7 @@ public:
      \param x input VecN
      \return wavelet coefficient
      */
-    virtual double operator ()(const typename  Function::E & x)=0;
+    virtual F32 operator ()(const typename  Function::E & x)=0;
 
 
 
@@ -136,13 +136,8 @@ class POP_EXPORTS WaveletHaar :public Wavelet<Function>
         as explained in Viola and Jone article, we normalize the calculation by the standart deviation. The wavelet coefficient is \f$a(\phi,f) =\frac{<f>_{\sqcap_+}- <f>_{\sqcap_-}}{(<f^2>_\sqcap-<f>^2_\sqcap)}  \f$ such that \f$< >\f$ is the mean symbol,
         \f$\sqcap_- \f$ is the negative rectangular windows,  \f$\sqcap_+ \f$ is the possitive rectangular windows and \f$\sqcap =\sqcap_+ \cup \sqcap-   \f$ is the windows
     */
-
-
-
-
-
 public:
-    typedef typename FunctionTypeTraitsSubstituteF<typename Function::E,double>::Result VecNDouble;
+    typedef typename FunctionTypeTraitsSubstituteF<typename Function::E,F32>::Result VecNDouble;
     enum{DIM=Function::DIM};
     typedef typename Function::E Feature;
     /*!
@@ -221,34 +216,34 @@ public:
         _x3_windows_negative = x + _x3_windows_negative;
         _x4_windows_negative = x + _x4_windows_negative;
     }
-    double operator ()(const typename  Function::E & x){
+    F32 operator ()(const typename  Function::E & x){
         //        setIntegralFunction(f);
         translateTemp(x);
-        F64 area_windows = (_x4_windows_translate-_x1_windows_translate).multCoordinate();
-        F64 area_windows_negative = (_x4_windows_negative_translate-_x1_windows_negative_translate).multCoordinate();
-        F64 area_windows_possitive = area_windows - area_windows_negative;
+        F32 area_windows = (_x4_windows_translate-_x1_windows_translate).multCoordinate();
+        F32 area_windows_negative = (_x4_windows_negative_translate-_x1_windows_negative_translate).multCoordinate();
+        F32 area_windows_possitive = area_windows - area_windows_negative;
 
 
-        F64 sumwindowspower2;
+        F32 sumwindowspower2;
         sumwindowspower2 = _funtion_integral_power2(_x1_windows_translate)+_funtion_integral_power2(_x4_windows_translate)-(_funtion_integral_power2(_x2_windows_translate)+_funtion_integral_power2(_x3_windows_translate));
 
-        F64 sumwindows;
+        F32 sumwindows;
         sumwindows =      _funtion_integral(_x1_windows_translate)+_funtion_integral(_x4_windows_translate)-(_funtion_integral(_x2_windows_translate)+_funtion_integral(_x3_windows_translate));
-        F64 mean_windows      = sumwindows/area_windows;
-        F64 mean_deviation_windows =sumwindowspower2/area_windows-mean_windows*mean_windows;
+        F32 mean_windows      = sumwindows/area_windows;
+        F32 mean_deviation_windows =sumwindowspower2/area_windows-mean_windows*mean_windows;
         if(mean_deviation_windows>0)
             mean_deviation_windows = std::sqrt( mean_deviation_windows);
         else
             mean_deviation_windows =1;
 
-        F64 sumwindows_negative;
+        F32 sumwindows_negative;
 
         sumwindows_negative =        _funtion_integral(_x1_windows_negative_translate)+_funtion_integral(_x4_windows_negative_translate)-(_funtion_integral(_x2_windows_negative_translate)+_funtion_integral(_x3_windows_negative_translate));
-        F64 diff_mean_negative = sumwindows_negative/area_windows_negative-mean_windows;
+        F32 diff_mean_negative = sumwindows_negative/area_windows_negative-mean_windows;
         // use this relation xox = xxx -  x
-        F64 sumwindows_possitive = sumwindows-sumwindows_negative;
-        F64 diff_mean_possitive = sumwindows_possitive/area_windows_possitive-mean_windows;
-        F64 result = (diff_mean_possitive -  diff_mean_negative)/  mean_deviation_windows;
+        F32 sumwindows_possitive = sumwindows-sumwindows_negative;
+        F32 diff_mean_possitive = sumwindows_possitive/area_windows_possitive-mean_windows;
+        F32 result = (diff_mean_possitive -  diff_mean_negative)/  mean_deviation_windows;
         if(result>5)
             return 5;
         else if(result<-5)

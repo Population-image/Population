@@ -65,5 +65,5 @@ int main()
     std::cout<<m3d<<std::endl;
     m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
     erosion1(m,5,2).display("erosion1",false);
-    erosion2(m,m.getIteratorERectangle(Vec2F64(m.getDomain())*0.25,Vec2F64(m.getDomain())*0.75),m.getIteratorENeighborhood(5,2)).display("erosion2");
+    erosion2(m,m.getIteratorERectangle(Vec2F32(m.getDomain())*0.25,Vec2F32(m.getDomain())*0.75),m.getIteratorENeighborhood(5,2)).display("erosion2");
 }

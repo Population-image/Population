@@ -48,7 +48,7 @@ in the Software.
 namespace pop
 {
 /*! \ingroup TypeF
-* \defgroup Complex  Complex{F64}
+* \defgroup Complex  Complex{F32}
 * \brief template class for complex numbers in cartesian form
 */
 template<class Type>
@@ -66,12 +66,12 @@ class POP_EXPORTS Complex
         * We implement the classical arithmetics for this number
 
         * To facilite its utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
-            - ComplexF64: each number is  representing by a float
-            - ComplexF64: each number is  representing by a float
+            - ComplexF32: each number is  representing by a float
+            - ComplexF32: each number is  representing by a float
 
         \code
-            ComplexF64 c1(1,-1);
-            ComplexF64 c2(1,1);
+            ComplexF32 c1(1,-1);
+            ComplexF32 c2(1,1);
              std::cout<<c1*c2<<std::endl;
         \endcode
         * \sa http://en.wikipedia.org/wiki/Complex_number
@@ -474,7 +474,7 @@ public:
     *
     * set the complex number from the angle c=cos (angle_radian)+ i*sin (angle_radian)
     */
-    void fromAngle(F64 angle_radian)
+    void fromAngle(F32 angle_radian)
     {
         this->real() = std::cos (angle_radian);
         this->img() =  std::sin (angle_radian);
@@ -484,7 +484,7 @@ public:
     *
     * return the angle defined by the complex number
     */
-    F64 toAngle()
+    F32 toAngle()
     {
         if(this->real()>0&&this->img()>=0)
             return std::atan(this->img()/this->img());
@@ -505,7 +505,7 @@ public:
     *
     *  return \f$ (|v(0)|^p+|v(1)|^p)^(1/p)\f$
     */
-    double norm(double p=2)const{
+    F32 norm(F32 p=2)const{
         if(p==0)
             return maximum(normValue(this->real(),0),normValue(this->img(),0));
         else if(p==1)
@@ -515,7 +515,7 @@ public:
         else
             return std::pow(normPowerValue(this->real(),p)+normPowerValue(this->img(),p),1./p);
     }
-    double normPower(double p=2)const{
+    F32 normPower(F32 p=2)const{
         if(p==0)
             return maximum(normValue(this->real(),0),normValue(this->img(),0));
         else if(p==1)
@@ -580,7 +580,7 @@ struct FunctionTypeTraitsSubstituteF<Complex<TypeIn>,TypeOut>
 {
     typedef Complex<typename FunctionTypeTraitsSubstituteF<TypeIn,TypeOut>::Result> Result;
 };
-typedef Complex<F64> ComplexF64;
+typedef Complex<F32> ComplexF32;
 
 
 template< typename R, typename T>
@@ -616,27 +616,27 @@ struct ArithmeticsSaturation<Complex<R>,Scalar >
 };
 
 template<typename Scalar>
-struct ArithmeticsSaturation<RGB<Scalar>,Complex<F64> >
+struct ArithmeticsSaturation<RGB<Scalar>,Complex<F32> >
 {
-    static RGB<Scalar>  Range(const Complex<F64>& p)
+    static RGB<Scalar>  Range(const Complex<F32>& p)
     {
-        return RGB<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
+        return RGB<Scalar>(ArithmeticsSaturation<Scalar,F32>::Range(p.norm()));
     }
 };
 //template<typename Scalar>
-//struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F64> >
+//struct ArithmeticsSaturation<RGBA<Scalar>,Complex<F32> >
 //{
-//    static RGBA<Scalar>  Range(const Complex<F64>& p)
+//    static RGBA<Scalar>  Range(const Complex<F32>& p)
 //    {
-//        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F64>::Range(p.norm()));
+//        return RGBA<Scalar>(ArithmeticsSaturation<Scalar,F32>::Range(p.norm()));
 //    }
 //};
 template<typename Scalar>
-struct ArithmeticsSaturation<Complex<F64> , RGB<Scalar> >
+struct ArithmeticsSaturation<Complex<F32> , RGB<Scalar> >
 {
-    static Complex<F64>  Range(const RGB<Scalar>& p)
+    static Complex<F32>  Range(const RGB<Scalar>& p)
     {
-        return Complex<F64>(p.norm());
+        return Complex<F32>(p.norm());
     }
 };
 /*!
@@ -686,7 +686,7 @@ pop::Complex<T1>  squareRoot(const pop::Complex<T1>&  x1)
 *
 */
 template <class T1>
-double  productInner(const pop::Complex<T1>&  x1,const pop::Complex<T1>&  x2)
+F32  productInner(const pop::Complex<T1>&  x1,const pop::Complex<T1>&  x2)
 {
     return x1.real()*x2.real()+  x1.img()*x2.img();
 }
@@ -699,7 +699,7 @@ double  productInner(const pop::Complex<T1>&  x1,const pop::Complex<T1>&  x2)
 *
 */
 template <class T1>
-double  normValue(const pop::Complex<T1>&  x1,double p=2)
+F32  normValue(const pop::Complex<T1>&  x1,F32 p=2)
 {
     return x1.norm(p);
 }
@@ -712,7 +712,7 @@ double  normValue(const pop::Complex<T1>&  x1,double p=2)
 *
 */
 template <class T1>
-double  normPowerValue(const pop::Complex<T1>&  x1,double p=2)
+F32  normPowerValue(const pop::Complex<T1>&  x1,F32 p=2)
 {
     return x1.normPower(p);
 }
@@ -726,7 +726,7 @@ double  normPowerValue(const pop::Complex<T1>&  x1,double p=2)
 *
 */
 template <class T1>
-double  distance(const pop::Complex<T1>&  x1,const pop::Complex<T1>&  x2,double p=2)
+F32  distance(const pop::Complex<T1>&  x1,const pop::Complex<T1>&  x2,F32 p=2)
 {
     return normValue(x1-x2,p);
 }

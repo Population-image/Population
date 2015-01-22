@@ -164,11 +164,11 @@ public:
     MatNDisplayCImg & display(const MatN<2, UI8 > &img);
     MatNDisplayCImg & display(const MatN<2, UI16 > &img);
     MatNDisplayCImg & display(const MatN<2, UI32 > &img);
-    MatNDisplayCImg & display(const MatN<2, F64 > &img);
+    MatNDisplayCImg & display(const MatN<2, F32 > &img);
 
    template<int DIM,typename Type>
     MatNDisplayCImg & display(const MatN<DIM,Type >&  ){
-        std::cerr<<"Cannot display this image with this pixel type. For 2D, you have to convert it in UI8 or F64 pixel type before to display it";
+        std::cerr<<"Cannot display this image with this pixel type. For 2D, you have to convert it in UI8 or F32 pixel type before to display it";
         return *this;
     }
 

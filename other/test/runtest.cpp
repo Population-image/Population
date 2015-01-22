@@ -18,18 +18,18 @@ void testMatN(){
     pop::PopTest test;
     test._bool_write = true;
 
-    Mat2F64 m1(2,3);
+    Mat2F32 m1(2,3);
     m1(0,0)=1; m1(0,1)=2; m1(0,2)=0;
     m1(1,0)=4; m1(1,1)=3; m1(1,2)=-1;
 
-    Mat2F64 m2(3,2);
+    Mat2F32 m2(3,2);
     m2(0,0)=5; m2(0,1)=1;
     m2(1,0)=2; m2(1,1)=3;
     m2(2,0)=3; m2(2,1)=4;
-    Mat2F64 m3 = m1*m2;
+    Mat2F32 m3 = m1*m2;
 
     std::cout<<m3<<std::endl;
-    Mat2F64 mout(2,2);
+    Mat2F32 mout(2,2);
     mout(0,0)=9; mout(0,1)=7;
     mout(1,0)=23; mout(1,1)=9;
 
@@ -38,13 +38,13 @@ void testMatN(){
         exit(0);
     }
 
-    VecF64 v1(3);
+    VecF32 v1(3);
     v1(0)=2;v1(1)=-1;v1(2)=4;
 
 
-    VecF64 v2 = m1*v1;
+    VecF32 v2 = m1*v1;
 
-    VecF64 vout(2);
+    VecF32 vout(2);
     vout(0)=0;vout(1)=1;
     if(v2!=vout){
         std::cerr<<"[ERROR] Matrix multiplication with vector"<<std::endl;
@@ -69,21 +69,21 @@ int testAnamysis(){
     porespace = pop::Processing::greylevelRemoveEmptyValue(porespace);//the porespace label is now 1 (before 255)
     //    porespace = porespace(Vec3I32(0,0,0),Vec3I32(50,50,50));//for the first execution, you can test the process in small sample
 
-    //    Mat2F64 mverpore = Analysis::REVPorosity(porespace,VecN<3,F64>(porespace.getDomain())*0.5,200);
+    //    Mat2F32 mverpore = Analysis::REVPorosity(porespace,VecN<3,F64>(porespace.getDomain())*0.5,200);
     //    mverpore.saveAscii("spinodal_VER.m");
 
-    //    Mat2F64 mhisto = Analysis::histogram(porespace);
+    //    Mat2F32 mhisto = Analysis::histogram(porespace);
     //    std::cout<<"porespace fraction:"<<mhisto(1,1)<<std::endl;
-    //    Mat2F64 mchord = Analysis::chord(porespace);
+    //    Mat2F32 mchord = Analysis::chord(porespace);
     //    mchord.saveAscii("spinodal_chord.m");
     //    mchord.deleteCol(1);
     //    Distribution dchord_solid(mchord);
     //    std::cout<<"Charateristic length of solid space "<<Statistics::moment(dchord_solid,1,0,300,1)<<std::endl;// \sum_{i=0}^{300} i*d(i)=27.2
 
-    //    Mat2F64 mcorre= Analysis::correlation(porespace);
+    //    Mat2F32 mcorre= Analysis::correlation(porespace);
     //    mcorre.saveAscii("spinodal_corre.m");
 
-    //    Mat3F64 corre= Analysis::correlationDirectionByFFT(porespace);
+    //    Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
     //    corre = GeometricalTransformation::translate(corre,corre.getDomain()/2,MATN_BOUNDARY_CONDITION_PERIODIC);//centered
     ////    corre = corre(corre.getDomain()/2-Vec3I32(20,20,20),corre.getDomain()/2+Vec3I32(20,20,20));//take only the core (the correlation length is near 20)
     //    Mat3UI8 dcorre;
@@ -102,7 +102,7 @@ int testAnamysis(){
     ////    scene.display();//if you close the opengl windows, that stop the program in linux. So comment this line in linux to execute the rest of the code
     ////    }
     //    Mat3UI8 fdistance;
-    //    Mat2F64 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
+    //    Mat2F32 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
     //    mldistance.saveAscii("spinodal_ldistance.m");
     //    Mat3RGBUI8 dcorregrad1=Visualization::labelToRandomRGB(fdistance);//random color
     //    dcorregrad1.display();
@@ -115,7 +115,7 @@ int testAnamysis(){
 
     //    Mat3UI8 fgranulo;
     //    //granulo of the solid space
-    //    Mat2F64 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
+    //    Mat2F32 mlgranulo= Analysis::granulometryMatheron(porespace,2,fgranulo);//quite long algorithm in euclidean distance
     //    mlgranulo.saveAscii("spinodal_granulo.m");
     //    Mat3RGBUI8 dcorregrad2=Visualization::labelToRandomRGB(fgranulo);//random color
     //    dcorregrad2.display();
@@ -126,7 +126,7 @@ int testAnamysis(){
     ////    Visualization::lineCube(scene,dcorregrad);
     ////    scene.display();
 
-    //    Mat2F64 mgeometrical = Analysis::geometricalTortuosity(porespace);
+    //    Mat2F32 mgeometrical = Analysis::geometricalTortuosity(porespace);
     //    mgeometrical.saveAscii("spinodal_geometrical.m");
 
 
@@ -135,9 +135,9 @@ int testAnamysis(){
     //    std::ofstream out("spinodal_euler.m");
     //    out<<euler;//euler
     //    out.close();
-    //    Mat2F64 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
+    //    Mat2F32 mpercolationopening = Analysis::percolationOpening(porespace,2);//->charactertic length related to permeability
     //    mpercolationopening.saveAscii("spinodal_percolationopening.m");//output is 6 in three direction-> the structure sill percolates after an opening of ball of radius of 6 but not with a radius of size 7
-    //    Mat2F64 mpercolationerosion = Analysis::percolationErosion(porespace,2);
+    //    Mat2F32 mpercolationerosion = Analysis::percolationErosion(porespace,2);
     //    mpercolationerosion.saveAscii("spinodal_percolationerosion.m");//output is 5 in three direction-> the structure sill percolates after an erosion of ball of radius of 5 but not with a radius of size 6
     //    Mat3UI8 porespace_hole= pop::Processing::holeFilling(porespace);
     //    Mat3UI8 skeleton= Analysis::thinningAtConstantTopology3d(porespace_hole,std::string(POP_PROJECT_SOURCE_DIR)+"/file/topo24.dat");
@@ -164,20 +164,20 @@ int testAnamysis(){
 
     //    std::cout<<euler/g.sizeVertex()<<std::endl;//N_3/alpha_0 normalised topogical characteristic (connectivity number in my phd)
     //    //############ PHYSICAL ###################
-    Mat2F64 mdiffusion = PDE::randomWalk(porespace,500);
+    Mat2F32 mdiffusion = PDE::randomWalk(porespace,500);
     mdiffusion.saveAscii("spinodal_self_diffusion.m","# time\t D_0/D(t)\t D_0/D_x(t)\t D_0/D_y(t)\t D_0/D_z(t)");
 
-    MatN<3,Vec3F64> velocityfield;
-    Mat2F64 K(3,3);
-    VecF64 kx = PDE::permeability(porespace,velocityfield,0,0.01);//permeability in x-direction
-    //    VecF64 ky = PDE::permeability(porespace,velocityfield,1,0.01);//permeability in y-direction
-    //    VecF64 kz = PDE::permeability(porespace,velocityfield,2,0.01);//permeability in z-direction
+    MatN<3,Vec3F32> velocityfield;
+    Mat2F32 K(3,3);
+    VecF32 kx = PDE::permeability(porespace,velocityfield,0,0.01);//permeability in x-direction
+    //    VecF32 ky = PDE::permeability(porespace,velocityfield,1,0.01);//permeability in y-direction
+    //    VecF32 kz = PDE::permeability(porespace,velocityfield,2,0.01);//permeability in z-direction
     //merge the results in the permeability matrix
     K.setCol(0,kx);
     //    K.setCol(1,ky);
     //    K.setCol(2,kz);
     //display the norm of the last valocity field
-    Mat3F64 velocityfield_norm(velocityfield);
+    Mat3F32 velocityfield_norm(velocityfield);
 
     ForEachDomain3D(x,velocityfield)
     {
@@ -210,7 +210,7 @@ void processingTest()
 
 
     test.start("thresholdOtsuMethod");
-    double value;
+    F32 value;
     out = pop::Processing::thresholdOtsuMethod(in,value);
     test.end(out);
 
@@ -284,7 +284,7 @@ void processingTest()
         test.end(out);
     }
     {
-        Mat2UI8 grad= Processing::greylevelRange(pop::Processing::gradientMagnitudeGaussian(Mat2F64(in),5),0,255);
+        Mat2UI8 grad= Processing::greylevelRange(pop::Processing::gradientMagnitudeGaussian(Mat2F32(in),5),0,255);
         grad= pop::Processing::dynamic(grad,70);
         Mat2UI32 seed= pop::Processing::minimaRegional(grad);
         test.start("watershed");
@@ -293,7 +293,7 @@ void processingTest()
     }
     {
         in.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/outil.bmp");
-        in = GeometricalTransformation::scale(in,Vec2F64(10,10));
+        in = GeometricalTransformation::scale(in,Vec2F32(10,10));
         in = pop::Processing::threshold(in,150);
         test.start("erosionRegionGrowing");
         out = Processing::erosionRegionGrowing(in,10,1);
@@ -305,7 +305,7 @@ void processingTest()
 
 int main(){
     testMatN();
-    //    processingTest();
+    processingTest();
 
     //    testAnamysis();
     return 1;
@@ -314,7 +314,7 @@ int main(){
     img.load("/home/vincent/Desktop/Gold.jpg");
     img.display();
     img = Processing::threshold(img,125);
-    Mat2F64 corre = Analysis::correlationDirectionByFFT(img);
+    Mat2F32 corre = Analysis::correlationDirectionByFFT(img);
     corre = corre(Vec2I32(0,0),Vec2I32(40,40));
     corre(0,0)=0;
     corre= pop::Processing::greylevelRange(corre,1,5);//0 is black color so start at 1
@@ -327,21 +327,21 @@ int main(){
 
 
     img = img.opposite();
-    Mat2Vec2F64 vel;
+    Mat2Vec2F32 vel;
     int dir=0;
-    Vec2F64 kx = PDE::permeability(img,vel,dir,0.01);
-    vel= GeometricalTransformation::scale(vel,Vec2F64(8));
+    Vec2F32 kx = PDE::permeability(img,vel,dir,0.01);
+    vel= GeometricalTransformation::scale(vel,Vec2F32(8));
     Mat2RGBUI8 c = Visualization::vectorField2DToArrows(vel,RGBUI8(0,0,255),RGBUI8(255,0,0));
-    mask = GeometricalTransformation::scale(mask,Vec2F64(c.getDomain())/(mask.getDomain()));
+    mask = GeometricalTransformation::scale(mask,Vec2F32(c.getDomain())/(mask.getDomain()));
     c = mask+c;
     c.display("velocity",false,false);
     dir=1;
-    Vec2F64 ky = PDE::permeability(img,vel,dir,0.01);
-    vel= GeometricalTransformation::scale(vel,Vec2F64(8));
+    Vec2F32 ky = PDE::permeability(img,vel,dir,0.01);
+    vel= GeometricalTransformation::scale(vel,Vec2F32(8));
     c = Visualization::vectorField2DToArrows(vel,RGBUI8(0,0,255),RGBUI8(255,0,0));
     c = mask+c;
     c.display("velocity",true,false);
-    Mat2F64 K(2,2);
+    Mat2F32 K(2,2);
     K.setCol(0,kx);
     K.setCol(1,ky);
     std::cout<<K<<std::endl;

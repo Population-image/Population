@@ -71,7 +71,7 @@ public:
         int low_value, high_value;
         MatN<DIM,PixelType>  img(in);
         if(automaticresize ==true){
-            VecN<MatN<DIM,PixelType>::DIM,pop::F64> scale(600./img.getDomain()(0));
+            VecN<MatN<DIM,PixelType>::DIM,pop::F32> scale(600./img.getDomain()(0));
             img= GeometricalTransformation::scale(img,scale);
         }
         high_value=255;
@@ -143,7 +143,7 @@ public:
 
         Mat2RGBUI8  img(in);
 
-        VecN<2,pop::F64> scale(600./img.getDomain()(0));
+        VecN<2,pop::F32> scale(600./img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale);
 
         lowvalue =RGBUI8(125,125,125);

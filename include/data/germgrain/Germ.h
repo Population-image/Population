@@ -11,7 +11,7 @@ class POP_EXPORTS Germ
 
 public:
     RGBUI8 color;
-    VecN<DIM,F64> x;
+    VecN<DIM,F32> x;
 
     Germ()
         :color(255,255,255)
@@ -20,14 +20,14 @@ public:
     virtual ~Germ()
     {
     }
-    void translation(const VecN<DIM,F64> & trans){x = trans +x;}
+    void translation(const VecN<DIM,F32> & trans){x = trans +x;}
 
 
-    virtual bool intersectionPoint(const VecN<DIM,F64> &    )  {
+    virtual bool intersectionPoint(const VecN<DIM,F32> &    )  {
         std::cout<<"you are in the master class for the method intersction VecN"<<std::endl;
         return true;
     }
-    virtual F64 getRadiusBallNorm0IncludingGrain(){
+    virtual F32 getRadiusBallNorm0IncludingGrain(){
         std::cout<<"you are in the master class radius"<<std::endl;
         return true;
     }
@@ -44,17 +44,17 @@ namespace Details {
 
 template<int DIM>
 struct Rot{
-    inline static Mat2x<F64,DIM,DIM> rotation(F64 angleradian,int coordinate);
+    inline static Mat2x<F32,DIM,DIM> rotation(F32 angleradian,int coordinate);
 };
 template<>
 struct Rot<2>{
-    inline static Mat2x<F64,2,2> rotation(F64 angleradian,int ){
+    inline static Mat2x<F32,2,2> rotation(F32 angleradian,int ){
         return GeometricalTransformation::rotation2D(angleradian);
     }
 };
 template<>
 struct Rot<3>{
-    inline static  Mat2x<F64,3,3> rotation(F64 angleradian,int coordinate){
+    inline static  Mat2x<F32,3,3> rotation(F32 angleradian,int coordinate){
         return GeometricalTransformation::rotation3D(angleradian,coordinate);
     }
 };
@@ -64,8 +64,8 @@ template<int DIM>
 class POP_EXPORTS OrientationEulerAngle
 {
 private:
-    Vec<F64> angle;
-    Vec<Mat2x<F64,DIM,DIM> > M_minus;
+    Vec<F32> angle;
+    Vec<Mat2x<F32,DIM,DIM> > M_minus;
 public:
 
     OrientationEulerAngle(){
@@ -100,16 +100,16 @@ public:
         }
 
     }
-    void setAngle_ei(F64 angleradian,int coordinate=0){
+    void setAngle_ei(F32 angleradian,int coordinate=0){
         angle(coordinate) = angleradian;
         M_minus(coordinate) = Details::Rot<DIM>::rotation(-angleradian,coordinate);
 
     }
-    void setAngle(Vec<F64> angles_radian){
+    void setAngle(Vec<F32> angles_radian){
         for(unsigned int i =0;i<angles_radian.size();i++)
             setAngle_ei(angles_radian(i),i);
     }
-    VecN<DIM, F64> inverseRotation(const VecN<DIM, F64> & x){
+    VecN<DIM, F32> inverseRotation(const VecN<DIM, F32> & x){
         if(DIM==2){
             return M_minus(0)*x;
         }else{

@@ -31,7 +31,7 @@ Distribution & Distribution::operator =(const Distribution& d){
     return *this;
 }
 
-Distribution::Distribution(double param , std::string type)
+Distribution::Distribution(F32 param , std::string type)
 {
     if(type==DistributionPoisson::getKey() ){
         _deriveddistribution= new DistributionPoisson(param);
@@ -40,9 +40,9 @@ Distribution::Distribution(double param , std::string type)
     }else if(type==DistributionDirac::getKey())
         _deriveddistribution= new DistributionDirac(param);
     else
-        std::cerr<<std::string("In Distribution::Distribution(double param , const char* type), type must be equal to one accepted distribution: ") +DistributionPoisson::getKey()+" "+DistributionExponential::getKey()+" "+DistributionDirac::getKey();
+        std::cerr<<std::string("In Distribution::Distribution(F32 param , const char* type), type must be equal to one accepted distribution: ") +DistributionPoisson::getKey()+" "+DistributionExponential::getKey()+" "+DistributionDirac::getKey();
 }
-Distribution::Distribution(double param1,double param2, std::string type)
+Distribution::Distribution(F32 param1,F32 param2, std::string type)
 {
     if(type==DistributionBinomial::getKey()){
         _deriveddistribution= new DistributionBinomial(param1,param2);
@@ -54,17 +54,17 @@ Distribution::Distribution(double param1,double param2, std::string type)
     else if(type==DistributionUniformReal::getKey())
         _deriveddistribution= new DistributionUniformReal(param1,param2);
     else
-        std::cerr<<std::string("In Distribution::Distribution(double param1,double param2 , const char* type), type must be equal to one accepted distribution: ")+DistributionBinomial::getKey()+" "+DistributionNormal::getKey()+" "+DistributionUniformInt::getKey()+" "+DistributionUniformReal::getKey();
+        std::cerr<<std::string("In Distribution::Distribution(F32 param1,F32 param2 , const char* type), type must be equal to one accepted distribution: ")+DistributionBinomial::getKey()+" "+DistributionNormal::getKey()+" "+DistributionUniformInt::getKey()+" "+DistributionUniformReal::getKey();
 }
 
-Distribution::Distribution(const Mat2F64& param,std::string type){
+Distribution::Distribution(const Mat2F32& param,std::string type){
     if(type==std::string(DistributionRegularStep::getKey()) ){
         _deriveddistribution= new DistributionRegularStep(param);
     }else if(type==DistributionIntegerRegularStep::getKey()){
         _deriveddistribution= new DistributionIntegerRegularStep(param);
     }
     else
-        std::cerr<<std::string("In Distribution::Distribution(Mat2F64 param,const char* type), type must be equal to one accepted distribution: ")+DistributionRegularStep::getKey()+" "+DistributionIntegerRegularStep::getKey();
+        std::cerr<<std::string("In Distribution::Distribution(Mat2F32 param,const char* type), type must be equal to one accepted distribution: ")+DistributionRegularStep::getKey()+" "+DistributionIntegerRegularStep::getKey();
 }
 
 Distribution::Distribution(const char* param,std::string type){
@@ -81,52 +81,52 @@ Distribution::~Distribution()
         delete _deriveddistribution;
 }
 
-void Distribution::setStep(F64 )const{
+void Distribution::setStep(F32 )const{
 
 }
 
 
-F64 Distribution::getStep()const{
+F32 Distribution::getStep()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->getStep();
     else
         return 0.01;
 }
 
-F64 Distribution::getXmin()const{
+F32 Distribution::getXmin()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->getXmin();
     else
-        return -NumericLimits<F64>::maximumRange();
+        return -NumericLimits<F32>::maximumRange();
 }
-F64 Distribution::getXmax()const{
+F32 Distribution::getXmax()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->getXmax();
     else
-        return NumericLimits<F64>::maximumRange();
+        return NumericLimits<F32>::maximumRange();
 }
-F64 Distribution::randomVariable(F64 value)const 
+F32 Distribution::randomVariable(F32 value)const 
 {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
     else{
-        std::cerr<<"In Distribution::randomVariable(F64 value), empty distributio";
+        std::cerr<<"In Distribution::randomVariable(F32 value), empty distributio";
         return 0;
     }
 }
 
 
 
-F64 Distribution::operator()(F64 value)const {
+F32 Distribution::operator()(F32 value)const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
     else{
-        std::cerr<<"In Distribution::operator()(F64 value), empty distribution";
+        std::cerr<<"In Distribution::operator()(F32 value), empty distribution";
         return 0;
     }
 }
 
-F64 Distribution::randomVariable()const {
+F32 Distribution::randomVariable()const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->randomVariable();
     else{
@@ -134,7 +134,7 @@ F64 Distribution::randomVariable()const {
         return 0;
     }
 }
-F64 Distribution::operator()()const {
+F32 Distribution::operator()()const {
     return this->randomVariable();
 }
 
@@ -220,34 +220,34 @@ Distribution  Distribution::operator -()const
     return dout;
 }
 
-Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,double xmin,double xmax,double ymin,double ymax,int sizex,int sizey){
+Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
     std::vector<Distribution> d;
     d.push_back(d1);
     d.push_back(d2);
     d.push_back(d3);
     return Distribution::multiDisplay( d,    xmin, xmax, ymin, ymax, sizex, sizey);
 }
-Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,double xmin,double xmax,double ymin,double ymax,int sizex,int sizey){
+Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
     std::vector<Distribution> d;
     d.push_back(d1);
     d.push_back(d2);
     return Distribution::multiDisplay( d,    xmin, xmax, ymin, ymax, sizex, sizey);
 }
-Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,double xmin,double xmax,double ymin,double ymax,int sizex,int sizey){
-    if(xmin == -NumericLimits<double>::maximumRange()){
+Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
+    if(xmin == -NumericLimits<F32>::maximumRange()){
         xmin = d[0].getXmin();
-        if(xmin == -NumericLimits<double>::maximumRange())
+        if(xmin == -NumericLimits<F32>::maximumRange())
             xmin = 0;
     }
-    if(xmax == NumericLimits<double>::maximumRange()){
+    if(xmax == NumericLimits<F32>::maximumRange()){
         xmax = d[0].getXmax();
-        if(xmax == NumericLimits<double>::maximumRange())
+        if(xmax == NumericLimits<F32>::maximumRange())
             xmax = 1;
     }
-    if(ymin == -NumericLimits<double>::maximumRange()){
+    if(ymin == -NumericLimits<F32>::maximumRange()){
         ymin = pop::Statistics::minValue(d[0],xmin,xmax);
     }
-    if(ymax == NumericLimits<double>::maximumRange()){
+    if(ymax == NumericLimits<F32>::maximumRange()){
         ymax = pop::Statistics::maxValue(d[0],xmin,xmax);
     }
     std::vector<RGBUI8> v_RGB;
@@ -264,31 +264,31 @@ Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,double xmin
     while (!main_disp.is_closed() ) {
 
         if(main_disp.is_keyARROWDOWN()){
-            double diff =ymax-ymin;
+            F32 diff =ymax-ymin;
             ymin -= diff*0.02;
             ymax -= diff*0.02;
         }
         if(main_disp.is_keyARROWUP())
         {
-            double diff =ymax-ymin;
+            F32 diff =ymax-ymin;
             ymin += diff*0.02;
             ymax += diff*0.02;
         }
         if(main_disp.is_keyARROWLEFT()){
-            double diff =xmax-xmin;
+            F32 diff =xmax-xmin;
             xmin -= diff*0.02;
             xmax -= diff*0.02;
         }
         if(main_disp.is_keyARROWRIGHT())
         {
-            double diff =xmax-xmin;
+            F32 diff =xmax-xmin;
             xmin += diff*0.02;
             xmax += diff*0.02;
         }
         if(main_disp.is_keyPADADD())
         {
-            double diffx =xmax-xmin;
-            double diffy =ymax-ymin;
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
             xmin += diffx*0.02;
             xmax -= diffx*0.02;
             ymin += diffy*0.02;
@@ -296,8 +296,8 @@ Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,double xmin
         }
         if(main_disp.is_keyPADSUB())
         {
-            double diffx =xmax-xmin;
-            double diffy =ymax-ymin;
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
             xmin -= diffx*0.02;
             xmax += diffx*0.02;
             ymin -= diffy*0.02;
@@ -323,21 +323,21 @@ Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,double xmin
     return img;
 }
 
-Mat2RGBUI8 Distribution::display(double xmin,double xmax,double ymin,double ymax,int sizewidth,int sizeheight){
-    if(xmin == -NumericLimits<double>::maximumRange()){
+Mat2RGBUI8 Distribution::display(F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizewidth,int sizeheight){
+    if(xmin == -NumericLimits<F32>::maximumRange()){
         xmin = this->getXmin();
-        if(xmin == -NumericLimits<double>::maximumRange())
+        if(xmin == -NumericLimits<F32>::maximumRange())
             xmin = 0;
     }
-    if(xmax == NumericLimits<double>::maximumRange()){
+    if(xmax == NumericLimits<F32>::maximumRange()){
         xmax = this->getXmax();
-        if(xmax == NumericLimits<double>::maximumRange())
+        if(xmax == NumericLimits<F32>::maximumRange())
             xmax = 1;
     }
-    if(ymin == -NumericLimits<double>::maximumRange()){
+    if(ymin == -NumericLimits<F32>::maximumRange()){
         ymin = pop::Statistics::minValue(*this,xmin,xmax);
     }
-    if(ymax == NumericLimits<double>::maximumRange()){
+    if(ymax == NumericLimits<F32>::maximumRange()){
         ymax = pop::Statistics::maxValue(*this,xmin,xmax);
     }
 
@@ -353,31 +353,31 @@ Mat2RGBUI8 Distribution::display(double xmin,double xmax,double ymin,double ymax
     while (!main_disp.is_closed() ) {
 
         if(main_disp.is_keyARROWDOWN()){
-            double diff =ymax-ymin;
+            F32 diff =ymax-ymin;
             ymin -= diff*0.02;
             ymax -= diff*0.02;
         }
         else if(main_disp.is_keyARROWUP())
         {
-            double diff =ymax-ymin;
+            F32 diff =ymax-ymin;
             ymin += diff*0.02;
             ymax += diff*0.02;
         }
         else if(main_disp.is_keyARROWLEFT()){
-            double diff =xmax-xmin;
+            F32 diff =xmax-xmin;
             xmin -= diff*0.02;
             xmax -= diff*0.02;
         }
         else if(main_disp.is_keyARROWRIGHT())
         {
-            double diff =xmax-xmin;
+            F32 diff =xmax-xmin;
             xmin += diff*0.02;
             xmax += diff*0.02;
         }
         else if(main_disp.is_keyPADADD())
         {
-            double diffx =xmax-xmin;
-            double diffy =ymax-ymin;
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
             xmin += diffx*0.02;
             xmax -= diffx*0.02;
             ymin += diffy*0.02;
@@ -385,8 +385,8 @@ Mat2RGBUI8 Distribution::display(double xmin,double xmax,double ymin,double ymax
         }
         else if(main_disp.is_keyPADSUB())
         {
-            double diffx =xmax-xmin;
-            double diffy =ymax-ymin;
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
             xmin -= diffx*0.02;
             xmax += diffx*0.02;
             ymin -= diffy*0.02;

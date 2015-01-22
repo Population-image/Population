@@ -159,7 +159,7 @@ class POP_EXPORTS FunctorMean
 private:
 
     const FunctionTopo &_topo;
-    std::vector<  double > _v_mean;
+    std::vector<  F32 > _v_mean;
     std::vector<  int    > _v_number;
 public:
     FunctorMean(const FunctionTopo & topo)
@@ -198,9 +198,9 @@ class POP_EXPORTS FunctorMeanStandardDeviation
 private:
 
     const FunctionTopo &_topo;
-    std::vector<  double > _v_X;
-    std::vector<  double > _v_X_power_2;
-    std::vector<  double > _v_standard_deviation;
+    std::vector<  F32 > _v_X;
+    std::vector<  F32 > _v_X_power_2;
+    std::vector<  F32 > _v_standard_deviation;
     std::vector<  int    > _v_number;
 public:
     FunctorMeanStandardDeviation(const FunctionTopo & topo)
@@ -235,7 +235,7 @@ public:
     I32 operator()(int label, const typename FunctionTopo::E&x)
     const
     {
-        return maximum(0.0,absolute( (_topo(x)-_v_X[label]))/_v_standard_deviation[label] );
+        return maximum(F32(0.0),absolute( (_topo(x)-_v_X[label]))/_v_standard_deviation[label] );
     }
 };
 template<typename FunctionTopo>
@@ -244,7 +244,7 @@ class POP_EXPORTS FunctorMeanMerge
 private:
 public:
     const FunctionTopo &_topo;
-    std::vector<  double > _v_mean;
+    std::vector<  F32 > _v_mean;
     std::vector<  int    > _v_number;
 
 
@@ -267,7 +267,7 @@ public:
             _v_mean[label] =  (_v_mean[label]*_v_number[label] + _topo(x))/(_v_number[label] +1);
         _v_number[label]++;
     }
-    double diff(int label_1,int label_2){
+    F32 diff(int label_1,int label_2){
         return absolute(_v_mean[label_1]-_v_mean[label_2]);
     }
 
@@ -279,7 +279,7 @@ public:
     I32 operator()(int label, const typename FunctionTopo::E&x)
     const
     {
-        return maximum(0.0,absolute(_topo(x)-_v_mean[label]) );
+        return maximum(F32(0.0),absolute(_topo(x)-_v_mean[label]) );
     }
 };
 struct MasterSlave

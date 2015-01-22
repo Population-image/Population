@@ -50,11 +50,11 @@ class LaplacienSmooth
 {
 private:
     MatNIteratorENeighborhood<VecN<DIM,int>,MatNBoundaryConditionMirror> _itn;
-    std::vector<F64> _v_value;
-    double _sigma;
+    std::vector<F32> _v_value;
+    F32 _sigma;
     int _radius_kernel;
 public:
-    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 _sigma,int _radius_kernel=1);
+    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F32 _sigma,int _radius_kernel=1);
     TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x);
 };
 }
@@ -70,11 +70,11 @@ is coded as follows:
 \code
 Mat2UI8 img;
 img.load("../image/Lena.bmp");
-Mat2F64 img_timet(img);//operation on float
-Mat2F64 img_timet_plus_one(img);
+Mat2F32 img_timet(img);//operation on float
+Mat2F32 img_timet_plus_one(img);
 FunctorPDE::Laplacien<> laplacien;
 
-double D=0.25;//diffusion coefficient
+F32 D=0.25;//diffusion coefficient
 MatNDisplay disp;
 for(unsigned int index_time=0;index_time<300;index_time++){
     std::cout<<index_time<<std::endl;
@@ -123,7 +123,7 @@ public:
       * \image html nonlineargaussian.png
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusion(const MatN<DIM,TypePixel>& in,int Nstep=20,F64 K=50)
+    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusion(const MatN<DIM,TypePixel>& in,int Nstep=20,F32 K=50)
     {
         typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F32>::Result F_Float;
 
@@ -147,7 +147,7 @@ public:
       * \param bulk  pore space defined by \f$\{x:bulk(x)\neq 0 \}\f$
       * \param direction direction of the pressure gradient
       * \param errorpressuremax the default value insures  the convergence but that can be long
-      * \param velocity velocity field with a type equal to 2d = MatN<2,Vec2F64>  3d = MatN<3,Vec3F64>
+      * \param velocity velocity field with a type equal to 2d = MatN<2,Vec2F32>  3d = MatN<3,Vec3F32>
       * \return permeability in the different direction
       *
 \section Formalism Formalism
@@ -284,19 +284,19 @@ As example, this code produces
     Mat2UI8 img;
     img.load(POP_PROJECT_SOURCE_DIR+(std::string)"/image/outil.bmp");
     img = img.opposite();
-    Mat2Vec2F64 vel;
+    Mat2Vec2F32 vel;
     int dir=0;
-    VecF64 kx = PDE::permeability(img,vel,dir,0.01);
-    vel= GeometricalTransformation::scale(vel,Vec2F64(8));
+    VecF32 kx = PDE::permeability(img,vel,dir,0.01);
+    vel= GeometricalTransformation::scale(vel,Vec2F32(8));
     Mat2RGBUI8 c = Visualization::vectorField2DToArrows(vel);
     c.display("velocity",false,false);
     dir=1;
-    VecF64 ky = PDE::permeability(img,vel,dir,0.01);
-    Mat2F64 K(2,2);
+    VecF32 ky = PDE::permeability(img,vel,dir,0.01);
+    Mat2F32 K(2,2);
     K.setCol(0,kx);
     K.setCol(1,ky);
     std::cout<<K<<std::endl;
-    Mat2F64 img_norm(img.getDomain());
+    Mat2F32 img_norm(img.getDomain());
     ForEachDomain2D(x,img){
         img_norm(x)= vel(x).norm();
     }
@@ -310,11 +310,11 @@ As example, this code produces
 */
 
     template<int DIM>
-    static VecN<DIM,F64>  permeability(const  MatN<DIM,UI8> & bulk,MatN<DIM,VecN<DIM,F64> > & velocity, int direction=0,F64 errorpressuremax=0.01  )
+    static VecN<DIM,F32>  permeability(const  MatN<DIM,UI8> & bulk,MatN<DIM,VecN<DIM,F32> > & velocity, int direction=0,F32 errorpressuremax=0.01  )
     {
-        VecN<DIM,F64>  permeability;
-        F64 relaxationSOR=0.9;
-        F64 relaxationpressure=1;
+        VecN<DIM,F32>  permeability;
+        F32 relaxationSOR=0.9;
+        F32 relaxationpressure=1;
         PDEAdvanced::permeability(bulk,direction,errorpressuremax, relaxationSOR,  relaxationpressure,velocity,permeability);
         return permeability;
     }
@@ -335,7 +335,7 @@ As example, this code produces
       * \code
       * Mat3UI8 img;
       * img.load("../image/spinodal.pgm");
-      * Mat2F64 m = PDE::randomWalk(img);
+      * Mat2F32 m = PDE::randomWalk(img);
       * m.saveAscii("random_walk.m","time\t D_0/D(t)\t D_0/D_x(t)\t D_0/D_y(t)\t D_0/D_z(t)");
       * Distribution d(m);
       * d.display();
@@ -343,9 +343,9 @@ As example, this code produces
      * \image html spinodal_self_diffusion.png "Coefficient of self diffusion"
      */
     template<int DIM>
-    static Mat2F64   randomWalk(const MatN<DIM,UI8> &  bulk, int nbrwalkers=50000, F64 standard_deviation=0.5 ,  F64 time_max=2000,F64 delta_time_write=10)
+    static Mat2F32   randomWalk(const MatN<DIM,UI8> &  bulk, int nbrwalkers=50000, F32 standard_deviation=0.5 ,  F32 time_max=2000,F32 delta_time_write=10)
     {
-        VecN<DIM,F64> x_current,x_start;
+        VecN<DIM,F32> x_current,x_start;
         DistributionNormal distnorm(0,standard_deviation);
 
         std::vector<DistributionUniformReal>randimage;
@@ -353,12 +353,12 @@ As example, this code produces
             randimage.push_back(DistributionUniformReal(0,bulk.getDomain()(i)-1));
 
 
-        Mat2F64  t(static_cast<int>(std::floor(time_max/delta_time_write))+2,2+DIM);
+        Mat2F32  t(static_cast<int>(std::floor(time_max/delta_time_write))+2,2+DIM);
 
         for(int j =0;j<nbrwalkers;j++){
             int timestepwrite= 0;
-            VecN<DIM,F64> v_sum  = 0;
-            F64 timecurrent=0;
+            VecN<DIM,F32> v_sum  = 0;
+            F32 timecurrent=0;
             x_start = start_VecN(bulk,randimage);
             x_current = x_start;
             while(timecurrent <=time_max){
@@ -372,7 +372,7 @@ As example, this code produces
                 }
                 if(timecurrent>= (timestepwrite+1)*delta_time_write) {
                     timestepwrite++;
-                    VecN<DIM,F64> distance = x_current -x_start +v_sum;
+                    VecN<DIM,F32> distance = x_current -x_start +v_sum;
                     t(timestepwrite,0)+=timecurrent;
                     t(timestepwrite,1)+=distance.normPower();
                     for(int dim1=0;dim1<DIM;dim1++)
@@ -424,7 +424,7 @@ As example, this code produces
       * \image html spinodaldecomposition.gif
       * This algorithm can be used for the regularisation:
       * \code
-      * Vec3F64 domain(256);//2d field domain
+      * Vec3F32 domain(256);//2d field domain
       * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
       * Distribution dnormal(30,20,"NORMAL");
       * RandomGeometry::sphere(grain,dnormal);
@@ -432,7 +432,7 @@ As example, this code produces
       * Mat3UI8 img_VecN_grey;
       * img_VecN_grey = img_VecN;
       * img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-      * Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,40);
+      * Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,40);
       * phasefield = PDE::getField(img_VecN_grey,phasefield,1,6);
       * Scene3d scene;
       * pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -443,17 +443,17 @@ As example, this code produces
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield, int nbrsteps)
+    static MatN<DIM,F32> allenCahn( MatN<DIM,TypePixel>&  labelfield, int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
         FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredMultiPhaseField<DIM,TypePixel > > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
-        MatN<DIM,F64>   phasefield(labelfield.getDomain());
+        MatN<DIM,F32>   phasefield(labelfield.getDomain());
         phasefield=1;
         typename MatN<DIM,TypePixel>::IteratorEDomain it = labelfield.getIteratorEDomain();
 
-        RegionGrowingMultiPhaseField<MatN<DIM,F64> > pop(phasefield,labelfield,0.95);
+        RegionGrowingMultiPhaseField<MatN<DIM,F32> > pop(phasefield,labelfield,0.95);
         PDEAdvanced::allenCahnInMutliPhaseField(phasefield,labelfield,nbrsteps,pop.getIterator(),laplacien);
         return phasefield;
 
@@ -467,7 +467,7 @@ As example, this code produces
       * The classical allen-cahn equation. I will publish soon an article related to its application in matrix processing.
       * This algorithm can be used for the grain partition regularisation:
       * \code
-    Vec2F64 domain(512);//2d field domain
+    Vec2F32 domain(512);//2d field domain
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
     Distribution dnormal(30,5,"NORMAL");
     RandomGeometry::sphere(grain,dnormal);
@@ -476,7 +476,7 @@ As example, this code produces
     solid = lattice;
     inverse = solid;
     inverse = inverse.opposite();
-    Mat2F64 dist = pop::Processing::distanceEuclidean(inverse);
+    Mat2F32 dist = pop::Processing::distanceEuclidean(inverse);
     Mat2UI16 distl;
     distl= dist;
     distl = distl.opposite();
@@ -488,17 +488,17 @@ As example, this code produces
       * \image html allencahn.gif
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> allenCahn( MatN<DIM,TypePixel>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
+    static MatN<DIM,F32> allenCahn( MatN<DIM,TypePixel>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
         FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredInBulkMultiPhaseField<DIM,TypePixel> > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
         laplacien.partialsecond.setBulk(bulk);
-        MatN<DIM,F64>   phasefield(labelfield.getDomain());
+        MatN<DIM,F32>   phasefield(labelfield.getDomain());
         phasefield=1;
 
-        RegionGrowingMultiPhaseField<MatN<DIM,F64> > pop(phasefield,labelfield,0.95,bulk);
+        RegionGrowingMultiPhaseField<MatN<DIM,F32> > pop(phasefield,labelfield,0.95,bulk);
         PDEAdvanced::allenCahnInMutliPhaseField(phasefield,labelfield,nbrsteps,pop.getIterator(),laplacien);
         return phasefield;
 
@@ -514,7 +514,7 @@ As example, this code produces
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,F64> getField(const MatN<DIM,TypePixel> & labelfield,const MatN<DIM,F64> & scalarfield, typename MatN<DIM,TypePixel>::F label,int width=3)
+    static MatN<DIM,F32> getField(const MatN<DIM,TypePixel> & labelfield,const MatN<DIM,F32> & scalarfield, typename MatN<DIM,TypePixel>::F label,int width=3)
     {
 
         typename MatN<DIM,TypePixel>::IteratorEDomain itg(labelfield.getIteratorEDomain()) ;
@@ -526,7 +526,7 @@ As example, this code produces
         MatN<DIM,UI8> dilateselectfield(scalarfield.getDomain());
         dilateselectfield = pop::Processing::dilationRegionGrowing(selectfield,width,1);
         itg.init();
-        MatN<DIM,F64> scalarfield_phase(scalarfield.getDomain()) ;
+        MatN<DIM,F32> scalarfield_phase(scalarfield.getDomain()) ;
         itg.init();
         while(itg.next()){
             if(dilateselectfield(itg.x())==1){
@@ -547,7 +547,7 @@ As example, this code produces
 
     /*!
       * \param binary input binary matrix
-      * \param curvature output curvature matrix with type equal to 2d=Mat2F64 or 2d=Mat3F64
+      * \param curvature output curvature matrix with type equal to 2d=Mat2F32 or 2d=Mat3F32
       * \param phasefield output phasefield
       * \param cutoffmin minimum curvature
       * \param cutoffmax maximum curvature
@@ -558,23 +558,23 @@ As example, this code produces
       *
       *  \f$1/k = \overrightarrow{\nabla}\cdot \frac{\overrightarrow{\nabla} \phi(x)}{|\overrightarrow{\nabla} \phi(x)|} \f$
       * \code
-    double porosity=0.85;
+    F32 porosity=0.85;
     Distribution d1(20,"DIRAC");
     Distribution d2(25,"DIRAC");
     DistributionExpression dexp("4");
     d1 = dexp*d1+d2;
     d1 = pop::Statistics::toProbabilityDistribution(d1,10,40);
-    double moment_order_3 = pop::Statistics::moment(d1,3,0,1024);
-    double surface_expectation = 4./3.*moment_order_3*3.14159265;
-    Vec3F64 domain(300);//2d field domain
-    double lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
+    F32 moment_order_3 = pop::Statistics::moment(d1,3,0,1024);
+    F32 surface_expectation = 4./3.*moment_order_3*3.14159265;
+    Vec3F32 domain(300);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
     ModelGermGrain3 grains = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
     RandomGeometry::sphere(grains,d1);
     Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grains);
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
-    Mat3F64 curvature;
-    Mat3F64 phasefield;
+    Mat3F32 curvature;
+    Mat3F32 phasefield;
     Distribution dcurvature = PDE::curvaturePhaseField(img_VecN_grey,curvature,phasefield,-50,-5);
     dcurvature.display();
     img_VecN_grey = pop::Processing::greylevelRange(curvature,0,255);
@@ -599,43 +599,43 @@ As example, this code produces
     */
 
     template<int DIM>
-    static Distribution curvaturePhaseField(const MatN<DIM,UI8> & binary,MatN<DIM,F64>& curvature,MatN<DIM,F64>& phasefield, F64 cutoffmin=-100 , F64 cutoffmax=100 ,int nbriteration=30, F64 b=-0.5,F64 a=0.5){
+    static Distribution curvaturePhaseField(const MatN<DIM,UI8> & binary,MatN<DIM,F32>& curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30, F32 b=-0.5,F32 a=0.5){
 
         phasefield.resize(binary.getDomain());
-        typename MatN<DIM,F64>::IteratorEDomain it(binary.getIteratorEDomain());
+        typename MatN<DIM,F32>::IteratorEDomain it(binary.getIteratorEDomain());
         while(it.next()){
             if(binary(it.x())>0)
                 phasefield(it.x())=1;
             else
                 phasefield(it.x())=-1;
         }
-        Private::LaplacienSmooth<DIM,F64 > laplacien(phasefield,1,2);
+        Private::LaplacienSmooth<DIM,F32 > laplacien(phasefield,1,2);
         PDEAdvanced::allenCahnInSinglePhaseField(phasefield,nbriteration,it,laplacien,3);
 
 
-        MatN<DIM,VecN<DIM,F64> > gradnormalized(phasefield.getDomain());
+        MatN<DIM,VecN<DIM,F32> > gradnormalized(phasefield.getDomain());
         FunctorPDE::Gradient<FunctorPDE::PartialDerivateCentered > func_grad;
 
         it.init();
         while(it.next()){
             gradnormalized(it.x()) = func_grad(phasefield,it.x());
-            F64 v =gradnormalized(it.x()).norm();
+            F32 v =gradnormalized(it.x()).norm();
             if(v>0.0001)
                 gradnormalized(it.x())= gradnormalized(it.x())*(1.0/v);
             else
                 gradnormalized(it.x())= 0;
         }
         FunctorPDE::Divergence<FunctorPDE::PartialDerivateCentered > func_div;
-        VecF64 vcurve;
+        VecF32 vcurve;
         curvature.resize(phasefield.getDomain());
         curvature=0;
 
-        typename MatN<DIM,F64>::IteratorERectangle it2( binary.getIteratorERectangle(2,phasefield.getDomain()-3));
+        typename MatN<DIM,F32>::IteratorERectangle it2( binary.getIteratorERectangle(2,phasefield.getDomain()-3));
         it2.init();
         while(it2.next()){
-            typename MatN<DIM,F64>::E x = it2.x();
+            typename MatN<DIM,F32>::E x = it2.x();
             if(phasefield(x)>b&&phasefield(x)<a){
-                F64 divergence = func_div(gradnormalized,x);
+                F32 divergence = func_div(gradnormalized,x);
                 if(DIM==3)
                     divergence /=2;
                 if(divergence!=0&&1/divergence>cutoffmin&&1/divergence<cutoffmax){
@@ -651,27 +651,27 @@ As example, this code produces
         return d;
     }
     template<int DIM>
-    static Distribution curvaturePhaseFieldBetweenPhase(const MatN<DIM,UI8> & phase1,const MatN<DIM,UI8> & phase2,MatN<DIM,F64> & curvature,MatN<DIM,F64>& phasefield, F64 cutoffmin=-100 , F64 cutoffmax=100 ,int nbriteration=30,   F64 b=-0.5,F64 a=0.5){
+    static Distribution curvaturePhaseFieldBetweenPhase(const MatN<DIM,UI8> & phase1,const MatN<DIM,UI8> & phase2,MatN<DIM,F32> & curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30,   F32 b=-0.5,F32 a=0.5){
 
         phasefield.resize(phase1.getDomain());
-        typename MatN<DIM,F64>::IteratorEDomain it(phase1.getIteratorEDomain());
+        typename MatN<DIM,F32>::IteratorEDomain it(phase1.getIteratorEDomain());
         while(it.next()){
             if(phase1(it.x())>0)
                 phasefield(it.x())=1;
             else
                 phasefield(it.x())=-1;
         }
-        Private::LaplacienSmooth<DIM,F64> laplacien(phasefield,1,2);
+        Private::LaplacienSmooth<DIM,F32> laplacien(phasefield,1,2);
         it.init();
         PDEAdvanced::allenCahnInSinglePhaseField(phasefield,nbriteration,it,laplacien,3);
-        MatN<DIM,VecN<DIM,F64> > gradnormalized(phasefield.getDomain());
+        MatN<DIM,VecN<DIM,F32> > gradnormalized(phasefield.getDomain());
         FunctorPDE::Gradient<FunctorPDE::PartialDerivateCentered > func_grad;
         MatN<DIM,UI8>  phasedilation = pop::Processing::dilationRegionGrowing(phase2,10);
         it.init();
         while(it.next()){
 
             gradnormalized(it.x()) = func_grad(phasefield,it.x());
-            F64 v =gradnormalized(it.x()).norm();
+            F32 v =gradnormalized(it.x()).norm();
             if(v>0.0001)
                 gradnormalized(it.x())= gradnormalized(it.x())*(1.0/v);
             else
@@ -679,18 +679,18 @@ As example, this code produces
 
         }
         FunctorPDE::Divergence<FunctorPDE::PartialDerivateCentered > func_div;
-        VecF64 vcurve;
+        VecF32 vcurve;
         curvature.resize(phasefield.getDomain());
         curvature = 0;
 
-        typename MatN<DIM,F64>::IteratorERectangle it2(2,phasefield.getDomain()-3);
+        typename MatN<DIM,F32>::IteratorERectangle it2(2,phasefield.getDomain()-3);
         it2.init();
         while(it2.next()){
             if(phasedilation(it2.x())!=0){
-                typename MatN<DIM,F64>::E x = it2.x();
+                typename MatN<DIM,F32>::E x = it2.x();
                 if(phasefield(x)>b&&phasefield(x)<a){
 
-                    F64 divergence = func_div(gradnormalized,x);
+                    F32 divergence = func_div(gradnormalized,x);
                     if(DIM==3)
                         divergence /=2;
                     //                    std::cout<<1/divergence<<std::endl;
@@ -715,9 +715,9 @@ As example, this code produces
 private:
 
     template<int DIM,typename TypePixel>
-    static VecN<DIM,F64> start_VecN(const MatN<DIM,TypePixel> &  img, const std::vector<DistributionUniformReal> & d )
+    static VecN<DIM,F32> start_VecN(const MatN<DIM,TypePixel> &  img, const std::vector<DistributionUniformReal> & d )
     {
-        VecN<DIM,F64> x;
+        VecN<DIM,F32> x;
         do{
             for(int i =0;i<DIM;i++)
                 x(i)= d[i].randomVariable();
@@ -746,14 +746,14 @@ private:
 
 
 template<int DIM,typename TypePixel>
-Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixel>& f,F64 sigma,int radius_kernel)
+Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixel>& f,F32 sigma,int radius_kernel)
     :_itn(f.getIteratorENeighborhood(radius_kernel,0)),_sigma(sigma),_radius_kernel(radius_kernel){
-    F64 sum=0;
+    F32 sum=0;
     _itn.init(0);
     while(_itn.next()){
-        double dist = _itn.xreal().normPower();
+        F32 dist = _itn.xreal().normPower();
         if(dist!=0){
-            F64  value = std::exp(-0.5*dist/(sigma*sigma));
+            F32  value = std::exp(-0.5*dist/(sigma*sigma));
             _v_value.push_back(value);
             sum+=value;
         }
@@ -770,10 +770,10 @@ Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixe
 }
 template<int DIM,typename TypePixel>
 TypePixel Private::LaplacienSmooth<DIM,TypePixel>::operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
-    F64 sum=0;
-    FunctorF::FunctorMultiplicationF2<TypePixel,F64,F64> op;
+    F32 sum=0;
+    FunctorF::FunctorMultiplicationF2<TypePixel,F32,F32> op;
     _itn.init( x);
-    std::vector<F64>::iterator it = _v_value.begin();
+    std::vector<F32>::iterator it = _v_value.begin();
     while(_itn.next()){
         sum += op((*it),f(_itn.x()));
         it ++;

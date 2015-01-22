@@ -52,13 +52,13 @@ template<int DIM>
 class POP_EXPORTS GrainSphere: public Germ<DIM>
 {
 public:
-    F64 radius;
-    F64 getRadiusBallNorm0IncludingGrain(){
+    F32 radius;
+    F32 getRadiusBallNorm0IncludingGrain(){
         return radius;
     }
-    bool intersectionPoint(const VecN<DIM,F64> &  x)
+    bool intersectionPoint(const VecN<DIM,F32> &  x)
     {
-        VecN<DIM,F64>  temp=x-this->x;
+        VecN<DIM,F32>  temp=x-this->x;
         if(temp.normPower()<=radius*radius)return true;
         else return false;
     }
@@ -72,19 +72,19 @@ public:
 class POP_EXPORTS GrainEquilateralRhombohedron:public Germ<3>
 {
 private:
-    F64 cosangle;
-    F64 angleequi;
-    VecN<3,F64> normalplanx;
-    VecN<3,F64> normalplany;
-    VecN<3,F64> normalplanz;
+    F32 cosangle;
+    F32 angleequi;
+    VecN<3,F32> normalplanx;
+    VecN<3,F32> normalplany;
+    VecN<3,F32> normalplanz;
 
 public:
-    F64 radius;
+    F32 radius;
     OrientationEulerAngle<3> orientation;
     GrainEquilateralRhombohedron();
-    void setAnglePlane(F64 angleradian);
-    virtual F64 getRadiusBallNorm0IncludingGrain();
-    bool intersectionPoint(const VecN<3,F64> &  x_value);
+    void setAnglePlane(F32 angleradian);
+    virtual F32 getRadiusBallNorm0IncludingGrain();
+    bool intersectionPoint(const VecN<3,F32> &  x_value);
     virtual Germ<3> * clone()const;
 };
 
@@ -95,30 +95,30 @@ template<int DIM>
 class POP_EXPORTS GrainPolyhedra:public Germ<DIM>
 {
 public:
-    Vec<F64> radius;
-    F64 maxRadius;
-    Vec<VecN<DIM,F64> > normalplan;
+    Vec<F32> radius;
+    F32 maxRadius;
+    Vec<VecN<DIM,F32> > normalplan;
     OrientationEulerAngle<DIM> orientation;
     GrainPolyhedra()
         :maxRadius(0)
     {
     }
 
-    virtual F64 getRadiusBallNorm0IncludingGrain(){
+    virtual F32 getRadiusBallNorm0IncludingGrain(){
         //TODO Find the minimum radius depending on the normal and the radius
         return 4*maxRadius;
     }
 
 
-    void addPlane(F64 distance, VecN<DIM,F64> normal)
+    void addPlane(F32 distance, VecN<DIM,F32> normal)
     {
         normalplan.push_back(normal);
         radius.push_back(distance);
         maxRadius= maximum(maxRadius,distance);
     }
-    bool intersectionPoint(const VecN<DIM,F64> &  x)
+    bool intersectionPoint(const VecN<DIM,F32> &  x)
     {
-        VecN<DIM,F64> p = this->x -x;
+        VecN<DIM,F32> p = this->x -x;
         p = this->orientation.inverseRotation(p);
         for(int i =0;i<(int)radius.size();i++){
             if(productInner(normalplan[i],p)>this->radius[i])
@@ -136,24 +136,24 @@ template<int DIM>
 class POP_EXPORTS GrainEllipsoid:public Germ<DIM>
 {
 private:
-    VecN<DIM,F64> radius;
+    VecN<DIM,F32> radius;
 public:
 
-    VecN<DIM,F64> radiusinverse;
+    VecN<DIM,F32> radiusinverse;
     OrientationEulerAngle<DIM> orientation;
-    virtual void setRadius(const VecN<DIM,F64> & _radius){
+    virtual void setRadius(const VecN<DIM,F32> & _radius){
         radius=_radius;
         for(int i =0;i<DIM;i++)
             radiusinverse[i]=1./radius[i];
     }
-    virtual F64 getRadiusBallNorm0IncludingGrain(){
+    virtual F32 getRadiusBallNorm0IncludingGrain(){
         return 1.1*radius.norm(0);
     }
-    bool intersectionPoint(const VecN<DIM,F64> &  p)
+    bool intersectionPoint(const VecN<DIM,F32> &  p)
     {
-        VecN<DIM,F64> pp = this->x -p;
+        VecN<DIM,F32> pp = this->x -p;
         pp = this->orientation.inverseRotation(pp);
-        F64 sum=0;
+        F32 sum=0;
         for(int i =0;i<DIM;i++)
         {
             sum+=pp[i]*pp[i]*radiusinverse[i]*radiusinverse[i];
@@ -172,27 +172,27 @@ public:
 class POP_EXPORTS GrainCylinder:public Germ<3>
 {
 public:
-    F64 radius;
-    F64 height;
-    F64 maxradius;
+    F32 radius;
+    F32 height;
+    F32 maxradius;
     OrientationEulerAngle<3> orientation;
     GrainCylinder();
-    virtual F64 getRadiusBallNorm0IncludingGrain();
-    bool intersectionPoint(const VecN<3,F64> &  x_value);
+    virtual F32 getRadiusBallNorm0IncludingGrain();
+    bool intersectionPoint(const VecN<3,F32> &  x_value);
     virtual Germ<3> * clone()const;
 };
 template<int DIM>
 class POP_EXPORTS GrainBox:public Germ<DIM>
 {
 public:
-    VecN<DIM,F64> radius;
+    VecN<DIM,F32> radius;
     OrientationEulerAngle<DIM> orientation;
-    virtual F64 getRadiusBallNorm0IncludingGrain(){
+    virtual F32 getRadiusBallNorm0IncludingGrain(){
         return 2*radius.norm(0);
     }
-    bool intersectionPoint(const VecN<DIM,F64> &  x)
+    bool intersectionPoint(const VecN<DIM,F32> &  x)
     {
-        VecN<DIM,F64> p = this->x -x;
+        VecN<DIM,F32> p = this->x -x;
         p = this->orientation.inverseRotation(p);
         for(I32 i = 0;i<DIM;i++)
         {
@@ -213,11 +213,11 @@ class POP_EXPORTS GrainFromBinaryMatrix:public Germ<DIM>
 public:
     const MatN<DIM,UI8> * img;
     OrientationEulerAngle<DIM> orientation;
-    virtual F64 getRadiusBallNorm0IncludingGrain(){
+    virtual F32 getRadiusBallNorm0IncludingGrain(){
         return this->img->getDomain().norm(0);
     }
-    bool intersectionPoint(const VecN<DIM,F64> &  x){
-            VecN<DIM,F64> p = this->x -x;
+    bool intersectionPoint(const VecN<DIM,F32> &  x){
+            VecN<DIM,F32> p = this->x -x;
             p = this->orientation.inverseRotation(p);
             p += this->img->getDomain()/2;
             if(p.allSuperiorEqual(0)&&p.allInferior(this->img->getDomain())&&(*img)(p)!=0){
@@ -259,7 +259,7 @@ class POP_EXPORTS ModelGermGrain
         \code
         DistributionUniformReal duniform_radius(3,25);
         DistributionMultiVariate dd (DistributionMultiVariate(duniform_radius,duniform_radius),duniform_radius);
-        Vec3F64 domain(100,100,100);
+        Vec3F32 domain(100,100,100);
         ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.00005);//generate the 2d Poisson VecN process
         DistributionMultiVariate angle(DistributionMultiVariate(Distribution(0,3.14159265,"UNIFORMREAL"),Distribution(0,3.14159265,"UNIFORMREAL")),Distribution(0,3.14159265,"UNIFORMREAL") );
 
@@ -284,7 +284,7 @@ class POP_EXPORTS ModelGermGrain
     /*! \var _transparency
      * coefficient of transparency for the Transparent model
      */
-    F64 _transparency;
+    F32 _transparency;
     /*! \var _grains
      * Vec of elementary grains
      */
@@ -292,7 +292,7 @@ class POP_EXPORTS ModelGermGrain
     /*! \var _domain
      * domain size of the model
      */
-    VecN<DIM,F64> _domain;
+    VecN<DIM,F32> _domain;
 
     MatNBoundaryConditionType _boundary;
 public:
@@ -346,10 +346,10 @@ public:
     void setModel(ModelGermGrainEnum model){
         this->_model = model;
     }
-    void setTransparency(F64 transparency){
+    void setTransparency(F32 transparency){
         this->_transparency = transparency;
     }
-    void setDomain(const VecN<DIM,F64> & domain){
+    void setDomain(const VecN<DIM,F32> & domain){
         _domain=domain;
     }
     void setBoundaryCondition(MatNBoundaryConditionType boundary){
@@ -359,11 +359,11 @@ public:
     ModelGermGrainEnum getModel( )const{
         return this->_model;
     }
-    F64 getTransparency()const{
+    F32 getTransparency()const{
         return this->_transparency;
     }
 
-    VecN<DIM,F64> getDomain()const{
+    VecN<DIM,F32> getDomain()const{
         return _domain;
     }
     MatNBoundaryConditionType getBoundaryCondition()const{

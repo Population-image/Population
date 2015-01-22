@@ -63,7 +63,7 @@ DistributionMultiVariate::DistributionMultiVariate(std::string expresssion,std::
      exp->fromRegularExpression(std::make_pair(expresssion,variable));
      ___setPointererImplementation(exp);
 }
-DistributionMultiVariate::DistributionMultiVariate(VecF64 mean, Mat2F64 covariance)
+DistributionMultiVariate::DistributionMultiVariate(VecF32 mean, Mat2F32 covariance)
     :_deriveddistribution(NULL)
 {
      DistributionMultiVariateNormal *exp =new DistributionMultiVariateNormal;
@@ -91,21 +91,21 @@ DistributionMultiVariate::~DistributionMultiVariate()
 
 }
 
-F64 DistributionMultiVariate::operator()(const VecF64& value)const {
+F32 DistributionMultiVariate::operator()(const VecF32& value)const {
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->operator ()(value);
     else
-        std::cerr<<"In DistributionMultiVariate::operator()(const VecF64& value), empty distribution";
+        std::cerr<<"In DistributionMultiVariate::operator()(const VecF32& value), empty distribution";
     return 0;
 }
 
 
-VecF64 DistributionMultiVariate::randomVariable()const{
+VecF32 DistributionMultiVariate::randomVariable()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->randomVariable();
     else
         std::cerr<<"In DistributionMultiVariate:randomVariable(), empty distribution";
-    return VecF64();
+    return VecF32();
 }
 
 
@@ -184,7 +184,7 @@ DistributionMultiVariate * DistributionMultiVariate::clone()const {
     return NULL;
 }
 
-void DistributionMultiVariate::setStep(F64 step)const{
+void DistributionMultiVariate::setStep(F32 step)const{
     _step =step;
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->setStep(step);

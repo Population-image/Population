@@ -2,11 +2,11 @@
 %array_class(pop::UI8, ArrayUI8);
 %array_class(pop::UI16, ArrayUI16);
 %array_class(pop::UI32, ArrayUI32);
-%array_class(pop::F64, ArrayF64);
+%array_class(pop::F32, ArrayF32);
 %array_class(pop::RGBUI8, ArrayRGBUI8);
-%array_class(pop::RGBF64, ArrayRGBF64);
-%array_class(pop::ComplexF64, ArrayComplexF64);
-%array_class(pop::Vec2F64, ArrayVec2F64);
+%array_class(pop::RGBF32, ArrayRGBF32);
+%array_class(pop::ComplexF32, ArrayComplexF32);
+%array_class(pop::Vec2F32, ArrayVec2F32);
 
 //###basic types###
 %include "../../include/data/typeF/TypeF.h"
@@ -20,7 +20,6 @@ typedef unsigned int UI32;      /* 32 bit unsigned */
 typedef int I32;                /* 32 bit signed */
 typedef float F32;
 typedef double F64 ;
-typedef long double F128;
 template <int v>
 struct Int2Type
 {
@@ -56,32 +55,32 @@ struct isVectoriel{
 //###RGB###
 %include "../../include/data/typeF/RGB.h"
 %template(RGBUI8) pop::RGB<pop::UI8>;
-%template(RGBF64) pop::RGB<pop::F64>;
+%template(RGBF32) pop::RGB<pop::F32>;
 
 
 //###RGB###
 %include "../../include/data/typeF/Complex.h"
-%template(ComplexF64) pop::Complex<pop::F64>;
+%template(ComplexF32) pop::Complex<pop::F32>;
 
 //###VecN###
 %include "../../include/data/vec/VecN.h"
 
 %template(Vec2I32) pop::VecN<2,pop::I32>;
 %template(Vec3I32) pop::VecN<3,pop::I32>;
-%template(Vec2F64) pop::VecN<2,pop::F64>;
-%template(Vec3F64) pop::VecN<3,pop::F64>;
+%template(Vec2F32) pop::VecN<2,pop::F32>;
+%template(Vec3F32) pop::VecN<3,pop::F32>;
 
 
 %include "../../include/data/vec/Vec.h"
 %template(VecI32) pop::Vec<pop::I32>;
-%template(VecF64) pop::Vec<pop::F64>;
+%template(VecF32) pop::Vec<pop::F32>;
 
 
 %template(vectorRGBUI8) std::vector<pop::RGB<pop::UI8> >;
-%template(vectorRGBF64) std::vector<pop::RGB<pop::F64> >;
-%template(vectorComplexF64) std::vector<pop::Complex<pop::F64> >;
-%template(vectorVec2F64) std::vector<pop::VecN<2,pop::F64> >;
-%template(vectorVec3F64) std::vector<pop::VecN<3,pop::F64> >;
+%template(vectorRGBF32) std::vector<pop::RGB<pop::F32> >;
+%template(vectorComplexF32) std::vector<pop::Complex<pop::F32> >;
+%template(vectorVec2F32) std::vector<pop::VecN<2,pop::F32> >;
+%template(vectorVec3F32) std::vector<pop::VecN<3,pop::F32> >;
 
 
 //### MatN###
@@ -100,29 +99,29 @@ struct isVectoriel{
 %template(Mat2UI8) pop::MatN<2,pop::UI8>;
 %template(Mat2UI16) pop::MatN<2,pop::UI16>;
 %template(Mat2UI32) pop::MatN<2,pop::UI32>;
-%template(Mat2F64) pop::MatN<2,pop::F64>;
+%template(Mat2F32) pop::MatN<2,pop::F32>;
 %template(Mat2RGBUI8) pop::MatN<2,pop::RGBUI8>;
-%template(Mat2RGBF64) pop::MatN<2,pop::RGBF64>;
-%template(Mat2ComplexF64) pop::MatN<2,pop::ComplexF64>;
-%template(Mat2Vec2F64) pop::MatN<2,pop::Vec2F64 >;
+%template(Mat2RGBF32) pop::MatN<2,pop::RGBF32>;
+%template(Mat2ComplexF32) pop::MatN<2,pop::ComplexF32>;
+%template(Mat2Vec2F32) pop::MatN<2,pop::Vec2F32 >;
 
 %template(Mat3UI8) pop::MatN<3,pop::UI8>;
-%template(Mat3F64) pop::MatN<3,pop::F64>;
+%template(Mat3F32) pop::MatN<3,pop::F32>;
 %template(Mat3RGBUI8) pop::MatN<3,pop::RGBUI8>;
-%template(Mat3RGBF64) pop::MatN<3,pop::RGBF64>;
-%template(Mat3ComplexF64) pop::MatN<3,pop::ComplexF64>;
+%template(Mat3RGBF32) pop::MatN<3,pop::RGBF32>;
+%template(Mat3ComplexF32) pop::MatN<3,pop::ComplexF32>;
 %template(Mat3UI16) pop::MatN<3,pop::UI16>;
 %template(Mat3UI32) pop::MatN<3,pop::UI32>;
-%template(Mat3Vec3F64) pop::MatN<3,pop::Vec3F64 >;
+%template(Mat3Vec3F32) pop::MatN<3,pop::Vec3F32 >;
 
 %include"../../include/data/mat/MatNDisplay.h"
 
 
-%template(Mat2x22F64) pop::Mat2x<pop::F64,2,2>;
-%template(Mat2x22ComplexF64) pop::Mat2x<pop::ComplexF64,2,2>;
+%template(Mat2x22F32) pop::Mat2x<pop::F32,2,2>;
+%template(Mat2x22ComplexF32) pop::Mat2x<pop::ComplexF32,2,2>;
 
-%template(Mat2x33F64) pop::Mat2x<pop::F64,3,3>;
-%template(Mat2x33ComplexF64) pop::Mat2x<pop::ComplexF64,3,3>;
+%template(Mat2x33F32) pop::Mat2x<pop::F32,3,3>;
+%template(Mat2x33ComplexF32) pop::Mat2x<pop::ComplexF32,3,3>;
 
 
 
@@ -151,15 +150,15 @@ public:
     void lock();
     void unlock();
     void snapshot(const char * file);
-    void rotateX(F64 angle);
-    void rotateY(F64 angle);
-    void rotateZ(F64 angle);
+    void rotateX(F32 angle);
+    void rotateY(F32 angle);
+    void rotateZ(F32 angle);
     void setColorAllGeometricalFigure(const RGBUI8 & value);
     void setTransparencyAllGeometricalFigure(UI8 value);
-    void setAmbient(const pop::RGBF64 &ambient);
-    pop::RGBF64 getAmbient()const;
-    void setDiffuse(const pop::RGBF64 &diffuse);
-    pop::RGBF64 getDiffuse()const;
+    void setAmbient(const pop::RGBF32 &ambient);
+    pop::RGBF32 getAmbient()const;
+    void setDiffuse(const pop::RGBF32 &diffuse);
+    pop::RGBF32 getDiffuse()const;
     void setTransparentMode(bool istranspararent);
     bool getTransparentMode()const;
 
@@ -199,29 +198,29 @@ public:
 %template(minimum) pop::minimum<3,pop::UI8>;
 %template(minimum) pop::minimum<2,pop::I32>;
 %template(minimum) pop::minimum<3,pop::I32>;
-%template(minimum) pop::minimum<2,pop::F64>;
-%template(minimum) pop::minimum<3,pop::F64>;
+%template(minimum) pop::minimum<2,pop::F32>;
+%template(minimum) pop::minimum<3,pop::F32>;
 
 %template(maximum) pop::maximum<2,pop::UI8>;
 %template(maximum) pop::maximum<3,pop::UI8>;
 %template(maximum) pop::maximum<2,pop::I32>;
 %template(maximum) pop::maximum<3,pop::I32>;
-%template(maximum) pop::maximum<2,pop::F64>;
-%template(maximum) pop::maximum<3,pop::F64>;
+%template(maximum) pop::maximum<2,pop::F32>;
+%template(maximum) pop::maximum<3,pop::F32>;
 
 %template(normValue) pop::normValue<2,pop::I32>;
 %template(normValue) pop::normValue<3,pop::I32>;
-%template(normValue) pop::normValue<2,pop::F64>;
-%template(normValue) pop::normValue<3,pop::F64>;
+%template(normValue) pop::normValue<2,pop::F32>;
+%template(normValue) pop::normValue<3,pop::F32>;
 
-%template(round) pop::round<2,pop::F64>;
-%template(round) pop::round<3,pop::F64>;
+%template(round) pop::round<2,pop::F32>;
+%template(round) pop::round<3,pop::F32>;
 
 %template(productInner) pop::productInner<2,pop::I32>;
 %template(productInner) pop::productInner<3,pop::I32>;
-%template(productInner) pop::productInner<2,pop::F64>;
-%template(productInner) pop::productInner<3,pop::F64>;
+%template(productInner) pop::productInner<2,pop::F32>;
+%template(productInner) pop::productInner<3,pop::F32>;
 
-%template(productVectoriel) pop::productVectoriel<pop::F64>;
+%template(productVectoriel) pop::productVectoriel<pop::F32>;
 
 

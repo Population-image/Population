@@ -56,8 +56,8 @@ private:
 public:
     void setDistributionMultiVariateLeft(const DistributionMultiVariate & f_left);
     void setDistributionMultiVariateRight(const DistributionMultiVariate &f_right);
-    VecF64 randomVariable()const ;
-    void setStep(F64 step)const;
+    VecF32 randomVariable()const ;
+    void setStep(F32 step)const;
 
 
     DistributionMultiVariate & getDistributionMultiVariateLeft();
@@ -76,7 +76,7 @@ public:
     DistributionMultiVariateArithmeticAddition();
     DistributionMultiVariateArithmeticAddition(const DistributionMultiVariateArithmeticAddition & dist);
     virtual DistributionMultiVariateArithmeticAddition * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
  };
  class DistributionMultiVariateArithmeticSubtraction : public DistributionMultiVariateArithmetic
  {
@@ -85,7 +85,7 @@ public:
     DistributionMultiVariateArithmeticSubtraction();
     DistributionMultiVariateArithmeticSubtraction(const DistributionMultiVariateArithmeticSubtraction & dist);
     virtual DistributionMultiVariateArithmeticSubtraction * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateArithmeticMultiplication : public DistributionMultiVariateArithmetic
@@ -95,7 +95,7 @@ public:
     DistributionMultiVariateArithmeticMultiplication();
     DistributionMultiVariateArithmeticMultiplication(const DistributionMultiVariateArithmeticMultiplication & dist);
     virtual DistributionMultiVariateArithmeticMultiplication * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateArithmeticDivision : public DistributionMultiVariateArithmetic
@@ -105,7 +105,7 @@ public:
     DistributionMultiVariateArithmeticDivision();
     DistributionMultiVariateArithmeticDivision(const DistributionMultiVariateArithmeticDivision & dist);
     virtual DistributionMultiVariateArithmeticDivision * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateArithmeticComposition : public DistributionMultiVariateArithmetic
@@ -115,7 +115,7 @@ public:
     DistributionMultiVariateArithmeticComposition();
     DistributionMultiVariateArithmeticComposition(const DistributionMultiVariateArithmeticComposition & dist);
     virtual DistributionMultiVariateArithmeticComposition * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateArithmeticMax : public DistributionMultiVariateArithmetic
@@ -125,7 +125,7 @@ public:
     DistributionMultiVariateArithmeticMax();
     DistributionMultiVariateArithmeticMax(const DistributionMultiVariateArithmeticMax & dist);
     virtual DistributionMultiVariateArithmeticMax * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateArithmeticMin : public DistributionMultiVariateArithmetic
@@ -135,7 +135,7 @@ public:
     DistributionMultiVariateArithmeticMin();
     DistributionMultiVariateArithmeticMin(const DistributionMultiVariateArithmeticMin & dist);
     virtual DistributionMultiVariateArithmeticMin * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
+    virtual F32 operator()(const VecF32&  value)const;
 
  };
  class DistributionMultiVariateSeparationProduct:public DistributionMultiVariateArithmetic
@@ -152,8 +152,8 @@ public:
     DistributionMultiVariateSeparationProduct();
     DistributionMultiVariateSeparationProduct(const DistributionMultiVariateSeparationProduct & dist);
     virtual DistributionMultiVariateSeparationProduct * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
-    VecF64 randomVariable()const ;
+    virtual F32 operator()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
     virtual int getNbrVariable()const;
  };
 
@@ -185,8 +185,8 @@ public:
     Distribution getSingleDistribution() const;
 
     virtual DistributionMultiVariateCoupled * clone()const ;
-    virtual F64 operator()(const VecF64&  value)const;
-    VecF64 randomVariable()const ;
+    virtual F32 operator()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
     virtual int getNbrVariable()const;
  };
 /// @endcond

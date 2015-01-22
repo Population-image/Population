@@ -211,9 +211,9 @@ struct ArithmeticsTrait<UI16,I32>
 };
 
 template<>
-struct ArithmeticsTrait<UI16,F64>
+struct ArithmeticsTrait<UI16,F32>
 {
-    typedef F64 Result;
+    typedef F32 Result;
 };
 
 //F1=I16
@@ -240,9 +240,9 @@ struct ArithmeticsTrait<I16,I32>
 };
 
 template<>
-struct ArithmeticsTrait<I16,F64>
+struct ArithmeticsTrait<I16,F32>
 {
-    typedef F64 Result;
+    typedef F32 Result;
 };
 
 
@@ -270,36 +270,36 @@ struct ArithmeticsTrait<I32,I32>
 };
 
 template<>
-struct ArithmeticsTrait<I32,F64>
+struct ArithmeticsTrait<I32,F32>
 {
-    typedef F64 Result;
+    typedef F32 Result;
 };
-//F1=F64
+//F1=F32
 template<>
-struct ArithmeticsTrait<F64,UI8>
+struct ArithmeticsTrait<F32,UI8>
 {
-    typedef F64 Result;
-};
-template<>
-struct ArithmeticsTrait<F64,UI16>
-{
-    typedef F64 Result;
+    typedef F32 Result;
 };
 template<>
-struct ArithmeticsTrait<F64,I16>
+struct ArithmeticsTrait<F32,UI16>
 {
-    typedef F64 Result;
+    typedef F32 Result;
+};
+template<>
+struct ArithmeticsTrait<F32,I16>
+{
+    typedef F32 Result;
 };
 
 template<>
-struct ArithmeticsTrait<F64,I32>
+struct ArithmeticsTrait<F32,I32>
 {
-    typedef F64 Result;
+    typedef F32 Result;
 };
 template<>
-struct ArithmeticsTrait<F64,F64>
+struct ArithmeticsTrait<F32,F32>
 {
-    typedef F64 Result;
+    typedef F32 Result;
 };
 
 
@@ -320,16 +320,6 @@ struct ArithmeticsSaturation
     }
 };
 template<>
-struct ArithmeticsSaturation<UI8,F64>
-{
-    static UI8 Range(F64 p)
-    {
-        if(p+0.5>=NumericLimits<UI8>::maximumRange())return NumericLimits<UI8>::maximumRange();
-        else if(p+0.5<NumericLimits<UI8>::minimumRange())return NumericLimits<UI8>::minimumRange();
-        else return static_cast<UI8>(p+0.5);
-    }
-};
-template<>
 struct ArithmeticsSaturation<UI8,F32>
 {
     static UI8 Range(F32 p)
@@ -339,11 +329,21 @@ struct ArithmeticsSaturation<UI8,F32>
         else return static_cast<UI8>(p+0.5);
     }
 };
+template<>
+struct ArithmeticsSaturation<UI8,F64>
+{
+    static UI8 Range(F64 p)
+    {
+        if(p+0.5>=NumericLimits<UI8>::maximumRange())return NumericLimits<UI8>::maximumRange();
+        else if(p+0.5<NumericLimits<UI8>::minimumRange())return NumericLimits<UI8>::minimumRange();
+        else return static_cast<UI8>(p+0.5);
+    }
+};
 
 template<>
-struct ArithmeticsSaturation< F64, F64>
+struct ArithmeticsSaturation< F32, F32>
 {
-    static F64 Range(F64 p)
+    static F32 Range(F32 p)
     {
         return p;
     }

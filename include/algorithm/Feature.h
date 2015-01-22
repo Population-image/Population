@@ -36,8 +36,8 @@ private:
      * \code
         Mat2UI8 img;
         img.load("../image/Lena.bmp");
-        double sigma = 1.6;
-        Pyramid<2,F64> pyramid1 = Feature::pyramidGaussian(img,sigma);
+        F32 sigma = 1.6;
+        Pyramid<2,F32> pyramid1 = Feature::pyramidGaussian(img,sigma);
         Vec<KeyPointPyramid<2> > keypoint1 = Feature::keyPointSIFT(pyramid1);
         std::cout<<keypoint1.size()<<std::endl;
 
@@ -45,14 +45,14 @@ private:
 
         //Apply geometrical transformation
         MatN<2,UI8> imgt(img);
-        imgt = GeometricalTransformation::scale(imgt,Vec2F64(0.5));
+        imgt = GeometricalTransformation::scale(imgt,Vec2F32(0.5));
         imgt = GeometricalTransformation::rotate(imgt,PI/6);
-        Pyramid<2,F64> pyramid2 = Feature::pyramidGaussian(imgt,sigma);
+        Pyramid<2,F32> pyramid2 = Feature::pyramidGaussian(imgt,sigma);
         Vec<KeyPointPyramid<2> > keypoint2 = Feature::keyPointSIFT(pyramid2);
         Vec<Descriptor<KeyPointPyramid<2> > > descriptors2 = Feature::descriptorPyramidPieChart(pyramid2,keypoint2,sigma);
 
 
-        Vec<DescriptorMatch<Descriptor<KeyPointPyramid<2> > >   > match = Feature::descriptorMatch(descriptors1,descriptors2);
+        Vec<DescriptorMatch<Descriptor<KeyPointPyramid<2> > >   > match = Feature::descriptorMatchVPTree(descriptors1,descriptors2);
         int nbr_math_draw = std::min((int)match.size(),30);
         match.erase(match.begin()+nbr_math_draw,match.end());
         Feature::drawDescriptorMatch(img,imgt,match,1).display();
@@ -76,7 +76,7 @@ public:
         m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/barriere.png"));
         Mat2UI8 edge = Processing::edgeDetectorCanny(m,2,0.5,5);
         edge.display("edge",false);
-        Mat2F64 hough = Feature::transformHough(edge);
+        Mat2F32 hough = Feature::transformHough(edge);
         hough.display("hough",false);
         std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
         Mat2RGBUI8 m_hough(m);
@@ -87,26 +87,26 @@ public:
     * \endcode
     * \image html hough.png
     */
-    static inline Mat2F64 transformHough(Mat2UI8 binary)
+    static inline Mat2F32 transformHough(Mat2UI8 binary)
     {
-        double DEG2RAD=0.017453293f;
+        F32 DEG2RAD=0.017453293f;
         //Create the accu
-        double hough_h = ((sqrt(2.0) * (double)(binary.sizeI()>binary.sizeJ()?binary.sizeI():binary.sizeJ())) / 2.0);
+        F32 hough_h = ((sqrt(2.0) * (F32)(binary.sizeI()>binary.sizeJ()?binary.sizeI():binary.sizeJ())) / 2.0);
         int heigh = hough_h * 2.0; // -r -> +r
         int width = 180;
-        Mat2F64 accu (heigh,width);
-        double center_x = binary.sizeJ()/2;
-        double center_y = binary.sizeI()/2;
+        Mat2F32 accu (heigh,width);
+        F32 center_x = binary.sizeJ()/2;
+        F32 center_y = binary.sizeI()/2;
         for(unsigned int i=0;i<binary.sizeI();i++){
             for(unsigned int j=0;j<binary.sizeJ();j++){
                 if( binary(i,j) > 125){
-                    for(double t=0;t<180;t++){
-                        double r = ( (j- center_x) * std::cos((double)t * DEG2RAD)) + ((i - center_y) * std::sin((double)t * DEG2RAD));
+                    for(F32 t=0;t<180;t++){
+                        F32 r = ( (j- center_x) * std::cos((F32)t * DEG2RAD)) + ((i - center_y) * std::sin((F32)t * DEG2RAD));
                         r = r + hough_h;
                         unsigned int r_min= static_cast<unsigned int>(std::floor(r));
-                        double weigh_min= 1-(r-r_min);
+                        F32 weigh_min= 1-(r-r_min);
                         unsigned int r_max= r_min+1;
-                        double weigh_max= 1-(r_max-r);
+                        F32 weigh_max= 1-(r_max-r);
                         if(accu.isValid(r_min,t))
                             accu(r_min,t)+=weigh_min;
                         if(accu.isValid(r_max,t))
@@ -128,7 +128,7 @@ public:
         m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/barriere.png"));
         Mat2UI8 edge = Processing::edgeDetectorCanny(m,2,0.5,5);
         edge.display("edge",false);
-        Mat2F64 hough = Feature::transformHough(edge);
+        Mat2F32 hough = Feature::transformHough(edge);
         hough.display("hough",false);
         std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
         Mat2RGBUI8 m_hough(m);
@@ -139,15 +139,15 @@ public:
     * \endcode
     * \image html hough.png
     */
-    static inline std::vector< std::pair<Vec2I32, Vec2I32 > > HoughToLines(Mat2F64 hough,Mat2UI8 binary,  double threshold=0.7, int radius_maximum_neightborhood=4)
+    static inline std::vector< std::pair<Vec2I32, Vec2I32 > > HoughToLines(Mat2F32 hough,Mat2UI8 binary,  F32 threshold=0.7, int radius_maximum_neightborhood=4)
     {
         std::vector< std::pair<Vec2I32, Vec2I32 > > lines;
-        double DEG2RAD=0.017453293f;
-        Mat2F64::IteratorENeighborhood it=hough.getIteratorENeighborhood(radius_maximum_neightborhood,2);
+        F32 DEG2RAD=0.017453293f;
+        Mat2F32::IteratorENeighborhood it=hough.getIteratorENeighborhood(radius_maximum_neightborhood,2);
         ForEachDomain2D(x,hough){
             if(hough(x) >= threshold){
                 it.init(x);
-                double value=hough(x);
+                F32 value=hough(x);
                 bool max_local=true;
                 while(it.next()){
                     if(hough(it.x())>value){
@@ -157,17 +157,17 @@ public:
                 }
                 if(max_local==true){
                     Vec2I32 x1,x2;
-                    double radius  = x(0);
-                    double angle   = x(1);
+                    F32 radius  = x(0);
+                    F32 angle   = x(1);
 
                     if(angle>45&&angle<135){
-                        double value1=binary.sizeJ()/2;
+                        F32 value1=binary.sizeJ()/2;
                         x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
                         x1(1) = value1 + binary.sizeJ()/2;
                         x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
                         x2(1) = (-value1) + binary.sizeJ()/2;
                     }else{
-                        double value1=binary.sizeI()/2;
+                        F32 value1=binary.sizeI()/2;
                         x1(1) = (-sin(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
                         x1(0) = value1 + binary.sizeI()/2;
                         x2(1) = (-sin(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
@@ -202,30 +202,30 @@ public:
     * \image html lenaharris.jpg
     */
     template<int DIM,typename TypePixel>
-    static Vec<KeyPoint<DIM> > keyPointHarris(const MatN<DIM,TypePixel> & img,double sigma = 2,double kappa=0.20)
+    static Vec<KeyPoint<DIM> > keyPointHarris(const MatN<DIM,TypePixel> & img,F32 sigma = 2,F32 kappa=0.20)
     {
 
-        MatN<DIM,F64> imgf(img);
+        MatN<DIM,F32> imgf(img);
         imgf = Processing::greylevelRange(imgf,0,1);
         FunctorPDE::HessianMatrix<> func_hessian;
 
 
-        MatN<DIM,Mat2x<F64,DIM,DIM> >  img_hessian(imgf.getDomain());
+        MatN<DIM,Mat2x<F32,DIM,DIM> >  img_hessian(imgf.getDomain());
         forEachFunctorBinaryFunctionE(imgf,img_hessian, func_hessian);
-        typename MatN<DIM,F64>::IteratorEDomain itdomain(imgf.getIteratorEDomain());
+        typename MatN<DIM,F32>::IteratorEDomain itdomain(imgf.getIteratorEDomain());
         img_hessian = FunctorMatN::convolutionGaussian(img_hessian,itdomain,sigma,2*sigma);
 
         itdomain.init();
         while(itdomain.next()){
-            Mat2x22F64 & m=img_hessian(itdomain.x());
+            Mat2x22F32 & m=img_hessian(itdomain.x());
             imgf(itdomain.x())= m.determinant()-kappa*m.trace()*m.trace();
         }
-        typename MatN<DIM,F64>::IteratorENeighborhood itneigh(imgf.getIteratorENeighborhood(1,0));
+        typename MatN<DIM,F32>::IteratorENeighborhood itneigh(imgf.getIteratorENeighborhood(1,0));
         itdomain.init();
         Vec<KeyPoint<DIM> > v_maxima;
         while(itdomain.next()){
             if(imgf(itdomain.x())>0.00001){
-                F64 value = imgf(itdomain.x());
+                F32 value = imgf(itdomain.x());
                 bool maxima=true;
                 itneigh.init(itdomain.x());
                 while(itneigh.next()&&maxima==true){
@@ -253,9 +253,9 @@ public:
     *
     */
     template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,Type> & pyramid_gaussian,double threshold_low_contrast=0.04,double ratio_edge_response=10)
+    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,Type> & pyramid_gaussian,F32 threshold_low_contrast=0.04,F32 ratio_edge_response=10)
     {
-        Pyramid<DIM,F64>         pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
+        Pyramid<DIM,F32>         pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
         Vec<KeyPointPyramid<DIM> > extrema   =   Feature::pyramidExtrema(pyramid_difference);
         Vec<KeyPointPyramid<DIM> > extrema2  =   Feature::pyramidExtremaAdjust(pyramid_difference,extrema);
         Vec<KeyPointPyramid<DIM> > extrema3  =   Feature::pyramidExtremaThresholdLowContrast(pyramid_difference,extrema2,threshold_low_contrast);
@@ -287,29 +287,29 @@ public:
         */
 
     template<int DIM,typename Type>
-    static Vec<Descriptor<KeyPointPyramid<DIM> > > descriptorPyramidPieChart(const Pyramid<DIM,Type>& pyramid_G,const Vec<KeyPointPyramid<DIM> >   & keypoints, double sigma=1.6,double scale_factor_gaussien=4,int nbr_orientation=6)
+    static Vec<Descriptor<KeyPointPyramid<DIM> > > descriptorPyramidPieChart(const Pyramid<DIM,Type>& pyramid_G,const Vec<KeyPointPyramid<DIM> >   & keypoints, F32 sigma=1.6,F32 scale_factor_gaussien=4,int nbr_orientation=6)
     {
         Vec<Descriptor<KeyPointPyramid<DIM> > > descriptors;
 
 
         const MatN<DIM+1,Type> & octaveinit = pyramid_G.octave(0);
         typename MatN<DIM,Type>::IteratorENeighborhood itn (pyramid_G.getLayer(0,0).getIteratorENeighborhood(sigma*2*3*scale_factor_gaussien,2));
-        double k = std::pow( 2., 1. / (octaveinit.getDomain()(DIM)-pyramid_G.getNbrExtraLayerPerOctave()) );
+        F32 k = std::pow( 2., 1. / (octaveinit.getDomain()(DIM)-pyramid_G.getNbrExtraLayerPerOctave()) );
 
 
 
         for(int index_extrema=0;index_extrema<(int)keypoints.size();index_extrema++){
             const KeyPointPyramid<DIM>  & keypoint =keypoints[index_extrema];
             int octave =keypoint.octave();
-            double layer=round(keypoint.layer());
+            F32 layer=round(keypoint.layer());
             MatN<DIM,Type> plane= pyramid_G.getLayer(octave,layer);
             itn.setDomainMatN(plane.getDomain());
-            VecN<DIM,F64> x =keypoint.xInPyramid();
+            VecN<DIM,F32> x =keypoint.xInPyramid();
             itn.init(round(x));
-            double sigma_layer = std::pow(k,keypoint.layer())*sigma*scale_factor_gaussien;
-            VecN<DIM,F64> orientation = orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(plane,itn,sigma_layer);
+            F32 sigma_layer = std::pow(k,keypoint.layer())*sigma*scale_factor_gaussien;
+            VecN<DIM,F32> orientation = orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(plane,itn,sigma_layer);
             itn.init(round(x));
-            Mat2F64 data = pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(plane,itn,orientation,nbr_orientation,sigma_layer);
+            Mat2F32 data = pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(plane,itn,orientation,nbr_orientation,sigma_layer);
             Descriptor<KeyPointPyramid<DIM> >  descriptor;
             descriptor.keyPoint() = keypoint;
             descriptor.orientation() = orientation;
@@ -319,9 +319,9 @@ public:
         return descriptors;
     }
     template<int DIM,typename Type,typename TKeyPoint>
-    static Vec<Descriptor<TKeyPoint> > descriptorPieChart(const MatN<DIM,Type>& f,const Vec<TKeyPoint >   & keypoints, double radius=10,int nbr_orientation=6)
+    static Vec<Descriptor<TKeyPoint> > descriptorPieChart(const MatN<DIM,Type>& f,const Vec<TKeyPoint >   & keypoints, F32 radius=10,int nbr_orientation=6)
     {
-        MatN<DIM,F64> img(f);
+        MatN<DIM,F32> img(f);
         Vec<Descriptor<TKeyPoint> > descriptors;
         typename MatN<DIM,Type>::IteratorENeighborhood itn (img.getIteratorENeighborhood(radius*2,2));
 
@@ -329,9 +329,9 @@ public:
             const TKeyPoint  & keypoint =keypoints[index_extrema];
 
             itn.init(round(keypoint.x()));
-            VecN<DIM,F64> orientation = orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(img,itn,radius);
+            VecN<DIM,F32> orientation = orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(img,itn,radius);
             itn.init(round(keypoint.x()));
-            Mat2F64 data = pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(img,itn,orientation,nbr_orientation,radius);
+            Mat2F32 data = pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(img,itn,orientation,nbr_orientation,radius);
             Descriptor<TKeyPoint>  descriptor;
             descriptor.keyPoint() = keypoint;
             descriptor.orientation() = orientation;
@@ -348,14 +348,14 @@ public:
     //-------------------------------------
 
     template<typename Descriptor>
-    static Vec<Descriptor   > descriptorFilterNoOverlap(const Vec<Descriptor > & descriptors, double min_distance){
+    static Vec<Descriptor   > descriptorFilterNoOverlap(const Vec<Descriptor > & descriptors, F32 min_distance){
 
-        KDTree<Descriptor::DIM,F64> kdtree;
+        KDTree<Descriptor::DIM,F32> kdtree;
         Vec<Descriptor   >  descriptorfilter;
         for(unsigned int i=0;i<descriptors.size();i++){
-            VecN<Descriptor::DIM,F64> target = descriptors(i).x();
-            double distance;
-            VecN<Descriptor::DIM,F64> result;
+            VecN<Descriptor::DIM,F32> target = descriptors(i).x();
+            F32 distance;
+            VecN<Descriptor::DIM,F32> result;
             kdtree.search(target,result,distance);
             if(distance>min_distance){
                 kdtree.addItem(target);
@@ -372,7 +372,7 @@ public:
     //@{
     //-------------------------------------
     template<typename Descriptor>
-    static Vec<DescriptorMatch<Descriptor >   > descriptorMatch(const Vec<Descriptor > & descriptor1, const Vec<Descriptor > & descriptor2){
+    static Vec<DescriptorMatch<Descriptor >   > descriptorMatchVPTree(const Vec<Descriptor > & descriptor1, const Vec<Descriptor > & descriptor2){
         VpTree<Descriptor > c;
         c.create(descriptor1);
 
@@ -380,7 +380,7 @@ public:
 
         for(unsigned int i=0;i<descriptor2.size();i++){
             Vec<Descriptor > v_target;
-            Vec<double > v_distance;
+            Vec<F32 > v_distance;
             c.search(descriptor2[i],2,v_target,v_distance);
 
             if(v_distance.size()>0){
@@ -390,6 +390,30 @@ public:
                 match._error= v_distance[0];
                 v_match.push_back(match);
             }
+        }
+        std::sort(v_match.begin(),v_match.end());
+        return v_match;
+    }
+    template<typename Descriptor>
+    static Vec<DescriptorMatch<Descriptor >   > descriptorMatchBruteForce(const Vec<Descriptor > & descriptor1, const Vec<Descriptor > & descriptor2){
+        Vec<DescriptorMatch<Descriptor > > v_match;
+        for(unsigned int j=0;j<descriptor1.size();j++){
+            F32 distance =1000;
+            int index=-1;
+            for(unsigned int i=0;i<descriptor2.size();i++){
+                const Descriptor& d1=descriptor1[j];
+                const Descriptor& d2=descriptor2[i];
+                F32 dist_temp = pop::distance(d1.data(),d2.data(),2);
+                if(dist_temp<distance){
+                    index = i;
+                    distance =dist_temp;
+                }
+            }
+            DescriptorMatch<Descriptor > match;
+            match._d1 = descriptor1[j];
+            match._d2 = descriptor2[index];
+            match._error= distance;
+            v_match.push_back(match);
         }
         std::sort(v_match.begin(),v_match.end());
         return v_match;
@@ -411,41 +435,41 @@ public:
     * \brief gaussian pyramid
     *
     * This algorithm can be use for 2D or 3D matrix.
-    * The number of octave is often defined as round(log(static_cast<double>(I.getDomain().minCoordinate())) / log(2.) - 2);
+    * The number of octave is often defined as round(log(static_cast<F32>(I.getDomain().minCoordinate())) / log(2.) - 2);
     * \code
     * Mat2UI8 imgc;
     * imgc.load("/home/vincent/Population/doc/matrix/Lena.pgm");
-    * Pyramid<2,F64 >        pyramid_gaussian =   Feature::pyramidGaussian(imgc);
-    * Pyramid<2,F64 >        pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
+    * Pyramid<2,F32 >        pyramid_gaussian =   Feature::pyramidGaussian(imgc);
+    * Pyramid<2,F32 >        pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
     * Vec<KeyPointPyramid<2> > extrema   =   Feature::pyramidExtrema(pyramid_difference);
     * Feature::drawKeyPointsCircle(imgc,extrema).display("extrema");
     * \endcode
     *
     */
     template<int DIM,typename Type>
-    static Pyramid<DIM,F64 > pyramidGaussian(const MatN<DIM,Type> & img,  double sigma=1.6,double sigma_init=0.5,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
+    static Pyramid<DIM,F32 > pyramidGaussian(const MatN<DIM,Type> & img,  F32 sigma=1.6,F32 sigma_init=0.5,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
     {
-        MatN<DIM,F64> I(img);
+        MatN<DIM,F32> I(img);
 
         I = Processing::greylevelRange(I,0,1);
         if(number_octave<1)
-            number_octave = round(std::log(  (double)img.getDomain().minCoordinate()) / std::log(2.) - 2);
+            number_octave = round(std::log(  (F32)img.getDomain().minCoordinate()) / std::log(2.) - 2);
 
-        double sig_diff = std::sqrt( std::max(sigma * sigma - sigma_init * sigma_init, 0.0001) );
+        F32 sig_diff = std::sqrt( std::max(sigma * sigma - sigma_init * sigma_init, 0.0001f) );
         if(sig_diff>0.01)
             I = FunctorMatN::convolutionGaussian(I,sig_diff,std::ceil(2.5*sig_diff));
 
 
-        Vec<double> sig(number_layers_per_octave + number_extra_layer_per_octave);
-        double k = std::pow( 2., 1. / number_layers_per_octave );
+        Vec<F32> sig(number_layers_per_octave + number_extra_layer_per_octave);
+        F32 k = std::pow( 2., 1. / number_layers_per_octave );
         for( int i = 1; i < number_layers_per_octave + number_extra_layer_per_octave; i++ )
         {
-            double sig_i_minus_one= std::pow(k, static_cast<double>(i-1))*sigma;
-            double sig_i          = std::pow(k, static_cast<double>(i)  )*sigma;
+            F32 sig_i_minus_one= std::pow(k, static_cast<F32>(i-1))*sigma;
+            F32 sig_i          = std::pow(k, static_cast<F32>(i)  )*sigma;
             sig[i] =std::sqrt(sig_i*sig_i - sig_i_minus_one*sig_i_minus_one);
         }
 
-        Pyramid<DIM,F64 > pyramid;
+        Pyramid<DIM,F32 > pyramid;
         for(int i=0;i<number_octave;i++){
             if(i==0){
                 pyramid.pushOctave(I.getDomain(),number_layers_per_octave + number_extra_layer_per_octave);
@@ -454,7 +478,7 @@ public:
             else{
                 VecN<DIM,int> size(pyramid.octave(pyramid.nbrOctave()-1).getDomain()/2);//half size of the previous octave
                 pyramid.pushOctave(size,number_layers_per_octave + number_extra_layer_per_octave);
-                MatN<DIM,F64>  temp = pyramid.getLayer(pyramid.nbrOctave()-2,number_layers_per_octave);//last octave and last layer
+                MatN<DIM,F32>  temp = pyramid.getLayer(pyramid.nbrOctave()-2,number_layers_per_octave);//last octave and last layer
                 temp = GeometricalTransformation::subResolution(temp,2);
                 pyramid.setLayer(pyramid.nbrOctave()-1,0,temp);
                 temp = pyramid.getLayer(pyramid.nbrOctave()-1,0);
@@ -462,8 +486,8 @@ public:
 
             }
             for(int j=1;j< number_layers_per_octave + number_extra_layer_per_octave;j++){
-                MatN<DIM,F64>  temp = pyramid.getLayer(pyramid.nbrOctave()-1,j-1);
-                typename MatN<DIM,F64>::IteratorEDomain it= temp.getIteratorEDomain();
+                MatN<DIM,F32>  temp = pyramid.getLayer(pyramid.nbrOctave()-1,j-1);
+                typename MatN<DIM,F32>::IteratorEDomain it= temp.getIteratorEDomain();
                 temp = FunctorMatN::convolutionGaussian(temp,it,sig[j],maximum(2.,std::ceil(sig[j]*2.5)));
                 pyramid.setLayer(pyramid.nbrOctave()-1,j,temp);
             }
@@ -500,8 +524,8 @@ public:
     * \return extrema of the pyramid
     */
     template<int DIM,typename Type>
-    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,Type>& pyramid_DofG,double contrast_threshold=0.04, int border=5,unsigned int nbr_layer_per_octave=3){
-        double threshold = 0.5*contrast_threshold/(pyramid_DofG.nbrLayers(0)-2);
+    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,Type>& pyramid_DofG,F32 contrast_threshold=0.04, int border=5,unsigned int nbr_layer_per_octave=3){
+        F32 threshold = 0.5*contrast_threshold/(pyramid_DofG.nbrLayers(0)-2);
         Vec<KeyPointPyramid<DIM> >  extrema;
         for(unsigned int index_octave=0;index_octave<pyramid_DofG.nbrOctave();index_octave++){
             const MatN<DIM+1,Type> & foctave = pyramid_DofG.octave(index_octave);
@@ -513,7 +537,7 @@ public:
             typename MatN<DIM+1,Type>::IteratorERectangle itg (foctave.getIteratorERectangle(xmin,xmax));
             typename MatN<DIM+1,Type>::IteratorENeighborhood itn (foctave.getIteratorENeighborhood(1,0));
             while(itg.next()){
-                double value = foctave(itg.x());
+                F32 value = foctave(itg.x());
                 if(std::abs(value)>threshold)
                 {
                     if(value>0){
@@ -563,19 +587,19 @@ public:
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust;
         FunctorPDE::Gradient<> grad;
         FunctorPDE::HessianMatrix<> hessian;
-        VecN<DIM+1,F64> ZeroCinq;
+        VecN<DIM+1,F32> ZeroCinq;
         ZeroCinq = 0.5;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
             int octave = extrema[index_extrema].octave();
-            VecN<DIM+1,F64> x=extrema[index_extrema].xInPyramid();
+            VecN<DIM+1,F32> x=extrema[index_extrema].xInPyramid();
             int local_iteration=0;
             for( ; local_iteration < max_iteration; local_iteration++ )
             {
-                VecN<DIM+1,F64> v;
+                VecN<DIM+1,F32> v;
                 VecN<DIM+1,int> xint = round(x);
                 v= grad(pyramid_DofG.octave(octave),xint);
-                Mat2x<F64,DIM+1,DIM+1> H =  hessian(pyramid_DofG.octave(octave),xint);
-                VecN<DIM+1,F64> X;
+                Mat2x<F32,DIM+1,DIM+1> H =  hessian(pyramid_DofG.octave(octave),xint);
+                VecN<DIM+1,F32> X;
                 H = -H.inverse();
                 X=H*v;
                 x+=X;
@@ -602,16 +626,16 @@ public:
     */
 
     template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, double contrast_threshold=0.04)
+    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, F32 contrast_threshold=0.04)
     {
 
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust2;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
-            VecN<DIM+1,F64> x=extrema[index_extrema].xInPyramid();
+            VecN<DIM+1,F32> x=extrema[index_extrema].xInPyramid();
             int octave = extrema[index_extrema].octave();
             FunctorPDE::Gradient<FunctorPDE::PartialDerivateCentered> grad;
             VecN<DIM+1,int> xint(round(x));
-            VecN<DIM+1,F64> D=    grad(pyramid_DofG.octave(octave),xint);
+            VecN<DIM+1,F32> D=    grad(pyramid_DofG.octave(octave),xint);
             if(absolute(0.5*productInner(D,x)+pyramid_DofG.octave(octave)(x))* (pyramid_DofG.nbrLayers(0)-2)>contrast_threshold*2)
                 v_extrema_adjust2.push_back(KeyPointPyramid<DIM>(x,octave));
         }
@@ -626,19 +650,19 @@ public:
 
     */
     template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> >  pyramidExtremaThresholdEdgeResponse(const Pyramid<DIM,Type>& pyramid_DofG,const Vec<KeyPointPyramid<DIM> >   & extrema, double ratio_threshold=10)
+    static Vec<KeyPointPyramid<DIM> >  pyramidExtremaThresholdEdgeResponse(const Pyramid<DIM,Type>& pyramid_DofG,const Vec<KeyPointPyramid<DIM> >   & extrema, F32 ratio_threshold=10)
     {
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust3;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
-            VecN<DIM+1,F64> x=extrema[index_extrema].xInPyramid();
+            VecN<DIM+1,F32> x=extrema[index_extrema].xInPyramid();
             int octave = extrema[index_extrema].octave();
             FunctorPDE::PartialDerivateSecondCentered  derivate;
             VecN<DIM+1,int> xint(round(x));
-            F64 dxx = derivate.operator ()(pyramid_DofG.octave(octave),xint,0,0);
-            F64 dyy = derivate.operator ()(pyramid_DofG.octave(octave),xint,1,1);
-            F64 dxy = derivate.operator ()(pyramid_DofG.octave(octave),xint,1,0);
-            F64 tr = dxx + dyy;
-            F64 det = dxx * dyy - dxy * dxy;
+            F32 dxx = derivate.operator ()(pyramid_DofG.octave(octave),xint,0,0);
+            F32 dyy = derivate.operator ()(pyramid_DofG.octave(octave),xint,1,1);
+            F32 dxy = derivate.operator ()(pyramid_DofG.octave(octave),xint,1,0);
+            F32 tr = dxx + dyy;
+            F32 det = dxx * dyy - dxy * dxy;
             if( det > 0 && tr*tr*ratio_threshold< (ratio_threshold + 1)*(ratio_threshold + 1)*det )
                 v_extrema_adjust3.push_back(KeyPointPyramid<DIM>(x,octave));
         }
@@ -680,23 +704,23 @@ public:
     \image html Panorama.jpg
     */
     template<typename TypePixel>
-    static MatN<2,TypePixel> panoramic(const Vec<MatN<2,TypePixel> >  & V_img_fromleft_toright,int mode_transformation=1,double distmax=1,unsigned int number_match_point=100,unsigned int min_overlap=20){
+    static MatN<2,TypePixel> panoramic(const Vec<MatN<2,TypePixel> >  & V_img_fromleft_toright,int mode_transformation=1,F32 distmax=1,unsigned int number_match_point=100,unsigned int min_overlap=20){
         typedef KeyPointPyramid<2> KeyPointAlgo;
         Vec<Vec<DescriptorMatch<Descriptor<KeyPointAlgo > > > >  matchs;
         for(unsigned int i=0;i<V_img_fromleft_toright.size()-1;i++){
-            Pyramid<2,F64> pyramid1 = Feature::pyramidGaussian(V_img_fromleft_toright[i]);
+            Pyramid<2,F32> pyramid1 = Feature::pyramidGaussian(V_img_fromleft_toright[i]);
             Vec<KeyPointAlgo > keypoint1 = Feature::keyPointSIFT(pyramid1);
             Vec<Descriptor<KeyPointAlgo > >descriptor1 = Feature::descriptorPieChart(V_img_fromleft_toright[i],keypoint1);
-            Pyramid<2,F64> pyramid2 = Feature::pyramidGaussian(V_img_fromleft_toright[i+1]);
+            Pyramid<2,F32> pyramid2 = Feature::pyramidGaussian(V_img_fromleft_toright[i+1]);
             Vec<KeyPointAlgo > keypoint2 = Feature::keyPointSIFT(pyramid2);
             Vec<Descriptor<KeyPointAlgo > >descriptor2 = Feature::descriptorPieChart(V_img_fromleft_toright[i+1],keypoint2);
-            Vec<DescriptorMatch<Descriptor<KeyPointAlgo > > > match = Feature::descriptorMatch(descriptor1,descriptor2);
+            Vec<DescriptorMatch<Descriptor<KeyPointAlgo > > > match = Feature::descriptorMatchVPTree(descriptor1,descriptor2);
             if(number_match_point<match.size())
                 match.erase(match.begin()+number_match_point,match.end());
             match = Feature::descriptorFilterNoOverlap(match,min_overlap);
             matchs.push_back(match);
         }
-        Vec<Mat2x33F64 > v_hom;
+        Vec<Mat2x33F32 > v_hom;
         for(unsigned int i=0;i<matchs.size();i++){
             Vec<pop::GeometricalTransformationRANSACModel::Data> v_data;
             for(unsigned int j=0;j<matchs(i).size();j++){
@@ -714,12 +738,12 @@ public:
                 v_hom.push_back(model.getTransformation());
             }
         }
-        Mat2x33F64 Mmult = Mat2x33F64::identity();
+        Mat2x33F32 Mmult = Mat2x33F32::identity();
         MatN<2,TypePixel> panoramic(V_img_fromleft_toright[0]);
         for(unsigned int i=0;i<v_hom.size();i++){
 
             Mmult = v_hom[i]*Mmult;
-            Vec2F64 trans;
+            Vec2F32 trans;
             panoramic = GeometricalTransformation::mergeTransformHomogeneous2D(Mmult,panoramic,V_img_fromleft_toright[i+1],trans);
             Mmult*=GeometricalTransformation::translation2DHomogeneousCoordinate(trans);
         }
@@ -744,7 +768,7 @@ public:
     {
         MatN<DIM,RGBUI8> h(f);
         for(unsigned int index_extrema=0;index_extrema<key_points.size();index_extrema++){
-            VecN<DIM,F64> x= key_points[index_extrema].x();
+            VecN<DIM,F32> x= key_points[index_extrema].x();
             Draw::circle(h,round(x),radius,RGBUI8::randomRGB(),1);
         }
         return h;
@@ -759,12 +783,12 @@ public:
     * \return output matrix
    */
     template<int DIM,typename Type,typename TDescriptor>
-    static MatN<DIM,RGBUI8>  drawDescriptorArrow(const MatN<DIM,Type> & f,const Vec<TDescriptor >    & descriptors,int length=20,double sigma=1.6)
+    static MatN<DIM,RGBUI8>  drawDescriptorArrow(const MatN<DIM,Type> & f,const Vec<TDescriptor >    & descriptors,int length=20,F32 sigma=1.6)
     {
         MatN<DIM,RGBUI8> h(f);
         for(unsigned int index_extrema=0;index_extrema<descriptors.size();index_extrema++){
             const TDescriptor & descriptor = descriptors[index_extrema];
-            VecN<DIM,F64> x= descriptor.keyPoint().x();
+            VecN<DIM,F32> x= descriptor.keyPoint().x();
             RGBUI8 color = RGBUI8::randomRGB();
             Draw::circle(h,round(x),sigma*descriptor.keyPoint().scale(),color,1);
             Draw::arrow(h,round(x),round(x)+descriptor.orientation()*length,color,1);
@@ -814,10 +838,10 @@ public:
      *  The orientations must be normalized at 1
      *
      * \code
-     * Vec<Vec2F64> v_orientation;
-     * Vec2F64 p1(1,0);
+     * Vec<Vec2F32> v_orientation;
+     * Vec2F32 p1(1,0);
      * v_orientation.push_back(p1/p1.norm());
-     * Vec2F64 p2(0,1);
+     * Vec2F32 p2(0,1);
      * v_orientation.push_back(p2/p2.norm());
      * cout<<Statistics::orientationPrincipalMean(v_orientation)<<endl;
      * \endcode
@@ -851,10 +875,10 @@ public:
      *  The orientations must be normalized at 1
      *
      * \code
-     * Vec<Vec2F64> v_orientation;
-     * Vec2F64 p1(1,0);
+     * Vec<Vec2F32> v_orientation;
+     * Vec2F32 p1(1,0);
      * v_orientation.push_back(p1/p1.norm());
-     * Vec2F64 p2(0,1);
+     * Vec2F32 p2(0,1);
      * v_orientation.push_back(p2/p2.norm());
      * cout<<Statistics::orientationPrincipalHistogram(v_orientation)<<endl;
      * \endcode
@@ -862,15 +886,15 @@ public:
     template<typename Type>
     static VecN<2,Type> orientationPrincipalHistogram(const Vec<VecN<2,Type> > & v_orientions, const Vec<Type > & weight,int nbr_angle=36)
     {
-        Vec<F64> repartition(nbr_angle);
-        Vec<F64> angles;
+        Vec<F32> repartition(nbr_angle);
+        Vec<F32> angles;
         for(int i=0;i<nbr_angle;i++){
             angles.push_back(360.*i/nbr_angle-180);
         }
         Vec<int> v_affect;
         for(unsigned int i=0;i<v_orientions.size();i++){
-            double angle =std::atan2(v_orientions(i)(0),v_orientions(i)(1))*180/pop::PI;
-            std::vector<F64>::const_iterator  low=std::lower_bound (angles.begin(), angles.end(),angle );
+            F32 angle =std::atan2(v_orientions(i)(0),v_orientions(i)(1))*180/pop::PI;
+            std::vector<F32>::const_iterator  low=std::lower_bound (angles.begin(), angles.end(),angle );
             I32 indice = I32(low- angles.begin())-1 ;
             //std::cout<<indice<<std::endl;
             repartition[indice]+=weight(i);
@@ -885,16 +909,16 @@ public:
         return sum_of_elems*(1./sum_of_elems.norm());
     }
     template<int DIM,typename TypePixel,typename IteratorNeigh>
-    static VecN<DIM,F64>   orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,double sigma)
+    static VecN<DIM,F32>   orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,F32 sigma)
     {
         FunctorPDE::Gradient<> gradient;
-        Vec<double>  gradient_magnitude;
-        Vec< VecN<DIM,F64> >  gradient_orientation;
-        double gaussian_coefficient_exp = -1/(2 * sigma * sigma);
+        Vec<F32>  gradient_magnitude;
+        Vec< VecN<DIM,F32> >  gradient_orientation;
+        F32 gaussian_coefficient_exp = -1/(2 * sigma * sigma);
         while(itn.next()){
-            VecN<DIM,F64> g = gradient(f,itn.x());
-            F64 norm = g.norm();
-            double radius = itn.xWithoutTranslation().normPower();
+            VecN<DIM,F32> g = gradient(f,itn.x());
+            F32 norm = g.norm();
+            F32 radius = itn.xWithoutTranslation().normPower();
             radius*=gaussian_coefficient_exp;
             gradient_magnitude.push_back(std::exp(radius)*norm);
             if(norm!=0)
@@ -905,18 +929,18 @@ public:
         return orientationPrincipalMean(gradient_orientation,gradient_magnitude);
     }
     template<int DIM,typename TypePixel,typename IteratorNeigh>
-    static Mat2F64   pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,VecN<DIM,F64> &orientation,int nbr_orientation, double sigma)
+    static Mat2F32   pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,VecN<DIM,F32> &orientation,int nbr_orientation, F32 sigma)
     {
         FunctorPDE::Gradient<> gradient;
         PieChartInPieChart<DIM> disk(orientation,nbr_orientation);
-        double gaussian_coefficient_exp = -1/(2 * sigma * sigma);
+        F32 gaussian_coefficient_exp = -1/(2 * sigma * sigma);
         while(itn.next()){
-            VecN<DIM,F64> orientationglobal =itn.xWithoutTranslation();
-            VecN<DIM,F64> orientationlocal = gradient(f,itn.x());
-            double norm = normValue(orientationlocal);
-            double radius = itn.xWithoutTranslation().normPower();
+            VecN<DIM,F32> orientationglobal =itn.xWithoutTranslation();
+            VecN<DIM,F32> orientationlocal = gradient(f,itn.x());
+            F32 norm = normValue(orientationlocal);
+            F32 radius = itn.xWithoutTranslation().normPower();
             radius*=gaussian_coefficient_exp;
-            double weight =norm*std::exp(radius);
+            F32 weight =norm*std::exp(radius);
             disk.addValue(orientationglobal,orientationlocal,weight);
         }
         disk.normalize();

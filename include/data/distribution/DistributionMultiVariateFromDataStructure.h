@@ -84,7 +84,7 @@ public:
     *  copy constructor
     */
     DistributionMultiVariateUniformInt(const DistributionMultiVariateUniformInt & dist);
-    VecF64 randomVariable()const ;
+    VecF32 randomVariable()const ;
     DistributionMultiVariateUniformInt * clone()const ;
 };
 
@@ -124,7 +124,7 @@ public:
     *  copy constructor
     */
     DistributionMultiVariateUnitSphere(const DistributionMultiVariateUnitSphere & dist);
-    VecF64 randomVariable()const ;
+    VecF32 randomVariable()const ;
     DistributionMultiVariateUnitSphere * clone()const ;
 
 };
@@ -147,12 +147,12 @@ private:
     */
 public:
     DistributionUniformReal uni;
-    std::vector<F64 >_repartition;
-    VecF64 _xmin;
-    MatN<2,F64> _mat2d;
-//    MatN<3,F64> _mat3d;
-//    MatN<4,F64> _mat4d;
-//    MatN<5,F64> _mat5d;
+    std::vector<F32 >_repartition;
+    VecF32 _xmin;
+    MatN<2,F32> _mat2d;
+//    MatN<3,F32> _mat3d;
+//    MatN<4,F32> _mat4d;
+//    MatN<5,F32> _mat5d;
 
 
     /*!
@@ -164,12 +164,12 @@ public:
     DistributionMultiVariateRegularStep();
     DistributionMultiVariateRegularStep(const DistributionMultiVariateRegularStep & dist);
 
-    DistributionMultiVariateRegularStep(const MatN<2,F64> data_x_y, VecF64& xmin,F64 step);
-//    DistributionMultiVariateRegularStep(const MatN<3,F64> data_x_y_z, VecF64& xmin,F64 step);
-//    DistributionMultiVariateRegularStep(const MatN<4,F64> data_x_y_z_w, VecF64& xmin,F64 step);
-    virtual F64 operator ()(const VecF64&  value)const;
+    DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step);
+//    DistributionMultiVariateRegularStep(const MatN<3,F32> data_x_y_z, VecF32& xmin,F32 step);
+//    DistributionMultiVariateRegularStep(const MatN<4,F32> data_x_y_z_w, VecF32& xmin,F32 step);
+    virtual F32 operator ()(const VecF32&  value)const;
     virtual DistributionMultiVariateRegularStep * clone()const ;
-    virtual VecF64 randomVariable()const ;
+    virtual VecF32 randomVariable()const ;
 
     virtual int getNbrVariable()const;
 };
@@ -190,7 +190,7 @@ private:
     Distribution d("std::exp(x*std::log(x))");
     DistributionMultiVariateFromDistribution dmulti;
     dmulti.fromDistribution(d);
-    VecF64 v(1);
+    VecF32 v(1);
     v(0)=6;
     std::cout<<dmulti(v)<<std::endl;
     *\endcode
@@ -205,9 +205,9 @@ public:
     DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution & dist);
 
     virtual DistributionMultiVariateFromDistribution * clone()const ;
-    virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const ;
-    void setStep(F64 step)const;
+    virtual F32 operator ()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
+    void setStep(F32 step)const;
     void fromDistribution(const Distribution &d);
     Distribution  toDistribution()const;
         virtual int getNbrVariable()const;
@@ -224,28 +224,28 @@ private:
         \author Tariel Vincent
     * see http://en.wikipedia.org/wiki/Multivariate_normal_distribution
     \code
-    double mux=0;
-    double muy=0;
-    double sigmax=3;
-    double sigmay=1;
-    double rho = -0.7;
+    F32 mux=0;
+    F32 muy=0;
+    F32 sigmax=3;
+    F32 sigmay=1;
+    F32 rho = -0.7;
     DistributionMultiVariateNormal multi;
-    VecF64 v(2);
+    VecF32 v(2);
 
     v(0)=mux;
     v(1)=muy;
-    Mat2F64 m(2,2);
+    Mat2F32 m(2,2);
     m(0,0)=sigmax*sigmax;    m(0,1)=sigmax*sigmay*rho;
     m(1,0)=sigmax*sigmay*rho;m(1,1)=sigmay*sigmay;
     multi.fromMeanVecAndCovarianceMatrix(v,m);
 
     Mat2UI8 img(512,512);
-    MatNDisplay windows(img);
-    while(!windows.is_closed())
+    MatNDisplay windows;
+    while(0==0)
     {
-        VecF64 v = multi.randomVariable();
-        Vec2F64 p= v.toVecN<2>();
-        Vec2I32 x= p*25+Vec2F64(img.getDomain())*0.5;
+        VecF32 v = multi.randomVariable();
+        Vec2F32 p= v;
+        Vec2I32 x= p*25+Vec2F32(img.getDomain())*0.5;
         if(img.isValid(x(0),x(1))){
             img(x)=255;
             windows.display(img);
@@ -253,21 +253,21 @@ private:
     }
     \endcode
     */
-    Mat2F64 _sigma;//covariance matrix
-    VecF64 _mean;//mean std::vector
-    Mat2F64 _a;// _A _A^t = _sigma to sample random variables
-    F64 _determinant_sigma;
-    Mat2F64 _sigma_minus_one;
+    Mat2F32 _sigma;//covariance matrix
+    VecF32 _mean;//mean std::vector
+    Mat2F32 _a;// _A _A^t = _sigma to sample random variables
+    F32 _determinant_sigma;
+    Mat2F32 _sigma_minus_one;
     DistributionNormal _standard_normal;
 public:
     DistributionMultiVariateNormal();
     DistributionMultiVariateNormal(const DistributionMultiVariateNormal & dist);
-    virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const ;
+    virtual F32 operator ()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
     virtual DistributionMultiVariateNormal * clone()const ;
-    void fromMeanVecAndCovarianceMatrix(VecF64 mean, Mat2F64 covariance);
-    void fromMeanVecAndCovarianceMatrix(std::pair<VecF64, Mat2F64> meanvectorAndcovariancematrix);
-    std::pair<VecF64,Mat2F64> toMeanVecAndCovarianceMatrix()const;
+    void fromMeanVecAndCovarianceMatrix(VecF32 mean, Mat2F32 covariance);
+    void fromMeanVecAndCovarianceMatrix(std::pair<VecF32, Mat2F32> meanvectorAndcovariancematrix);
+    std::pair<VecF32,Mat2F32> toMeanVecAndCovarianceMatrix()const;
     virtual int getNbrVariable()const;
 
 };
@@ -289,7 +289,7 @@ private:
     \code
         DistributionMultiVariateExpression dexp;
         dexp.fromRegularExpression("std::exp(x*std::log(x))*y","x","y");
-        VecF64 v(2);
+        VecF32 v(2);
         v(0)=6;
         v(1)=4;
         std::cout<<dexp(v)<<std::endl;
@@ -306,8 +306,8 @@ public:
     int _nbrvariable;
     DistributionMultiVariateExpression();
     DistributionMultiVariateExpression(const DistributionMultiVariateExpression & dist);
-    virtual F64 operator ()(const VecF64&  value)const;
-    VecF64 randomVariable()const ;
+    virtual F32 operator ()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
     virtual DistributionMultiVariateExpression * clone()const ;
 
     bool fromRegularExpression(std::string expression,std::string var1);

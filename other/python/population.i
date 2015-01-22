@@ -4,7 +4,6 @@
 %{
 #include"Population.h"
 %}
-
 #define HAVE_SWIG
 #define POP_EXPORTS
 %include <std_string.i>
@@ -14,7 +13,7 @@ namespace std{
 %template(vectorI32) vector<int>;
 %template(vectorUI16) vector<unsigned short>;
 %template(vectorUI32) vector<unsigned int>;
-%template(vectorF64) vector<double>;
+%template(vectorF32) vector<float>;
 template <class T, class U > struct pair {
 typedef T first_type;
 typedef U second_type;

@@ -49,8 +49,8 @@ namespace pop
 
 */
 
-const double PI = 3.141592;
-const double EPSILON = 0.000001;
+const F32 PI = 3.141592f;
+const F32 EPSILON = 0.000001f;
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
 template<typename T>
@@ -195,7 +195,7 @@ public:
     *
     * \code
     std::string str = "2.7";
-    double d;
+    F32 d;
     BasicUtility::String2Any(str,d);
     std::cout<<d<<std::endl;
     * \endcode
@@ -239,7 +239,7 @@ public:
     *
     * \code
     std::string str ;
-    double d=2.7;
+    F32 d=2.7;
     BasicUtility::Any2String(d,str);
     std::cout<<str<<std::endl;
     * \endcode
@@ -263,7 +263,7 @@ public:
     \return output string
     *
     * \code
-    double d=2.7;
+    F32 d=2.7;
     std::cout<<BasicUtility::Any2String(d,str)<<std::endl;
     * \endcode
     *
@@ -314,45 +314,45 @@ T1 maximum(T1 v1,T1 v2){
 }
 template<typename T1>
 T1 absolute(T1 v1){
-    return std::abs(static_cast<double>(v1));
+    return std::abs(static_cast<F32>(v1));
 }
 template<typename T1>
-double normValue(const T1& v1,int =2){
-    return std::abs(static_cast<double>(v1));
+F32 normValue(const T1& v1,int =2){
+    return std::abs(static_cast<F32>(v1));
 }
 template<typename T1>
-double normPowerValue(T1 v1,int p=2){
+F32 normPowerValue(T1 v1,int p=2){
     if(p==0||p==1)
-        return std::abs(static_cast<double>(v1));
+        return std::abs(static_cast<F32>(v1));
     else if(p==2)
         return v1*v1;
     else
-        return std::pow(std::abs(static_cast<double>(v1)),p);
+        return std::pow(std::abs(static_cast<F32>(v1)),p);
 }
 template<typename T1>
-double distance(const T1& v1,const T1& v2, int p =2){
+F32 distance(const T1& v1,const T1& v2, int p =2){
     return normValue(v1-v2,p);
 }
 
 
 template <class T1, class T2>
-double productInner(const T1&  x1,const T2&  x2)
+F32 productInner(const T1&  x1,const T2&  x2)
 {
-    return static_cast<double>(x1)*static_cast<double>(x2);
+    return static_cast<F32>(x1)*static_cast<F32>(x2);
 }
 
 
 struct FunctoProductInner{
     template <class T1, class T2>
-    double operator ()(const T1&  x1,const T2&  x2)
+    F32 operator ()(const T1&  x1,const T2&  x2)
     {
-        return static_cast<double>(x1)*static_cast<double>(x2);
+        return static_cast<F32>(x1)*static_cast<F32>(x2);
     }
 };
 
 template<typename T1>
 T1 round(T1 v1){
-    return std::floor(v1+0.5);
+    return std::floor(v1+0.5f);
 }
 template <class T1>
 T1  squareRoot(T1  x)

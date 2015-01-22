@@ -406,10 +406,10 @@ void FigureCone::draw()
     glBegin(GL_TRIANGLE_FAN);
     glColor4ub(this->_RGB.r(),this->_RGB.g(),this->_RGB.b(),this->_transparant);
     glVertex3f(x(0)+dir(0)*h,x(1)+dir(1)*h,x(2)+dir(2)*h);
-    Mat2x33F64 m= GeometricalTransformation::rotationFromVectorToVector(Vec3F64(0,0,1),dir);
-    for(double angle=0.0f;angle<=(2*PI);angle+=(PI/10.0))
+    Mat2x33F32 m= GeometricalTransformation::rotationFromVectorToVector(Vec3F32(0,0,1),dir);
+    for(F32 angle=0.0f;angle<=(2*PI);angle+=(PI/10.0))
     {
-        Vec3F64 xrot(r*std::sin(angle),r*std::cos(angle),0);
+        Vec3F32 xrot(r*std::sin(angle),r*std::cos(angle),0);
         xrot= m*xrot;
         glNormal3f(xrot(0),xrot(1),xrot(2));
         xrot = x+xrot;
@@ -464,7 +464,7 @@ void FigureArrow::draw()
 
 }
 
-void FigureArrow::setArrow(const Vec3F64 x1,const Vec3F64 x2,double heigh_peak){
+void FigureArrow::setArrow(const Vec3F32 x1,const Vec3F32 x2,F32 heigh_peak){
     _line.x1=x1;
     _line.x2=x2;
     _cone.x = x2;
@@ -514,11 +514,11 @@ void FigureArrow::callEndMode()
 Vec<GeometricalFigure*> FigureArrow::referencielEuclidean(pop::RGBUI8 color){
     Vec<GeometricalFigure*> v;
     FigureArrow * arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F64(0,0,0),Vec3F64(1,0,0),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(1,0,0),0.1);v.push_back(arrow);
     arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F64(0,0,0),Vec3F64(0,1,0),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,1,0),0.1);v.push_back(arrow);
     arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F64(0,0,0),Vec3F64(0,0,1),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,0,1),0.1);v.push_back(arrow);
     return v;
 }
 
@@ -526,10 +526,10 @@ Vec<GeometricalFigure*> FigureArrow::referencielEuclidean(pop::RGBUI8 color){
 
 
 Scene3d * op=NULL;
-double scale_global=0.75;
-double xRot=25;
-double yRot=0;
-double zRot=25;
+F32 scale_global=0.75;
+F32 xRot=25;
+F32 yRot=0;
+F32 zRot=25;
 #ifdef HAVE_OPENGL
 tthread::mutex  mutex_draw;
 tthread::thread *thread_draw;
@@ -636,13 +636,13 @@ void DrawGLScene()
             _min = minimum(_min, op->_v_figure[i]->getMin());
         }
 
-        double scale=1;
+        F32 scale=1;
         if(_max(0)-_min(0)!=0)
-            scale = minimum(scale,1./(_max(0)-_min(0)));
+            scale = minimum(scale,1.f/(_max(0)-_min(0)));
         if(_max(1)-_min(1)!=0)
-            scale = minimum(scale,1./(_max(1)-_min(1)));
+            scale = minimum(scale,1.f/(_max(1)-_min(1)));
         if(_max(2)-_min(2)!=0)
-            scale = minimum(scale,1./(_max(2)-_min(2)));
+            scale = minimum(scale,1.f/(_max(2)-_min(2)));
 
         scale *=10;
         glScalef(scale*scale_global, scale*scale_global, scale*scale_global);
@@ -925,13 +925,13 @@ int DrawGLScene()                                    // Here's Where We Do All T
                     _min(j)=v(j);
 
         }
-        double scale=1;
+        F32 scale=1;
         if(_max(0)-_min(0)!=0)
-            scale = std::min<double>(scale,1./(_max(0)-_min(0)));
+            scale = std::min<F32>(scale,1./(_max(0)-_min(0)));
         if(_max(1)-_min(1)!=0)
-            scale = std::min<double>(scale,1./(_max(1)-_min(1)));
+            scale = std::min<F32>(scale,1./(_max(1)-_min(1)));
         if(_max(2)-_min(2)!=0)
-            scale = std::min<double>(scale,1./(_max(2)-_min(2)));
+            scale = std::min<F32>(scale,1./(_max(2)-_min(2)));
 
         scale *=10;
         glScalef(scale*scale_global, scale*scale_global, scale*scale_global);
@@ -1495,16 +1495,16 @@ Scene3d& Scene3d::merge(const Scene3d& g){
     return *this;
 }
 
-void Scene3d::rotateX(F64 angle)
+void Scene3d::rotateX(F32 angle)
 {
     xRot+=angle;
 }
 
-void Scene3d::rotateY(F64 angle)
+void Scene3d::rotateY(F32 angle)
 {
     yRot+=angle;
 }
-void Scene3d::rotateZ(F64 angle)
+void Scene3d::rotateZ(F32 angle)
 {
     zRot+=angle;
 }
@@ -1519,18 +1519,18 @@ void Scene3d::setTransparencyAllGeometricalFigure( UI8  value){
     for(unsigned int i=0;i<this->_v_figure.size();i++)
         this->_v_figure[i]->setTransparent(value);
 }
-void Scene3d::setAmbient(const pop::RGBF64 &ambient){
+void Scene3d::setAmbient(const pop::RGBF32 &ambient){
     _ambient = ambient;
 }
 
-pop::RGBF64 Scene3d::getAmbient()const{
+pop::RGBF32 Scene3d::getAmbient()const{
     return _ambient;
 }
-void Scene3d::setDiffuse(const pop::RGBF64 &diffuse){
+void Scene3d::setDiffuse(const pop::RGBF32 &diffuse){
     _diffuse = diffuse;
 }
 
-pop::RGBF64 Scene3d::getDiffuse()const{
+pop::RGBF32 Scene3d::getDiffuse()const{
     return _diffuse;
 }
 void Scene3d::setTransparentMode(bool istranspararent){

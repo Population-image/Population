@@ -4,43 +4,43 @@
 //#####################Algorithm ###################
 %define ALL_IMAGE(CLASS,METHOD)
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2F64>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2F32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2RGBUI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI16>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3F64>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3F32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3RGBUI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI16>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI32>;
 %enddef
 %define ALL_IMAGE_SCALAR(CLASS,METHOD)
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2F64>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2F32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI16>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3F64>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3F32>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI16>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI32>;
 %enddef
 %define ALL_IMAGE_SCALAR_TYPE(CLASS,METHOD)
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI8>;
-%template(METHOD) pop::CLASS::METHOD<2,pop::F64>;
+%template(METHOD) pop::CLASS::METHOD<2,pop::F32>;
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI16>;
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI32>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI8>;
-%template(METHOD) pop::CLASS::METHOD<3,pop::F64>;
+%template(METHOD) pop::CLASS::METHOD<3,pop::F32>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI16>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI32>;
 %enddef
 %define ALL_IMAGE_SCALAR_SWIG(CLASS,METHODSWIG,METHODNAME)
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat2UI8>;
-%template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat2F64>;
+%template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat2F32>;
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat2UI16>;
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat2UI32>;
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat3UI8>;
-%template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat3F64>;
+%template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat3F32>;
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat3UI16>;
 %template(METHODNAME) pop::CLASS::METHODSWIG<pop::Mat3UI32>;
 %enddef
@@ -66,24 +66,24 @@
 %template(METHOD) pop::CLASS::METHODSWIG<2,pop::UI8>;
 %template(METHOD) pop::CLASS::METHODSWIG<2,pop::UI16>;
 %template(METHOD) pop::CLASS::METHODSWIG<2,pop::UI32>;
-%template(METHOD) pop::CLASS::METHODSWIG<2,pop::F64>;
+%template(METHOD) pop::CLASS::METHODSWIG<2,pop::F32>;
 %template(METHOD) pop::CLASS::METHODSWIG<2,pop::RGBUI8>;
 %template(METHOD) pop::CLASS::METHODSWIG<3,pop::UI8>;
 %template(METHOD) pop::CLASS::METHODSWIG<3,pop::UI16>;
 %template(METHOD) pop::CLASS::METHODSWIG<3,pop::UI32>;
-%template(METHOD) pop::CLASS::METHODSWIG<3,pop::F64>;
+%template(METHOD) pop::CLASS::METHODSWIG<3,pop::F32>;
 %template(METHOD) pop::CLASS::METHODSWIG<3,pop::RGBUI8>;
 %enddef
 %define ALL_IMAGE2_DIM_TYPE(CLASS,METHOD)
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI8>;
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI16>;
 %template(METHOD) pop::CLASS::METHOD<2,pop::UI32>;
-%template(METHOD) pop::CLASS::METHOD<2,pop::F64>;
+%template(METHOD) pop::CLASS::METHOD<2,pop::F32>;
 %template(METHOD) pop::CLASS::METHOD<2,pop::RGBUI8>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI8>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI16>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::UI32>;
-%template(METHOD) pop::CLASS::METHOD<3,pop::F64>;
+%template(METHOD) pop::CLASS::METHOD<3,pop::F32>;
 %template(METHOD) pop::CLASS::METHOD<3,pop::RGBUI8>;
 %enddef
 
@@ -129,23 +129,23 @@
 
 %define ALL_IMAGE_BINARY(CLASS,METHOD)
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI8,pop::Mat2UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2F64,pop::Mat2UI8>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2F32,pop::Mat2UI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2RGBUI8,pop::Mat2UI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat2UI32,pop::Mat2UI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI8,pop::Mat3UI8>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3F64,pop::Mat3UI8>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3F32,pop::Mat3UI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3RGBUI8,pop::Mat3UI8>;
 %template(METHOD) pop::CLASS::METHOD<pop::Mat3UI32,pop::Mat3UI8>;
 %enddef
 %define ALL_IMAGE_FLOAT(CLASS,METHOD)
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2UI8,pop::Mat2F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2F64,pop::Mat2F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2RGBUI8,pop::Mat2F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat2UI32,pop::Mat2F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3UI8,pop::Mat3F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3F64,pop::Mat3F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3RGBUI8,pop::Mat3F64>;
-%template(METHOD) pop::CLASS::METHOD<pop::Mat3UI32,pop::Mat3F64>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2UI8,pop::Mat2F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2F32,pop::Mat2F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2RGBUI8,pop::Mat2F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat2UI32,pop::Mat2F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3UI8,pop::Mat3F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3F32,pop::Mat3F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3RGBUI8,pop::Mat3F32>;
+%template(METHOD) pop::CLASS::METHOD<pop::Mat3UI32,pop::Mat3F32>;
 %enddef
 
 

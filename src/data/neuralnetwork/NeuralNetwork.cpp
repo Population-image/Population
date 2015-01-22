@@ -79,7 +79,7 @@ NeuralNetworkFeedForward & NeuralNetworkFeedForward::operator=(const NeuralNetwo
 }
 
 
-void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF64 &out)
+void NeuralNetworkFeedForward::propagateFront(const pop::VecF32& in , pop::VecF32 &out)
 {
     // first layer is imput layer: directly set outputs of all of its neurons
     // to the input vector
@@ -110,7 +110,7 @@ void NeuralNetworkFeedForward::propagateFront(const pop::VecF64& in , pop::VecF6
         out(i_neuron) = neuron->_Xn;
     }
 }
-void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF64& desired_output)
+void NeuralNetworkFeedForward::propagateBackFirstDerivate(const pop::VecF32& desired_output)
 {
     NNLayer & layerlast = *(_layers[_layers.size()-1]);
     POP_DbgAssert( desired_output.size() == layerlast._neurons.size() );
@@ -167,7 +167,7 @@ void NeuralNetworkFeedForward::addInputLayerMatrix(unsigned int height,unsigned 
     layer._type = NNLayer::INPUTMATRIX;
 }
 
-void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,double standart_deviation_weight){
+void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,F32 standart_deviation_weight){
 
     NNLayer & layerprevious = *(_layers[_layers.size()-1]);
     _layers.push_back( new NNLayer(nbr_neuron) );
@@ -188,7 +188,7 @@ void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,do
     unsigned int nbr_weight = nbr_neuron*(nbr_neuron_previous_layer+1);
     for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
     {
-        double initweight =0;
+        F32 initweight =0;
         if(standart_deviation_weight>0)
             initweight =  d.randomVariable();
         layer._weights.push_back(new NNWeight(initweight ) );
@@ -212,7 +212,7 @@ void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,do
 
 
 }
-void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsigned int kernelsize,double standart_deviation_weight){
+void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsigned int kernelsize,F32 standart_deviation_weight){
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
@@ -240,7 +240,7 @@ void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsi
         unsigned int nbr_weight = nbr_map*nbr_map_previous*(kernelsize*kernelsize+1);
         for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
         {
-            double initweight =0;
+            F32 initweight =0;
             if(standart_deviation_weight>0)
                 initweight =  d.randomVariable();
             layer->_weights.push_back(new NNWeight(initweight ) );
@@ -282,7 +282,7 @@ void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsi
         }
     }
 }
-void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,double standart_deviation_weight){
+void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,F32 standart_deviation_weight){
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
@@ -302,7 +302,7 @@ void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,double
         unsigned int nbr_weight = nbr_integral*(height_previous*width_previous+1);
         for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
         {
-            double initweight =0;
+            F32 initweight =0;
             if(standart_deviation_weight>0)
                 initweight =  d.randomVariable();
             layer->_weights.push_back(new NNWeight(initweight ) );
@@ -333,7 +333,7 @@ void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,double
     }
 }
 
-void NeuralNetworkFeedForward::addLayerSubScaling(unsigned int sub_scale_factor,double standart_deviation_weight){
+void NeuralNetworkFeedForward::addLayerSubScaling(unsigned int sub_scale_factor,F32 standart_deviation_weight){
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
@@ -357,7 +357,7 @@ void NeuralNetworkFeedForward::addLayerSubScaling(unsigned int sub_scale_factor,
         unsigned int nbr_weight = nbr_map_previous*height*width*(sub_scale_factor*sub_scale_factor+1);
         for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
         {
-            double initweight =0;
+            F32 initweight =0;
             if(standart_deviation_weight>0)
                 initweight =  d.randomVariable();
             layer->_weights.push_back(new NNWeight(initweight ) );
@@ -442,7 +442,7 @@ void NeuralNetworkFeedForward::addLayerMaxPooling(unsigned int sub_scale_factor)
     }
 }
 
-void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int nbr_map, unsigned int kernelsize,unsigned int sub_scale_sampling,double standart_deviation_weight){
+void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int nbr_map, unsigned int kernelsize,unsigned int sub_scale_sampling,F32 standart_deviation_weight){
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
 
 
@@ -476,7 +476,7 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
         unsigned int nbr_weight = nbr_map*nbr_map_previous*(kernelsize*kernelsize+1);
         for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
         {
-            double initweight =0;
+            F32 initweight =0;
             if(standart_deviation_weight>0)
                 initweight =  d.randomVariable();
             layer->_weights.push_back(new NNWeight(initweight ) );
@@ -530,7 +530,7 @@ void NeuralNetworkFeedForward::init(){
     }
     _layers.clear();
 }
-void NeuralNetworkFeedForward::setLearningRate(double eta)
+void NeuralNetworkFeedForward::setLearningRate(F32 eta)
 {
     for(unsigned int i_layer=0;i_layer<_layers.size();i_layer++)
     {
@@ -705,7 +705,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
-                    double weight ;
+                    F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
@@ -726,7 +726,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
-                    double weight ;
+                    F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
@@ -748,7 +748,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
-                    double weight ;
+                    F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
@@ -774,7 +774,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 NNLayer* layer = *(this->_layers.rbegin());
                 std::istringstream stream(str);
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
-                    double weight ;
+                    F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
                     pop::BasicUtility::String2Any(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
@@ -847,7 +847,7 @@ NNLayerMatrixMaxPooling::NNLayerMatrixMaxPooling(unsigned int nbr_map,unsigned i
 
 
 
-void NNLayerMatrix::setLearningRate(double eta){
+void NNLayerMatrix::setLearningRate(F32 eta){
     if(this->_type==MATRIXCONVOLUTIONNAL){
         eta = eta/std::sqrt(_neurons_matrix(0).getDomain()(0)*_neurons_matrix(0).getDomain()(1)*1.);
     }
@@ -876,7 +876,7 @@ NNLayer::~NNLayer(){
 
 
 
-void NNLayer::setLearningRate(double eta)
+void NNLayer::setLearningRate(F32 eta)
 {
 #if defined(HAVE_OPENMP)
 #pragma omp parallel for
@@ -974,7 +974,7 @@ void NNLayer::learningFirstDerivate()
 //  NNWeight
 
 
-NNWeight::NNWeight(  double Wn, double eta) :
+NNWeight::NNWeight(  F32 Wn, F32 eta) :
     _Wn( Wn ),_eta(eta)
 {
 }
@@ -1010,8 +1010,8 @@ void NNNeuron::propagateFront(){
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
-        double weight = c._weight->_Wn;
-        double neuron_out_previous = (c.isBiais() ? 1 : c._neuron->_Xn);
+        F32 weight = c._weight->_Wn;
+        F32 neuron_out_previous = (c.isBiais() ? 1 : c._neuron->_Xn);
         _Yn += weight*neuron_out_previous;
     }
     switch ( _f_act) {
@@ -1054,7 +1054,7 @@ void NNNeuron::initPropagateBackSecondDerivate(){
 
 void NNNeuron::propagateBackFirstDerivate(){
 
-    double fprime_Y;
+    F32 fprime_Y;
     switch ( _f_act) {
     case SIGMOID_FUNCTION:
         fprime_Y = DSIGMOID( _Xn );
@@ -1072,7 +1072,7 @@ void NNNeuron::propagateBackFirstDerivate(){
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
-        double Xnm1 = (c.isBiais() ? 1 : c._neuron->_Xn);
+        F32 Xnm1 = (c.isBiais() ? 1 : c._neuron->_Xn);
         c._weight->_dE_dWn += Xnm1 * _dErr_dYn;
         if(!c.isBiais())
         {
@@ -1082,7 +1082,7 @@ void NNNeuron::propagateBackFirstDerivate(){
 }
 void NNNeuron::propagateBackSecondDerivate(){
 
-    double fprime_Y;
+    F32 fprime_Y;
     switch ( _f_act) {
     case SIGMOID_FUNCTION:
         fprime_Y = DSIGMOID( _Xn );
@@ -1100,7 +1100,7 @@ void NNNeuron::propagateBackSecondDerivate(){
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
-        double Xnm1;
+        F32 Xnm1;
         Xnm1 = (c.isBiais() ? 1 : c._neuron->_Xn);
         c._weight->_d2E_dWn2 += Xnm1*Xnm1*_d2Err_dYn2;
         if(!c.isBiais())
@@ -1122,7 +1122,7 @@ NNConnection::NNConnection(NNWeight* weight , NNNeuron* neuron)
 
 }
 
-void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard,double elastic_distortion)
+void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(NeuralNetworkFeedForward &n,std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,int lecun_or_simard,F32 elastic_distortion)
 {
 
     Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
@@ -1165,12 +1165,12 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
     n.label2String() = label_digit;
 
 
-    double sigma_min =0.15;
-    double sigma_max =0.25;
-    double alpha =0.13;
+    F32 sigma_min =0.15;
+    F32 sigma_max =0.25;
+    F32 alpha =0.13;
 
-    double standard_deviation_angle = PI/4;
-    double standard_deviation_shear_j = PI/6;
+    F32 standard_deviation_angle = PI/4;
+    F32 standard_deviation_shear_j = PI/6;
     DistributionUniformReal dAngle(-standard_deviation_angle,standard_deviation_angle);
     DistributionUniformReal dShear(-standard_deviation_shear_j,standard_deviation_shear_j);
 
@@ -1182,8 +1182,8 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
 
 
 
-    Vec<VecF64> vtraining_in;
-    Vec<VecF64> vtraining_out;
+    Vec<VecF32> vtraining_in;
+    Vec<VecF32> vtraining_out;
 
     for(unsigned int i=0;i<number_training.size();i++){
         for(unsigned int j=0;j<number_training(i).size();j++){
@@ -1194,41 +1194,41 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
             //            disp.display(binary);
             // We apply elastic deformation and affine transformation (rotation, shear)
 
-            Mat2UI8 binary_scale =  binary;//GeometricalTransformation::scale(binary,Vec3F64(2,2));
+            Mat2UI8 binary_scale =  binary;//GeometricalTransformation::scale(binary,Vec3F32(2,2));
             for(unsigned int k=0;k<elastic_distortion;k++){
-                double deviation_length_random = d_deviation_length.randomVariable();
-                double correlation_lenght_random =d_correlation_lenght.randomVariable();
+                F32 deviation_length_random = d_deviation_length.randomVariable();
+                F32 correlation_lenght_random =d_correlation_lenght.randomVariable();
                 //                std::cout<<"deviation_length "<<deviation_length_random<<std::endl;
                 //                std::cout<<"correlation_lenght_random "<<correlation_lenght_random<<std::endl;
                 Mat2UI8 m= GeometricalTransformation::elasticDeformation(binary_scale,deviation_length_random*size_i,correlation_lenght_random*size_i);
-                double angle = dAngle.randomVariable();
-                double shear = dShear.randomVariable();
+                F32 angle = dAngle.randomVariable();
+                F32 shear = dShear.randomVariable();
 
-                double alphax=1,alphay=1;
+                F32 alphax=1,alphay=1;
                 if(sign.randomVariable()>0)
                     alphax= 1+d.randomVariable();
                 else
                     alphay= 1/(1+d.randomVariable());
-                Vec2F64 v(alphax,alphay);
+                Vec2F32 v(alphax,alphay);
                 //                std::cout<<"scale "<<v<<std::endl;
                 //                std::cout<<"angle "<<angle<<std::endl;
                 //                std::cout<<"shear "<<shear<<std::endl;
-                Mat2x33F64 maffine  = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
+                Mat2x33F32 maffine  = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
                 maffine *=  GeometricalTransformation::scale2DHomogeneousCoordinate(v);
                 maffine *=  GeometricalTransformation::shear2DHomogeneousCoordinate(shear,0);
                 maffine *=  GeometricalTransformation::rotation2DHomogeneousCoordinate(angle);//rotate
                 maffine *=  GeometricalTransformation::translation2DHomogeneousCoordinate(-m.getDomain()/2);
-                m = GeometricalTransformation::transformHomogeneous2D(maffine, m, 1);
+                m = GeometricalTransformation::transformHomogeneous2D(maffine, m);
                 //                m.display();
-                VecF64 vin = n.inputMatrixToInputNeuron(m);
+                VecF32 vin = n.inputMatrixToInputNeuron(m);
                 vtraining_in.push_back(vin);
-                VecF64 v_out(number_training.size(),-1);
+                VecF32 v_out(number_training.size(),-1);
                 v_out(i)=1;
                 vtraining_out.push_back(v_out);
             }
-            VecF64 vin = n.inputMatrixToInputNeuron(binary);
+            VecF32 vin = n.inputMatrixToInputNeuron(binary);
             vtraining_in.push_back(vin);
-            VecF64 v_out(number_training.size(),-1);
+            VecF32 v_out(number_training.size(),-1);
             v_out(i)=1;
             vtraining_out.push_back(v_out);
 
@@ -1236,14 +1236,14 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
     }
 
     int sum=0;
-    Vec<VecF64> vtest_in;
-    Vec<VecF64> vtest_out;
+    Vec<VecF32> vtest_in;
+    Vec<VecF32> vtest_out;
     for(unsigned int i=0;i<number_test.size();i++){
         for(unsigned int j=0;j<number_test(i).size();j++){
             Mat2UI8 binary = number_test(i)(j);
-            VecF64 vin = n.inputMatrixToInputNeuron(binary);
+            VecF32 vin = n.inputMatrixToInputNeuron(binary);
             vtest_in.push_back(vin);
-            VecF64 v_out(number_test.size(),-1);
+            VecF32 v_out(number_test.size(),-1);
             v_out(i)=1;
             vtest_out.push_back(v_out);
             sum++;
@@ -1252,7 +1252,7 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
 
     trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01,50,true);
 }
-void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF64>& trainingins,const Vec<VecF64>& trainingouts,double eta,unsigned int nbr_epoch,bool display_error_classification)
+void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta,unsigned int nbr_epoch,bool display_error_classification)
 {
     n.setLearningRate(eta);
     std::vector<int> v_global_rand(trainingins.size());
@@ -1265,7 +1265,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,d.MTRand());
         int error=0;
         for(unsigned int j=0;j<v_global_rand.size();j++){
-            VecF64 vout;
+            VecF32 vout;
             n.propagateFront(trainingins(v_global_rand[j]),vout);
             n.propagateBackFirstDerivate(trainingouts(v_global_rand[j]));
             n.learningFirstDerivate();
@@ -1281,7 +1281,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
     }
 }
 
-void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF64>& trainingins,const Vec<VecF64>& trainingouts,const Vec<VecF64>& testins,const Vec<VecF64>& testouts,double eta,unsigned int nbr_epoch,bool display_error_classification)
+void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,const Vec<VecF32>& testins,const Vec<VecF32>& testouts,F32 eta,unsigned int nbr_epoch,bool display_error_classification)
 {
     n.setLearningRate(eta);
     std::vector<int> v_global_rand(trainingins.size());
@@ -1294,7 +1294,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,d.MTRand());
         int error_training=0,error_test=0;
         for(unsigned int j=0;j<v_global_rand.size();j++){
-            VecF64 vout;
+            VecF32 vout;
             n.propagateFront(trainingins(v_global_rand[j]),vout);
             n.propagateBackFirstDerivate(trainingouts(v_global_rand[j]));
             n.learningFirstDerivate();
@@ -1308,7 +1308,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         //        std::cout<<testins.size()<<std::endl;
 
         for(unsigned int j=0;j<testins.size();j++){
-            VecF64 vout;
+            VecF32 vout;
             n.propagateFront(testins(j),vout);
             if(display_error_classification==true){
                 int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
@@ -1326,23 +1326,23 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
 }
 
 
-//void NeuralNetworkFeedForwardMerge::propagateFront(const pop::VecF64& in , pop::VecF64 &out){
-//    pop::VecF64 out1;
+//void NeuralNetworkFeedForwardMerge::propagateFront(const pop::VecF32& in , pop::VecF32 &out){
+//    pop::VecF32 out1;
 //    n1->propagateFront(in,out1);
-//    pop::VecF64 out2;
+//    pop::VecF32 out2;
 //    n2->propagateFront(in,out2);
 //    out1.insert( out1.end(), out2.begin(), out2.end() );
 //    n.propagateFront(out1,out);
 //}
 
-//void NeuralNetworkFeedForwardMerge::propagateBackFirstDerivate(const pop::VecF64& desired_output){
+//void NeuralNetworkFeedForwardMerge::propagateBackFirstDerivate(const pop::VecF32& desired_output){
 //    n.propagateBackFirstDerivate(desired_output);
 //    NNLayer & layerfirst = *(n._layers[0]);
 
 //    int size1 = n1->_layers[n1->_layers.size()-1]->_neurons.size();
 //    int size2 = n2->_layers[n2->_layers.size()-1]->_neurons.size();
-//    pop::VecF64 desired_output1(size1);
-//    pop::VecF64 desired_output2(size2);
+//    pop::VecF32 desired_output1(size1);
+//    pop::VecF32 desired_output2(size2);
 
 //    for(unsigned int i =0;i<layerfirst._neurons.size();i++){
 //        NNNeuron *  neuron = layerfirst._neurons[i];
@@ -1361,7 +1361,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
 //    n2->learningFirstDerivate();
 //}
 
-//void NeuralNetworkFeedForwardMerge::setLearningRate(double eta){
+//void NeuralNetworkFeedForwardMerge::setLearningRate(F32 eta){
 //    n.setLearningRate(eta);
 //    n1->setLearningRate(eta);
 //    n2->setLearningRate(eta);
@@ -1378,7 +1378,7 @@ void NNNeuronMaxPool::addConnection( NNNeuron* neuron){
 }
 
 void NNNeuronMaxPool::propagateFront(){
-    this->_Yn=-std::numeric_limits<double>::max();
+    this->_Yn=-std::numeric_limits<F32>::max();
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
 
@@ -1391,7 +1391,7 @@ void NNNeuronMaxPool::propagateFront(){
 void NNNeuronMaxPool::propagateBackFirstDerivate(){
 
     _dErr_dYn = _dErr_dXn;
-    double max_value = -std::numeric_limits<double>::max();
+    F32 max_value = -std::numeric_limits<F32>::max();
     unsigned int i_index_max=0;
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
@@ -1469,14 +1469,14 @@ Vec<Vec<Mat2UI8> > TrainingNeuralNetwork::loadMNIST( std::string datapath,  std:
 
 Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix( Vec<pop::Mat2UI8>  number_training,
                                                                                   unsigned int number,
-                                                                                  double sigma_elastic_distortion_min,
-                                                                                  double sigma_elastic_distortion_max,
-                                                                                  double alpha_elastic_distortion_min,
-                                                                                  double alpha_elastic_distortion_max,
-                                                                                  double beta_angle_degree_rotation,
-                                                                                  double beta_angle_degree_shear,
-                                                                                  double gamma_x_scale,
-                                                                                  double gamma_y_scale){
+                                                                                  F32 sigma_elastic_distortion_min,
+                                                                                  F32 sigma_elastic_distortion_max,
+                                                                                  F32 alpha_elastic_distortion_min,
+                                                                                  F32 alpha_elastic_distortion_max,
+                                                                                  F32 beta_angle_degree_rotation,
+                                                                                  F32 beta_angle_degree_shear,
+                                                                                  F32 gamma_x_scale,
+                                                                                  F32 gamma_y_scale){
 
     DistributionUniformReal dAngle(-beta_angle_degree_rotation*pop::PI/180,beta_angle_degree_rotation*pop::PI/180);
     DistributionUniformReal dShear(-beta_angle_degree_shear*pop::PI/180,beta_angle_degree_shear*pop::PI/180);
@@ -1498,26 +1498,26 @@ Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix
 
         Mat2UI8 binary_scale =  binary;
         for(unsigned int k=0;k<number;k++){
-            double deviation_length_random = d_deviation_length.randomVariable();
-            double correlation_lenght_random =d_correlation_lenght.randomVariable();
+            F32 deviation_length_random = d_deviation_length.randomVariable();
+            F32 correlation_lenght_random =d_correlation_lenght.randomVariable();
             Mat2UI8 m= GeometricalTransformation::elasticDeformation(binary_scale,deviation_length_random,correlation_lenght_random);
-            double angle = dAngle.randomVariable();
-            double shear = dShear.randomVariable();
+            F32 angle = dAngle.randomVariable();
+            F32 shear = dShear.randomVariable();
 
-            double alphax=d_scale_x.randomVariable();
-            double alphay=d_scale_y.randomVariable();
+            F32 alphax=d_scale_x.randomVariable();
+            F32 alphay=d_scale_y.randomVariable();
 
-            Vec2F64 v(alphax,alphay);
+            Vec2F32 v(alphax,alphay);
             //                std::cout<<"scale "<<v<<std::endl;
             //                std::cout<<"angle "<<angle<<std::endl;
             //                std::cout<<"shear "<<shear<<std::endl;
-            Mat2x33F64 maffine  = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
+            Mat2x33F32 maffine  = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
             maffine *=  GeometricalTransformation::scale2DHomogeneousCoordinate(v);
             maffine *=  GeometricalTransformation::shear2DHomogeneousCoordinate(shear,0);
             maffine *=  GeometricalTransformation::rotation2DHomogeneousCoordinate(angle);//rotate
             maffine *=  GeometricalTransformation::translation2DHomogeneousCoordinate(-m.getDomain()/2);
-            m = GeometricalTransformation::transformHomogeneous2D(maffine, m, 1);
-            //                double sum2=0;
+            m = GeometricalTransformation::transformHomogeneous2D(maffine, m);
+            //                F32 sum2=0;
             //                ForEachDomain2D(x,m){
             //                    sum2+=m(x);
             //                }
@@ -1528,17 +1528,17 @@ Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix
     }
     return v_out_i;
 }
-void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF64> &v_neuron_in, Vec<VecF64> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, double ratio){
+void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, F32 ratio){
 
-    ratio =std::max(0.,std::min(1.,ratio));
+    ratio =std::max(0.f,std::min(1.f,ratio));
     //    std::cout<<number_training.size()*ratio<<
     for(unsigned int i=0;i<number_training.size();i++){
         for(unsigned int j=0;j<number_training(i).size()*ratio;j++){
             Mat2UI8 binary = number_training(i)(j);
 
-            VecF64 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain,method,normalization_value);
+            VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain,method,normalization_value);
             v_neuron_in.push_back(vin);
-            VecF64 v_out(number_training.size(),-1);
+            VecF32 v_out(number_training.size(),-1);
             v_out(i)=1;
             v_neuron_out.push_back(v_out);
 

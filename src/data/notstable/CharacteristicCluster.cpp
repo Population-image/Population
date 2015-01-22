@@ -25,45 +25,45 @@ Vec2I32 CharacteristicCluster::center()const{
 void CharacteristicCluster::addPoint(const Vec2I32 & x){
     _min = pop::minimum(_min,x);
     _max = pop::maximum(_max,x);
-    //_barycentre=(_barycentre*_mass+ Vec2F64(x))/(_mass+1);
+    //_barycentre=(_barycentre*_mass+ Vec2F32(x))/(_mass+1);
     _mass++;
 
 }
 
-double CharacteristicClusterDistanceMass::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
+F32 CharacteristicClusterDistanceMass::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a._mass!=0&&b._mass!=0)
         return std::abs(a._mass-b._mass)*1./std::min(a._mass,b._mass);
     else
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<F32>::max();
 }
 
-double CharacteristicClusterDistanceHeight::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
+F32 CharacteristicClusterDistanceHeight::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(0)!=0&&b.size()(0)!=0)
         return std::abs(a.size()(0)-b.size()(0))*1./std::min(a.size()(0),b.size()(0));
     else
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<F32>::max();
 }
 
-double CharacteristicClusterDistanceWidth::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
+F32 CharacteristicClusterDistanceWidth::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(1)!=0&&b.size()(1)!=0)
         return std::abs(a.size()(1)-b.size()(1))*1./std::min(a.size()(1),b.size()(1));
     else
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<F32>::max();
 }
 
 
-double CharacteristicClusterDistanceWidthInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
+F32 CharacteristicClusterDistanceWidthInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(1)!=0&&b.size()(1)!=0)
         return std::abs(a.center()(1)-b.center()(1))*1./std::max(a.size()(1),b.size()(1));
     else
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<F32>::max();
 }
 
-double CharacteristicClusterDistanceHeightInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
+F32 CharacteristicClusterDistanceHeightInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(0)!=0&&b.size()(0)!=0)
         return std::abs(a.center()(0)-b.center()(0))*1./std::max(a.size()(0),b.size()(0));
     else
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<F32>::max();
 }
 
 
@@ -93,7 +93,7 @@ bool CharacteristicClusterFilterWidth::operator ()(const CharacteristicCluster& 
 }
 bool CharacteristicClusterFilterAsymmetryHeightPerWidth::operator ()(const CharacteristicCluster& a){
     if(a.size()(0)!=0){
-        double ratio =a.size()(0)*1.0/a.size()(1);
+        F32 ratio =a.size()(0)*1.0/a.size()(1);
         return (ratio>=_min&&ratio<_max);
     }
     else
@@ -136,11 +136,11 @@ pop::Mat2UI32 applyClusterFilter(const pop::Mat2UI32& labelled_image, Vec<Charac
     return  Processing::greylevelRemoveEmptyValue(labelled_image_out);
 }
 namespace Private{
-bool sortMyFunction (std::pair<double,int> i,std::pair<double,int> j) { return (i.first<j.first); }
+bool sortMyFunction (std::pair<F32,int> i,std::pair<F32,int> j) { return (i.first<j.first); }
 bool sortMyFunctionLeft (std::pair<int,int>  i,std::pair<int,int> j) { return (i.first<j.first); }
 }
 
-Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<CharacteristicClusterDistance*> v_dist, Vec<double> v_weight ,double threshold ){
+Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<CharacteristicClusterDistance*> v_dist, Vec<F32> v_weight ,F32 threshold ){
 
     int max_value = Analysis::maxValue(labelled_image);
     Vec<CharacteristicCluster> v_cluster(max_value+1);
@@ -158,7 +158,7 @@ Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<Ch
     for(unsigned int i=1;i<v_cluster.size();i++){
         Vec<int> v_neight;
         for(unsigned int j=i+1;j<v_cluster.size();j++){
-            double sum=0;
+            F32 sum=0;
             for(unsigned int k=0;k<v_dist.size();k++){
                 CharacteristicCluster & a = v_cluster[i];
                 CharacteristicCluster & b = v_cluster[j];

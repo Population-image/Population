@@ -77,10 +77,10 @@ protected:
     DistributionMultiVariate * _deriveddistribution;
      std::string _key;
     static MTRand_int32 irand;
-    mutable F64 _step;
+    mutable F32 _step;
 public:
-    typedef  VecF64 E;
-    typedef  F64 F;
+    typedef  VecF32 E;
+    typedef  F32 F;
     /*!
     \fn DistributionMultiVariate();
     *
@@ -99,7 +99,7 @@ public:
     DistributionMultiVariateExpression dexp;
     dexp.fromRegularExpression("x*y+y","x","y");
     DistributionMultiVariate d(dexp);
-    VecF64 v(2);
+    VecF32 v(2);
     v(0)=6;
     v(1)=4;
     std::cout<<d(v)<<std::endl;
@@ -116,7 +116,7 @@ public:
     * \code
     Distribution dmulti(DistributionUniformInt(0,255));
     DistributionMultiVariate dcoupled(dmulti,3);
-    VecF64 v = dcoupled.randomVariable();
+    VecF32 v = dcoupled.randomVariable();
     v.display();
     \endcode
     The vector v contain three times the same ranmdom variables  following the Uniform probability distribution
@@ -148,7 +148,7 @@ public:
     *
     * \code
     DistributionMultiVariate d("exp(-1/3*x^3-x-y^2)","x,y");
-    VecF64 v(2);
+    VecF32 v(2);
     v(0)=-1;
     v(0)=0;
     cout<<d(v)<<endl;
@@ -159,22 +159,22 @@ public:
 
 
     /*!
-    \fn DistributionMultiVariate(VecF64 mean, Mat2F64 covariance);
+    \fn DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
     * \brief normal disptribution http://en.wikipedia.org/wiki/Multivariate_normal_distribution
     * \param mean mean value
     * \param covariance  covariance (nonnegative-definite matrix)
     *
     \code
-    double mux=0;
-    double muy=0;
-    double sigmax=3;
-    double sigmay=1;
-    double rho = -0.7;
+    F32 mux=0;
+    F32 muy=0;
+    F32 sigmax=3;
+    F32 sigmay=1;
+    F32 rho = -0.7;
 
-    VecF64 v(2);
+    VecF32 v(2);
     v(0)=mux;
     v(1)=muy;
-    Mat2F64 m(2,2);
+    Mat2F32 m(2,2);
     m(0,0)=sigmax*sigmax;    m(0,1)=sigmax*sigmay*rho;
     m(1,0)=sigmax*sigmay*rho;m(1,1)=sigmay*sigmay;
 
@@ -184,9 +184,9 @@ public:
     MatNDisplay windows(img);
     while(!windows.is_closed())
     {
-        VecF64 v = multi.randomVariable();
-        Vec2F64 p= v.toVecN<2>();
-        Vec2I32 x= p*25+Vec2F64(img.getDomain())*0.5;
+        VecF32 v = multi.randomVariable();
+        Vec2F32 p= v.toVecN<2>();
+        Vec2I32 x= p*25+Vec2F32(img.getDomain())*0.5;
         if(img.isValid(x(0),x(1))){
             img(x)=255;
             windows.display(img);
@@ -195,7 +195,7 @@ public:
     \endcode
 
     */
-    DistributionMultiVariate(VecF64 mean, Mat2F64 covariance);
+    DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
 
 
     /*!
@@ -206,23 +206,23 @@ public:
     virtual ~DistributionMultiVariate();
 
     /*!
-    \fn     virtual F64 operator()(const VecF64& v)const;
+    \fn     virtual F32 operator()(const VecF32& v)const;
     * \param v input  value Vec
     * \return y
     *
     *  Unary function to call y=f(Vec )
     */
-    virtual F64 operator()(const VecF64& v)const;
+    virtual F32 operator()(const VecF32& v)const;
 
     /*!
-    \fn  virtual VecF64 randomVariable()const ;
+    \fn  virtual VecF32 randomVariable()const ;
     * \return multivariate random number
     *
     *  Generate random variable, X, following the probability DistributionMultiVariate f.\n
     *  You have to implement this member in any derived class for an analytical DistributionMultiVariate. Otherwise,
     *
     */
-    virtual VecF64 randomVariable()const ;
+    virtual VecF32 randomVariable()const ;
 
     /*!
     \fn virtual DistributionMultiVariate * clone();
@@ -304,15 +304,15 @@ public:
 
 
     /*!
-    \fn virtual void setStep(F64 step)const;
-    * \param step F64 step
+    \fn virtual void setStep(F32 step)const;
+    * \param step F32 step
     *
     *  You can ignore the implementation of this member in the derived class.
     * This member inform the object that the subinterval of the partition for calculation as a given step
     *
     * \sa IteratorDistributionMultiVariateSamplingRiemann DistributionMultiVariateDiscrete
     */
-    virtual void setStep(F64 step)const;
+    virtual void setStep(F32 step)const;
 
     DistributionMultiVariate * ___getPointerImplementation();
     const DistributionMultiVariate * ___getPointerImplementation()const ;

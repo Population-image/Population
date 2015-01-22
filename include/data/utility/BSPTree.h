@@ -20,12 +20,12 @@ struct DistanceDefault
 
     }
     template<typename T>
-    double operator()(const T& a, const T& b) {
+    F32 operator()(const T& a, const T& b) {
         return distance( a, b ,_norm);
     }
 };
 }
-template<int Dim,typename Type=F64>
+template<int Dim,typename Type=F32>
 class POP_EXPORTS KDTree
 {
 public:
@@ -44,9 +44,9 @@ public:
     void addItem(const VecN<Dim,Type> & item){
         this->addItem(_root, item,0);
     }
-    void search( const VecN<Dim,Type> & target, VecN<Dim,Type> & result,double& distance_min)
+    void search( const VecN<Dim,Type> & target, VecN<Dim,Type> & result,F32& distance_min)
     {
-        distance_min = NumericLimits<double>::maximumRange();
+        distance_min = NumericLimits<F32>::maximumRange();
         search( _root,target, result, distance_min,0 );
     }
 private:
@@ -126,10 +126,10 @@ private:
     }
 
 
-    void search(const Node * node, const VecN<Dim,Type> & target, VecN<Dim,Type> & result,double& distance_min,int depth)
+    void search(const Node * node, const VecN<Dim,Type> & target, VecN<Dim,Type> & result,F32& distance_min,int depth)
     {
         if(node!=NULL){
-            double distance = dist(target,node->value);
+            F32 distance = dist(target,node->value);
             if(distance<distance_min){
                 distance_min = distance;
                 result =node->value;
@@ -146,7 +146,7 @@ private:
                     if(i!=depth%Dim)
                         v(i)=target(i);
                 v(depth%Dim)=node->value(depth%Dim);
-                double distance_hyper = dist(target,v);
+                F32 distance_hyper = dist(target,v);
                 if(distance_hyper<=distance_min){
                     search( node->right,target, result, distance_min,depth1);
                 }
@@ -161,7 +161,7 @@ private:
                     if(i!=depth%Dim)
                         v(i)=target(i);
                 v(depth%Dim)=node->value(depth%Dim);
-                double distance_hyper = dist(target,v);
+                F32 distance_hyper = dist(target,v);
                 if(distance_hyper<=distance_min){
                     search( node->left,target, result, distance_min,depth1);
                 }
@@ -193,11 +193,11 @@ public:
     }
 
     void search( const T& target, int k, std::vector<T>& results,
-                 std::vector<double>& distances)
+                 std::vector<F32>& distances)
     {
         std::priority_queue<HeapItem> heap;
 
-        _tau = NumericLimits<double>::maximumRange();
+        _tau = NumericLimits<F32>::maximumRange();
         search( _root, target, k, heap );
 
         results.clear(); distances.clear();
@@ -217,12 +217,12 @@ private:
     std::vector<T> _items;
 
 
-    double _tau;
+    F32 _tau;
 
     struct Node
     {
         int index;
-        double threshold;
+        F32 threshold;
         Node* left;
         Node* right;
 
@@ -235,10 +235,10 @@ private:
         }
     }* _root;
     struct HeapItem {
-        HeapItem( int index_value, double dist_value) :
+        HeapItem( int index_value, F32 dist_value) :
             index(index_value), dist(dist_value) {}
         int index;
-        double dist;
+        F32 dist;
         bool operator<( const HeapItem& o ) const {
             return dist < o.dist;
         }
@@ -266,7 +266,7 @@ private:
         if ( upper - lower > 1 ) {
 
             // choose an arbitrary VecN and move it to the start
-            int i = (int)((double)rand() / RAND_MAX * (upper - lower - 1) ) + lower;
+            int i = (int)((F32)rand() / RAND_MAX * (upper - lower - 1) ) + lower;
             std::swap( _items[lower], _items[i] );
 
             int median = ( upper + lower ) / 2;
@@ -294,7 +294,7 @@ private:
     {
         if ( node == NULL ) return;
 
-        double dist = op_dist( _items[node->index], target );
+        F32 dist = op_dist( _items[node->index], target );
         //printf("dist=%g tau=%gn", dist, _tau );
 
         if ( dist < _tau ) {

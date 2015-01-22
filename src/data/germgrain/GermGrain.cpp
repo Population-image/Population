@@ -4,13 +4,13 @@ GrainCylinder::GrainCylinder()
     : maxradius(0)
 {
 }
-F64 GrainCylinder::getRadiusBallNorm0IncludingGrain(){
+F32 GrainCylinder::getRadiusBallNorm0IncludingGrain(){
     if(maxradius==0)maxradius=std::sqrt(radius*radius+height*height/4);
     return  maxradius;
 }
-bool GrainCylinder::intersectionPoint(const VecN<3,F64> &  x_value)
+bool GrainCylinder::intersectionPoint(const VecN<3,F32> &  x_value)
 {
-    VecN<3,F64> p = this->x -x_value;
+    VecN<3,F32> p = this->x -x_value;
     p = this->orientation.inverseRotation(p);
     if(p[0]*p[0]+p[1]*p[1]>this->radius*this->radius)
         return false;
@@ -29,7 +29,7 @@ Germ<3> * GrainCylinder::clone() const
 //    setAngle_ei(0,2);
 //}
 
-//void OrientationEulerAngle<3>::setAngle_ei(F64 angleradian,int index_coordinate)
+//void OrientationEulerAngle<3>::setAngle_ei(F32 angleradian,int index_coordinate)
 //{
 //    if(index_coordinate==0){
 //        this->anglex = angleradian;
@@ -45,7 +45,7 @@ Germ<3> * GrainCylinder::clone() const
 //    }
 //    else std::cout<<"Problem only three axes for 3D for the grains";
 //}
-//void OrientationEulerAngle<3>::setAngle(Vec<F64> vangleradian)
+//void OrientationEulerAngle<3>::setAngle(Vec<F32> vangleradian)
 //{
 //    if((int)vangleradian.size()!=3)
 //    {
@@ -62,9 +62,9 @@ Germ<3> * GrainCylinder::clone() const
 //    this->setAngle_ei( uni.randomVariable(),1);
 //    this->setAngle_ei( uni.randomVariable(),2);
 //}
-//VecN<3, F64> OrientationEulerAngle<3>::inverseRotation(VecN<3, F64> & x)
+//VecN<3, F32> OrientationEulerAngle<3>::inverseRotation(VecN<3, F32> & x)
 //{
-//    VecN<3, F64> v(x);
+//    VecN<3, F32> v(x);
 //    v= Mz_minus1*v;
 //    v= My_minus1*v;
 //    v= Mx_minus1*v;
@@ -110,7 +110,7 @@ Germ<3> * GrainCylinder::clone() const
 //    return *this;
 //}
 
-//void OrientationEulerAngle<2>::setAngle_ei(F64 angleradian,int index_coordinate)
+//void OrientationEulerAngle<2>::setAngle_ei(F32 angleradian,int index_coordinate)
 //{
 //    if(index_coordinate==0){
 //        angle = angleradian;
@@ -118,7 +118,7 @@ Germ<3> * GrainCylinder::clone() const
 //    }
 //    else std::cout<<"Problem only one axe of rotation for 2D Grains";
 //}
-//void OrientationEulerAngle<2>::setAngle(Vec<F64> vangle)
+//void OrientationEulerAngle<2>::setAngle(Vec<F32> vangle)
 //{
 //    if((int)vangle.size()!=1)
 //    {
@@ -131,7 +131,7 @@ Germ<3> * GrainCylinder::clone() const
 //    DistributionUniformReal uni(-pop::PI,pop::PI);
 //    setAngle_ei(uni.randomVariable(),0);
 //}
-//VecN<2, F64> OrientationEulerAngle<2>::inverseRotation(const VecN<2, F64> & x)
+//VecN<2, F32> OrientationEulerAngle<2>::inverseRotation(const VecN<2, F32> & x)
 //{
 //    return M_minus1*x;
 //}
@@ -145,7 +145,7 @@ GrainEquilateralRhombohedron::GrainEquilateralRhombohedron()
     angleequi = 15*pop::PI/180;
     setAnglePlane(angleequi);
 }
-void GrainEquilateralRhombohedron::setAnglePlane(F64 angleradian)
+void GrainEquilateralRhombohedron::setAnglePlane(F32 angleradian)
 {
     angleequi = angleradian;
     cosangle = std::cos(angleequi);
@@ -153,15 +153,15 @@ void GrainEquilateralRhombohedron::setAnglePlane(F64 angleradian)
     normalplany[0]=(-std::sin(angleequi));normalplany[1]=(std::cos(angleequi));normalplany[2]=(0);
     normalplanz[0]=(0);normalplanz[1]=(-std::sin(angleequi));normalplanz[2]=(std::cos(angleequi));
 }
-F64 GrainEquilateralRhombohedron::getRadiusBallNorm0IncludingGrain(){
+F32 GrainEquilateralRhombohedron::getRadiusBallNorm0IncludingGrain(){
     return 2*radius/cosangle;
 }
-bool GrainEquilateralRhombohedron::intersectionPoint(const VecN<3,F64> &  x_value)
+bool GrainEquilateralRhombohedron::intersectionPoint(const VecN<3,F32> &  x_value)
 {
-    VecN<3,F64> p = this->x -x_value;
+    VecN<3,F32> p = this->x -x_value;
     p = this->orientation.inverseRotation(p);
 
-    F64 signe;
+    F32 signe;
     signe = (productInner(normalplanx,p)+this->radius)*(productInner(normalplanx,p)-this->radius);
     if(signe>=0)
     {

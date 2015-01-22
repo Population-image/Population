@@ -11,7 +11,7 @@ void crop(Mat3UI8 m){
     small_cube.display("crop");
 }
 void subresolution(Mat3UI8 m){
-    Mat3UI8 sub_resoltion =GeometricalTransformation::scale(m,Vec3F64(0.5,0.5,0.5));//scale the domain with the factor (0.5,0.5,0.5) so (256*0.5,256*0.5,256*0.5)=(128,128,128)
+    Mat3UI8 sub_resoltion =GeometricalTransformation::scale(m,Vec3F32(0.5,0.5,0.5));//scale the domain with the factor (0.5,0.5,0.5) so (256*0.5,256*0.5,256*0.5)=(128,128,128)
     Scene3d scene;
     Visualization::cubeExtruded(scene,sub_resoltion);//add the cube surfaces to the scene
     Visualization::lineCube(scene,sub_resoltion);//add the border red lines to the scene to the scene

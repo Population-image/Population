@@ -63,20 +63,20 @@ The ModelGermGrain class represent this model.The aim of the RandomGeometry clas
 following code, we construct the boolean model with disk at a given expected porosity.
 
  \code
-double porosity=0.4;
-double mean=20;
-double standard_deviation=7;
+F32 porosity=0.4;
+F32 mean=20;
+F32 standard_deviation=7;
 Distribution dnormal (mean,standard_deviation,"NORMAL");//Normal distribution for disk radius
-double moment_order_2 = pop::Statistics::moment(dnormal,2,0,40);
-double surface_expectation = moment_order_2*3.14159265;
-Vec2F64 domain(1024);//2d field domain
-double lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
+F32 moment_order_2 = pop::Statistics::moment(dnormal,2,0,40);
+F32 surface_expectation = moment_order_2*3.14159265;
+Vec2F32 domain(1024);//2d field domain
+F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
 ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 RandomGeometry::sphere(grain,dnormal);//Dress these germs with sphere
 Mat2UI8 lattice = RandomGeometry::continuousToDiscrete(grain);//Convert the continuous model to the lattice
 lattice.display();
 lattice.save("../doc/image2/boolean.jpg");
-Mat2F64 mhisto=  Analysis::histogram(lattice);
+Mat2F32 mhisto=  Analysis::histogram(lattice);
 std::cout<<"Realization porosity"<<mhisto(0,1)<<std::endl;
 \endcode
 \image html  boolean.jpg
@@ -86,20 +86,20 @@ template<int DIM>
 class IntersectionRectangle
 {
 public:
-    VecN<DIM,F64> x;
-    VecN<DIM,F64> size;
-    bool perhapsIntersection(Germ<DIM> * grain,const VecN<DIM,F64> & domain,MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
+    VecN<DIM,F32> x;
+    VecN<DIM,F32> size;
+    bool perhapsIntersection(Germ<DIM> * grain,const VecN<DIM,F32> & domain,MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
     {
         if(boundary_condition==MATN_BOUNDARY_CONDITION_BOUNDED){
-            VecN<DIM,F64> xx =grain->x-x;
-            double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
+            VecN<DIM,F32> xx =grain->x-x;
+            F32 width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
             if( xx.norm(0)< width )
                 return true;
             else
                 return false;
         }else{
-            double width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
-            VecN<DIM,F64> xx =grain->x-x;
+            F32 width = this->size.norm(0)*0.5+grain->getRadiusBallNorm0IncludingGrain();
+            VecN<DIM,F32> xx =grain->x-x;
             if( xx.norm(0)< width )
                 return true;
             for(unsigned int i=0;i<DIM;i++){
@@ -116,11 +116,11 @@ public:
     }
 };
 template<int DIM>
-static VecN<DIM,F64> smallestDistanceTore(const VecN<DIM,F64> xtore,const VecN<DIM,F64> xfixed, const VecN<DIM,F64> domain){
-    VecN<DIM,F64> x(xtore);
-    VecN<DIM,F64> xtemp(xtore);
-    double dist = (xtemp-xfixed).normPower(2);
-    double distemp;
+static VecN<DIM,F32> smallestDistanceTore(const VecN<DIM,F32> xtore,const VecN<DIM,F32> xfixed, const VecN<DIM,F32> domain){
+    VecN<DIM,F32> x(xtore);
+    VecN<DIM,F32> xtemp(xtore);
+    F32 dist = (xtemp-xfixed).normPower(2);
+    F32 distemp;
     for(unsigned int i=0;i<DIM;i++){
         xtemp(i)-=domain(i);
         distemp = (xtemp-xfixed).normPower(2);
@@ -171,8 +171,8 @@ public:
     *
     * This method returns a realization of uniform Posssin point process in the given domain and with a given number of VecNs
     *  \code
-    Vec2F64 domain(512);//2d field domain
-    double lambda= 0.001;// parameter of the Poisson point process
+    Vec2F32 domain(512);//2d field domain
+    F32 lambda= 0.001;// parameter of the Poisson point process
 
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
     Distribution d (1,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
@@ -183,7 +183,7 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static ModelGermGrain<DIM>    poissonPointProcess(VecN<DIM,F64> domain,double lambda);
+    static ModelGermGrain<DIM>    poissonPointProcess(VecN<DIM,F32> domain,F32 lambda);
 
 
     /*!
@@ -209,9 +209,9 @@ public:
     *  \code
     * Mat2RGBUI8 img;
     * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F64(1024./img.getDomain()(0)));
-    * double radius=10;
-    * Vec2F64 domain;
+    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+    * F32 radius=10;
+    * Vec2F32 domain;
     * domain= img.getDomain();
 
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,1);//generate the 2d Poisson point process
@@ -234,7 +234,7 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static void  hardCoreFilter( ModelGermGrain<DIM>  & grain, F64 radius);
+    static void  hardCoreFilter( ModelGermGrain<DIM>  & grain, F32 radius);
 
     /*!
     * \brief Min-overlap filter
@@ -246,9 +246,9 @@ public:
     * //Initial field with a local porosity equal to img(x)/255
     * Mat2RGBUI8 img;
     * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F64(1024./img.getDomain()(0)));
-    * double radius=10;
-    * Vec2F64 domain;
+    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+    * F32 radius=10;
+    * Vec2F32 domain;
     * domain= img.getDomain();
 
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
@@ -272,7 +272,7 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static void  minOverlapFilter( ModelGermGrain<DIM>  & grain, F64 radius);
+    static void  minOverlapFilter( ModelGermGrain<DIM>  & grain, F32 radius);
 
     /*!
     * \brief Keep the VecN if intersection
@@ -284,9 +284,9 @@ public:
     * //Initial field with a local porosity equal to img(x)/255
     * Mat2RGBUI8 img;
     * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F64(1024./img.getDomain()(0)));
-    * double radius=15;
-    * Vec2F64 domain;
+    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+    * F32 radius=15;
+    * Vec2F32 domain;
     * domain= img.getDomain();
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
     * img = pop::Processing::gradientMagnitudeDeriche(img,0.5);
@@ -322,21 +322,21 @@ public:
     * dress the VecNs with sphere with a random radius following the probability distribution dist
     *
     * \code
-    * double porosity=0.25;
+    * F32 porosity=0.25;
     *  std::string power_law="1/x^(3.1)";
     * Distribution dpower(power_law.c_str());//Poisson generator
     * dpower = pop::Statistics::toProbabilityDistribution(dpower,10,1024,0.1);
 
-    * double moment_order_2 = pop::Statistics::moment(dpower,2,0,1024);
-    * double surface_expectation = moment_order_2*3.14159265;
-    * Vec2F64 domain(4048);//2d field domain
-    * double lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
+    * F32 moment_order_2 = pop::Statistics::moment(dpower,2,0,1024);
+    * F32 surface_expectation = moment_order_2*3.14159265;
+    * Vec2F32 domain(4048);//2d field domain
+    * F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
     * RandomGeometry::sphere(grain,dpower);
     * Mat2RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
     * Mat2UI8 img_VecN_grey;
     * img_VecN_grey = img_VecN;
-    * Mat2F64 m=  Analysis::histogram(img_VecN_grey);
+    * Mat2F32 m=  Analysis::histogram(img_VecN_grey);
     * std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
     * Mat2UI32 img_label = pop::Processing::clusterToLabel(img_VecN_grey,0);
     * img_VecN = pop::Visualization::labelToRandomRGB(img_label)  ;
@@ -359,7 +359,7 @@ public:
     * \code
     Mat2RGBUI8 img;
     img.load("../image/Lena.bmp");
-    Vec2F64 domain;
+    Vec2F32 domain;
     domain= img.getDomain();
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
 
@@ -393,15 +393,15 @@ public:
     * Dress the VecNs with polyhedra with a random radius/nomals following the probability distributions. In the following code, we dress with  regular tetrahedron:
     *
     * \code
-    double porosity=0.8;
-    double radius=7;
+    F32 porosity=0.8;
+    F32 radius=7;
     Distribution ddirac_radius(radius,"DIRAC");
 
-    double moment_order3 = pop::Statistics::moment(ddirac_radius,3,0,40);
+    F32 moment_order3 = pop::Statistics::moment(ddirac_radius,3,0,40);
     //std::sqrt(2)/12*(std::sqrt(24))^3
-    double volume_expectation = moment_order3*std::sqrt(2.)/12.*std::pow(std::sqrt(24.),3.);
-    Vec3F64 domain(128);//2d field domain
-    double lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+    F32 volume_expectation = moment_order3*std::sqrt(2.)/12.*std::pow(std::sqrt(24.),3.);
+    Vec3F32 domain(128);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 
     Vec<Distribution > v_radius;
@@ -440,11 +440,11 @@ public:
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
 
-    Mat2F64 m=  Analysis::histogram(img_VecN_grey);
+    Mat2F32 m=  Analysis::histogram(img_VecN_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
     img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-    Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,20);
+    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,20);
     phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
     Scene3d scene;
     pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -465,16 +465,16 @@ public:
     * Dress the VecNs with ellipsoids with a  random radius following the probability distributions.
     *
     * \code
-    double porosity=0.8;
-    double radiusmin=5;
-    double radiusmax=30;
+    F32 porosity=0.8;
+    F32 radiusmin=5;
+    F32 radiusmax=30;
     Distribution duniform_radius(radiusmin,radiusmax,"UNIFORMREAL");
 
-    double moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
+    F32 moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
     //4/3*pi*E^3(R)
-    double volume_expectation = moment_order3*4/3.*3.14159265;
-    Vec3F64 domain(200);//2d field domain
-    double lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+    F32 volume_expectation = moment_order3*4/3.*3.14159265;
+    Vec3F32 domain(200);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
 
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 
@@ -487,11 +487,11 @@ public:
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
 
-    Mat2F64 m=  Analysis::histogram(img_VecN_grey);
+    Mat2F32 m=  Analysis::histogram(img_VecN_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
     img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-    Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,10);
+    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,10);
     phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
     Scene3d scene;
     pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -513,19 +513,19 @@ public:
     * Dress the VecNs with rhombohedron with a random radius following the probability distributions.
     *
     * \code
-    double porosity=0.8;
-    double radiusmin=5;
-    double radiusmax=30;
+    F32 porosity=0.8;
+    F32 radiusmin=5;
+    F32 radiusmax=30;
     Distribution duniform_radius(radiusmin,radiusmax,"UNIFORMREAL");
 
-    double angle=10*3.14159265/180;//10 degre
+    F32 angle=10*3.14159265/180;//10 degre
     Distribution ddirar_angle(angle,"DIRAC");
 
-    double moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
+    F32 moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
     //8*E^3(R)/E^3(std::cos(theta))
-    double volume_expectation = moment_order3*8./(std::pow(std::cos(angle),3.0));
-    Vec3F64 domain(256);//2d field domain
-    double lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+    F32 volume_expectation = moment_order3*8./(std::pow(std::cos(angle),3.0));
+    Vec3F32 domain(256);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 
     DistributionMultiVariate v_orientation (DistributionMultiVariate(Distribution(0,3.14159265,"UNIFORMREAL"),Distribution(0,3.14159265,"UNIFORMREAL")) ,Distribution(0,3.14159265,"UNIFORMREAL"));
@@ -534,11 +534,11 @@ public:
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
 
-    Mat2F64 m=  Analysis::histogram(img_VecN_grey);
+    Mat2F32 m=  Analysis::histogram(img_VecN_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
     img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-    Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,15);
+    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,15);
     phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
     Scene3d scene;
     pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -559,20 +559,20 @@ public:
     * Dress the VecNs with cylinder with a random radius/height following the probability distributions.
     *
     * \code
-    double porosity=0.8;
-    double radius=5;
+    F32 porosity=0.8;
+    F32 radius=5;
     Distribution ddirac_radius(radius,"DIRAC");
 
-    double heightmix=40;
-    double heightmax=70;
+    F32 heightmix=40;
+    F32 heightmax=70;
     Distribution duniform_height(heightmix,heightmax,"UNIFORMREAL");
 
-    double moment_order2 = pop::Statistics::moment(ddirac_radius,2,0,40);
-    double moment_order1 = pop::Statistics::moment(duniform_height,1,0,100);
+    F32 moment_order2 = pop::Statistics::moment(ddirac_radius,2,0,40);
+    F32 moment_order1 = pop::Statistics::moment(duniform_height,1,0,100);
     //8*E^2(R)/E^3(std::cos(theta))
-    double volume_expectation = 3.14159265*moment_order2*moment_order1;
-    Vec3F64 domain(256);//2d field domain
-    double lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+    F32 volume_expectation = 3.14159265*moment_order2*moment_order1;
+    Vec3F32 domain(256);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 
     Vec<Distribution> v_orientation;
@@ -584,11 +584,11 @@ public:
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
 
-    Mat2F64 m=  Analysis::histogram(img_VecN_grey);
+    Mat2F32 m=  Analysis::histogram(img_VecN_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
     img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-    Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,15);
+    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,15);
     phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
     Scene3d scene;
     pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -609,14 +609,14 @@ public:
     * addition of the grains
     *
     * \code
-    double radius=10;
+    F32 radius=10;
     Distribution ddirac_radius(radius,"DIRAC");
 
-    double heightmix=40;
-    double heightmax=70;
+    F32 heightmix=40;
+    F32 heightmax=70;
     Distribution duniform_height(heightmix,heightmax,"UNIFORMREAL");
 
-    Vec3F64 domain(256);//2d field domain
+    Vec3F32 domain(256);//2d field domain
 
     ModelGermGrain3 grain1 = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
 
@@ -640,7 +640,7 @@ public:
     Mat3UI8 img_VecN_grey;
     img_VecN_grey = img_VecN;
     img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-    Mat3F64 phasefield = PDE::allenCahn(img_VecN_grey,15);
+    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,15);
     phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
     Scene3d scene;
     pop::Visualization::marchingCubeLevelSet(scene,phasefield);
@@ -664,7 +664,7 @@ public:
     * affect a black and white RGB randomly to the grains
     *
     * \code
-    Vec2F64 domain(512,512);
+    Vec2F32 domain(512,512);
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
 
     Distribution d("1/x^3");
@@ -695,7 +695,7 @@ public:
     * affect a RGB randomly following the input distributions
     *
     * \code
-    Vec2F64 domain(512,512);
+    Vec2F32 domain(512,512);
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
 
     Distribution d("1/x^3");
@@ -730,7 +730,7 @@ public:
     * \code
     Mat2RGBUI8 img;
     img.load("../image/Lena.bmp");
-    Vec2F64 domain;
+    Vec2F32 domain;
     domain= img.getDomain();
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
     Distribution d("1/x^(3.1)");
@@ -766,7 +766,7 @@ public:
     * \code
     Mat2RGBUI8 img;
     img.load("../image/Lena.bmp");
-    Vec2F64 domain;
+    Vec2F32 domain;
     domain= img.getDomain();
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
     Distribution d("1/x^3");
@@ -790,7 +790,7 @@ public:
     * \image html art.gif
     */
     template<int DIM>
-    static void  randomWalk( ModelGermGrain<DIM> &  grain, F64 radius);
+    static void  randomWalk( ModelGermGrain<DIM> &  grain, F32 radius);
 
     //@}
     //-------------------------------------
@@ -854,7 +854,7 @@ public:
     *
     */
     template<int DIM>
-    static MatN<DIM,UI8> gaussianThesholdedRandomField(const Mat2F64 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F64> & gaussianfield);
+    static MatN<DIM,UI8> gaussianThesholdedRandomField(const Mat2F32 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F32> & gaussianfield);
 
 
 
@@ -868,7 +868,7 @@ public:
     *
     */
     template<int DIM>
-    static MatN<DIM,UI8> randomStructure(const VecN<DIM,I32> &domainmodel,const Mat2F64 & volume_fraction);
+    static MatN<DIM,UI8> randomStructure(const VecN<DIM,I32> &domainmodel,const Mat2F32 & volume_fraction);
 
 
     /*!
@@ -885,7 +885,7 @@ public:
     Mat2UI8 ref;
     ref.load("/home/vincent/Desktop/CI_4_0205_18_00_seg.pgm");
         ref= Processing::greylevelRemoveEmptyValue(ref);
-        Mat2F64 m = Analysis::histogram(ref);
+        Mat2F32 m = Analysis::histogram(ref);
         VecN<3,int> p(256,256,256);
         Mat3UI8 model =RandomGeometry::randomStructure(p,m);
         RandomGeometry::annealingSimutated(model, ref,128,8 );//long algorithm at least 15 hours
@@ -896,7 +896,7 @@ public:
     */
 
     template<int DIM1,int DIM2>
-    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F64 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,double temperature_inverse=1);
+    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F32 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,F32 temperature_inverse=1);
 
 
     /*!
@@ -924,15 +924,15 @@ public:
 private:
     template <int DIM>
     static void divideTilling(const Vec<int> & v,Private::IntersectionRectangle<DIM> &rec,const  ModelGermGrain<DIM> & grainlist, MatN<DIM,RGBUI8> &img);
-    static Distribution generateProbabilitySpectralDensity(const Mat2F64& correlation,double beta);
+    static Distribution generateProbabilitySpectralDensity(const Mat2F32& correlation,F32 beta);
 
-    inline static bool annealingSimutatedLaw(double energynext,double energycurrent,double temperature_inverse){
+    inline static bool annealingSimutatedLaw(F32 energynext,F32 energycurrent,F32 temperature_inverse){
         if(energynext<energycurrent)
             return true;
         else
         {
-            double v1 = rand()*1.0/RAND_MAX;
-            double v2 = std::exp((energycurrent-energynext)*temperature_inverse);
+            F32 v1 = rand()*1.0/RAND_MAX;
+            F32 v2 = std::exp((energycurrent-energynext)*temperature_inverse);
             if(v1<v2)
                 return true;
             else
@@ -1094,26 +1094,26 @@ private:
 
     }
 
-    static double energy(Vec< Vec<int> >& v1,Vec< Vec<int> >& v2,Vec<int> &nbr_pixel_by_phase1,Vec<int> &nbr_pixel_by_phase2)
+    static F32 energy(Vec< Vec<int> >& v1,Vec< Vec<int> >& v2,Vec<int> &nbr_pixel_by_phase1,Vec<int> &nbr_pixel_by_phase2)
     {
-        double sum=0;
+        F32 sum=0;
         for(int i =0;i<(int)v1.size();i++){
             for(int j =0;j<(int)v1[i].size();j++){
-                double diff = 1.0*v1[i][j]/nbr_pixel_by_phase1[i]-1.0*v2[i][j]/nbr_pixel_by_phase2[i];
+                F32 diff = 1.0*v1[i][j]/nbr_pixel_by_phase1[i]-1.0*v2[i][j]/nbr_pixel_by_phase2[i];
                 sum+=(diff*diff);
             }
         }
         return std::sqrt(sum);
     }
-    static double energy(Vec< Vec< Vec<int> > >& v1,Vec< Vec< Vec<int> > >& v2)
+    static F32 energy(Vec< Vec< Vec<int> > >& v1,Vec< Vec< Vec<int> > >& v2)
     {
-        double sum=0;
+        F32 sum=0;
         for(int i =0;i<(int)v1.size();i++){
             for(int j =0;j<(int)v1[i].size();j++){
                 for(int k =0;k<(int)v1[i][j].size();k++){
 
                     //                    sum+=absolute(1.0*v1[i][i][k]/v1[i][i][0]-1.0*v2[i][i][k]/v2[i][i][0]);
-                    double diff = 1.0*v1[i][j][k]/v1[i][i][0]-1.0*v2[i][j][k]/v2[i][i][0];
+                    F32 diff = 1.0*v1[i][j][k]/v1[i][i][0]-1.0*v2[i][j][k]/v2[i][i][0];
                     //                    if(i==j)
                     sum+=(diff*diff);
                     //                    else
@@ -1148,7 +1148,7 @@ void  RandomGeometry::RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiV
         std::cerr<<"In RandomGeometry::RGBRandom, the distRGB_RGB distribution must generate a 3d multuvate random variable";
     }
     for(typename Vec<Germ<DIM> * >::iterator it= grain.grains().begin();it!=grain.grains().end();it++ ){
-        VecF64 v = distRGB_RGB.randomVariable();
+        VecF32 v = distRGB_RGB.randomVariable();
         (*it)->color=RGBUI8(v(0),v(1),v(2));
     }
 }
@@ -1161,22 +1161,22 @@ void RandomGeometry::RGBFromMatrix( ModelGermGrain<DIM> &  grain,const MatN<DIM,
 }
 
 template<int DIM>
-void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius)
+void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F32 radius)
 {
-    KDTree<DIM,F64> kptree;
+    KDTree<DIM,F32> kptree;
     Vec<bool> v_in;
 
     for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++){
-        VecN<DIM,F64> x = grain.grains()[index_grain]->x;
-        VecN<DIM,F64> xfind;
-        double dist;
+        VecN<DIM,F32> x = grain.grains()[index_grain]->x;
+        VecN<DIM,F32> xfind;
+        F32 dist;
         kptree.search(x,xfind,dist);
         if(dist>radius){
             v_in.push_back(true);
             kptree.addItem(x);
             if(grain.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_PERIODIC){
                 for(int i=0;i<DIM;i++){
-                    VecN<DIM,F64> xtore(x);
+                    VecN<DIM,F32> xtore(x);
                     xtore(i)-=grain.getDomain()(i);
                     kptree.addItem(xtore);
                     xtore(i)+=(2*grain.getDomain()(i));
@@ -1200,9 +1200,9 @@ void  RandomGeometry::hardCoreFilter( ModelGermGrain<DIM> &  grain, F64 radius)
     grain.grains() = vlist_temp;
 }
 template<int DIM>
-void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)
+void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F32 radius)
 {
-    Vec<F64> v;
+    Vec<F32> v;
     v= grain.getDomain();
     DistributionNormal d(0,radius);
     for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++)
@@ -1222,17 +1222,17 @@ void RandomGeometry::randomWalk( ModelGermGrain<DIM> &  grain, F64 radius)
 }
 
 template<int DIM>
-void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius)
+void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F32 radius)
 {
 
-    Vec<VecN<DIM,F64> > v_x;
+    Vec<VecN<DIM,F32> > v_x;
 
     for(int index_grain =0; index_grain<(int)grain.grains().size();index_grain++){
-        VecN<DIM,F64> x = grain.grains()[index_grain]->x;
+        VecN<DIM,F32> x = grain.grains()[index_grain]->x;
         v_x.push_back(x);
         if(grain.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_BOUNDED){
             for(int i=0;i<DIM;i++){
-                VecN<DIM,F64> xtore(x);
+                VecN<DIM,F32> xtore(x);
                 xtore(i)-=grain.getDomain()(i);
                 v_x.push_back(xtore);
                 xtore(i)+=(2*grain.getDomain()(i));
@@ -1240,14 +1240,14 @@ void  RandomGeometry::minOverlapFilter(ModelGermGrain<DIM> &  grain, F64 radius)
             }
         }
     }
-    VpTree<VecN<DIM,F64> > vptree;
+    VpTree<VecN<DIM,F32> > vptree;
     vptree.create(v_x);
     v_x.clear();
     Vec<bool> v_in;
     for(unsigned int i =0; i<grain.grains().size();i++){
-        VecN<DIM,F64> x = grain.grains()[i]->x;
-        Vec<VecN<DIM,F64> > v_neigh;
-        Vec<double > v_dist;
+        VecN<DIM,F32> x = grain.grains()[i]->x;
+        Vec<VecN<DIM,F32> > v_neigh;
+        Vec<F32 > v_dist;
         vptree.search(x,2,v_neigh,v_dist);
         if(v_dist[0]<=radius&&v_dist[1]<=radius)
             v_in.push_back(true);
@@ -1291,7 +1291,7 @@ void  RandomGeometry::addition(const ModelGermGrain<DIM> &  grain1,ModelGermGrai
 }
 
 template<int DIM>
-ModelGermGrain<DIM>  RandomGeometry::poissonPointProcess(VecN<DIM,F64> domain,double lambda)
+ModelGermGrain<DIM>  RandomGeometry::poissonPointProcess(VecN<DIM,F32> domain,F32 lambda)
 {
     std::cout<<"Poisson Point process"<<std::endl;
     DistributionPoisson d(lambda*domain.multCoordinate());
@@ -1302,10 +1302,10 @@ ModelGermGrain<DIM>  RandomGeometry::poissonPointProcess(VecN<DIM,F64> domain,do
     for(int i =0;i<nbr_VecNs;i++)
     {
         Germ<DIM> * g = new Germ<DIM>();
-        VecN<DIM,F64> x;
+        VecN<DIM,F32> x;
         for(int j = 0;j<DIM;j++)
         {
-            F64 rand = rx.randomVariable();
+            F32 rand = rx.randomVariable();
             x[j]= rand*1.0*(domain)[j];
         }
         g->x=x;
@@ -1318,7 +1318,7 @@ template<int DIM,typename TYPE>
 ModelGermGrain<DIM>  RandomGeometry::poissonPointProcessNonUniform(const MatN<DIM,TYPE> & lambdafield)
 {
 
-    double lambdamax = Analysis::maxValue(lambdafield);
+    F32 lambdamax = Analysis::maxValue(lambdafield);
     DistributionPoisson d(lambdamax*lambdafield.getDomain().multCoordinate());
     int nbr_VecNs = d.randomVariable();
     ModelGermGrain<DIM> grain;
@@ -1326,13 +1326,13 @@ ModelGermGrain<DIM>  RandomGeometry::poissonPointProcessNonUniform(const MatN<DI
     DistributionUniformReal rx(0,1);
     for(int i =0;i<nbr_VecNs;i++)
     {
-        VecN<DIM,F64> x;
+        VecN<DIM,F32> x;
         for(int j = 0;j<DIM;j++)
         {
-            F64 rand = rx.randomVariable();
+            F32 rand = rx.randomVariable();
             x[j]= rand*1.0*lambdafield.getDomain()(j);
         }
-        double U = rx.randomVariable();
+        F32 U = rx.randomVariable();
         if(U<lambdafield(x)/lambdamax){
             Germ<DIM> * germ = new Germ<DIM>();
             germ->x=x;
@@ -1352,7 +1352,7 @@ void RandomGeometry::sphere( ModelGermGrain<DIM> &  grain, Distribution & dist)
         Germ<DIM> * g = (*it);
         GrainSphere<DIM> * sphere = new GrainSphere<DIM>();
         sphere->setGerm(*g);
-        F64 value =dist.randomVariable();
+        F32 value =dist.randomVariable();
         sphere->radius = value;
         (*it) = sphere;
         delete g;
@@ -1383,18 +1383,18 @@ void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVa
         Germ<DIM> * g = (*it);
         GrainBox<DIM> * box = new GrainBox<DIM>();
         box->setGerm(*g);
-        VecN<DIM,F64> x;
+        VecN<DIM,F32> x;
         x = distradius.randomVariable();
         box->radius=x;
         if(DIM==3)
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
         (*it) = box;
@@ -1428,8 +1428,8 @@ void RandomGeometry::polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution >&
 
         polyedra->setGerm(*g);
         for(int i =0;i<(int)distradius.size();i++){
-            F64 distance =    distradius[i].randomVariable();
-            VecN<DIM,F64> normal;
+            F32 distance =    distradius[i].randomVariable();
+            VecN<DIM,F32> normal;
             for(int j=0;j<DIM;j++)
                 normal[j]=distnormal[DIM*i+j].randomVariable();
             polyedra->addPlane(distance,normal);
@@ -1473,18 +1473,18 @@ void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionM
         GrainEllipsoid<DIM> * box = new GrainEllipsoid<DIM>();
         box->setGerm(*g);
 
-        VecN<DIM,F64> x;
+        VecN<DIM,F32> x;
         x = distradius.randomVariable();
         box->setRadius(x);
         if(DIM==3)
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
 
@@ -1502,13 +1502,13 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
     // divide and conquer
     if(v.size()>10 && rec.size.allSuperior(2))
     {
-        VecN<DIM,F64> upleft = rec.x - rec.size*0.5;
+        VecN<DIM,F32> upleft = rec.x - rec.size*0.5;
         for(int i =0; i<std::pow(2,DIM*1.0);i++)
         {
-            VecN<DIM,F64> rectempsize,rectempcenter;
+            VecN<DIM,F32> rectempsize,rectempcenter;
             for(int j =0; j<DIM;j++)
             {
-                F64 value =  rec.size[j]*0.5;
+                F32 value =  rec.size[j]*0.5;
                 if((int)(i/std::pow(2,j*1.0))%2==0)
                 {
                     rectempsize[j]= std::floor(value);
@@ -1542,7 +1542,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
     {
 
 
-        VecN<DIM,F64> upleft = rec.x - rec.size*0.5;
+        VecN<DIM,F32> upleft = rec.x - rec.size*0.5;
 
         VecN<DIM,int> sizeboule =rec.size;
         typename MatN<DIM,int>::IteratorEDomain b(sizeboule);
@@ -1550,14 +1550,14 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
         {
 
             VecN<DIM,int> ximg =  b.x() + ((upleft));
-            VecN<DIM,F64> y = b.x();
+            VecN<DIM,F32> y = b.x();
             y = y;
-            VecN<DIM,F64> x = upleft + y;
+            VecN<DIM,F32> x = upleft + y;
 
             Vec<int> v_hit;
             for(int i=0;i<(int)v.size();i++)
             {
-                VecN<DIM,F64> xx;
+                VecN<DIM,F32> xx;
                 if(grainlist.getBoundaryCondition()==MATN_BOUNDARY_CONDITION_PERIODIC)
                     xx =  Private::smallestDistanceTore(x,(grainlist.grains()[v[i]])->x,grainlist.getDomain());
                 else
@@ -1592,9 +1592,9 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                     img(ximg) =   (grainlist.grains()[*(v_hit.begin())])->color;
                     Vec<int>::iterator it;
                     for(it=v_hit.begin()+1;it!=v_hit.end();it++){
-                        //                        std::cout<<img(ximg)<<"t"<<transparancy<<" "<<transparancy*RGBF64(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
-                        img(ximg) = grainlist.getTransparency()*RGBF64(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF64(img(ximg));
-                        //                        std::cout<<"t"<<transparancy<<" "<<transparancy*RGBF64(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
+                        //                        std::cout<<img(ximg)<<"t"<<transparancy<<" "<<transparancy*RGBF32(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
+                        img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
+                        //                        std::cout<<"t"<<transparancy<<" "<<transparancy*RGBF32(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
                     }
                 }else{
                     Vec<int>::iterator it;
@@ -1623,34 +1623,34 @@ pop::MatN<DIM,pop::RGBUI8> RandomGeometry::continuousToDiscrete(const ModelGermG
     return img;
 }
 template<int DIM>
-MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F64> & gaussianfield )
+MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F32 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F32> & gaussianfield )
 {
-    double porosity = mcorre(0,1);
+    F32 porosity = mcorre(0,1);
     Distribution f("1/(2*pi)^(1./2)*exp(-(x^2)/2)");
-    double beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);
+    F32 beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);
     Distribution Pmagnitude = RandomGeometry::generateProbabilitySpectralDensity(mcorre,beta);
 
     DistributionUniformReal d2pi(0,2*3.14159265);
     DistributionMultiVariateUnitSphere dpshere(DIM);
     int number_cosinus=1000;
-    Vec< VecN<DIM, double> > direction(number_cosinus);
-    Vec<  double > module(number_cosinus);
-    Vec<  double > phase(number_cosinus);
+    Vec< VecN<DIM, F32> > direction(number_cosinus);
+    Vec<  F32 > module(number_cosinus);
+    Vec<  F32 > phase(number_cosinus);
     std::cout<<"generate cosinus"<<std::endl;
     for(int i=0;i<number_cosinus;i++){
-        double p = d2pi.randomVariable();
+        F32 p = d2pi.randomVariable();
         phase[i] = p;
         module[i] = Pmagnitude.randomVariable();
         direction[i]= dpshere.randomVariable();
     }
 
     gaussianfield.resize(domain);
-    typename MatN<DIM,double>::IteratorEDomain b(gaussianfield.getIteratorEDomain());
+    typename MatN<DIM,F32>::IteratorEDomain b(gaussianfield.getIteratorEDomain());
     std::cout<<"generate field"<<std::endl;
     while(b.next())
     {
-        double sum=0;
-        VecN<DIM, double> x = b.x();
+        F32 sum=0;
+        VecN<DIM, F32> x = b.x();
         for(int i=0;i<number_cosinus;i++)
         {
             sum +=std::cos(productInner(x,direction[i])*module[i]+phase[i]);
@@ -1660,15 +1660,15 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
     }
     MatN<DIM,unsigned char> gaussianfieldthresolded(domain);
 
-    double betamin= beta -1;
-    double betamax= beta +1;
+    F32 betamin= beta -1;
+    F32 betamax= beta +1;
     bool test =true;
     do{
         test =false;
         gaussianfieldthresolded = Processing::threshold(gaussianfield,beta,100);
-        Mat2F64 mhisto = Analysis::histogram(gaussianfieldthresolded);
-        double porositymodel =mhisto(0,1);
-        double porosityref   = mcorre(0,1);
+        Mat2F32 mhisto = Analysis::histogram(gaussianfieldthresolded);
+        F32 porositymodel =mhisto(0,1);
+        F32 porosityref   = mcorre(0,1);
         std::cout<<"porositymodel "<<porositymodel<<std::endl;
         std::cout<<"porosityref   "<<porosityref<<std::endl;
         if(absolute(porosityref - porositymodel)>0.0001){
@@ -1683,7 +1683,7 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F64 &mcorr
     return gaussianfieldthresolded;
 }
 template<int DIM>
-MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const Mat2F64& volume_fraction){
+MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const Mat2F32& volume_fraction){
     MatN<DIM,UI8> out (domain);
     Vec<DistributionUniformInt> dist;
     for(int i=0;i<DIM;i++)
@@ -1710,7 +1710,7 @@ MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const
 
 
 template<int DIM1,int DIM2>
-void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference,F64 nbr_permutation_by_pixel, int lengthcorrelation,double temperature_inverse){
+void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference,F32 nbr_permutation_by_pixel, int lengthcorrelation,F32 temperature_inverse){
     if(temperature_inverse==-1)
         temperature_inverse=model.getDomain().multCoordinate();
     if(lengthcorrelation==-1){
@@ -1725,7 +1725,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
     std::cout<<"correlation lenght "<<lengthcorrelation<<std::endl;
     MatN<DIM2,UI8> ref= Processing::greylevelRemoveEmptyValue(img_reference);
     model= Processing::greylevelRemoveEmptyValue(model);
-    Mat2F64 m = Analysis::histogram(ref);
+    Mat2F32 m = Analysis::histogram(ref);
     int nbrphase=m.sizeI();
 
     Vec<Vec< Vec<int> > > vref = RandomGeometry::autoCorrelation(ref,lengthcorrelation,nbrphase);
@@ -1735,7 +1735,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
     Vec<Vec< Vec<int> > > vmodelcross = RandomGeometry::autoCorrelationCross(model,lengthcorrelation,nbrphase);
 
     int count=0;
-    double energy_current =10000;
+    F32 energy_current =10000;
 
     MatNDisplay d;
 
@@ -1779,7 +1779,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
         RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p2,state1);
         RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state1);
         model(p2)=state1;
-        double energytemp = RandomGeometry::energy(vref,vmodel);
+        F32 energytemp = RandomGeometry::energy(vref,vmodel);
         energytemp += RandomGeometry::energy(vrefcross,vmodelcross);
         temperature_inverse++;
         if(annealingSimutatedLaw(energytemp, energy_current,temperature_inverse)==false){
@@ -1822,13 +1822,13 @@ void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,
         box->img = &img;
         if(DIM==3)
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF64 v = distangle.randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
         (*it) = box;
