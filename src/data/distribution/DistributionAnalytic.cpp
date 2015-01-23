@@ -88,11 +88,9 @@ DistributionUniformInt * DistributionUniformInt::clone()const
 }
 
 DistributionUniformInt::DistributionUniformInt(int min, int max)
-    :DistributionDiscrete(0.1),_xmin(min),_xmax(max)
+    :DistributionDiscrete(0.1f),_xmin(min),_xmax(max)
 {
 }
-
-
 F32 DistributionUniformInt::randomVariable()const 
 {
     return _xmin + Distribution::irand.operator ()()%(1+_xmax-_xmin);

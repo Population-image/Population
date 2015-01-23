@@ -548,16 +548,16 @@ template<typename Type>
 F32 Vec<Type>::norm(int p)const{
     Private::sumNorm<Type> op(p);
     if(p==0||p==1)
-        return std::accumulate(this->begin(),this->end(),0.,op);
+        return std::accumulate(this->begin(),this->end(),0.f,op);
     if(p==2)
-        return std::sqrt(std::accumulate(this->begin(),this->end(),0.,op));
+        return std::sqrt(std::accumulate(this->begin(),this->end(),0.f,op));
     else
-        return std::pow(std::accumulate(this->begin(),this->end(),0.,op),1./p);
+        return std::pow(std::accumulate(this->begin(),this->end(),0.f,op),1.f/p);
 }
 template<typename Type>
 F32 Vec<Type>::normPower(int p)const{
     Private::sumNorm<Type> op(p);
-    return std::accumulate(this->begin(),this->end(),0.,op);
+    return std::accumulate(this->begin(),this->end(),0.f,op);
 
 }
 template<typename Type>

@@ -249,7 +249,7 @@ F32 Statistics::norm(const Distribution &f, F32 norm,F32 xmin, F32 xmax,F32 step
     while(it.next()){
         integral +=std::pow(absolute(f.operator ()(it.x())),norm)*step;
     }
-    return std::pow(integral,1./norm);
+    return std::pow(integral,1.f/norm);
 }
 
 F32 Statistics::productInner(const Distribution &f,const Distribution &g, F32 xmin, F32 xmax,F32 step)

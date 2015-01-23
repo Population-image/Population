@@ -376,7 +376,7 @@ struct ProcessingAdvanced
         F32 pow_min=0;
         F32 pow_max=1000;
         F32 pow_current=1;
-        F32 error_max=0.1;
+        F32 error_max=0.1f;
         F32 error_current=1;
         int number=0;
         bool test=false;

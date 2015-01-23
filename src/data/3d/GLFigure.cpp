@@ -514,11 +514,11 @@ void FigureArrow::callEndMode()
 Vec<GeometricalFigure*> FigureArrow::referencielEuclidean(pop::RGBUI8 color){
     Vec<GeometricalFigure*> v;
     FigureArrow * arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(1,0,0),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(1,0,0),0.1f);v.push_back(arrow);
     arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,1,0),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,1,0),0.1f);v.push_back(arrow);
     arrow =  new FigureArrow;
-    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,0,1),0.1);v.push_back(arrow);
+    arrow->setRGB(color);arrow->setArrow(Vec3F32(0,0,0),Vec3F32(0,0,1),0.1f);v.push_back(arrow);
     return v;
 }
 
