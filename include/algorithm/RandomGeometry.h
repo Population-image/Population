@@ -381,7 +381,7 @@ public:
     * \image html AborigenLenaBox.png
     */
     template<int DIM>
-    static void box( ModelGermGrain<DIM> &  grain,const  DistributionMultiVariate * distradius,const DistributionMultiVariate* distangle );
+    static void box( ModelGermGrain<DIM> &  grain,const  DistributionMultiVariate & distradius,const DistributionMultiVariate& distangle );
 
     /*!
     * \brief dress the VecNs with polyhedra
@@ -501,7 +501,7 @@ public:
     * \image html ellipsoid.png
     */
     template<int DIM>
-    static void ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate* distradius,const DistributionMultiVariate* distangle);
+    static void ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle);
 
     /*!
     * \brief dress the VecNs with polyhedra
@@ -547,10 +547,10 @@ public:
     * \endcode
     * \image html rhombohedron.png
     */
-    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution* distradius,const Distribution* distangle, const DistributionMultiVariate* distorientation );
+    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution& distradius,const Distribution& distangle, const DistributionMultiVariate& distorientation=DistributionMultiVariateProduct(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI)) );
 
     /*!
-    * \brief dress the VecNs with cylinder
+    * \brief dress the germs with cylinder
     * \param grain input/output grain
     * \param distradius  radius probability distribution
     * \param distheight  height probability distribution
@@ -598,9 +598,9 @@ public:
     * \image html cylinder.png
     */
 
-    static void  cylinder( pop::ModelGermGrain3  & grain,const Distribution&  distradius,const Distribution&  distheight,const DistributionMultiVariate& distorientation);
+    static void  cylinder( pop::ModelGermGrain3  & grain,const Distribution&  distradius,const Distribution&  distheight,const DistributionMultiVariate& distorientation=DistributionMultiVariateProduct(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI)));
     template<int DIM>
-    static void matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate* distangle );
+    static void matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle );
 
     /*!
     * \brief addition of the grains
@@ -1363,18 +1363,18 @@ void RandomGeometry::sphere( ModelGermGrain<DIM> &  grain, Distribution & dist)
 }
 
 template<int DIM>
-void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate* distradius,const DistributionMultiVariate* distangle )
+void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distradius,const DistributionMultiVariate& distangle )
 {
 
-    if((int)distradius->getNbrVariable()!=DIM )
+    if((int)distradius.getNbrVariable()!=DIM )
     {
         std::cerr<<"In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension";//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
     }
-    if(DIM==2 && distangle->getNbrVariable()!=1)
+    if(DIM==2 && distangle.getNbrVariable()!=1)
     {
         std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
-    if(DIM==3 && distangle->getNbrVariable()!=3)
+    if(DIM==3 && distangle.getNbrVariable()!=3)
     {
         std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
@@ -1385,17 +1385,17 @@ void RandomGeometry::box( ModelGermGrain<DIM> &  grain,const DistributionMultiVa
         GrainBox<DIM> * box = new GrainBox<DIM>();
         box->setGerm(*g);
         VecN<DIM,F32> x;
-        x = distradius->randomVariable();
+        x = distradius.randomVariable();
         box->radius=x;
         if(DIM==3)
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
         (*it) = box;
@@ -1450,18 +1450,18 @@ void RandomGeometry::polyhedra( ModelGermGrain<DIM> &  grain,Vec<Distribution* >
 }
 
 template<int DIM>
-void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate * distradius,const DistributionMultiVariate * distangle )
+void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate & distradius,const DistributionMultiVariate& distangle )
 {
 
-    if((int)distradius->getNbrVariable()!=DIM )
+    if((int)distradius.getNbrVariable()!=DIM )
     {
         std::cerr<<"In RandomGeometry::box, the radius DistributionMultiVariate must have d variables with d the space dimension";//for radii (with a random angle) \n\t 3 random variables for the three radii plus 3 for the angle");
     }
-    if(DIM==2 && distangle->getNbrVariable()!=1)
+    if(DIM==2 && distangle.getNbrVariable()!=1)
     {
         std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
-    if(DIM==3 && distangle->getNbrVariable()!=3)
+    if(DIM==3 && distangle.getNbrVariable()!=3)
     {
         std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
@@ -1473,17 +1473,17 @@ void RandomGeometry::ellipsoid( ModelGermGrain<DIM> &  grain,const DistributionM
         box->setGerm(*g);
 
         VecN<DIM,F32> x;
-        x = distradius->randomVariable();
+        x = distradius.randomVariable();
         box->setRadius(x);
         if(DIM==3)
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
 
@@ -1804,12 +1804,12 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
 }
 
 template<int DIM>
-void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate* distangle ){
-    if(DIM==2 && distangle->getNbrVariable()!=1)
+void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,UI8> &img,const DistributionMultiVariate& distangle ){
+    if(DIM==2 && distangle.getNbrVariable()!=1)
     {
         std::cerr<<"In RandomGeometry::box, for d = 2, the angle distribution Vec must have 1 variable with d the space dimension";
     }
-    if(DIM==3 && distangle->getNbrVariable()!=3)
+    if(DIM==3 && distangle.getNbrVariable()!=3)
     {
         std::cerr<<"In RandomGeometry::box, for d = 3, the angle distribution Vec must have 3 variables with d the space dimension";
     }
@@ -1821,13 +1821,13 @@ void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,
         box->img = &img;
         if(DIM==3)
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             for(int i=0;i<DIM;i++)
                 box->orientation.setAngle_ei(v(i),i);
         }
         else
         {
-            VecF32 v = distangle->randomVariable();
+            VecF32 v = distangle.randomVariable();
             box->orientation.setAngle_ei(v(0),0);
         }
         (*it) = box;

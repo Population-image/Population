@@ -3,9 +3,9 @@
 namespace pop{
 
 
-void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution *distradius,const Distribution *distangle, const DistributionMultiVariate *distorientation )
+void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution&distradius,const Distribution& distangle, const DistributionMultiVariate&distorientation )
 {
-    if(distorientation->getNbrVariable() !=3)
+    if(distorientation.getNbrVariable() !=3)
     {
         std::cerr<<"In RandomGeometry::rhombohedron, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }
@@ -14,9 +14,9 @@ void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution 
         Germ<3> * g = (*it);
         GrainEquilateralRhombohedron * box = new GrainEquilateralRhombohedron();
         box->setGerm(*g);
-        box->radius= distradius->randomVariable();
-        box->setAnglePlane( distangle->randomVariable());
-        VecF32 v = distorientation->randomVariable();
+        box->radius= distradius.randomVariable();
+        box->setAnglePlane( distangle.randomVariable());
+        VecF32 v = distorientation.randomVariable();
         for(int i=0;i<3;i++)
             box->orientation.setAngle_ei(v(i),i);
         (*it) = box;
@@ -26,7 +26,7 @@ void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution 
 void RandomGeometry::cylinder( pop::ModelGermGrain3  & grain,const Distribution&  distradius,const Distribution&  distheight,const DistributionMultiVariate& distorientation )
 {
 
-    if(distorientation.getNbrVariable()==3)
+    if(distorientation.getNbrVariable()!=3)
     {
         std::cerr<<"In RandomGeometry::cylinder, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }

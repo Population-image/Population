@@ -146,7 +146,8 @@ public:
                 }
                 else{
                     x(coordinate)++;
-                    return TypePixel(0);
+                    y-=f(x);
+                    return y;
                 }
             }else{
                 x(coordinate)--;
@@ -498,8 +499,9 @@ public:
         *
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
         {
+                        typename MatN<DIM,TypePixel>::E x=xx;
             TypePixelLabel label = _label->operator()(x);
             x(coordinate)++;
             TypePixel y;
@@ -558,8 +560,9 @@ public:
         * \sa PartialDerivateForward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
         {
+                        typename MatN<DIM,TypePixel>::E x=xx;
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=-f(x);
             x(coordinate)++;
@@ -604,8 +607,9 @@ public:
         * \sa PartialDerivateBackward
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
         {
+            typename MatN<DIM,TypePixel>::E x=xx;
             TypePixelLabel label = _label->operator()(x);
             TypePixel y=f(x);
             x(coordinate)--;
@@ -660,8 +664,9 @@ public:
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
         template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate_i,int coordinate_j )
         {
+            typename MatN<DIM,TypePixel>::E x=xx;
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
             }
@@ -677,7 +682,7 @@ public:
                     y-=partiatcentered(f,x,coordinate_i);
                 }
                 x(coordinate_j)++;
-                return 0;
+                return y;
             }
         }
     };
@@ -903,7 +908,7 @@ public:
                     y-=partiatcentered(f,x,coordinate_i);
                 }
                 x(coordinate_j)++;
-                return 0;
+                return y;
             }
         }
     };
@@ -1109,7 +1114,7 @@ public:
         F32 _kpower2;
         template<typename TypePixel>
         inline F32 f(TypePixel v) {
-            return 0.5 /(1 + pop::productInner(v,v)/(_kpower2));
+            return 0.5f /(1 + pop::productInner(v,v)/(_kpower2));
         }
         PartialDerivateBackward derivate_backward;
         PartialDerivateForward derivate_forward;
@@ -1156,7 +1161,7 @@ public:
     */
     class POP_EXPORTS  FreeEnergy
     {
-    private:
+    public:
         /*!
         * \param x input value
         * \return \f$\phi(1-\phi^2)\f$,

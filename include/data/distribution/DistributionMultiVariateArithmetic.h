@@ -120,52 +120,9 @@ DistributionMultiVariateArithmeticMultiplication operator *(const DistributionMu
 DistributionMultiVariateArithmeticDivision operator /(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
 DistributionMultiVariateArithmeticMin minimum(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
 DistributionMultiVariateArithmeticMax maximum(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
-//class DistributionMultiVariateSeparationProduct:public DistributionMultiVariateArithmetic
-//{
-//    /*!
-//         \class pop::DistributionMerge
-//         \brief h(x,y)=f(x)*g(y)
-//         \author Tariel Vincent
-//     *
-//     *
-//     */
-//public:
-//    DistributionMultiVariateSeparationProduct();
-//    DistributionMultiVariateSeparationProduct(const DistributionMultiVariateSeparationProduct & dist);
-//    virtual DistributionMultiVariateSeparationProduct * clone()const ;
-//    virtual F32 operator()(const VecF32&  value)const;
-//    VecF32 randomVariable()const ;
-//    virtual unsigned int getNbrVariable()const;
-//};
-// class DistributionMultiVariateCoupled:public DistributionMultiVariate
-// {
-//     /*!
-//         \class pop::DistributionMerge
-//         \brief generate two coupled random variable \f$H(X={x,y})=F(X={x}) for x=y, 0 otherwise \f$
-//         \author Tariel Vincent
-//     *
-//     *
-//     */
-//private:
-//    int _nbr_variable_coupled;
-//    Distribution* _single;
-
-//public:
-//    DistributionMultiVariateCoupled();
-//    DistributionMultiVariateCoupled(const DistributionMultiVariateCoupled &dist);
-
-//    void setNbrVariableCoupled(int nbr_variable_coupled);
-//    int getNbrVariableCoupled() const;
 
 
-//    void setSingleDistribution(Distribution *distsingle);
-//    Distribution * getSingleDistribution() const;
 
-//    virtual DistributionMultiVariateCoupled * clone()const ;
-//    virtual F32 operator()(const VecF32&  value)const;
-//    VecF32 randomVariable()const ;
-//    virtual int getNbrVariable()const;
-// };
 /// @endcond
 }
 #endif // DISTRIBUTIONMULTIVARIATEARITHMETIC_H

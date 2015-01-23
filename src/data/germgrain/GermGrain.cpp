@@ -5,7 +5,7 @@ GrainCylinder::GrainCylinder()
 {
 }
 F32 GrainCylinder::getRadiusBallNorm0IncludingGrain(){
-    if(maxradius==0)maxradius=std::sqrt(radius*radius+height*height/4);
+    if(maxradius==0)maxradius=std::sqrt(radius*radius+height*height/2);
     return  maxradius;
 }
 bool GrainCylinder::intersectionPoint(const VecN<3,F32> &  x_value)

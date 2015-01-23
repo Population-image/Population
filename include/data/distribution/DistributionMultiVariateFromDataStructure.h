@@ -145,41 +145,6 @@ public:
 
 
 
-
-class POP_EXPORTS DistributionMultiVariateFromDistribution : public DistributionMultiVariate
-{
-private:
-    /*!
-        \class pop::DistributionMultiVariateFromDistribution
-        \ingroup DistributionMultiVariate
-        \brief convert a Distribution to a DistributionMultiVariate
-        \author Tariel Vincent
-    *
-    * \code
-    DistributionExpression d("std::exp(x*std::log(x))");
-    DistributionMultiVariateFromDistribution dmulti(f);
-    dmulti.fromDistribution(d);
-    VecF32 v(1);
-    v(0)=6;
-    std::cout<<dmulti(v)<<std::endl;
-    *\endcode
-    * \sa Distribution
-    */
-
-    Distribution *_f;
-
-public:
-    ~DistributionMultiVariateFromDistribution();
-    DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution &f);
-    DistributionMultiVariateFromDistribution operator ()(const DistributionMultiVariateFromDistribution &f);
-    DistributionMultiVariateFromDistribution(const Distribution &f);
-    virtual DistributionMultiVariateFromDistribution * clone()const ;
-    virtual F32 operator ()(const VecF32&  value)const;
-    VecF32 randomVariable()const ;
-    unsigned int getNbrVariable()const;
-};
-
-
 class POP_EXPORTS DistributionMultiVariateNormal:public DistributionMultiVariate
 {
 private:
@@ -273,6 +238,31 @@ public:
     DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2,std::string var3,std::string var4);
     unsigned int getNbrVariable()const;
 };
+class DistributionMultiVariateProduct: public DistributionMultiVariate
+{
+    /*!
+         \class pop::DistributionMerge
+         \brief h(x,y)=f(x)*g(y)
+         \author Tariel Vincent
+     *
+     *
+     */
+private:
+    Vec<Distribution *> _v_dist;
+public:
+    ~DistributionMultiVariateProduct();
+    DistributionMultiVariateProduct& operator=(const DistributionMultiVariateProduct&a);
+    DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2);
+    DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3);
+    DistributionMultiVariateProduct(const Vec<Distribution*> v_dist);
+
+    virtual DistributionMultiVariateProduct * clone()const ;
+    virtual F32 operator()(const VecF32&  value)const;
+    VecF32 randomVariable()const ;
+    virtual unsigned int getNbrVariable()const;
+};
+
+
 /// @endcond
 }
 #endif // DISTRIBUTIONMULTIVARIATEFROMDATASTRUCTURE_H

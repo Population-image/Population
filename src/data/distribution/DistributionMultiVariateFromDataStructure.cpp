@@ -72,38 +72,6 @@ VecF32 DistributionMultiVariateRegularStep::randomVariable()const {
 }
 
 
-DistributionMultiVariateFromDistribution::~DistributionMultiVariateFromDistribution()
-{
-    if(_f!=NULL)delete _f;
-}
-
-
-
-DistributionMultiVariateFromDistribution::DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution & dist)
-    :DistributionMultiVariate(),_f(NULL)
-{
-    _f = dist._f->clone();
-}
-
-DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribution::clone()const {
-    return new DistributionMultiVariateFromDistribution(*this);
-}
-
-F32 DistributionMultiVariateFromDistribution::operator ()(const VecF32&  value)const{
-    return _f->operator ()(value(0));
-}
-
-VecF32 DistributionMultiVariateFromDistribution::randomVariable()const {
-    VecF32 v(1);
-    v(0)=_f->randomVariable();
-    return v;
-}
-
-unsigned int DistributionMultiVariateFromDistribution::getNbrVariable()const{
-    return 1;
-}
-
-
 DistributionMultiVariateNormal::DistributionMultiVariateNormal(VecF32 mean, Mat2F32 covariance)
     :DistributionMultiVariate(),_standard_normal(0,1)
 {
@@ -278,5 +246,57 @@ DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()
 F32 DistributionMultiVariateUniformInt::operator()(const VecF32& v)const{
    std::cerr<<"Not implemented "<<std::endl;
 }
+DistributionMultiVariateProduct::~DistributionMultiVariateProduct(){
+    for(unsigned int i=0;i<_v_dist.size();i++){
+        if(_v_dist[i]!=NULL)delete _v_dist[i];
+    }
+    _v_dist.clear();
+}
+DistributionMultiVariateProduct& DistributionMultiVariateProduct::operator=(const DistributionMultiVariateProduct&a){
+    for(unsigned int i=0;i<_v_dist.size();i++){
+        if(_v_dist[i]!=NULL)delete _v_dist[i];
+    }
+    _v_dist.clear();
+    for(unsigned int i=0;i<a._v_dist.size();i++){
+        _v_dist.push_back(a._v_dist(i)->clone());
+    }
+}
 
+DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2){
+    _v_dist.push_back(dist1.clone());
+    _v_dist.push_back(dist2.clone());
+}
+
+DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3){
+    _v_dist.push_back(dist1.clone());
+    _v_dist.push_back(dist2.clone());
+    _v_dist.push_back(dist3.clone());
+}
+
+DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Vec<Distribution*> v_dist){
+    for(unsigned int i=0;i<v_dist.size();i++){
+        _v_dist.push_back(v_dist(i)->clone());
+    }
+}
+
+DistributionMultiVariateProduct * DistributionMultiVariateProduct::clone()const {
+     return new DistributionMultiVariateProduct(_v_dist);
+}
+ F32 DistributionMultiVariateProduct::operator()(const VecF32&  value)const{
+     double sum=0;
+     for(unsigned int i=0;i<_v_dist.size();i++){
+         sum =_v_dist(i)->operator ()(value(i));
+     }
+     return sum;
+ }
+VecF32 DistributionMultiVariateProduct::randomVariable()const{
+    VecF32 random(this->getNbrVariable());
+    for(unsigned int i=0;i<_v_dist.size();i++){
+        random(i) =_v_dist(i)->randomVariable();
+    }
+    return random;
+}
+unsigned int DistributionMultiVariateProduct::getNbrVariable()const{
+    return _v_dist.size();
+}
 }
