@@ -1,5 +1,6 @@
 //#include <ctime>
 #include"data/distribution/Distribution.h"
+#include"time.h"
 //#include"data/distribution/DistributionFromDataStructure.h"
 //#include"data/utility/BasicUtility.h"
 //#include"data/distribution/DistributionArithmetic.h"

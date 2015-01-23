@@ -132,7 +132,7 @@ unsigned int DistributionMultiVariateNormal::getNbrVariable()const{
 
 VecF32 DistributionMultiVariateNormal::randomVariable()const {
     VecF32 V(this->getNbrVariable());
-    for(int i = 0;i<this->getNbrVariable();i++){
+    for(unsigned int i = 0;i<this->getNbrVariable();i++){
         V(i)=_standard_normal.randomVariable();
     }
     return _mean + _a*V;
@@ -224,8 +224,9 @@ DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimen
 {
     _dim=dimension;
 }
- F32 DistributionMultiVariateUnitSphere::operator()(const VecF32& v)const{
+ F32 DistributionMultiVariateUnitSphere::operator()(const VecF32& )const{
     std::cerr<<"Not implemented "<<std::endl;
+    return 0;
 }
 
 VecF32 DistributionMultiVariateUnitSphere::randomVariable()const {
@@ -275,8 +276,9 @@ VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
 DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()const {
     return new DistributionMultiVariateUniformInt(_xmin,_xmax);
 }
-F32 DistributionMultiVariateUniformInt::operator()(const VecF32& v)const{
+F32 DistributionMultiVariateUniformInt::operator()(const VecF32& )const{
    std::cerr<<"Not implemented "<<std::endl;
+   return 0;
 }
 
 }

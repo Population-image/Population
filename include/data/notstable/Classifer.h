@@ -103,6 +103,7 @@ public:
             if(isGoodAffectation(i)==false)
                 error +=_v_weight[i];
         }
+        return _error;
     }
     void training(){
         F32 error_sign_true=NumericLimits<F32>::maximumRange();
