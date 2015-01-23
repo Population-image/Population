@@ -252,7 +252,7 @@ private:
     template<typename FloatType>
     static VecN<4,std::pair<FloatType,Vec2I32> > _getWeightPosition(const  Vec2I32 x_domain,const  VecN<2,FloatType> &x_point,MatNBoundaryCondition boundary, pop::Int2Type<2>)
     {
-        VecN<4,std::pair<FloatType,Vec2I32> > v_out(std::make_pair(0, Vec2I32(0,0)));
+        VecN<4,std::pair<FloatType,Vec2I32> > v_out(std::make_pair(0.f, Vec2I32(0,0)));
         VecN<2,FloatType> x;
         x(0)=x_point(0)+EPSILON;
         x(1)=x_point(1)+EPSILON;

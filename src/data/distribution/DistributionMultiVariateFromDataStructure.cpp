@@ -219,7 +219,7 @@ bool DistributionMultiVariateExpression::fromRegularExpression(std::pair<std::st
         if(_concatvar[i]==',')
             _nbrvariable++;
     }
-    fparser.AddConstant("pi", 3.1415926535897932);
+    fparser.AddConstant("pi", 3.1415926535897932f);
     //
     I32 res = fparser.Parse(regularexpressionAndconcatvar.first, regularexpressionAndconcatvar.second);
     //

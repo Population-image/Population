@@ -232,7 +232,7 @@ public:
                     threshold(x)=0;
 
             }
-            Mat2RGBUI8 visu = pop::Visualization::labelForeground(threshold,img,0.2);
+            Mat2RGBUI8 visu = pop::Visualization::labelForeground(threshold,img,0.2f);
 
             window.display(visu);
             if(click==true)

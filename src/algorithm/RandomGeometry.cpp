@@ -161,19 +161,19 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& c
     Distribution f(equation.c_str());
     std::string  equation2= "1/(2*pi)*1/((1-x^2)^(1./2))*exp(-("+s+")^(2)/(1-x))";
     Distribution f2(equation2.c_str());
-    Distribution fintegral = Statistics::integral(f,0,1,0.001);
-    Distribution fintegral2 = Statistics::integral(f2,0,1,0.001);
+    Distribution fintegral = Statistics::integral(f,0,1.f,0.001f);
+    Distribution fintegral2 = Statistics::integral(f2,0.f,1,0.001f);
     Mat2F32 g(correlation.sizeI() ,2);
     for(unsigned int i= 0; i<correlation.sizeI();i++) {
         g(i,0) = i;
         if(autocorrelation(i,0)>=0)
-            g(i,1)=Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral,autocorrelation(i,0),0,1,0.001);
+            g(i,1)=Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral,autocorrelation(i,0),0,1,0.001f);
         else
-            g(i,1)=-Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral2,-autocorrelation(i,0),0,1,0.001);
+            g(i,1)=-Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral2,-autocorrelation(i,0),0,1,0.001f);
     }
     Distribution(g).display();
-    F32 pi =3.14159265;
-    F32 step2 =0.001;
+    F32 pi =3.14159265f;
+    F32 step2 =0.001f;
     F32 maxrange=2;
     Mat2F32 rho_k(maxrange/step2,2);
     for(unsigned int i= 1; i<rho_k.sizeI();i++)

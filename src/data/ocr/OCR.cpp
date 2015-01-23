@@ -30,7 +30,7 @@ std::string OCR::parseText(const Mat2UI8 & m,int nbr_pixels_width_caracter){
     return str1+"\n"+str2;
 }
 std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_caracter){
-    Mat2UI8 threhold =        Processing::thresholdNiblackMethod(m,0.2,3*nbr_pixels_width_caracter,-20);
+    Mat2UI8 threhold =        Processing::thresholdNiblackMethod(m,0.2f,3*nbr_pixels_width_caracter,-20);
 
     Mat2UI32 label = Processing::clusterToLabel(threhold,0);
 
@@ -59,9 +59,9 @@ std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_car
     v_dist.push_back(&dist_interval_width);
     v_dist.push_back(&dist_interval_height);
     v_weight.push_back(10);
-    v_weight.push_back(0.1);
+    v_weight.push_back(0.1f);
     v_weight.push_back(4);
-    Vec<Vec<Mat2UI8> > v_v_img = applyGraphCluster(label,v_dist,v_weight,0.5);
+    Vec<Vec<Mat2UI8> > v_v_img = applyGraphCluster(label,v_dist,v_weight,0.5f);
 
     std::string str;
     for(unsigned int i=0;i<v_v_img.size();i++){

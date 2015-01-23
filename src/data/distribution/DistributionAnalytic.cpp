@@ -117,12 +117,12 @@ DistributionUniformInt * DistributionUniformInt::clone()const
 }
 
 DistributionUniformInt::DistributionUniformInt(int min, int max)
-    :DistributionDiscrete(0.1),_xmin(min),_xmax(max)
+    :DistributionDiscrete(0.1f),_xmin(min),_xmax(max)
 {
 }
 
 DistributionUniformInt::DistributionUniformInt()
-:DistributionDiscrete(0.1)
+:DistributionDiscrete(0.1f)
 {
 }
 

@@ -90,7 +90,7 @@ F32 Distribution::getStep()const{
     if(_deriveddistribution!=NULL)
         return _deriveddistribution->getStep();
     else
-        return 0.01;
+        return 0.01f;
 }
 
 F32 Distribution::getXmin()const{

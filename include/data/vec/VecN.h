@@ -650,7 +650,7 @@ public:
             {
                 value+=std::pow(static_cast<F32>(absolute(this->_dat[i])),static_cast<F32>(p));
             }
-            value = std::pow(value,1./p);
+            value = std::pow(value,1.f/p);
         }
         return value;
     }

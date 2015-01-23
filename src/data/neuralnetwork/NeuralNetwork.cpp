@@ -1165,9 +1165,9 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
     n.label2String() = label_digit;
 
 
-    F32 sigma_min =0.15;
-    F32 sigma_max =0.25;
-    F32 alpha =0.13;
+    F32 sigma_min =0.15f;
+    F32 sigma_max =0.25f;
+    F32 alpha =0.13f;
 
     F32 standard_deviation_angle = PI/4;
     F32 standard_deviation_shear_j = PI/6;
@@ -1250,7 +1250,7 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
         }
     }
 
-    trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01,50,true);
+    trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01f,50,true);
 }
 void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta,unsigned int nbr_epoch,bool display_error_classification)
 {
@@ -1320,7 +1320,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         n.save(("neuralnetwork"+BasicUtility::IntFixedDigit2String(i,2)+".xml").c_str() );
         if(display_error_classification==true)
             std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<std::endl;
-        eta *=0.9;
+        eta *=0.9f;
         n.setLearningRate(eta);
     }
 }
