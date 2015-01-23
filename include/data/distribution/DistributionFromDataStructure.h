@@ -140,7 +140,7 @@ public:
     virtual F32 getStep()const;
 };
 
-class POP_EXPORTS DistributionIntegerRegularStep:public DistributionDiscrete
+class POP_EXPORTS DistributionIntegerRegularStep:public Distribution, public DistributionDiscrete
 {
 private:
     /*!

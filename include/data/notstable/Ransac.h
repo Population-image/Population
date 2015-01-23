@@ -48,7 +48,7 @@ POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriterati
     typedef typename Model::Data DataModel;
     Distribution d;
     for(unsigned int iterations=0;iterations<nbriteration;iterations++){
-        std::random_shuffle ( data.begin(), data.end() ,d.MTRand());
+        std::random_shuffle ( data.begin(), data.end() ,Distribution::irand());
         Vec<DataModel> consensus_set (data.begin(),data.begin()+best_model.getNumberDataFitModel());
         Model maybe_model(consensus_set);
 
@@ -74,7 +74,7 @@ POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned
     unsigned int minnbrdatatoassertmodel =1;
     Distribution d;
     for(unsigned int iterations=0;iterations<nbriteration;iterations++){
-        std::random_shuffle ( data.begin(), data.end() , d.MTRand());
+        std::random_shuffle ( data.begin(), data.end() , Distribution::irand);
         Vec<DataModel> consensus_set (data.begin(),data.begin()+best_model.getNumberDataFitModel());
         Model maybe_model(consensus_set);
 

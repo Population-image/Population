@@ -1260,9 +1260,9 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         v_global_rand[i]=i;
     if(display_error_classification==true)
         std::cout<<"iter_epoch\t error_train"<<std::endl;
-    Distribution d;
+
     for(unsigned int i=0;i<nbr_epoch;i++){
-        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,d.MTRand());
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand);
         int error=0;
         for(unsigned int j=0;j<v_global_rand.size();j++){
             VecF32 vout;
@@ -1289,9 +1289,9 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         v_global_rand[i]=i;
     if(display_error_classification==true)
         std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
-    Distribution d;
+
     for(unsigned int i=0;i<nbr_epoch;i++){
-        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,d.MTRand());
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand);
         int error_training=0,error_test=0;
         for(unsigned int j=0;j<v_global_rand.size();j++){
             VecF32 vout;

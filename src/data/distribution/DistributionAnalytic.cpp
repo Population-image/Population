@@ -16,13 +16,10 @@
 namespace pop
 {
 DistributionDiscrete::DistributionDiscrete(F32 step)
-    :Distribution(),_step(step){
+    :_step(step){
 
 }
-DistributionDiscrete::DistributionDiscrete(const DistributionDiscrete & discrete)
-    :Distribution(discrete),_step(discrete._step){
 
-}
 void DistributionDiscrete::setStep(F32 step)const{
     _step = step;
 }
@@ -38,13 +35,8 @@ bool DistributionDiscrete::isInStepIntervale(F32 value, F32 hitvalue)const{
         return false;
 }
 
-DistributionSign::DistributionSign()
-:DistributionDiscrete(0.1){
-}
 
-DistributionSign::DistributionSign(const DistributionSign & d)
-    :DistributionDiscrete(d){
-}
+
 
 DistributionSign * DistributionSign::clone()const {
     return new DistributionSign;
@@ -60,14 +52,12 @@ F32 DistributionSign::operator()(F32 value)const {
 }
 
 F32 DistributionSign::randomVariable()const {
-    if(irand()%2==1)
+    if(Distribution::irand.operator ()()%2==1)
         return 1;
     else
         return -1;
 }
-std::string DistributionUniformReal::getKey(){
-    return "UNIFORMREAL";
-}
+
 DistributionUniformReal * DistributionUniformReal::clone()const 
 {
     return new DistributionUniformReal(_xmin,  _xmax);
@@ -77,19 +67,8 @@ DistributionUniformReal::DistributionUniformReal(F32 min, F32 max)
     :Distribution(),_xmin(min),_xmax(max)
 {
 }
-DistributionUniformReal::DistributionUniformReal(const DistributionUniformReal & dist)
-    :Distribution(),_xmin(dist.getXmin()),_xmax(dist.getXmax())
-{
-}
 
 
-
-F32 DistributionUniformReal::getXmin()const{
-    return _xmin;
-}
-F32 DistributionUniformReal::getXmax()const{
-    return _xmax;
-}
 F32 DistributionUniformReal::operator()(F32 value)const 
 {
     if(value>=_xmin&&value<_xmax)return 1/(_xmin-_xmax);
@@ -101,16 +80,8 @@ F32 DistributionUniformReal::randomVariable()const
     return _xmin + value;
 }
 
-void DistributionUniformReal::reset(F32 xmin, F32 xmax){
-    this->_xmin =xmin;
-    this->_xmax =xmax;
-}
-
-
-
 //Uniform Distribution
 
-std::string DistributionUniformInt::getKey(){return "UNIFORMINT";}
 DistributionUniformInt * DistributionUniformInt::clone()const 
 {
     return new DistributionUniformInt(_xmin,  _xmax);
@@ -121,35 +92,10 @@ DistributionUniformInt::DistributionUniformInt(int min, int max)
 {
 }
 
-DistributionUniformInt::DistributionUniformInt()
-:DistributionDiscrete(0.1)
-{
-}
-
-DistributionUniformInt::DistributionUniformInt(const DistributionUniformInt & dist)
-    :DistributionDiscrete(0.1),_xmin(dist.getXmin()),_xmax(dist.getXmax())
-{
-}
-
-
-F32 DistributionUniformInt::getXmin()const{
-    return _xmin;
-}
-
-F32 DistributionUniformInt::getXmax()const{
-    return _xmax;
-}
-void DistributionUniformInt::setXmin(F32 xmin){
-    _xmin = xmin;
-}
-
-void DistributionUniformInt::setXmax(F32 xmax){
-    _xmax = xmax;
-}
 
 F32 DistributionUniformInt::randomVariable()const 
 {
-    return _xmin + irand.operator ()()%(1+_xmax-_xmin);
+    return _xmin + Distribution::irand.operator ()()%(1+_xmax-_xmin);
 }
 F32 DistributionUniformInt::operator()(F32 value)const 
 {
@@ -163,38 +109,17 @@ F32 DistributionUniformInt::operator()(F32 value)const
     }
     return 0;
 }
-void DistributionUniformInt::reset(int xmin, int xmax){
-    this->_xmin =xmin;
-    this->_xmax =xmax;
-}
-
 
 //Normal distribtuion
-std::string DistributionNormal::getKey(){return "NORMAL";}
 DistributionNormal * DistributionNormal::clone()const 
 {
     return new DistributionNormal(_mean, _standard_deviation);
 }
 
-F32 DistributionNormal::getMean()const{
-    return _mean;
-}
-
-F32 DistributionNormal::getStandartDeviation()const{
-    return _standard_deviation;
-}
-
-
 DistributionNormal::DistributionNormal(F32 mean, F32 standard_deviation)
     :_mean(mean),_standard_deviation(standard_deviation),_real(0,1)
 {
 }
-DistributionNormal::DistributionNormal(const DistributionNormal & dist)
-    :Distribution(),_mean(dist.getMean()),_standard_deviation(dist.getStandartDeviation()),_real(0,1)
-{
-}
-
-
 F32 DistributionNormal::randomVariable()const 
 {
     F32 x1, x2, w;
@@ -214,42 +139,20 @@ F32 DistributionNormal::operator()(F32 value)const
 
     return (1/std::sqrt((2*3.141592654*_standard_deviation*_standard_deviation)))*std::exp(-(value-_mean)*(value-_mean)/(2*_standard_deviation*_standard_deviation));
 }
-void DistributionNormal::reset(F32 mean, F32 standard_deviation){
-    this->_mean =mean;
-    this->_standard_deviation=standard_deviation;
-}
-
-F32 DistributionNormal::getXmin()const{
-    return _mean - 5 *_standard_deviation;
-}
-F32 DistributionNormal::getXmax()const{
-    return _mean + 5 *_standard_deviation;
-}
-
 
 //Binomial
-std::string DistributionBinomial::getKey(){return "BINOMIAL";}
+
 DistributionBinomial * DistributionBinomial::clone()const 
 {
     return new DistributionBinomial(_probability, _number_times);
 }
 
-F32 DistributionBinomial::getProbability()const{
-    return _probability;
-}
-
-int DistributionBinomial::getNumberTime()const{
-    return _number_times;
-}
 
 DistributionBinomial::DistributionBinomial(F32 probability, int number_times)
     :DistributionDiscrete(1),_probability(probability),_number_times(number_times),distreal01(0,1)
 {
 }
-DistributionBinomial::DistributionBinomial(const DistributionBinomial & dist)
-    :DistributionDiscrete(1),_probability(dist.getProbability()),_number_times(dist.getNumberTime()),distreal01(0,1)
-{
-}
+
 F32 DistributionBinomial::randomVariable()const 
 {
     int sum =0;
@@ -262,22 +165,11 @@ F32 DistributionBinomial::operator()(F32 )const
     std::cerr<<"In DistributionBinomial::operator()(F32 ), not implemented";
     return 1;
 }
-void DistributionBinomial::reset(F32 probability, int number_times){
-    this->_probability =probability;
-    this->_number_times=number_times;
-
-}
-
-
 //exponentiel
-std::string DistributionExponential::getKey(){return "EXPONENTIAL";}
+
 DistributionExponential * DistributionExponential::clone()const 
 {
     return new DistributionExponential(_lambda);
-}
-
-F32 DistributionExponential::getLambda()const{
-    return _lambda;
 }
 
 
@@ -285,10 +177,7 @@ DistributionExponential::DistributionExponential(F32 lambda)
     :_lambda(lambda),distreal01(0,1)
 {
 }
-DistributionExponential::DistributionExponential(const DistributionExponential & dist)
-    :Distribution(),_lambda(dist.getLambda()),distreal01(0,1)
-{
-}
+
 F32 DistributionExponential::randomVariable()const 
 {
     return -std::log(distreal01.randomVariable())/_lambda;
@@ -303,28 +192,20 @@ void DistributionExponential::reset(F32 lambda){
 
 }
 
-F32 DistributionExponential::getXmin()const{
-    return 0;
-}
-F32 DistributionExponential::getXmax()const{
-    return 4/_lambda;
-}
+
 
 
 //Poisson
-std::string DistributionPoisson::getKey(){return "POISSON";}
+
 DistributionPoisson * DistributionPoisson::clone()const 
 {
     return new DistributionPoisson(_lambda);
 }
 
-F32 DistributionPoisson::getLambda()const{
-    return _lambda;
-}
 DistributionPoisson::~DistributionPoisson()
 {
-    if(this->flambdalargemult==NULL)delete this->flambdalargemult;
-    if(this->flambdalargerest==NULL)delete this->flambdalargerest;
+    if(this->flambdalargemult!=NULL)delete this->flambdalargemult;
+    if(this->flambdalargerest!=NULL)delete this->flambdalargerest;
 
 }
 DistributionPoisson::DistributionPoisson(F32 lambda)
@@ -332,11 +213,7 @@ DistributionPoisson::DistributionPoisson(F32 lambda)
 {
     this->init();
 }
-DistributionPoisson::DistributionPoisson(const DistributionPoisson & dist)
-    :DistributionDiscrete(1),_lambda(dist.getLambda()),_maxlambda(200),flambdalargemult(NULL),flambdalargerest(NULL),distreal01(0,1)
-{
-    this->init();
-}
+
 void DistributionPoisson::init()
 {
     if(flambdalargemult!=NULL)delete flambdalargemult;
@@ -435,43 +312,16 @@ F32 DistributionPoisson::operator()(F32 value)const
 
 }
 
-void DistributionPoisson::reset(F32 lambda){
-    this->_lambda =lambda;
-    this->init();
-
-}
-F32 DistributionPoisson::getXmin()const{
-    return 0;
-}
-F32 DistributionPoisson::getXmax()const{
-    return 3*_lambda;
-}
-
-
-
 
 //Dirac
-std::string DistributionDirac::getKey(){return "DIRAC";}
 DistributionDirac * DistributionDirac::clone()const 
 {
     return new DistributionDirac(this->_x);
 }
 
 
-F32 DistributionDirac::getX()const{
-    return _x;
-}
-void DistributionDirac::reset(F32 x){
-    _x = x;
-}
-
-
 DistributionDirac::DistributionDirac(F32 x)
     :_x(x)
-{
-}
-DistributionDirac::DistributionDirac(DistributionDirac &dist)
-    :DistributionDiscrete(),_x(dist.getX())
 {
 }
 
@@ -487,7 +337,6 @@ F32 DistributionDirac::operator()(F32 value)const
 }
 
 //Triangle
-std::string DistributionTriangle::getKey(){return "TRIANGLE";}
 DistributionTriangle * DistributionTriangle::clone()const 
 {
     return new DistributionTriangle(*this);
@@ -496,10 +345,6 @@ DistributionTriangle * DistributionTriangle::clone()const
 
 DistributionTriangle::DistributionTriangle(F32 xmin,F32 xmax,F32 peak)
     :_x_min(xmin),_x_max(xmax),_x_peak(peak),_distreal01(0,1)
-{
-}
-DistributionTriangle::DistributionTriangle(const DistributionTriangle &dist)
-    :Distribution(),_x_min(dist._x_min),_x_max(dist._x_max),_x_peak(dist._x_peak),_distreal01(0,1)
 {
 }
 

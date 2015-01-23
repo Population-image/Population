@@ -44,57 +44,55 @@ in the Software.
 #include <limits>
 
 #include"3rdparty/MTRand.h"
-#include"data/mat/MatNBoundaryCondition.h"
-#include"data/mat/MatN.h"
-#include"data/mat/Mat2x.h"
 
-/*! \ingroup Data
-* \defgroup DistributionFunction  Function (mathematics)
-* \brief Function (mathematics) defined with a symbolic link
-*/
+
+///*! \ingroup Data
+//* \defgroup DistributionFunction  Function (mathematics)
+//* \brief Function (mathematics) defined with a symbolic link
+//*/
 
 namespace pop
 {
 
 
-/*! \ingroup DistributionFunction
-* \defgroup Distribution  Distribution
-* \brief mapping from the real number to the real number
-*
-* \section DefinitonDistribution Basic definition
-*
-* The class Distribution, not named function to avoid any confusions with the function concept,  is a mapping from the real number
-* to the real number where the input element, x, completely determines the output element, y,  by this relation: y = f(x).
-* The evaluation of the output element from an input element is a symbolic (implicit) relation for instance,
-* for a function equal to \f$x \mapsto x^2\f$, the output element is evaluated by the multiplication of the input element by itself.
-*
-* \section ImplementationDistribution Code
-*
-* I implement a class pop::Distribution and many derived. Because I hide the polymorphism mechanis
-* with an implementation pattern, you have to create objects (and not pointer) of the class pop::Distribution to operate
-*  - basic arithmetic operations
-*  - analysis/process with algorithm class pop::Statistics
-*
-* For instance, this code
-      \code
-    Distribution f("x", "EXPRESSION");//f(x)=x
-    for(int i =0;i<4;i++)
-        std::cout<<f(i)<<" ";
-    std::cout<<std::endl;
-    f = f*f;//now f(x)=x*x
-    for(int i =0;i<4;i++)
-        std::cout<<f(i)<<" ";
-    std::cout<<std::endl;
-    f = pop::Statistics::derivate(f,0,10);//now f(x)=2*x
-    for(int i =0;i<4;i++)
-        std::cout<<f(i)<<" ";
-    std::cout<<std::endl;
-      \endcode
-      produce this output: \n
-    0 1 2 3 \n
-    0 1 4 9 \n
-    0.01 2.01 4.01 6.01 \n
-*/
+///*! \ingroup DistributionFunction
+//* \defgroup Distribution  Distribution
+//* \brief mapping from the real number to the real number
+//*
+//* \section DefinitonDistribution Basic definition
+//*
+//* The class Distribution, not named function to avoid any confusions with the function concept,  is a mapping from the real number
+//* to the real number where the input element, x, completely determines the output element, y,  by this relation: y = f(x).
+//* The evaluation of the output element from an input element is a symbolic (implicit) relation for instance,
+//* for a function equal to \f$x \mapsto x^2\f$, the output element is evaluated by the multiplication of the input element by itself.
+//*
+//* \section ImplementationDistribution Code
+//*
+//* I implement a class pop::Distribution and many derived. Because I hide the polymorphism mechanis
+//* with an implementation pattern, you have to create objects (and not pointer) of the class pop::Distribution to operate
+//*  - basic arithmetic operations
+//*  - analysis/process with algorithm class pop::Statistics
+//*
+//* For instance, this code
+//      \code
+//    Distribution f("x", "EXPRESSION");//f(x)=x
+//    for(int i =0;i<4;i++)
+//        std::cout<<f(i)<<" ";
+//    std::cout<<std::endl;
+//    f = f*f;//now f(x)=x*x
+//    for(int i =0;i<4;i++)
+//        std::cout<<f(i)<<" ";
+//    std::cout<<std::endl;
+//    f = pop::Statistics::derivate(f,0,10);//now f(x)=2*x
+//    for(int i =0;i<4;i++)
+//        std::cout<<f(i)<<" ";
+//    std::cout<<std::endl;
+//      \endcode
+//      produce this output: \n
+//    0 1 2 3 \n
+//    0 1 4 9 \n
+//    0.01 2.01 4.01 6.01 \n
+//*/
 class POP_EXPORTS Distribution
 {
     /*!
@@ -139,14 +137,19 @@ class POP_EXPORTS Distribution
 
     */
 private:
-    static unsigned long init[4];
+   static unsigned long init[4];
     static unsigned long length;
-protected:
-    Distribution * _deriveddistribution;
-    mutable MTRand_int32 irand;
-
-
 public:
+//    struct Test{
+//        unsigned long operator ()(){
+//            return 0;
+//        }
+//         unsigned long operator()(unsigned int N ) {
+//            return 0;
+//         }
+//    };
+//    static Test irand;
+    static MTRand_int32 irand;
     //-------------------------------------
     //
     //! \name Constructor
@@ -156,7 +159,7 @@ public:
     *
     * default constructor
     */
-    Distribution();
+//    Distribution();
 
 
     /*!
@@ -171,7 +174,7 @@ public:
     * \endcode
     *
     */
-    Distribution(const Distribution & d);
+//    Distribution(const Distribution & d);
     /*!
     * \param param discrete data in matrix (x-values=first column, y-valuess=second column)
     * \param type type of distribution with a Matrix parameter as argument
@@ -195,7 +198,7 @@ public:
     *
     * \sa DistributionRegularStep
     */
-    Distribution(const Mat2F32& param,std::string type="STEP");
+//    Distribution(const Mat2F32& param,std::string type="STEP");
 
 
     /*!
@@ -214,7 +217,7 @@ public:
     * For developper, because the licence is under LGPL licence,  you cannot modify the code of the file fparser.hh, fpconfig.hh and fptypes.hh.
     * \sa DistributionExpression
     */
-    Distribution(const char* param,std::string type="EXPRESSION");
+//    Distribution(const char* param,std::string type="EXPRESSION");
 
 
 
@@ -244,7 +247,7 @@ public:
     * \sa DistributionPoisson DistributionExponential DistributionDirac
     * \sa http://en.wikipedia.org/wiki/Poisson_distribution http://en.wikipedia.org/wiki/Exponential_distribution http://en.wikipedia.org/wiki/Dirac_delta_function
     */
-    Distribution(F32 param,std::string type="POISSON");
+//    Distribution(F32 param,std::string type="POISSON");
 
 
     /*!
@@ -272,7 +275,7 @@ public:
     * \endcode
     * \sa  DistributionUniformReal, DistributionUniformInt, DistributionNormal, DistributionBinomial
     */
-    Distribution(F32 param1,F32 param2,std::string type="NORMAL");
+//    Distribution(F32 param1,F32 param2,std::string type="NORMAL");
 
 
 
@@ -281,7 +284,7 @@ public:
     *
     *  virtual destructor
     */
-    virtual ~Distribution();
+    virtual ~Distribution(){}
 
 
     //@}
@@ -301,7 +304,7 @@ public:
         std::cout<<f(i)<<" ";
         \endcode
     */
-    virtual F32 operator()(F32 value)const ;
+    virtual F32 operator()(F32 value)const=0;
     /*!
     * \return X random variable
     *
@@ -332,14 +335,7 @@ public:
     \endcode
     *
     */
-    virtual F32 randomVariable()const ;
-    /*!
-    * \return X random variable
-    *
-    *  Generate random variable, X, following the probability distribution f.\n
-    *
-    */
-    virtual F32 operator()()const ;
+    virtual F32 randomVariable()const=0;
 
 
     //@}
@@ -371,7 +367,7 @@ public:
     \endcode
     * \sa pop::Statistics::toMatrix
     */
-    Mat2RGBUI8 display(F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizewidth=800,int sizeheight=600);
+//    Mat2RGBUI8 display(F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizewidth=800,int sizeheight=600);
 
     /*!
     * \param vd
@@ -400,9 +396,9 @@ public:
     \endcode
     * \sa pop::Statistics::toMatrix
     */
-    static Mat2RGBUI8 multiDisplay( std::vector<Distribution> & vd,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
-    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
-    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
+//    static Mat2RGBUI8 multiDisplay( std::vector<Distribution> & vd,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
+//    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
+//    static Mat2RGBUI8 multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,F32 xmin=-NumericLimits<F32>::maximumRange(),F32 xmax=NumericLimits<F32>::maximumRange(),F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizex=800,int sizey=600);
 
 
     //@}
@@ -416,7 +412,7 @@ public:
     *
     * Basic assignement of the other distribution to this distribution
     */
-    Distribution & operator =(const Distribution& d);
+//    Distribution & operator =(const Distribution& d);
 
 
 
@@ -433,7 +429,7 @@ public:
     d1.display(-10,10);
     * \endcode
     */
-    Distribution rho(const Distribution &g)const;
+//    Distribution rho(const Distribution &g)const;
 
     /*!
     * \param d input Distribution
@@ -447,7 +443,7 @@ public:
     d1.display(-2,2);
     * \endcode
     */
-    Distribution  operator +(const Distribution& d)const;
+//    Distribution  operator +(const Distribution& d)const;
 
     /*!
     * \param d other Distribution
@@ -461,7 +457,7 @@ public:
     d1.display(-2,2);
     * \endcode
     */
-    Distribution  operator -(const Distribution& d)const;
+//    Distribution  operator -(const Distribution& d)const;
     /*!
     * \param d other Distribution
     * \return   distribution
@@ -474,7 +470,7 @@ public:
     d1.display(-2,2);
     * \endcode
     */
-    Distribution  operator *(const Distribution& d)const;
+//    Distribution  operator *(const Distribution& d)const;
 
     /*!
     \fn Distribution  operator /(const Distribution& d)const;
@@ -489,14 +485,14 @@ public:
     d1.display(-2,2);
     * \endcode
     */
-    Distribution  operator /(const Distribution& d)const;
+//    Distribution  operator /(const Distribution& d)const;
 
     /*!
     * \return   distribution
     *
     *  Unary minus operator : h(x) = -(*this)(x)
     */
-    Distribution  operator -()const;
+//    Distribution  operator -()const;
     //@}
 
     //-------------------------------------
@@ -513,7 +509,7 @@ public:
     *
     * \sa IteratorDistributionSamplingRiemann DistributionDiscrete
     */
-    virtual void setStep(F32 step)const;
+//    virtual void setStep(F32 step)const;
 
 
     /*!
@@ -522,7 +518,7 @@ public:
     *  f(x)=0 for x<min value by default min_value=-infinity
     *
     */
-    virtual F32 getXmin()const;
+//    virtual F32 getXmin()const;
 
     /*!
     \fn virtual F32 getXmax()const;
@@ -531,7 +527,7 @@ public:
     *  f(x)=0 for x>max_value by default min_value=+infinity
     *
     */
-    virtual F32 getXmax()const;
+//    virtual F32 getXmax()const;
 
 
 
@@ -541,7 +537,7 @@ public:
     *  partition interval used for approximation calculation (by default 0.01)
     *
     */
-    virtual F32 getStep()const;
+//    virtual F32 getStep()const;
 
 
 
@@ -551,7 +547,7 @@ public:
     *
     *  Get the generator of random number (mersene twister)
     */
-    MTRand_int32 & MTRand();
+//    MTRand_int32 & MTRand();
 
 
     /*!
@@ -559,14 +555,14 @@ public:
     *
     *  clone pattern
     */
-    virtual Distribution * clone()const ;
+    virtual Distribution * clone()const=0 ;
     //@}
 
 
-    virtual F32 randomVariable(F32 param)const ;
-    Distribution * ___getPointerImplementation();
-    const Distribution * ___getPointerImplementation()const ;
-    void ___setPointererImplementation(Distribution * d);
+//    virtual F32 randomVariable(F32 param)const ;
+//    Distribution * ___getPointerImplementation();
+//    const Distribution * ___getPointerImplementation()const ;
+//    void ___setPointererImplementation(Distribution * d);
 };
 
 /*!
@@ -574,7 +570,7 @@ public:
 * \param d1 other  Distribution
 * \param d2 other  Distribution
 * \return  distribution
-*
+*: public Distribution
 *  h(x) = max(f(x),g(x))
 * \code
         Distribution d1("x^2");
@@ -584,7 +580,7 @@ public:
 * \endcode
 */
 
-POP_EXPORTS pop::Distribution maximum(const pop::Distribution & d1, const pop::Distribution & d2);
+//POP_EXPORTS pop::Distribution maximum(const pop::Distribution & d1, const pop::Distribution & d2);
 /*!
 * \ingroup Distribution
 * \param d1 input  Distribution
@@ -600,7 +596,7 @@ POP_EXPORTS pop::Distribution maximum(const pop::Distribution & d1, const pop::D
 * \endcode
 */
 
-POP_EXPORTS pop::Distribution minimum(const pop::Distribution & d1, const pop::Distribution & d2);
+//POP_EXPORTS pop::Distribution minimum(const pop::Distribution & d1, const pop::Distribution & d2);
 
 }
 

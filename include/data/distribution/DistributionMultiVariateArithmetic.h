@@ -38,157 +38,134 @@ in the Software.
 
 namespace pop
 {
-/// @cond DEV
-
-class DistributionMultiVariateArithmetic : public DistributionMultiVariate
+///// @cond DEV
+namespace Private {
+class DistributionMultiVariateConcatenation
 {
-    /*!
-        \class pop::DistributionMultiVariateArithmetic
-        \ingroup DistributionMultiVariate
-        \brief Arithmetic DistributionMultiVariate interface to allow arithmtic operations for the DistributionMultiVariate class
-        \author Tariel Vincent
-
-      \sa DistributionMultiVariate::operator +() DistributionMultiVariate::operator -() DistributionMultiVariate::operator *() DistributionMultiVariate::operator /()
-    */
-private:
-    DistributionMultiVariate  _fleft;
-    DistributionMultiVariate  _fright;
+protected:
+    DistributionMultiVariate * _fleft;
+    DistributionMultiVariate * _fright;
 public:
-    void setDistributionMultiVariateLeft(const DistributionMultiVariate & f_left);
-    void setDistributionMultiVariateRight(const DistributionMultiVariate &f_right);
-    VecF32 randomVariable()const ;
-    void setStep(F32 step)const;
+    DistributionMultiVariateConcatenation(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    DistributionMultiVariateConcatenation& operator=(const DistributionMultiVariateConcatenation&a);
+    virtual ~DistributionMultiVariateConcatenation();
+};
+}
 
 
-    DistributionMultiVariate & getDistributionMultiVariateLeft();
-    DistributionMultiVariate & getDistributionMultiVariateRight();
-    const DistributionMultiVariate & getDistributionMultiVariateLeft()const;
-    const DistributionMultiVariate & getDistributionMultiVariateRight()const;
-    DistributionMultiVariateArithmetic();
+class DistributionMultiVariateArithmeticAddition : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
+public:
+    DistributionMultiVariateArithmeticAddition(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    virtual DistributionMultiVariateArithmeticAddition * clone()const ;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
+};
+class DistributionMultiVariateArithmeticSubtraction : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
+public:
+    DistributionMultiVariateArithmeticSubtraction(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    virtual DistributionMultiVariateArithmeticSubtraction * clone()const ;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
+
+};
+class DistributionMultiVariateArithmeticMultiplication : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
+public:
+    DistributionMultiVariateArithmeticMultiplication(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    virtual DistributionMultiVariateArithmeticMultiplication * clone()const ;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
+
+};
+class DistributionMultiVariateArithmeticDivision : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
+public:
+    DistributionMultiVariateArithmeticDivision(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    virtual DistributionMultiVariateArithmeticDivision * clone()const ;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
 
 };
 
-
- class DistributionMultiVariateArithmeticAddition : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticAddition();
-    DistributionMultiVariateArithmeticAddition(const DistributionMultiVariateArithmeticAddition & dist);
-    virtual DistributionMultiVariateArithmeticAddition * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
- };
- class DistributionMultiVariateArithmeticSubtraction : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticSubtraction();
-    DistributionMultiVariateArithmeticSubtraction(const DistributionMultiVariateArithmeticSubtraction & dist);
-    virtual DistributionMultiVariateArithmeticSubtraction * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-
- };
- class DistributionMultiVariateArithmeticMultiplication : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticMultiplication();
-    DistributionMultiVariateArithmeticMultiplication(const DistributionMultiVariateArithmeticMultiplication & dist);
-    virtual DistributionMultiVariateArithmeticMultiplication * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-
- };
- class DistributionMultiVariateArithmeticDivision : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticDivision();
-    DistributionMultiVariateArithmeticDivision(const DistributionMultiVariateArithmeticDivision & dist);
-    virtual DistributionMultiVariateArithmeticDivision * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-
- };
- class DistributionMultiVariateArithmeticComposition : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticComposition();
-    DistributionMultiVariateArithmeticComposition(const DistributionMultiVariateArithmeticComposition & dist);
-    virtual DistributionMultiVariateArithmeticComposition * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-
- };
- class DistributionMultiVariateArithmeticMax : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticMax();
-    DistributionMultiVariateArithmeticMax(const DistributionMultiVariateArithmeticMax & dist);
+class DistributionMultiVariateArithmeticMax : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
+public:
+    DistributionMultiVariateArithmeticMax(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
     virtual DistributionMultiVariateArithmeticMax * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
 
- };
- class DistributionMultiVariateArithmeticMin : public DistributionMultiVariateArithmetic
- {
-
- public:
-    DistributionMultiVariateArithmeticMin();
-    DistributionMultiVariateArithmeticMin(const DistributionMultiVariateArithmeticMin & dist);
-    virtual DistributionMultiVariateArithmeticMin * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-
- };
- class DistributionMultiVariateSeparationProduct:public DistributionMultiVariateArithmetic
- {
-     /*!
-         \class pop::DistributionMerge
-         \brief h(x,y)=f(x)*g(y)
-         \author Tariel Vincent
-
-     *
-     *
-     */
- public:
-    DistributionMultiVariateSeparationProduct();
-    DistributionMultiVariateSeparationProduct(const DistributionMultiVariateSeparationProduct & dist);
-    virtual DistributionMultiVariateSeparationProduct * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-    VecF32 randomVariable()const ;
-    virtual int getNbrVariable()const;
- };
-
-
- class DistributionMultiVariateCoupled:public DistributionMultiVariate
- {
-     /*!
-         \class pop::DistributionMerge
-         \brief generate two coupled random variable \f$H(X={x,y})=F(X={x}) for x=y, 0 otherwise \f$
-         \author Tariel Vincent
-
-     *
-     *
-     */
-
-private:
-    int _nbr_variable_coupled;
-    Distribution _single;
+};
+class DistributionMultiVariateArithmeticMin : public DistributionMultiVariate, public Private::DistributionMultiVariateConcatenation
+{
 
 public:
-    DistributionMultiVariateCoupled();
-    DistributionMultiVariateCoupled(const DistributionMultiVariateCoupled &dist);
+    DistributionMultiVariateArithmeticMin(const DistributionMultiVariate &f_left,const DistributionMultiVariate& f_right);
+    virtual DistributionMultiVariateArithmeticMin * clone()const ;
+    virtual F32 operator()(const VecF32& value)const ;
+    virtual VecF32 randomVariable()const;
+    virtual unsigned int getNbrVariable()const;
 
-    void setNbrVariableCoupled(int nbr_variable_coupled);
-    int getNbrVariableCoupled() const;
+};
+DistributionMultiVariateArithmeticAddition operator +(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+DistributionMultiVariateArithmeticSubtraction operator -(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+DistributionMultiVariateArithmeticMultiplication operator *(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+DistributionMultiVariateArithmeticDivision operator /(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+DistributionMultiVariateArithmeticMin minimum(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+DistributionMultiVariateArithmeticMax maximum(const DistributionMultiVariate &d1,const DistributionMultiVariate &d2);
+//class DistributionMultiVariateSeparationProduct:public DistributionMultiVariateArithmetic
+//{
+//    /*!
+//         \class pop::DistributionMerge
+//         \brief h(x,y)=f(x)*g(y)
+//         \author Tariel Vincent
+//     *
+//     *
+//     */
+//public:
+//    DistributionMultiVariateSeparationProduct();
+//    DistributionMultiVariateSeparationProduct(const DistributionMultiVariateSeparationProduct & dist);
+//    virtual DistributionMultiVariateSeparationProduct * clone()const ;
+//    virtual F32 operator()(const VecF32&  value)const;
+//    VecF32 randomVariable()const ;
+//    virtual unsigned int getNbrVariable()const;
+//};
+// class DistributionMultiVariateCoupled:public DistributionMultiVariate
+// {
+//     /*!
+//         \class pop::DistributionMerge
+//         \brief generate two coupled random variable \f$H(X={x,y})=F(X={x}) for x=y, 0 otherwise \f$
+//         \author Tariel Vincent
+//     *
+//     *
+//     */
+//private:
+//    int _nbr_variable_coupled;
+//    Distribution* _single;
+
+//public:
+//    DistributionMultiVariateCoupled();
+//    DistributionMultiVariateCoupled(const DistributionMultiVariateCoupled &dist);
+
+//    void setNbrVariableCoupled(int nbr_variable_coupled);
+//    int getNbrVariableCoupled() const;
 
 
-    void setSingleDistribution(const Distribution &distsingle);
-    Distribution getSingleDistribution() const;
+//    void setSingleDistribution(Distribution *distsingle);
+//    Distribution * getSingleDistribution() const;
 
-    virtual DistributionMultiVariateCoupled * clone()const ;
-    virtual F32 operator()(const VecF32&  value)const;
-    VecF32 randomVariable()const ;
-    virtual int getNbrVariable()const;
- };
+//    virtual DistributionMultiVariateCoupled * clone()const ;
+//    virtual F32 operator()(const VecF32&  value)const;
+//    VecF32 randomVariable()const ;
+//    virtual int getNbrVariable()const;
+// };
 /// @endcond
 }
 #endif // DISTRIBUTIONMULTIVARIATEARITHMETIC_H

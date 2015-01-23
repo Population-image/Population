@@ -61,7 +61,6 @@ class POP_EXPORTS DistributionMultiVariateUniformInt:public DistributionMultiVar
         \ingroup DistributionMultiVariate
         \brief uniform int
         \author Tariel Vincent
-
     */
 private:
 
@@ -69,7 +68,6 @@ private:
 public:
     VecI32 _xmin;
     VecI32 _xmax;
-    int getDIM()const;
     /*!
     \fn DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax );
     *
@@ -77,15 +75,10 @@ public:
     *
     */
     DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax );
-
-    /*!
-    \fn DistributionMultiVariateUniformInt(const DistributionMultiVariateUniformInt & dist);
-    *
-    *  copy constructor
-    */
-    DistributionMultiVariateUniformInt(const DistributionMultiVariateUniformInt & dist);
     VecF32 randomVariable()const ;
     DistributionMultiVariateUniformInt * clone()const ;
+    unsigned int getNbrVariable()const;
+        virtual F32 operator()(const VecF32& v)const;
 };
 
 
@@ -97,11 +90,9 @@ class POP_EXPORTS DistributionMultiVariateUnitSphere:public DistributionMultiVar
         \ingroup DistributionMultiVariate
         \brief unit sphere distribution
         \author Tariel Vincent
-
       * Sphere VecN Picking http://mathworld.wolfram.com/SphereVecNPicking.html
       *
       *
-
       *
     */
 private:
@@ -109,7 +100,6 @@ private:
     DistributionUniformReal d2pi;
     DistributionUniformReal d2;
 public:
-    int getDIM()const;
     /*!
     \fn DistributionMultiVariateUnitSphere(int dimension);
     *
@@ -117,15 +107,10 @@ public:
     *
     */
     DistributionMultiVariateUnitSphere(int dimension);
-
-    /*!
-    \fn DistributionMultiVariateUnitSphere(const DistributionMultiVariateUnitSphere & dist);
-    *
-    *  copy constructor
-    */
-    DistributionMultiVariateUnitSphere(const DistributionMultiVariateUnitSphere & dist);
     VecF32 randomVariable()const ;
     DistributionMultiVariateUnitSphere * clone()const ;
+    unsigned int getNbrVariable()const;
+    virtual F32 operator()(const VecF32& v)const;
 
 };
 
@@ -150,28 +135,12 @@ public:
     std::vector<F32 >_repartition;
     VecF32 _xmin;
     MatN<2,F32> _mat2d;
-//    MatN<3,F32> _mat3d;
-//    MatN<4,F32> _mat4d;
-//    MatN<5,F32> _mat5d;
-
-
-    /*!
-    * \fn DistributionMultiVariateRegularStep();
-    *
-    *   constructor the regular step distribution from a matrix such that the first column contained the X-values with a regular spacing between successive
-    *  value and the second colum Y-values.
-    */
-    DistributionMultiVariateRegularStep();
-    DistributionMultiVariateRegularStep(const DistributionMultiVariateRegularStep & dist);
-
+    double _step;
     DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step);
-//    DistributionMultiVariateRegularStep(const MatN<3,F32> data_x_y_z, VecF32& xmin,F32 step);
-//    DistributionMultiVariateRegularStep(const MatN<4,F32> data_x_y_z_w, VecF32& xmin,F32 step);
-    virtual F32 operator ()(const VecF32&  value)const;
-    virtual DistributionMultiVariateRegularStep * clone()const ;
-    virtual VecF32 randomVariable()const ;
-
-    virtual int getNbrVariable()const;
+    F32 operator ()(const VecF32&  value)const;
+    DistributionMultiVariateRegularStep * clone()const ;
+    VecF32 randomVariable()const ;
+    unsigned int getNbrVariable()const;
 };
 
 
@@ -187,8 +156,8 @@ private:
         \author Tariel Vincent
     *
     * \code
-    Distribution d("std::exp(x*std::log(x))");
-    DistributionMultiVariateFromDistribution dmulti;
+    DistributionExpression d("std::exp(x*std::log(x))");
+    DistributionMultiVariateFromDistribution dmulti(f);
     dmulti.fromDistribution(d);
     VecF32 v(1);
     v(0)=6;
@@ -197,20 +166,17 @@ private:
     * \sa Distribution
     */
 
-    Distribution _f;
+    Distribution *_f;
 
 public:
     ~DistributionMultiVariateFromDistribution();
-    DistributionMultiVariateFromDistribution();
-    DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution & dist);
-
+    DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution &f);
+    DistributionMultiVariateFromDistribution operator ()(const DistributionMultiVariateFromDistribution &f);
+    DistributionMultiVariateFromDistribution(const Distribution &f);
     virtual DistributionMultiVariateFromDistribution * clone()const ;
     virtual F32 operator ()(const VecF32&  value)const;
     VecF32 randomVariable()const ;
-    void setStep(F32 step)const;
-    void fromDistribution(const Distribution &d);
-    Distribution  toDistribution()const;
-        virtual int getNbrVariable()const;
+    unsigned int getNbrVariable()const;
 };
 
 
@@ -260,16 +226,12 @@ private:
     Mat2F32 _sigma_minus_one;
     DistributionNormal _standard_normal;
 public:
-    DistributionMultiVariateNormal();
-    DistributionMultiVariateNormal(const DistributionMultiVariateNormal & dist);
+
     virtual F32 operator ()(const VecF32&  value)const;
     VecF32 randomVariable()const ;
     virtual DistributionMultiVariateNormal * clone()const ;
-    void fromMeanVecAndCovarianceMatrix(VecF32 mean, Mat2F32 covariance);
-    void fromMeanVecAndCovarianceMatrix(std::pair<VecF32, Mat2F32> meanvectorAndcovariancematrix);
-    std::pair<VecF32,Mat2F32> toMeanVecAndCovarianceMatrix()const;
-    virtual int getNbrVariable()const;
-
+    DistributionMultiVariateNormal(VecF32 mean, Mat2F32 covariance);
+    unsigned int getNbrVariable()const;
 };
 
 
@@ -287,8 +249,7 @@ private:
     *  std::string exp = "std::exp(x*std::log(x))*y"
     *
     \code
-        DistributionMultiVariateExpression dexp;
-        dexp.fromRegularExpression("std::exp(x*std::log(x))*y","x","y");
+        DistributionMultiVariateExpression dexp("std::exp(x*std::log(x))*y","x","y");
         VecF32 v(2);
         v(0)=6;
         v(1)=4;
@@ -296,29 +257,22 @@ private:
     \endcode
     *
     */
-     std::string _func;
-     std::string _concatvar;
+    std::string _func;
+    std::string _concatvar;
     mutable FunctionParser fparser;
-
-
-public:
-    bool fromRegularExpression(std::pair<std::string,std::string> regularexpressionAndconcatvar);
     int _nbrvariable;
-    DistributionMultiVariateExpression();
-    DistributionMultiVariateExpression(const DistributionMultiVariateExpression & dist);
+    bool fromRegularExpression(std::pair<std::string,std::string> regularexpressionAndconcatvar);
+public:
     virtual F32 operator ()(const VecF32&  value)const;
     VecF32 randomVariable()const ;
     virtual DistributionMultiVariateExpression * clone()const ;
 
-    bool fromRegularExpression(std::string expression,std::string var1);
-    bool fromRegularExpression(std::string expression,std::string var1,std::string var2);
-    bool fromRegularExpression(std::string expression,std::string var1,std::string var2,std::string var3);
-    bool fromRegularExpression(std::string expression,std::string var1,std::string var2,std::string var3,std::string var4);
-    std::pair<std::string,std::string> toRegularExpression()const;
-
-    virtual int getNbrVariable()const;
+    DistributionMultiVariateExpression(std::string expression,std::string var1);
+    DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2);
+    DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2,std::string var3);
+    DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2,std::string var3,std::string var4);
+    unsigned int getNbrVariable()const;
 };
 /// @endcond
-
 }
 #endif // DISTRIBUTIONMULTIVARIATEFROMDATASTRUCTURE_H

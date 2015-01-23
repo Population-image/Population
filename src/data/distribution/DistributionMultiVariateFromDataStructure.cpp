@@ -5,20 +5,6 @@
 #include"algorithm/LinearAlgebra.h"
 namespace pop{
 
-DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep()
-    :uni(0,1)
-{
-
-}
-DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const DistributionMultiVariateRegularStep & dist)
-    :DistributionMultiVariate(),uni(0,1)
-{
-    this->_step =  dist._step;
-    this->_repartition = dist._repartition;
-    this->_xmin  =dist._xmin;
-    this->_mat2d =dist._mat2d;
-
-}
 
 DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step)
     :DistributionMultiVariate(),uni(0,1)
@@ -45,7 +31,7 @@ void DistributionMultiVariateRegularStep::generateRepartition(){
 
 
 
-int DistributionMultiVariateRegularStep::getNbrVariable()const{
+unsigned int DistributionMultiVariateRegularStep::getNbrVariable()const{
     return _xmin.size();
 }
 
@@ -86,17 +72,17 @@ VecF32 DistributionMultiVariateRegularStep::randomVariable()const {
 }
 
 
-DistributionMultiVariateFromDistribution::~DistributionMultiVariateFromDistribution(){
+DistributionMultiVariateFromDistribution::~DistributionMultiVariateFromDistribution()
+{
+    if(_f!=NULL)delete _f;
 }
 
-DistributionMultiVariateFromDistribution::DistributionMultiVariateFromDistribution()
-{
-}
+
 
 DistributionMultiVariateFromDistribution::DistributionMultiVariateFromDistribution(const DistributionMultiVariateFromDistribution & dist)
-    :DistributionMultiVariate()
+    :DistributionMultiVariate(),_f(NULL)
 {
-    fromDistribution( dist.toDistribution());
+    _f = dist._f->clone();
 }
 
 DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribution::clone()const {
@@ -104,38 +90,32 @@ DistributionMultiVariateFromDistribution * DistributionMultiVariateFromDistribut
 }
 
 F32 DistributionMultiVariateFromDistribution::operator ()(const VecF32&  value)const{
-    return _f.operator ()(value(0));
+    return _f->operator ()(value(0));
 }
 
 VecF32 DistributionMultiVariateFromDistribution::randomVariable()const {
     VecF32 v(1);
-    v(0)=_f.randomVariable();
+    v(0)=_f->randomVariable();
     return v;
 }
 
-void DistributionMultiVariateFromDistribution::setStep(F32 step)const{
-    return _f.setStep(step);
-}
-void DistributionMultiVariateFromDistribution::fromDistribution(const Distribution &d){
-    _f = d;
-}
-int DistributionMultiVariateFromDistribution::getNbrVariable()const{
+unsigned int DistributionMultiVariateFromDistribution::getNbrVariable()const{
     return 1;
 }
-Distribution  DistributionMultiVariateFromDistribution::toDistribution()const{
-    return _f;
-}
 
 
-DistributionMultiVariateNormal::DistributionMultiVariateNormal()
-    :_standard_normal(0,1)
-{
-}
-DistributionMultiVariateNormal::DistributionMultiVariateNormal(const DistributionMultiVariateNormal & dist)
+DistributionMultiVariateNormal::DistributionMultiVariateNormal(VecF32 mean, Mat2F32 covariance)
     :DistributionMultiVariate(),_standard_normal(0,1)
 {
-    this->fromMeanVecAndCovarianceMatrix(dist.toMeanVecAndCovarianceMatrix());
+    _mean = mean;
+    _sigma = covariance;
+    _sigma_minus_one=LinearAlgebra::inverseGaussianElimination(_sigma);
+    _determinant_sigma = _sigma.determinant();
+
+    _a = LinearAlgebra::AATransposeEqualMDecomposition(_sigma);
+
 }
+
 F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
 
     VecF32 V= value - _mean;
@@ -146,7 +126,7 @@ F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
     v/=(std::pow(2*3.141592654,this->getNbrVariable()/2));
     return v;
 }
-int DistributionMultiVariateNormal::getNbrVariable()const{
+unsigned int DistributionMultiVariateNormal::getNbrVariable()const{
     return _mean.size();
 }
 
@@ -162,24 +142,6 @@ DistributionMultiVariateNormal * DistributionMultiVariateNormal::clone()const {
     return new DistributionMultiVariateNormal(*this);
 }
 
-void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(VecF32 mean, Mat2F32 covariance){
-    _mean = mean;
-    _sigma = covariance;
-    _sigma_minus_one=LinearAlgebra::inverseGaussianElimination(_sigma);
-    _determinant_sigma = _sigma.determinant();
-
-    _a = LinearAlgebra::AATransposeEqualMDecomposition(_sigma);
-
-}
-
-void DistributionMultiVariateNormal::fromMeanVecAndCovarianceMatrix(std::pair<VecF32, Mat2F32> meanvectorAndcovariancematrix){
-    fromMeanVecAndCovarianceMatrix(meanvectorAndcovariancematrix.first,meanvectorAndcovariancematrix.second);
-}
-
-std::pair<VecF32,Mat2F32> DistributionMultiVariateNormal::toMeanVecAndCovarianceMatrix()const{
-    return std::make_pair(_mean,_sigma);
-}
-
 F32 DistributionMultiVariateExpression::operator()( const VecF32&  value)const
 {
     return fparser.Eval(static_cast<const F32*>( &(*(value.begin()))));
@@ -189,7 +151,7 @@ VecF32 DistributionMultiVariateExpression::randomVariable()const {
     return VecF32();
 }
 
-int DistributionMultiVariateExpression::getNbrVariable()const{
+unsigned int DistributionMultiVariateExpression::getNbrVariable()const{
     return _nbrvariable;
 }
 
@@ -201,15 +163,6 @@ DistributionMultiVariateExpression *DistributionMultiVariateExpression::clone() 
 }
 
 
-DistributionMultiVariateExpression::DistributionMultiVariateExpression()
-{
-}
-DistributionMultiVariateExpression::DistributionMultiVariateExpression(const DistributionMultiVariateExpression & dist)
-    :DistributionMultiVariate()
-{
-    this->_nbrvariable = dist._nbrvariable;
-    this->fromRegularExpression(dist.toRegularExpression());
-}
 
 bool DistributionMultiVariateExpression::fromRegularExpression(std::pair<std::string,std::string> regularexpressionAndconcatvar){
     _func = regularexpressionAndconcatvar.first;
@@ -232,34 +185,38 @@ bool DistributionMultiVariateExpression::fromRegularExpression(std::pair<std::st
     }
     return true;
 }
-
-bool DistributionMultiVariateExpression::fromRegularExpression(std::string expression,std::string var1){
+DistributionMultiVariateExpression::DistributionMultiVariateExpression(std::string expression,std::string var1)
+    :DistributionMultiVariate()
+{
     _nbrvariable = 1;
-    return fromRegularExpression(std::make_pair(expression,var1));
+    fromRegularExpression(std::make_pair(expression,var1));
 }
-
-bool DistributionMultiVariateExpression::fromRegularExpression(std::string expression,std::string var1,std::string var2){
+DistributionMultiVariateExpression::DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2)
+    :DistributionMultiVariate()
+{
     _nbrvariable =  2;
-    return fromRegularExpression(std::make_pair(expression,var1+","+var2));
+    fromRegularExpression(std::make_pair(expression,var1+","+var2));
 }
 
-bool DistributionMultiVariateExpression::fromRegularExpression(std::string expression,std::string var1,std::string var2,std::string var3){
+DistributionMultiVariateExpression::DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2,std::string var3)
+    :DistributionMultiVariate()
+{
     _nbrvariable =  3;
-    return fromRegularExpression(std::make_pair(expression,var1+","+var2+","+var3));
+    fromRegularExpression(std::make_pair(expression,var1+","+var2+","+var3));
 }
 
-bool DistributionMultiVariateExpression::fromRegularExpression(std::string expression,std::string var1,std::string var2,std::string var3,std::string var4){
+DistributionMultiVariateExpression::DistributionMultiVariateExpression(std::string expression,std::string var1,std::string var2,std::string var3,std::string var4)
+    :DistributionMultiVariate()
+{
     _nbrvariable =  4;
-    return fromRegularExpression(std::make_pair(expression,var1+","+var2+","+var3+","+var4));
+    fromRegularExpression(std::make_pair(expression,var1+","+var2+","+var3+","+var4));
 }
 
 
 
-std::pair<std::string,std::string> DistributionMultiVariateExpression::toRegularExpression()const{
-    return std::make_pair(_func,_concatvar);
-}
 
-int DistributionMultiVariateUnitSphere::getDIM()const{
+
+unsigned int DistributionMultiVariateUnitSphere::getNbrVariable()const{
     return _dim;
 }
 DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimension)
@@ -267,12 +224,8 @@ DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimen
 {
     _dim=dimension;
 }
-
-
-DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(const DistributionMultiVariateUnitSphere & dist)
-    :DistributionMultiVariate(),d2pi(0,2*3.14159265),d2(-1,1)
-{
-    _dim = dist.getDIM();
+ F32 DistributionMultiVariateUnitSphere::operator()(const VecF32& v)const{
+    std::cerr<<"Not implemented "<<std::endl;
 }
 
 VecF32 DistributionMultiVariateUnitSphere::randomVariable()const {
@@ -302,19 +255,12 @@ DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()
     return new DistributionMultiVariateUnitSphere(_dim);
 }
 
-int DistributionMultiVariateUniformInt::getDIM()const{
+unsigned int DistributionMultiVariateUniformInt::getNbrVariable()const{
     return _xmin.size();
 }
 DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax )
     :DistributionMultiVariate(),_d(0,1),_xmin(xmin),_xmax(xmax)
 {
-}
-
-
-DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const DistributionMultiVariateUniformInt & dist)
-    :DistributionMultiVariate(),_d(0,1),_xmin(dist._xmin),_xmax(dist._xmin)
-{
-
 }
 
 VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
@@ -327,6 +273,10 @@ VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
 }
 
 DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()const {
-    return new DistributionMultiVariateUniformInt(*this);
+    return new DistributionMultiVariateUniformInt(_xmin,_xmax);
 }
+F32 DistributionMultiVariateUniformInt::operator()(const VecF32& v)const{
+   std::cerr<<"Not implemented "<<std::endl;
+}
+
 }

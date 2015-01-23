@@ -120,7 +120,7 @@ struct POP_EXPORTS LinearAlgebra
      *
      * Generate the random matrix such that each element is a random variable thrown following the probability distribution \a proba
      * \code
-     * Distribution d(0,10,"NORMAL");//centered normal distribution with sigma=10
+     * DistributionUniformReal d(0,10);//centered normal distribution with sigma=10
      * Mat2F32 R=LinearAlgebra::random(5,5,d);
      * std::cout<<R<<std::endl;
      * \endcode
@@ -133,7 +133,8 @@ struct POP_EXPORTS LinearAlgebra
       \endverbatim
      * \sa Distribution
     */
-    static Mat2F32 random(int size_i,int size_j, Distribution proba=Distribution(-MTRand_int32::maxValue(),MTRand_int32::maxValue(),"UNIFORMREAL"));
+    template<typename DistributionType>
+    static Mat2F32 random(int size_i,int size_j, DistributionType proba);
     /*!
      * \brief inverse the matrix by gaussian elimination algorithm
      * \param m input invertible Mat2F32
@@ -449,6 +450,15 @@ bool LinearAlgebra::isIdentity(const Matrix &m,F32 error){
         return false;
     else
         return true;
+}
+template<typename DistributionType>
+Mat2F32 LinearAlgebra::random(int size_i, int size_j, DistributionType proba){
+    Mat2F32 m(size_i,size_j);
+    Mat2F32::iterator __first = m.begin();
+    Mat2F32::iterator __last = m.end();
+    for (; __first != __last; ++__first)
+        *__first = proba.randomVariable();
+    return m;
 }
 }
 #endif // LINEARALGEBRA_H

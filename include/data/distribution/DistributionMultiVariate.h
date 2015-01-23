@@ -70,132 +70,122 @@ class POP_EXPORTS DistributionMultiVariate
 
       *
     */
-private:
-    static unsigned long init[4];
-    static unsigned long length;
-protected:
-    DistributionMultiVariate * _deriveddistribution;
-     std::string _key;
-    static MTRand_int32 irand;
-    mutable F32 _step;
 public:
-    typedef  VecF32 E;
-    typedef  F32 F;
-    /*!
-    \fn DistributionMultiVariate();
-    *
-    * default constructor
-    */
-    DistributionMultiVariate();
+//    /*!
+//    \fn DistributionMultiVariate();
+//    *
+//    * default constructor
+//    */
+//    DistributionMultiVariate();
 
 
-    /*!
-    \fn DistributionMultiVariate(const DistributionMultiVariate & d);
-    * \param d copied multi variate distribution
-    *
-    *  copy constructor
-    *
-    * \code
-    DistributionMultiVariateExpression dexp;
-    dexp.fromRegularExpression("x*y+y","x","y");
-    DistributionMultiVariate d(dexp);
-    VecF32 v(2);
-    v(0)=6;
-    v(1)=4;
-    std::cout<<d(v)<<std::endl;
-    * \endcode
-    */
-    DistributionMultiVariate(const DistributionMultiVariate & d);
+//    /*!
+//    \fn DistributionMultiVariate(const DistributionMultiVariate & d);
+//    * \param d copied multi variate distribution
+//    *
+//    *  copy constructor
+//    *
+//    * \code
+//    DistributionMultiVariateExpression dexp;
+//    dexp.fromRegularExpression("x*y+y","x","y");
+//    DistributionMultiVariate d(dexp);
+//    VecF32 v(2);
+//    v(0)=6;
+//    v(1)=4;
+//    std::cout<<d(v)<<std::endl;
+//    * \endcode
+//    */
+//    DistributionMultiVariate(const DistributionMultiVariate & d);
 
-    /*!
-    \fn DistributionMultiVariate(const Distribution & d,int nbr_variable_coupled);
-   * \param d single  distribution
-   * \param nbr_variable_coupled number of coupled random variables
-    *
-    * generate a random number H(X={x,...,z,})=F(X={x}) for x =...=z
-    * \code
-    Distribution dmulti(DistributionUniformInt(0,255));
-    DistributionMultiVariate dcoupled(dmulti,3);
-    VecF32 v = dcoupled.randomVariable();
-    v.display();
-    \endcode
-    The vector v contain three times the same ranmdom variables  following the Uniform probability distribution
-    */
-    DistributionMultiVariate(const Distribution &F,int nbr_variable_coupled);
-    /*!
-    \fn DistributionMultiVariate(const Distribution & f);
-    *
-    *  Construct a distribution such that h(x)=f(x) Idem for the probability distribution H(X={x})=F(X={x})
-    *
-    * \sa Distribution
-    */
-    DistributionMultiVariate(const Distribution & f);
-    /*!
-    \fn DistributionMultiVariate(const DistributionMultiVariate & f,const DistributionMultiVariate & g);
-    * \param f input multi variate distribution
-    * \param g input multi variate distribution
-    *
-    *  Construct a distribution such that h(x,y)=f(x)*g(y) Idem for the probability distribution H(X={x,y})=F(X={x})G(Y={y})
-    */
-    DistributionMultiVariate(const DistributionMultiVariate & f,const DistributionMultiVariate & g);
-
-
-    /*!
-    \fn DistributionMultiVariate(std::string expresssion,std::string variable);
-    * \brief regular expression
-    * \param expresssion regular expression
-    * \param variable variable seperate by ','
-    *
-    * \code
-    DistributionMultiVariate d("exp(-1/3*x^3-x-y^2)","x,y");
-    VecF32 v(2);
-    v(0)=-1;
-    v(0)=0;
-    cout<<d(v)<<endl;
-    * \endcode
-
-    */
-    DistributionMultiVariate(std::string expresssion,std::string variable);
+//    /*!
+//    \fn DistributionMultiVariate(const Distribution & d,int nbr_variable_coupled);
+//   * \param d single  distribution
+//   * \param nbr_variable_coupled number of coupled random variables
+//    *
+//    * generate a random number H(X={x,...,z,})=F(X={x}) for x =...=z
+//    * \code
+//    Distribution dmulti(DistributionUniformInt(0,255));
+//    DistributionMultiVariate dcoupled(dmulti,3);
+//    VecF32 v = dcoupled.randomVariable();
+//    v.display();
+//    \endcode
+//    The vector v contain three times the same ranmdom variables  following the Uniform probability distribution
+//    */
+//    DistributionMultiVariate(const Distribution &F,int nbr_variable_coupled);
+//    /*!
+//    \fn DistributionMultiVariate(const Distribution & f);
+//    *
+//    *  Construct a distribution such that h(x)=f(x) Idem for the probability distribution H(X={x})=F(X={x})
+//    *
+//    * \sa Distribution
+//    */
+//    DistributionMultiVariate(const Distribution & f);
+//    /*!
+//    \fn DistributionMultiVariate(const DistributionMultiVariate & f,const DistributionMultiVariate & g);
+//    * \param f input multi variate distribution
+//    * \param g input multi variate distribution
+//    *
+//    *  Construct a distribution such that h(x,y)=f(x)*g(y) Idem for the probability distribution H(X={x,y})=F(X={x})G(Y={y})
+//    */
+//    DistributionMultiVariate(const DistributionMultiVariate & f,const DistributionMultiVariate & g);
 
 
-    /*!
-    \fn DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
-    * \brief normal disptribution http://en.wikipedia.org/wiki/Multivariate_normal_distribution
-    * \param mean mean value
-    * \param covariance  covariance (nonnegative-definite matrix)
-    *
-    \code
-    F32 mux=0;
-    F32 muy=0;
-    F32 sigmax=3;
-    F32 sigmay=1;
-    F32 rho = -0.7;
+//    /*!
+//    \fn DistributionMultiVariate(std::string expresssion,std::string variable);
+//    * \brief regular expression
+//    * \param expresssion regular expression
+//    * \param variable variable seperate by ','
+//    *
+//    * \code
+//    DistributionMultiVariate d("exp(-1/3*x^3-x-y^2)","x,y");
+//    VecF32 v(2);
+//    v(0)=-1;
+//    v(0)=0;
+//    cout<<d(v)<<endl;
+//    * \endcode
 
-    VecF32 v(2);
-    v(0)=mux;
-    v(1)=muy;
-    Mat2F32 m(2,2);
-    m(0,0)=sigmax*sigmax;    m(0,1)=sigmax*sigmay*rho;
-    m(1,0)=sigmax*sigmay*rho;m(1,1)=sigmay*sigmay;
+//    */
+//    DistributionMultiVariate(std::string expresssion,std::string variable);
 
-    DistributionMultiVariate multi(v,m);
 
-    Mat2UI8 img(512,512);
-    MatNDisplay windows(img);
-    while(!windows.is_closed())
-    {
-        VecF32 v = multi.randomVariable();
-        Vec2F32 p= v.toVecN<2>();
-        Vec2I32 x= p*25+Vec2F32(img.getDomain())*0.5;
-        if(img.isValid(x(0),x(1))){
-            img(x)=255;
-            windows.display(img);
-        }
-    }
-    \endcode
+//    /*!
+//    \fn DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
+//    * \brief normal disptribution http://en.wikipedia.org/wiki/Multivariate_normal_distribution
+//    * \param mean mean value
+//    * \param covariance  covariance (nonnegative-definite matrix)
+//    *
+//    \code
+//    F32 mux=0;
+//    F32 muy=0;
+//    F32 sigmax=3;
+//    F32 sigmay=1;
+//    F32 rho = -0.7;
 
-    */
-    DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
+//    VecF32 v(2);
+//    v(0)=mux;
+//    v(1)=muy;
+//    Mat2F32 m(2,2);
+//    m(0,0)=sigmax*sigmax;    m(0,1)=sigmax*sigmay*rho;
+//    m(1,0)=sigmax*sigmay*rho;m(1,1)=sigmay*sigmay;
+
+//    DistributionMultiVariate multi(v,m);
+
+//    Mat2UI8 img(512,512);
+//    MatNDisplay windows(img);
+//    while(!windows.is_closed())
+//    {
+//        VecF32 v = multi.randomVariable();
+//        Vec2F32 p= v.toVecN<2>();
+//        Vec2I32 x= p*25+Vec2F32(img.getDomain())*0.5;
+//        if(img.isValid(x(0),x(1))){
+//            img(x)=255;
+//            windows.display(img);
+//        }
+//    }
+//    \endcode
+
+//    */
+//    DistributionMultiVariate(VecF32 mean, Mat2F32 covariance);
 
 
     /*!
@@ -203,7 +193,7 @@ public:
     *
     *  virtual destructor
     */
-    virtual ~DistributionMultiVariate();
+    virtual ~DistributionMultiVariate(){}
 
     /*!
     \fn     virtual F32 operator()(const VecF32& v)const;
@@ -212,7 +202,7 @@ public:
     *
     *  Unary function to call y=f(Vec )
     */
-    virtual F32 operator()(const VecF32& v)const;
+    virtual F32 operator()(const VecF32& v)const=0;
 
     /*!
     \fn  virtual VecF32 randomVariable()const ;
@@ -222,7 +212,7 @@ public:
     *  You have to implement this member in any derived class for an analytical DistributionMultiVariate. Otherwise,
     *
     */
-    virtual VecF32 randomVariable()const ;
+    virtual VecF32 randomVariable()const=0;
 
     /*!
     \fn virtual DistributionMultiVariate * clone();
@@ -230,68 +220,68 @@ public:
     *
     *  clone pattern used in the factory
     */
-    virtual DistributionMultiVariate * clone()const ;
+    virtual DistributionMultiVariate * clone()const=0;
 
 
-    /*!
-    \fn DistributionMultiVariate & operator =(const DistributionMultiVariate& d);
-    \param d other DistributionMultiVariate
-    *
-    * Basic assignement of the other DistributionMultiVariate to this DistributionMultiVariate
-    */
-    DistributionMultiVariate & operator =(const DistributionMultiVariate& d);
+//    /*!
+//    \fn DistributionMultiVariate & operator =(const DistributionMultiVariate& d);
+//    \param d other DistributionMultiVariate
+//    *
+//    * Basic assignement of the other DistributionMultiVariate to this DistributionMultiVariate
+//    */
+//    DistributionMultiVariate & operator =(const DistributionMultiVariate& d);
 
-    /*!
-    \fn DistributionMultiVariate rho(const DistributionMultiVariate &g)const;
-    * \param g other  DistributionMultiVariate
-    * \return   DistributionMultiVariate
-    *
-    *  h(x) = (*this)(g(x))
-    */
-    DistributionMultiVariate rho(const DistributionMultiVariate &g)const;
+//    /*!
+//    \fn DistributionMultiVariate rho(const DistributionMultiVariate &g)const;
+//    * \param g other  DistributionMultiVariate
+//    * \return   DistributionMultiVariate
+//    *
+//    *  h(x) = (*this)(g(x))
+//    */
+//    DistributionMultiVariate rho(const DistributionMultiVariate &g)const;
 
-    /*!
-    \fn DistributionMultiVariate  operator +(const DistributionMultiVariate& d)const;
-    * \param d other DistributionMultiVariate
-    * \return   DistributionMultiVariate
-    *
-    *  Addition operator :  h(x) = (*this)(x)+d(x)
-    */
-    DistributionMultiVariate  operator +(const DistributionMultiVariate& d)const;
+//    /*!
+//    \fn DistributionMultiVariate  operator +(const DistributionMultiVariate& d)const;
+//    * \param d other DistributionMultiVariate
+//    * \return   DistributionMultiVariate
+//    *
+//    *  Addition operator :  h(x) = (*this)(x)+d(x)
+//    */
+//    DistributionMultiVariate  operator +(const DistributionMultiVariate& d)const;
 
-    /*!
-    \fn DistributionMultiVariate  operator -(const DistributionMultiVariate& d)const;
-    * \param d other DistributionMultiVariate
-    * \return   DistributionMultiVariate
-    *
-    *  Subtraction operator : h(x) = (*this)(x)-d(x)
-    */
-    DistributionMultiVariate  operator -(const DistributionMultiVariate& d)const;
-    /*!
-    \fn DistributionMultiVariate  operator *(const DistributionMultiVariate& d)const;
-    * \param d other DistributionMultiVariate
-    * \return   DistributionMultiVariate
-    *
-    *  Multiplication operator : h(x) = (*this)(x)*d(x)
-    */
-    DistributionMultiVariate  operator *(const DistributionMultiVariate& d)const;
+//    /*!
+//    \fn DistributionMultiVariate  operator -(const DistributionMultiVariate& d)const;
+//    * \param d other DistributionMultiVariate
+//    * \return   DistributionMultiVariate
+//    *
+//    *  Subtraction operator : h(x) = (*this)(x)-d(x)
+//    */
+//    DistributionMultiVariate  operator -(const DistributionMultiVariate& d)const;
+//    /*!
+//    \fn DistributionMultiVariate  operator *(const DistributionMultiVariate& d)const;
+//    * \param d other DistributionMultiVariate
+//    * \return   DistributionMultiVariate
+//    *
+//    *  Multiplication operator : h(x) = (*this)(x)*d(x)
+//    */
+//    DistributionMultiVariate  operator *(const DistributionMultiVariate& d)const;
 
-    /*!
-    \fn DistributionMultiVariate  operator /(const DistributionMultiVariate& d)const;
-    * \param d other DistributionMultiVariate
-    * \return   DistributionMultiVariate
-    *
-    *  Division operator : h(x) = (*this)(x)/d(x)
-    */
-    DistributionMultiVariate  operator /(const DistributionMultiVariate& d)const;
+//    /*!
+//    \fn DistributionMultiVariate  operator /(const DistributionMultiVariate& d)const;
+//    * \param d other DistributionMultiVariate
+//    * \return   DistributionMultiVariate
+//    *
+//    *  Division operator : h(x) = (*this)(x)/d(x)
+//    */
+//    DistributionMultiVariate  operator /(const DistributionMultiVariate& d)const;
 
-    /*!
-    \fn DistributionMultiVariate  operator -()const;
-    * \return   DistributionMultiVariate
-    *
-    *  Unary minus operator : h(x) = -(*this)(x)
-    */
-    DistributionMultiVariate  operator -()const;
+//    /*!
+//    \fn DistributionMultiVariate  operator -()const;
+//    * \return   DistributionMultiVariate
+//    *
+//    *  Unary minus operator : h(x) = -(*this)(x)
+//    */
+//    DistributionMultiVariate  operator -()const;
 
 
     /*!
@@ -300,43 +290,43 @@ public:
     *
     *  Get the number of variables
     */
-    virtual int getNbrVariable()const;
+    virtual unsigned int getNbrVariable()const=0;
 
 
-    /*!
-    \fn virtual void setStep(F32 step)const;
-    * \param step F32 step
-    *
-    *  You can ignore the implementation of this member in the derived class.
-    * This member inform the object that the subinterval of the partition for calculation as a given step
-    *
-    * \sa IteratorDistributionMultiVariateSamplingRiemann DistributionMultiVariateDiscrete
-    */
-    virtual void setStep(F32 step)const;
+//    /*!
+//    \fn virtual void setStep(F32 step)const;
+//    * \param step F32 step
+//    *
+//    *  You can ignore the implementation of this member in the derived class.
+//    * This member inform the object that the subinterval of the partition for calculation as a given step
+//    *
+//    * \sa IteratorDistributionMultiVariateSamplingRiemann DistributionMultiVariateDiscrete
+//    */
+//    virtual void setStep(F32 step)const;
 
-    DistributionMultiVariate * ___getPointerImplementation();
-    const DistributionMultiVariate * ___getPointerImplementation()const ;
-    void ___setPointererImplementation(DistributionMultiVariate * d);
+//    DistributionMultiVariate * ___getPointerImplementation();
+//    const DistributionMultiVariate * ___getPointerImplementation()const ;
+//    void ___setPointererImplementation(DistributionMultiVariate * d);
 };
-/*!
-\fn pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
-* \param d1 other  DistributionMultiVariate
-* \param d2 other  DistributionMultiVariate
-* \return  DistributionMultiVariate
-*
-*  h(x) = max(f(x),g(x))
-*/
-pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
+///*!
+//\fn pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
+//* \param d1 other  DistributionMultiVariate
+//* \param d2 other  DistributionMultiVariate
+//* \return  DistributionMultiVariate
+//*
+//*  h(x) = max(f(x),g(x))
+//*/
+//pop::DistributionMultiVariate maximum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
 
-/*!
-\fn pop::DistributionMultiVariate minimum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
-* \param d1 input  DistributionMultiVariate
-* \param d2 input  DistributionMultiVariate
-* \return  DistributionMultiVariate
-*
-*  h(x) = min(f(x),g(x))
-*/
-pop::DistributionMultiVariate minimum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
+///*!
+//\fn pop::DistributionMultiVariate minimum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
+//* \param d1 input  DistributionMultiVariate
+//* \param d2 input  DistributionMultiVariate
+//* \return  DistributionMultiVariate
+//*
+//*  h(x) = min(f(x),g(x))
+//*/
+//pop::DistributionMultiVariate minimum(const pop::DistributionMultiVariate & d1, const pop::DistributionMultiVariate & d2);
 
 
 }

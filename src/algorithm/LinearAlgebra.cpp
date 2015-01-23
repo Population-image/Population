@@ -6,14 +6,6 @@ namespace pop{
 
 
 
-Mat2F32 LinearAlgebra::random(int size_i,int size_j, Distribution  proba){
-    Mat2F32 m(size_i,size_j);
-    Mat2F32::iterator __first = m.begin();
-    Mat2F32::iterator __last = m.end();
-    for (; __first != __last; ++__first)
-        *__first = proba.randomVariable();
-    return m;
-}
 
 Mat2F32 LinearAlgebra::inverseGaussianElimination(const Mat2F32 &m){
     Mat2F32 M(m.sizeI(),m.sizeJ()*2);

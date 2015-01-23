@@ -186,7 +186,6 @@ struct POP_EXPORTS Statistics
      *
      * \sa argMinLocal
      */
-
     static std::vector<F32> argMaxLocal(const Distribution &f,F32 xmin, F32 xmax,F32 step=0.01);
 
     /*! \fn F32 argMax(const Distribution &f,F32 xmin, F32 xmax,F32 step);
@@ -269,17 +268,7 @@ struct POP_EXPORTS Statistics
     */
     static DistributionRegularStep toStepFunction( const Distribution &f,F32 xmin, F32 xmax,F32 step=0.01);
 
-    /*! \fn Mat2F32 toMatrix( const Distribution &f,F32 xmin, F32 xmax,F32 step=0.01);
-     * \param f input distribution
-     * \param xmin lower bound
-     * \param xmax upper bound
-     * \param step step
-     * \return  Mat2F32
-     *
-     *  Convert the input distribution to a Mat2F32 with two columns where the first columns contains the X values and the second the Y values
-     * M(i,0)=xmin+i*step  and M(i,1)=f(xmin+i*step)
-    */
-    static Mat2F32 toMatrix( const Distribution &f,F32 xmin, F32 xmax,F32 step=0.01);
+
 
     /*! \fn F32 moment(const Distribution &f, int moment,F32 xmin, F32 xmax,F32 step=0.01);
      * \param f input distribution
@@ -322,6 +311,7 @@ struct POP_EXPORTS Statistics
      *
      *  Compute the inner product of two distribution \f$\int_{x_{min}}^{x_{max}} f(x)*g(x) dx\f$
     */
+
     static F32 productInner(const Distribution &f,const Distribution &g, F32 xmin, F32 xmax,F32 step=0.01);
 
     /*! \fn F32 FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &f, F32 y,F32 xmin, F32 xmax,F32 mindiff);
@@ -334,6 +324,7 @@ struct POP_EXPORTS Statistics
      *
      *  find x such that f(x)=y with the property that f is monotone increasing function with mindiff the maximu error
     */
+
     static F32 FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &f, F32 y,F32 xmin, F32 xmax,F32 mindiff);
 
 
@@ -551,7 +542,7 @@ struct POP_EXPORTS Statistics
      * \endcode
 
     */
-    static DistributionMultiVariateRegularStep toProbabilityDistribution( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step=0.01);
+    static DistributionMultiVariateRegularStep toProbabilityDistribution(const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step=0.01);
 
 
     /*!

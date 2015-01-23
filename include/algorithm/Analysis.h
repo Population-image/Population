@@ -1737,7 +1737,7 @@ struct POP_EXPORTS Analysis
 
 
     template<typename Vertex, typename Edge>
-    static Distribution coordinationNumberStatistics(GraphAdjencyList<Vertex,Edge>&g ){
+    static DistributionRegularStep coordinationNumberStatistics(GraphAdjencyList<Vertex,Edge>&g ){
         VecI32 v;
         for(int i=0;i<g.sizeEdge();i++)
         {

@@ -599,7 +599,7 @@ As example, this code produces
     */
 
     template<int DIM>
-    static Distribution curvaturePhaseField(const MatN<DIM,UI8> & binary,MatN<DIM,F32>& curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30, F32 b=-0.5,F32 a=0.5){
+    static DistributionRegularStep curvaturePhaseField(const MatN<DIM,UI8> & binary,MatN<DIM,F32>& curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30, F32 b=-0.5,F32 a=0.5){
 
         phasefield.resize(binary.getDomain());
         typename MatN<DIM,F32>::IteratorEDomain it(binary.getIteratorEDomain());
@@ -647,11 +647,11 @@ As example, this code produces
 
             }
         }
-        Distribution d = pop::Statistics::computedStaticticsFromRealRealizations(vcurve,0.05);
+        DistributionRegularStep d = pop::Statistics::computedStaticticsFromRealRealizations(vcurve,0.05);
         return d;
     }
     template<int DIM>
-    static Distribution curvaturePhaseFieldBetweenPhase(const MatN<DIM,UI8> & phase1,const MatN<DIM,UI8> & phase2,MatN<DIM,F32> & curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30,   F32 b=-0.5,F32 a=0.5){
+    static DistributionRegularStep curvaturePhaseFieldBetweenPhase(const MatN<DIM,UI8> & phase1,const MatN<DIM,UI8> & phase2,MatN<DIM,F32> & curvature,MatN<DIM,F32>& phasefield, F32 cutoffmin=-100 , F32 cutoffmax=100 ,int nbriteration=30,   F32 b=-0.5,F32 a=0.5){
 
         phasefield.resize(phase1.getDomain());
         typename MatN<DIM,F32>::IteratorEDomain it(phase1.getIteratorEDomain());
@@ -704,7 +704,7 @@ As example, this code produces
                 }
             }
         }
-        Distribution d = pop::Statistics::computedStaticticsFromRealRealizations(vcurve,0.05);
+        DistributionRegularStep d = pop::Statistics::computedStaticticsFromRealRealizations(vcurve,0.05);
         return d;
     }
     //@}

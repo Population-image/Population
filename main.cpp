@@ -19,10 +19,64 @@ struct Coordinate
         return (_x-x).norm(2);
     }
 };
-
-
 int main(){
+    {
+        DistributionMultiVariateExpression d0("","x","y");
+        DistributionMultiVariateArithmeticAddition d = d0+d0;
+        for(unsigned int i=0;i<20;i++)
+        {
+            DistributionMultiVariateExpression d1("x*y+x","x","y");
+            DistributionMultiVariateExpression d2("2","x","y");
+            d=d+d1+d2;
 
+            VecF32 v(2);
+            v(0)=2;v(1)=4;
+            std::cout<<d.operator ()(v)<<std::endl;
+        }
+        return 1;
+    }
+    F32 porosity=0.8;
+    F32 radius=5;
+    DistributionDirac ddirac_radius(radius);
+
+    F32 heightmix=40;
+    F32 heightmax=70;
+    DistributionUniformReal duniform_height(heightmix,heightmax);
+
+    F32 moment_order2 = pop::Statistics::moment(ddirac_radius,2,0,40);
+    F32 moment_order1 = pop::Statistics::moment(duniform_height,1,0,100);
+    //8*E^2(R)/E^3(std::cos(theta))
+    F32 volume_expectation = 3.14159265*moment_order2*moment_order1;
+    Vec3F32 domain(256);//2d field domain
+    F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+    ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
+
+
+    //    DistributionMultiVariateFromDistribution
+    //    Vec<Distribution&> v_orientation;
+    //    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
+    //    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
+    //    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
+    //    RandomGeometry::cylinder(grain,ddirac_radius,duniform_height,v_orientation);
+    //    Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
+    //    Mat3UI8 img_VecN_grey;
+    //    img_VecN_grey = img_VecN;
+
+    //    Mat2F32 m=  Analysis::histogram(img_VecN_grey);
+    //    std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
+
+    //    img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
+    //    Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,15);
+    //    phasefield = PDE::getField(img_VecN_grey,phasefield,1,3);
+    //    Scene3d scene;
+    //    pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+    //    pop::Visualization::lineCube(scene,img_VecN);
+    //    scene.display();
+
+    DistributionUniformReal d(0,1);
+    std::cout<<time(NULL)<<std::endl;
+    std::cout<<d.randomVariable()<<std::endl;
+    return 0;
 
     ClassiferThreshold<Coordinate> c;
     VecF32 v_affec(4);
@@ -60,10 +114,10 @@ int main(){
 
     Pyramid<2,F32> pyramid_gaussian = Feature::pyramidGaussian(img1);
     Vec<KeyPointPyramid<2> > keypoint1   = Feature::keyPointSIFT(pyramid_gaussian);
-//    Feature::drawKeyPointsCircle(img1,keypoint1).display("keypoint");
+    //    Feature::drawKeyPointsCircle(img1,keypoint1).display("keypoint");
 
     Vec<Descriptor<KeyPointAlgo > >descriptor1 = Feature::descriptorPieChart(img1,keypoint1);
-//    Feature::drawDescriptorArrow(img1,descriptor1).display("descriptor");
+    //    Feature::drawDescriptorArrow(img1,descriptor1).display("descriptor");
 
     Pyramid<2,F32> pyramid2 = Feature::pyramidGaussian(img2);
     Vec<KeyPointAlgo > keypoint2 = Feature::keyPointSIFT(pyramid2);

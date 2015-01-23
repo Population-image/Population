@@ -38,105 +38,89 @@ in the Software.
 namespace pop
 {
 /// @cond DEV
-class DistributionArithmetic : public Distribution
+namespace Private {
+class DistributionConcatenation
 {
 protected:
-    Distribution  _fleft;
-    Distribution  _fright;
-
-    /*!
-        \class pop::DistributionArithmetic
-        \ingroup Distribution
-        \brief Arithmetic distribution interface to allow arithmtic operations for the Distribution class
-        \author Tariel Vincent
-
-      \sa Distribution::operator +() Distribution::operator -() Distribution::operator *() Distribution::operator /()
-    */
-
+    Distribution * _fleft;
+    Distribution * _fright;
 public:
-    void setDistributionLeft(const Distribution & f_left);
-    void setDistributionRight(const Distribution & f_right);
-    F32 randomVariable()const ;
-    void setStep(F32 step)const;
-
-    Distribution & getDistributionLeft();
-    Distribution & getDistributionRight();
-    const Distribution & getDistributionLeft()const;
-    const Distribution & getDistributionRight()const;
-    DistributionArithmetic();
+    DistributionConcatenation(const Distribution &f_left,const Distribution& f_right);
+    DistributionConcatenation& operator=(const DistributionConcatenation&a);
+    virtual ~DistributionConcatenation();
 };
+}
 
-
- class DistributionArithmeticAddition : public DistributionArithmetic
+ class DistributionArithmeticAddition : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticAddition();
-    DistributionArithmeticAddition(const DistributionArithmeticAddition & dist);
+     DistributionArithmeticAddition(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticAddition * clone()const ;
     virtual F32 operator()(F32 value)const ;
-    ;
+    virtual F32 randomVariable()const;
  };
- class DistributionArithmeticSubtraction : public DistributionArithmetic
+ class DistributionArithmeticSubtraction : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticSubtraction();
-    DistributionArithmeticSubtraction(const DistributionArithmeticSubtraction & dist);
+     DistributionArithmeticSubtraction(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticSubtraction * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
- class DistributionArithmeticMultiplication : public DistributionArithmetic
+ class DistributionArithmeticMultiplication : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticMultiplication();
-    DistributionArithmeticMultiplication(const DistributionArithmeticMultiplication & dist);
+     DistributionArithmeticMultiplication(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticMultiplication * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
- class DistributionArithmeticDivision : public DistributionArithmetic
+ class DistributionArithmeticDivision : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticDivision();
-    DistributionArithmeticDivision(const DistributionArithmeticDivision & dist);
+     DistributionArithmeticDivision(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticDivision * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
- class DistributionArithmeticComposition : public DistributionArithmetic
+ class DistributionArithmeticComposition : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticComposition();
-    DistributionArithmeticComposition(const DistributionArithmeticComposition & dist);
+     DistributionArithmeticComposition(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticComposition * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
- class DistributionArithmeticMax : public DistributionArithmetic
+ class DistributionArithmeticMax : public Distribution, public Private::DistributionConcatenation
  {
-
  public:
-    DistributionArithmeticMax();
-    DistributionArithmeticMax(const DistributionArithmeticMax & dist);
+     DistributionArithmeticMax(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticMax * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
- class DistributionArithmeticMin : public DistributionArithmetic
+ class DistributionArithmeticMin : public Distribution, public Private::DistributionConcatenation
  {
 
  public:
-    DistributionArithmeticMin();
-    DistributionArithmeticMin(const DistributionArithmeticMin & dist);
+     DistributionArithmeticMin(const Distribution &f_left,const Distribution& f_right);
     virtual DistributionArithmeticMin * clone()const ;
     virtual F32 operator()(F32 value)const ;
+    virtual F32 randomVariable()const;
 
  };
+DistributionArithmeticAddition operator +(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticSubtraction operator -(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticMultiplication operator *(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticDivision operator /(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticMin minimum(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticMax maximum(const Distribution &d1,const Distribution &d2);
+DistributionArithmeticComposition f_rho_g(const Distribution &d1,const Distribution &d2);
 /// @endcond
 }
 #endif // DISTRIBUTIONARITHMETIC_H

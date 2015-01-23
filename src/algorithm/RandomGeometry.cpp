@@ -3,9 +3,9 @@
 namespace pop{
 
 
-void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution &distradius,const Distribution &distangle, const DistributionMultiVariate &distorientation )
+void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution *distradius,const Distribution *distangle, const DistributionMultiVariate *distorientation )
 {
-    if(distorientation.getNbrVariable() !=3)
+    if(distorientation->getNbrVariable() !=3)
     {
         std::cerr<<"In RandomGeometry::rhombohedron, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }
@@ -14,19 +14,19 @@ void  RandomGeometry::rhombohedron( ModelGermGrain3  & grain,const Distribution 
         Germ<3> * g = (*it);
         GrainEquilateralRhombohedron * box = new GrainEquilateralRhombohedron();
         box->setGerm(*g);
-        box->radius= distradius.randomVariable();
-        box->setAnglePlane( distangle.randomVariable());
-        VecF32 v = distorientation.randomVariable();
+        box->radius= distradius->randomVariable();
+        box->setAnglePlane( distangle->randomVariable());
+        VecF32 v = distorientation->randomVariable();
         for(int i=0;i<3;i++)
             box->orientation.setAngle_ei(v(i),i);
         (*it) = box;
         delete g;
     }
 }
-void RandomGeometry::cylinder( ModelGermGrain3  & grain,Distribution  distradius,Distribution distheight, const DistributionMultiVariate & distorientation )
+void RandomGeometry::cylinder( pop::ModelGermGrain3  & grain,const Distribution&  distradius,const Distribution&  distheight,const DistributionMultiVariate& distorientation )
 {
 
-    if(distorientation.getNbrVariable()!=3)
+    if(distorientation.getNbrVariable()==3)
     {
         std::cerr<<"In RandomGeometry::cylinder, for d = 3, the angle distribution std::vector must have 3 variables with d the space dimension";
     }
@@ -49,10 +49,10 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
     MatN<2,UI8 > in(size,size);
     in(VecN<2,F32>(in.getDomain())*0.5)=255;
 
-    Distribution d(0,1,"UNIFORMINT");
-    Distribution dface(0,MatN<2,UI8 >::DIM-1,"UNIFORMINT");
+    DistributionUniformInt d(0,1);
+    DistributionUniformInt dface(0,MatN<2,UI8 >::DIM-1);
 
-    Distribution dpos(0,in.sizeI()-1,"UNIFORMINT");
+    DistributionUniformInt dpos(0,in.sizeI()-1);
 
     MatN<2,UI8 >::IteratorENeighborhood N(in.getIteratorENeighborhood(1,0));
 
@@ -102,10 +102,10 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
     MatN<3,UI8 > in(size,size,size);
     in(VecN<3,F32>(in.getDomain())*0.5)=255;
 
-    Distribution d(0,1,"UNIFORMINT");
-    Distribution dface(0,MatN<3,UI8 >::DIM-1,"UNIFORMINT");
+    DistributionUniformInt d(0,1);
+    DistributionUniformInt dface(0,MatN<3,UI8 >::DIM-1);
 
-    Distribution dpos(0,in.sizeI()-1,"UNIFORMINT");
+    DistributionUniformInt dpos(0,in.sizeI()-1);
 
     MatN<3,UI8 >::IteratorENeighborhood N(in.getIteratorENeighborhood(1,1));
     for(int index_walker =0;index_walker<nbrwalkers;index_walker++){
@@ -147,7 +147,7 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
     }
     return in;
 }
-Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& correlation,F32 beta)
+DistributionRegularStep RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& correlation,F32 beta)
 {
     Mat2F32 autocorrelation(correlation.sizeI() ,1);
 
@@ -158,11 +158,11 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& c
     }
     std::string s = BasicUtility::Any2String(beta);
     std::string  equation= "1/(2*pi)*1/((1-x^2)^(1./2))*exp(-("+s+")^(2)/(1+x))";
-    Distribution f(equation.c_str());
+    DistributionExpression f(equation.c_str());
     std::string  equation2= "1/(2*pi)*1/((1-x^2)^(1./2))*exp(-("+s+")^(2)/(1-x))";
-    Distribution f2(equation2.c_str());
-    Distribution fintegral = Statistics::integral(f,0,1,0.001);
-    Distribution fintegral2 = Statistics::integral(f2,0,1,0.001);
+    DistributionExpression f2(equation2.c_str());
+    DistributionRegularStep fintegral = Statistics::integral(f,0,1,0.001);
+    DistributionRegularStep fintegral2 = Statistics::integral(f2,0,1,0.001);
     Mat2F32 g(correlation.sizeI() ,2);
     for(unsigned int i= 0; i<correlation.sizeI();i++) {
         g(i,0) = i;
@@ -171,7 +171,6 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& c
         else
             g(i,1)=-Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral2,-autocorrelation(i,0),0,1,0.001);
     }
-    Distribution(g).display();
     F32 pi =3.14159265;
     F32 step2 =0.001;
     F32 maxrange=2;
@@ -188,7 +187,7 @@ Distribution RandomGeometry::generateProbabilitySpectralDensity(const Mat2F32& c
         }
         rho_k(i,1)=sum;
     }
-    Distribution(rho_k).display();
+
     Mat2F32 P(rho_k.sizeI(),2);
     F32 sumnegative=0;
 

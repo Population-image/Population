@@ -141,6 +141,7 @@ VecF32 DistributionMultiVariateIteratorE::xInteger(){
     }
     return xx;
 }
+
 DistributionRegularStep  Statistics::integral(const Distribution &f, F32 xmin, F32 xmax,F32 step)
 {
 
@@ -250,11 +251,11 @@ F32 Statistics::norm(const Distribution &f, F32 norm,F32 xmin, F32 xmax,F32 step
     }
     return std::pow(integral,1./norm);
 }
+
 F32 Statistics::productInner(const Distribution &f,const Distribution &g, F32 xmin, F32 xmax,F32 step)
 {
 
     DistributionIteratorERegularInterval it(xmin,xmax,step);
-    g.setStep(step);
     F32 sum=0;
     while(it.next()){
         sum +=f.operator ()(it.x())*step*g.operator ()(it.x());
@@ -266,7 +267,7 @@ F32 Statistics::productInner(const Distribution &f,const Distribution &g, F32 xm
 F32 Statistics::FminusOneOfYMonotonicallyIncreasingFunction(const Distribution &f, F32 y,F32 xmin, F32 xmax,F32 mindiff)
 {
 
-    if(const DistributionRegularStep* dist =dynamic_cast<const DistributionRegularStep*>(f.___getPointerImplementation()))
+    if(const DistributionRegularStep* dist =dynamic_cast<const DistributionRegularStep*>(&f))
     {
         return dist->fMinusOneForMonotonicallyIncreasing(y);
     }
@@ -447,6 +448,7 @@ F32 Statistics::minValue( const Distribution &f,F32 xmin, F32 xmax,F32 step)
     }
     return min;
 }
+
 F32 Statistics::maxValue( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
@@ -460,6 +462,7 @@ F32 Statistics::maxValue( const Distribution &f,F32 xmin, F32 xmax,F32 step)
     }
     return max;
 }
+
 DistributionRegularStep Statistics::toProbabilityDistribution( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
@@ -481,6 +484,7 @@ DistributionRegularStep Statistics::toProbabilityDistribution( const Distributio
     }
     return DistributionRegularStep(m);
 }
+
 DistributionRegularStep Statistics::toCumulativeProbabilityDistribution( const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
@@ -503,6 +507,7 @@ DistributionRegularStep Statistics::toCumulativeProbabilityDistribution( const D
     }
     return DistributionRegularStep(m);
 }
+
 DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F32 xmin, F32 xmax,F32 step)
 {
 
@@ -519,20 +524,7 @@ DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F32 xmi
     d.fromMatrix(m);
     return d;
 }
-Mat2F32 Statistics::toMatrix(const Distribution &f,F32 xmin, F32 xmax,F32 step)
-{
-    DistributionIteratorERegularInterval it(xmin,xmax,step);
 
-    it.init();
-    Mat2F32 m(it.size(),2);
-    int i =0;
-    while(it.next()){
-        m(i,0)=it.x();
-        m(i,1)=f.operator ()(it.x());
-        i++;
-    }
-    return m;
-}
 
 
 
