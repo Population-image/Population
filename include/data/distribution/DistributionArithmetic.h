@@ -118,7 +118,36 @@ DistributionArithmeticAddition operator +(const Distribution &d1,const Distribut
 DistributionArithmeticSubtraction operator -(const Distribution &d1,const Distribution &d2);
 DistributionArithmeticMultiplication operator *(const Distribution &d1,const Distribution &d2);
 DistributionArithmeticDivision operator /(const Distribution &d1,const Distribution &d2);
+
+/*!
+* \ingroup Distribution
+* \param d1 input  Distribution
+* \param d2 input  Distribution
+* \return  distribution
+*
+*  h(x) = min(f(x),g(x))
+* \code
+        DistributionExpression d1("x^2");
+        DistributionExpression d2("x^4");
+        DistributionArithmeticMin dmin = maximum(d1,d2);//d1 is equal d1(x)=min(x^2,x^4)
+        d1.display(-2,2);
+* \endcode
+*/
 DistributionArithmeticMin minimum(const Distribution &d1,const Distribution &d2);
+/*!
+* \ingroup Distribution
+* \param d1 other  Distribution
+* \param d2 other  Distribution
+* \return  distribution
+*: public Distribution
+*  h(x) = max(f(x),g(x))
+* \code
+        Distribution d1("x^2");
+        Distribution d2("x^4");
+        d1 = maximum(d1,d2);//d1 is equal d1(x)=max(x^2,x^4)
+        d1.display(-2,2);
+* \endcode
+*/
 DistributionArithmeticMax maximum(const Distribution &d1,const Distribution &d2);
 DistributionArithmeticComposition f_rho_g(const Distribution &d1,const Distribution &d2);
 /// @endcond

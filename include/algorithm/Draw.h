@@ -892,7 +892,7 @@ struct POP_EXPORTS Draw
         }
         //DrawNumber
         int BAR=10;
-        for(int k=1;k<BAR;k++){
+        for(int k=0;k<BAR;k++){
             int i =1.0*k*img.getDomain()(1)/BAR;
             img(img.getDomain()(0)-space+1,i)=value;
             img(img.getDomain()(0)-space-1,i)=value;
@@ -927,7 +927,7 @@ struct POP_EXPORTS Draw
         Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,space-18),value,1);
     }
     template<int DIM,typename TypePixel>
-    static void distribution( Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,typename MatN<DIM,TypePixel>::F value,MatN<DIM,TypePixel> &img)
+    static void distribution(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,typename MatN<DIM,TypePixel>::F value,MatN<DIM,TypePixel> &img)
     {
         int sizex = img.sizeJ();
         int sizey = img.sizeI();

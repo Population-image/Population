@@ -10,8 +10,8 @@ int main(int argc, char *argv[]){
     Mat3UI8 imgfilter=Processing::median(img,2,2);
     //        imgfilter.display();
     Mat2F32 m = Analysis::histogram(img);
-    Distribution d(m);
-    //        d.display();
+    DistributionRegularStep d(m);
+    //DistributionDisplay::display(d,d.getXmin(),d.getXmax());
     //Manual threshold segmentation
     F32 threshold;
     Mat3UI8 grain= Processing::thresholdOtsuMethod(imgfilter,threshold);

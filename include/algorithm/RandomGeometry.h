@@ -719,7 +719,7 @@ public:
     * \image html deadleave_random.png
     */
     template<int DIM>
-    static void  RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate* distRGB_RGB);
+    static void  RGBRandom( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distRGB_RGB);
 
     /*!
     * \brief dress the grains with a RGB coming from the input image
@@ -1142,14 +1142,14 @@ void  RandomGeometry::RGBRandomBlackOrWhite( ModelGermGrain<DIM> &  grain)
 }
 
 template<int DIM>
-void  RandomGeometry::RGBRandom( ModelGermGrain<DIM> &  grain,DistributionMultiVariate* distRGB_RGB)
+void  RandomGeometry::RGBRandom( ModelGermGrain<DIM> &  grain,const DistributionMultiVariate& distRGB_RGB)
 {
 
-    if(distRGB_RGB->getNbrVariable()!=3){
+    if(distRGB_RGB.getNbrVariable()!=3){
         std::cerr<<"In RandomGeometry::RGBRandom, the distRGB_RGB distribution must generate a 3d multuvate random variable";
     }
     for(typename Vec<Germ<DIM> * >::iterator it= grain.grains().begin();it!=grain.grains().end();it++ ){
-        VecF32 v = distRGB_RGB->randomVariable();
+        VecF32 v = distRGB_RGB.randomVariable();
         (*it)->color=RGBUI8(v(0),v(1),v(2));
     }
 }

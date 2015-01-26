@@ -33,7 +33,7 @@ public:
      \brief operator retruning the label of the feature
      \param feature feature object
      */
-    virtual int operator()(const  FeatureType& feature) = 0;
+//    virtual int operator()(const  FeatureType& feature) = 0;
 };
 
 template <typename FeatureType>
@@ -167,9 +167,9 @@ public:
         }
     }
 
-    int operator()(const Feature& value){
-        return operator ()(_featuretovalue.operator ()(value));
-    }
+//    int operator()(const Feature& value){
+//        return operator ()(_featuretovalue.operator ()(value));
+//    }
     int operator()(F32 value)const{
         bool hit=(value<=_threshold);
         if(_sign==true)

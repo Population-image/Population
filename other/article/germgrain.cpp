@@ -21,7 +21,7 @@ void testUniformPoissonPointProcess2D(){
     double lambda= 0.001;// parameter of the Poisson VecN process
 
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
-    Distribution d (1,"DIRAC");//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+    DistributionDirac d (1);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
     RandomGeometry::sphere(grain,d);
     Mat2RGBUI8 img = RandomGeometry::continuousToDiscrete(grain);
     img.display();
@@ -33,7 +33,7 @@ void testUniformPoissonPointProcess3D(){
     double lambda= 0.0001;// parameter of the Poisson VecN process
 
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
-    Distribution d (1,"DIRAC");//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+    DistributionDirac d (1);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
     RandomGeometry::sphere(grain,d);
     Mat3RGBUI8 img = RandomGeometry::continuousToDiscrete(grain);
     Scene3d scene;
@@ -47,7 +47,7 @@ void testNonUniformPoissonPointProcess2D() {
     imgf=imgf/255.;
     imgf=imgf*0.05;
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcessNonUniform(imgf);
-    Distribution d(4,"DIRAC");
+    DistributionDirac d(4);
     RandomGeometry::sphere(grain,d);
     img = RandomGeometry::continuousToDiscrete(grain);
     img.display();
@@ -220,7 +220,7 @@ void testProbilityDistributionNormal(double porosity_volume_fraction=0.6){
 }
 
 void testProbilityDistributionPowerLaw(double porosity_volume_fraction=0.6){
-    Distribution dexp(DistributionExpression("1/x^(4.1)"));
+    DistributionExpression dexp("1/x^(4.1)");
     DistributionRegularStep d= Statistics::toProbabilityDistribution(dexp,5,512,0.1);
     double grain_volume_expectation = 4./3.*pop::PI*Statistics::moment(d,3,0,50);
     double lambda = -std::log(porosity_volume_fraction)/grain_volume_expectation;
@@ -239,14 +239,13 @@ void testProbilityDistributionPowerLaw(double porosity_volume_fraction=0.6){
 }
 
 void testRandomColorDeadLeave(){
-    Distribution dexp(DistributionExpression("1/x^(3.1)"));
+    DistributionExpression dexp("1/x^(3.1)");
     DistributionRegularStep d= Statistics::toProbabilityDistribution(dexp,5,512,0.1);
     Vec2F32 domain(512,512);//2d field domain
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 3d Poisson point process
     RandomGeometry::sphere(grain,d);
     grain.setModel(DeadLeave);
-    DistributionMultiVariate d0255(Distribution(0,255,"UNIFORMINT"));
-    DistributionMultiVariate drgb(d0255 ,DistributionMultiVariate(d0255,d0255));
+    DistributionMultiVariateProduct drgb(DistributionUniformInt(0,255),DistributionUniformInt(0,255),DistributionUniformInt(0,255));
     RandomGeometry::RGBRandom(grain,drgb);
     Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
     lattice.display();
@@ -262,10 +261,9 @@ void artAborigene(){
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,1);//generate the 2d Poisson point process
     grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
     RandomGeometry::hardCoreFilter(grain,radius);
-    Distribution d ("1/x^3");
-    d = Statistics::toProbabilityDistribution(d,5,256);
-    //Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
-    RandomGeometry::sphere(grain,d);
+    DistributionExpression d ("1/x^3");
+    DistributionRegularStep d_prob = Statistics::toProbabilityDistribution(d,5,256);
+    RandomGeometry::sphere(grain, d_prob);
     RandomGeometry::RGBFromMatrix(grain,img);
     grain.setModel( DeadLeave);
     grain.setTransparency(0.5);

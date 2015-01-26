@@ -1,85 +1,20 @@
 //#include <ctime>
 #include"data/distribution/Distribution.h"
 #include"time.h"
-//#include"data/distribution/DistributionFromDataStructure.h"
-//#include"data/utility/BasicUtility.h"
-//#include"data/distribution/DistributionArithmetic.h"
-//#include"data/distribution/DistributionAnalytic.h"
-//#include"data/mat/MatN.h"
-//#include"data/mat/MatNInOut.h"
-//#include"data/mat/MatNDisplay.h"
-//#include"algorithm/Draw.h"
-//#include"algorithm/Statistics.h"
+#include"data/mat/MatN.h"
+#include"data/mat/MatNInOut.h"
+#include"data/mat/MatNDisplay.h"
+#include"algorithm/Draw.h"
+#include"algorithm/Statistics.h"
 namespace pop
 {
 unsigned long Distribution::init[] = {static_cast<unsigned long>(time(NULL)), 0x234, 0x345, 0x456};
 unsigned long Distribution::length = 4;
 MTRand_int32 Distribution::irand(Distribution::init, Distribution::length);
-//Distribution::Test Distribution::irand;
-}
-//Distribution::Distribution()
-//    :_deriveddistribution(NULL),irand()
-//{
-//}
-
-//Distribution::Distribution(const Distribution & d)
-//    :_deriveddistribution(d.clone()),irand(Distribution::init, Distribution::length)
-//{
-//}
-//Distribution & Distribution::operator =(const Distribution& d){
-//    this->___setPointererImplementation( d.clone());
-//    return *this;
-//}
-
-//Distribution::Distribution(F32 param , std::string type)
-//{
-//    if(type==DistributionPoisson::getKey() ){
-//        _deriveddistribution= new DistributionPoisson(param);
-//    }else if(type==DistributionExponential::getKey()){
-//        _deriveddistribution= new DistributionExponential(param);
-//    }else if(type==DistributionDirac::getKey())
-//        _deriveddistribution= new DistributionDirac(param);
-//    else
-//        std::cerr<<std::string("In Distribution::Distribution(F32 param , const char* type), type must be equal to one accepted distribution: ") +DistributionPoisson::getKey()+" "+DistributionExponential::getKey()+" "+DistributionDirac::getKey();
-//}
-//Distribution::Distribution(F32 param1,F32 param2, std::string type)
-//{
-//    if(type==DistributionBinomial::getKey()){
-//        _deriveddistribution= new DistributionBinomial(param1,param2);
-//    }else if(type==DistributionNormal::getKey()){
-//        _deriveddistribution= new DistributionNormal(param1,param2);
-//    }else if(type==DistributionUniformInt::getKey()){
-//        _deriveddistribution= new DistributionUniformInt(param1,param2);
-//    }
-//    else if(type==DistributionUniformReal::getKey())
-//        _deriveddistribution= new DistributionUniformReal(param1,param2);
-//    else
-//        std::cerr<<std::string("In Distribution::Distribution(F32 param1,F32 param2 , const char* type), type must be equal to one accepted distribution: ")+DistributionBinomial::getKey()+" "+DistributionNormal::getKey()+" "+DistributionUniformInt::getKey()+" "+DistributionUniformReal::getKey();
-//}
-
-//Distribution::Distribution(const Mat2F32& param,std::string type){
-//    if(type==std::string(DistributionRegularStep::getKey()) ){
-//        _deriveddistribution= new DistributionRegularStep(param);
-//    }else if(type==DistributionIntegerRegularStep::getKey()){
-//        _deriveddistribution= new DistributionIntegerRegularStep(param);
-//    }
-//    else
-//        std::cerr<<std::string("In Distribution::Distribution(Mat2F32 param,const char* type), type must be equal to one accepted distribution: ")+DistributionRegularStep::getKey()+" "+DistributionIntegerRegularStep::getKey();
-//}
-
-//Distribution::Distribution(const char* param,std::string type){
-//    if(type==DistributionExpression::getKey() ){
-//        _deriveddistribution= new DistributionExpression(param);
-//    }else
-//        std::cerr<<std::string("In Distribution::Distribution(const char* param, const char* type), type must be equal to one accepted distribution: ")+DistributionExpression::getKey();
-//}
 
 
-//Distribution::~Distribution()
-//{
-//    if(_deriveddistribution!=NULL)
-//        delete _deriveddistribution;
-//}
+
+
 
 //void Distribution::setStep(F32 )const{
 
@@ -323,102 +258,75 @@ MTRand_int32 Distribution::irand(Distribution::init, Distribution::length);
 //    return img;
 //}
 
-//Mat2RGBUI8 Distribution::display(F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizewidth,int sizeheight){
-//    if(xmin == -NumericLimits<F32>::maximumRange()){
-//        xmin = this->getXmin();
-//        if(xmin == -NumericLimits<F32>::maximumRange())
-//            xmin = 0;
-//    }
-//    if(xmax == NumericLimits<F32>::maximumRange()){
-//        xmax = this->getXmax();
-//        if(xmax == NumericLimits<F32>::maximumRange())
-//            xmax = 1;
-//    }
-//    if(ymin == -NumericLimits<F32>::maximumRange()){
-//        ymin = pop::Statistics::minValue(*this,xmin,xmax);
-//    }
-//    if(ymax == NumericLimits<F32>::maximumRange()){
-//        ymax = pop::Statistics::maxValue(*this,xmin,xmax);
-//    }
+void DistributionDisplay::display(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizewidth,int sizeheight){
+
+    if(ymin == -NumericLimits<F32>::maximumRange()){
+        ymin = pop::Statistics::minValue(d,xmin,xmax);
+    }
+    if(ymax == NumericLimits<F32>::maximumRange()){
+        ymax = pop::Statistics::maxValue(d,xmin,xmax);
+    }
 
 
-//    MatN<2,unsigned char> img (sizeheight, sizewidth);
-//    Draw::distribution(*this, xmin, xmax, ymin, ymax,255,img);
-//    Draw::axis(img, xmin, xmax, ymin, ymax,255);
+    MatN<2,unsigned char> img (sizeheight, sizewidth);
+    Draw::distribution(d, xmin, xmax, ymin, ymax,255,img);
+    Draw::axis(img, xmin, xmax, ymin, ymax,255);
 
-//    MatNDisplay main_disp;
+    MatNDisplay main_disp;
 
-//    main_disp.set_title("Simple plot: left(right)-arrow to move x, up(down)-to move y and +(-) to (un)zoom");
-//    main_disp.display(img);
-//    while (!main_disp.is_closed() ) {
+    main_disp.set_title("Simple plot: left(right)-arrow to move x, up(down)-to move y and +(-) to (un)zoom");
+    main_disp.display(img);
+    while (!main_disp.is_closed() ) {
 
-//        if(main_disp.is_keyARROWDOWN()){
-//            F32 diff =ymax-ymin;
-//            ymin -= diff*0.02;
-//            ymax -= diff*0.02;
-//        }
-//        else if(main_disp.is_keyARROWUP())
-//        {
-//            F32 diff =ymax-ymin;
-//            ymin += diff*0.02;
-//            ymax += diff*0.02;
-//        }
-//        else if(main_disp.is_keyARROWLEFT()){
-//            F32 diff =xmax-xmin;
-//            xmin -= diff*0.02;
-//            xmax -= diff*0.02;
-//        }
-//        else if(main_disp.is_keyARROWRIGHT())
-//        {
-//            F32 diff =xmax-xmin;
-//            xmin += diff*0.02;
-//            xmax += diff*0.02;
-//        }
-//        else if(main_disp.is_keyPADADD())
-//        {
-//            F32 diffx =xmax-xmin;
-//            F32 diffy =ymax-ymin;
-//            xmin += diffx*0.02;
-//            xmax -= diffx*0.02;
-//            ymin += diffy*0.02;
-//            ymax -= diffy*0.02;
-//        }
-//        else if(main_disp.is_keyPADSUB())
-//        {
-//            F32 diffx =xmax-xmin;
-//            F32 diffy =ymax-ymin;
-//            xmin -= diffx*0.02;
-//            xmax += diffx*0.02;
-//            ymin -= diffy*0.02;
-//            ymax += diffy*0.02;
-//        }else if(main_disp.is_keyS())
-//        {
-//            img.save("snaphot.png");
-//        }
+        if(main_disp.is_keyARROWDOWN()){
+            F32 diff =ymax-ymin;
+            ymin -= diff*0.02;
+            ymax -= diff*0.02;
+        }
+        else if(main_disp.is_keyARROWUP())
+        {
+            F32 diff =ymax-ymin;
+            ymin += diff*0.02;
+            ymax += diff*0.02;
+        }
+        else if(main_disp.is_keyARROWLEFT()){
+            F32 diff =xmax-xmin;
+            xmin -= diff*0.02;
+            xmax -= diff*0.02;
+        }
+        else if(main_disp.is_keyARROWRIGHT())
+        {
+            F32 diff =xmax-xmin;
+            xmin += diff*0.02;
+            xmax += diff*0.02;
+        }
+        else if(main_disp.is_keyPADADD())
+        {
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
+            xmin += diffx*0.02;
+            xmax -= diffx*0.02;
+            ymin += diffy*0.02;
+            ymax -= diffy*0.02;
+        }
+        else if(main_disp.is_keyPADSUB())
+        {
+            F32 diffx =xmax-xmin;
+            F32 diffy =ymax-ymin;
+            xmin -= diffx*0.02;
+            xmax += diffx*0.02;
+            ymin -= diffy*0.02;
+            ymax += diffy*0.02;
+        }else if(main_disp.is_keyS())
+        {
+            img.save("snaphot.png");
+        }
 
-//        img=0;
-//        Draw::distribution(*this, xmin, xmax, ymin, ymax,255,img);
-//        Draw::axis(img, xmin, xmax, ymin, ymax,255);
-//        main_disp.display(img).waitTime();
-//    }
-//    return img;
-//}
-//pop::Distribution maximum(const pop::Distribution & d1, const pop::Distribution & d2){
-//    pop::DistributionArithmeticMax *dist = new pop::DistributionArithmeticMax;
-//    dist->setDistributionLeft(d1);
-//    dist->setDistributionRight(d2);
-//    pop::Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
+        img=0;
+        Draw::distribution(d, xmin, xmax, ymin, ymax,255,img);
+        Draw::axis(img, xmin, xmax, ymin, ymax,255);
+        main_disp.display(img).waitTime();
+    }
 
-//pop::Distribution minimum(const pop::Distribution & d1, const pop::Distribution & d2){
-//    pop::DistributionArithmeticMin *dist = new pop::DistributionArithmeticMin;
-//    dist->setDistributionLeft(d1);
-//    dist->setDistributionRight(d2);
-//    pop::Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//}
-
+}
+}

@@ -13,7 +13,7 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 #  set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 #endif()
 set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_VERBOSE_MAKEFILE 1)
+set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
 # ----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF  
 POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_CUDA         "Include Cuda"   OFF   IF (NOT ANDROID))
-
+POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
@@ -107,6 +107,14 @@ if(WITH_QT)
     set(HAVE_QT true)
 endif(WITH_QT)
 
+
+if(WITH_OPENCV)
+    set(HAVE_OPENCV true)
+    find_package( OpenCV REQUIRED )
+    set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${OpenCV_LIBS})
+    set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${${OpenCV_INCLUDE_DIRS}})
+endif(WITH_OPENCV)
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUNICODE=1")
 
 
@@ -144,9 +152,6 @@ if(BUILD_EXECUTABLE)
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)
- #   find_package( OpenCV REQUIRED )
- #   include_directories( ${OpenCV_INCLUDE_DIRS} )
- #   target_link_libraries( test_main ${OpenCV_LIBS} )
 endif(BUILD_EXECUTABLE)
 
 if(BUILD_PYTHON_SWIG)

@@ -44,6 +44,7 @@ in the Software.
 #include <limits>
 
 #include"3rdparty/MTRand.h"
+#include"data/typeF/TypeTraitsF.h"
 
 
 ///*! \ingroup Data
@@ -565,36 +566,19 @@ public:
 //    void ___setPointererImplementation(Distribution * d);
 };
 
-/*!
-* \ingroup Distribution
-* \param d1 other  Distribution
-* \param d2 other  Distribution
-* \return  distribution
-*: public Distribution
-*  h(x) = max(f(x),g(x))
-* \code
-        Distribution d1("x^2");
-        Distribution d2("x^4");
-        d1 = maximum(d1,d2);//d1 is equal d1(x)=max(x^2,x^4)
-        d1.display(-2,2);
-* \endcode
-*/
+
+class DistributionDisplay
+{
+public:
+    static void display(const Distribution & d,F32 xmin,F32 xmax,F32 ymin=-NumericLimits<F32>::maximumRange(),F32 ymax=NumericLimits<F32>::maximumRange(),int sizewidth=800,int sizeheight=600);
+};
+
+
+
+
 
 //POP_EXPORTS pop::Distribution maximum(const pop::Distribution & d1, const pop::Distribution & d2);
-/*!
-* \ingroup Distribution
-* \param d1 input  Distribution
-* \param d2 input  Distribution
-* \return  distribution
-*
-*  h(x) = min(f(x),g(x))
-* \code
-        Distribution d1("x^2");
-        Distribution d2("x^4");
-        d1 = maximum(d1,d2);//d1 is equal d1(x)=min(x^2,x^4)
-        d1.display(-2,2);
-* \endcode
-*/
+
 
 //POP_EXPORTS pop::Distribution minimum(const pop::Distribution & d1, const pop::Distribution & d2);
 

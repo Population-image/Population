@@ -356,12 +356,12 @@ struct POP_EXPORTS Statistics
      * its Probability density function \f$f_Y(y)\f$.  The theorotical one is equal to  \f$f_Y(y) = \left| \frac{d}{dy} (g^{-1}(y)) \right| \cdot f_X(g^{-1}(y)).\f$ with \f$g(x)=x^2\f$
 
      * \code
-     * Distribution d(10,2,"NORMAL");
+     * DistributionNormal d(10,2);
 
-     * Distribution fpower2("x^2");
-     * Distribution finverse= Statistics::inverse(fpower2,1,30,0.1);
-     * Distribution frho = d.rho(finverse);
-     * Distribution fderivate=Statistics::derivate(finverse,1,300,1);
+     * DistributionExpression fpower2("x^2");
+     * DistributionRegularStep finverse= Statistics::inverse(fpower2,1,30,0.1);
+     * DistributionRegularStep frho = d.rho(finverse);
+     * DistributionRegularStep fderivate=Statistics::derivate(finverse,1,300,1);
      * Distribution ftheorical = fderivate * frho;
 
      * VecF32 realizations;
@@ -386,12 +386,12 @@ struct POP_EXPORTS Statistics
      *  Estimated the discrete probability distribution from a collection of integer realizations
      *
      * \code
-     * Distribution danalytic(100,"POISSON");
+     * DistributionPoisson danalytic(100);
      * VecI32 realizations;
-     * for(int i=0;i<2000000;i++){
+     * for(int i=0;i<200000;i++){
      *    realizations.push_back(danalytic.randomVariable());
      * }
-     * Distribution dstat = Statistics::computedStaticticsFromIntegerRealizations(realizations);
+     * DistributionRegularStep dstat = Statistics::computedStaticticsFromIntegerRealizations(realizations);
      * F32 mean =    Statistics::moment(dstat,1,0,300);
      * F32 variance = Statistics::moment(dstat,2,0,300)-mean*mean;
 
@@ -399,7 +399,7 @@ struct POP_EXPORTS Statistics
      * std::cout<<"variance "<<variance<<std::endl;//100
      * \endcode
      */
-    static DistributionIntegerRegularStep computedStaticticsFromIntegerRealizations( const VecI32 & v);
+    static DistributionRegularStep computedStaticticsFromIntegerRealizations( const VecI32 & v);
 
 
 

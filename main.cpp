@@ -5,10 +5,7 @@
 #include"Population.h"//Single header
 #include"data/notstable/Classifer.h"
 using namespace pop;//Population namespace
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
+
 
 struct Coordinate
 {
@@ -20,6 +17,15 @@ struct Coordinate
 };
 int main(){
     {
+
+        DistributionMultiVariateProduct drgb(DistributionUniformInt(0,255),DistributionUniformInt(0,255),DistributionUniformInt(0,255));
+        std::cout<<drgb.randomVariable()<<std::endl;
+        Mat2F32 mmm;
+        DistributionRegularStep d(mmm);
+
+        DistributionDisplay::display(d,0,2);
+
+
 
         F32 porosity=0.95;
         F32 radius=5;

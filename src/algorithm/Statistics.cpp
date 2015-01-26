@@ -520,15 +520,14 @@ DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F32 xmi
         m(i,1)=f.operator ()(it.x());
         i++;
     }
-    DistributionRegularStep d;
-    d.fromMatrix(m);
+    DistributionRegularStep d(m);
     return d;
 }
 
 
 
 
-DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v){
+DistributionRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v){
     VecI32 vv(v);
     std::sort (vv.begin(), vv.end());
     Mat2F32 m(vv(vv.size()-1)-vv(0)+1,2);
@@ -540,7 +539,7 @@ DistributionIntegerRegularStep Statistics::computedStaticticsFromIntegerRealizat
         m(i,0)=vv(0)+i;
         m(i,1)/=vv.size();
     }
-    DistributionIntegerRegularStep dd(m);
+    DistributionRegularStep dd(m);
     return dd;
 
 }
