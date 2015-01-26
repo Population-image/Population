@@ -129,16 +129,16 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lena.bmp
      * \image html Lenascale.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> scale(const MatN<DIM,TypePixel> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
+    template<int DIM, typename TypeVecScale, typename TypePixel>
+    static MatN<DIM,TypePixel> scale(const MatN<DIM,TypePixel> & f,const VecN<DIM,TypeVecScale> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {
-        typename MatN<DIM,TypePixel>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
+        typename MatN<DIM,TypePixel>::Domain domain (scale*VecN<DIM,TypeVecScale>(f.getDomain()));
         MatN<DIM,TypePixel> temp(domain);
-        VecN<DIM,F32> alpha = VecN<DIM,F32>(1)/scale;
+        VecN<DIM,TypeVecScale> alpha = VecN<DIM,TypeVecScale>(1)/scale;
         typename MatN<DIM,TypePixel>::IteratorEDomain it (temp.getIteratorEDomain());
         while(it.next()){
-            VecN<DIM,F32> x;
-            x=(VecN<DIM,F32>(it.x())-0.5)*alpha;
+            VecN<DIM,TypeVecScale> x;
+            x=(VecN<DIM,TypeVecScale>(it.x())-0.5)*alpha;
             if(interpolation.isValid(f.getDomain(),x)){
                     temp(it.x())=interpolation.apply(f,x);
             }

@@ -99,10 +99,10 @@ typedef int I32;
  * \brief float type 32 bits
  * \ingroup BasicType
  *
- * * UI32's are mostly used in pixel/voxel type for labelling
+ * * F32's are mostly used when operations must be done on real numbers
  */
 typedef float F32;
-/*! \typedef F32
+/*! \typedef F64
  * \brief float type 64 bits
  * \ingroup BasicType
  *
