@@ -116,28 +116,30 @@ bool DistributionMultiVariateIteratorE::next(){
 
 VecF32 DistributionMultiVariateIteratorE::x(){
     int indice = _index;
-    VecF32 xx(_xminima.size());
-    for(unsigned int i=0;i<_xminima.size();i++)
+	unsigned int size = static_cast<unsigned int>(_xminima.size());
+    VecF32 xx(size);
+    for(unsigned int i=0;i<size;i++)
     {
         int temp=1;
-        for(unsigned int j=0;j<_xminima.size()-(i+1);j++)
+        for(size_t j=0;j<size-(i+1);j++)
             temp*=_domain(i);
-        xx(_xminima.size()-(i+1)) = (indice/temp);
-        indice -= (xx(_xminima.size()-(i+1)) *temp);
-        xx(_xminima.size()-(i+1)) =xx(_xminima.size()-(i+1)) *_step + _xminima(_xminima.size()-(i+1)) ;
+        xx(size-(i+1)) = (indice/temp);
+        indice -= (xx(size-(i+1)) *temp);
+        xx(size-(i+1)) =xx(size-(i+1)) *_step + _xminima(size-(i+1)) ;
     }
     return xx;
 }
 VecF32 DistributionMultiVariateIteratorE::xInteger(){
     int indice = _index;
-    VecF32 xx(_xminima.size());
-    for(unsigned int i=0;i<_xminima.size();i++)
+	unsigned int size = static_cast<unsigned int>(_xminima.size());
+    VecF32 xx(size);
+    for(unsigned int i=0;i<size;i++)
     {
         int temp=1;
-        for(unsigned int j=0;j<_xminima.size()-(i+1);j++)
+        for(unsigned int j=0;j<size-(i+1);j++)
             temp*=_domain(i);
-        xx(_xminima.size()-(i+1)) = (indice/temp);
-        indice -= (xx(_xminima.size()-(i+1)) *temp);
+        xx(size-(i+1)) = (indice/temp);
+        indice -= (xx(size-(i+1)) *temp);
     }
     return xx;
 }
@@ -530,14 +532,15 @@ DistributionRegularStep Statistics::toStepFunction(const Distribution &f,F32 xmi
 DistributionRegularStep Statistics::computedStaticticsFromIntegerRealizations( const VecI32 & v){
     VecI32 vv(v);
     std::sort (vv.begin(), vv.end());
-    Mat2F32 m(vv(vv.size()-1)-vv(0)+1,2);
+	unsigned int size = static_cast<unsigned int>(vv.size());
+    Mat2F32 m(vv(size-1)-vv(0)+1,2);
 
-    for(unsigned int i=0;i<vv.size();i++){
+    for(unsigned int i=0;i<size;i++){
         m(vv(i)-vv(0),1)++;
     }
     for(unsigned int i=0;i<m.sizeI();i++){
         m(i,0)=vv(0)+i;
-        m(i,1)/=vv.size();
+        m(i,1)/=size;
     }
     DistributionRegularStep dd(m);
     return dd;

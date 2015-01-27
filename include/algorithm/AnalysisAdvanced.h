@@ -146,8 +146,8 @@ struct AnalysisAdvanced
                 v_xmax[label(it.x())-1]= maximum(it.x(),v_xmax[label(it.x())-1]) ;
             }
         }
-        pop::Vec<MatN<DIM,UI8> > v(v_xmin.size());
-        for(int i =0;i<(int)v_xmin.size();i++){
+        pop::Vec<MatN<DIM,UI8> > v(static_cast<int>(v_xmin.size()));
+        for(int i =0;i<static_cast<int>(v_xmin.size());i++){
             if(v_xmin[i][0]!=NumericLimits<int>::maximumRange()){
                 typename MatN<DIM,TypePixel>::E size = (v_xmax[i]-v_xmin[i])+1;
                 v[i] = MatN<DIM,UI8>(size);

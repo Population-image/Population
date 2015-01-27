@@ -36,7 +36,7 @@ MatN<2,F32> DistributionMultiVariateRegularStep::toMatrix(VecF32& xmin,F32 &step
 
 
 unsigned int DistributionMultiVariateRegularStep::getNbrVariable()const{
-    return _xmin.size();
+    return static_cast<unsigned int>(_xmin.size());
 }
 
 F32 DistributionMultiVariateRegularStep::operator ()(const VecF32&  v)const{
@@ -99,7 +99,7 @@ F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
     return v;
 }
 unsigned int DistributionMultiVariateNormal::getNbrVariable()const{
-    return _mean.size();
+    return static_cast<unsigned int>(_mean.size());
 }
 
 VecF32 DistributionMultiVariateNormal::randomVariable()const {
@@ -192,7 +192,7 @@ unsigned int DistributionMultiVariateUnitSphere::getNbrVariable()const{
     return _dim;
 }
 DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimension)
-    :DistributionMultiVariate(),d2pi(0,2*3.14159265),d2(-1,1)
+    :DistributionMultiVariate(),d2pi(0,static_cast<pop::F32>(2*3.14159265)),d2(-1,1)
 {
     _dim=dimension;
 }
@@ -227,7 +227,6 @@ VecF32 DistributionMultiVariateUnitSphere::randomVariable()const {
 DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()const {
     return new DistributionMultiVariateUnitSphere(_dim);
 }
-
 DistributionMultiVariateProduct::~DistributionMultiVariateProduct(){
     for(unsigned int i=0;i<_v_dist.size();i++){
         if(_v_dist[i]!=NULL)delete _v_dist[i];
@@ -242,6 +241,7 @@ DistributionMultiVariateProduct& DistributionMultiVariateProduct::operator=(cons
     for(unsigned int i=0;i<a._v_dist.size();i++){
         _v_dist.push_back(a._v_dist(i)->clone());
     }
+	return *this;
 }
 DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist){
     _v_dist.push_back(dist.clone());
@@ -282,6 +282,6 @@ VecF32 DistributionMultiVariateProduct::randomVariable()const{
     return random;
 }
 unsigned int DistributionMultiVariateProduct::getNbrVariable()const{
-    return _v_dist.size();
+    return static_cast<unsigned int>(_v_dist.size());
 }
 }

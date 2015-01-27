@@ -305,7 +305,7 @@ struct MasterSlave
                 MasterSlave * slave = master->_my_slaves[i];
                 slave->_my_master = this;
             }
-            int size = this->_my_slaves.size() ;
+            size_t size = this->_my_slaves.size() ;
             this->_my_slaves.resize( this->_my_slaves.size() + master->_my_slaves.size() ); // preallocate memory
            std::copy(master->_my_slaves.begin(), master->_my_slaves.end(),this->_my_slaves.begin()+size);
             master->_my_slaves.clear();

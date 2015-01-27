@@ -9,8 +9,8 @@
 namespace pop {
 
 // Encrypt the text text using the key key of size key_len. Returns an array of char of size len
-char* Cryptography::xor_encryptText(const std::string text, int* len,
-		const char* key, const int key_len) {
+char* Cryptography::xor_encryptText(const std::string text, size_t* len,
+		const char* key, const size_t key_len) {
 	*len = text.length() + 1;
 	char* cstr = new char[*len]; // final '\0' not taken into account by length()
 	std::strcpy(cstr, text.c_str());
@@ -20,8 +20,8 @@ char* Cryptography::xor_encryptText(const std::string text, int* len,
 }
 
 // Decrypt the binary data d of size len using the key key of size key_len and return the decrypted data as a string
-std::string Cryptography::xor_decryptText(const char* d, const int len,
-		const char* key, const int key_len) {
+std::string Cryptography::xor_decryptText(const char* d, const size_t len,
+		const char* key, const size_t key_len) {
 	char* copy = new char[len];
 	std::memcpy(copy, d, len);
 
@@ -33,16 +33,16 @@ std::string Cryptography::xor_decryptText(const char* d, const int len,
 }
 
 // Encrypt or decrypt the binary data d of size len in place using the key key of size key_len
-void Cryptography::xor_encryptOrDecryptBinary(char* d, const int len,
-		const char* key, const int key_len) {
+void Cryptography::xor_encryptOrDecryptBinary(char* d, const size_t len,
+		const char* key, const size_t key_len) {
 	for (int i = 0; i < len; i++) {
 		d[i] = d[i] ^ key[i % key_len];
 	}
 }
 
 // Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char of size *len
-char* Cryptography::xor_decryptFile(const std::string filename, int *len, const char* key,
-		const int key_len) {
+char* Cryptography::xor_decryptFile(const std::string filename, size_t *len, const char* key,
+		const size_t key_len) {
 	std::ifstream infile(filename.c_str(), std::ios::binary);
 	infile.seekg(0, infile.end);
     *len = infile.tellg();
@@ -58,8 +58,8 @@ char* Cryptography::xor_decryptFile(const std::string filename, int *len, const 
 }
 
 // Encrypt d and write it in filename
-void Cryptography::xor_encryptToFile(const char* d, const int len, const std::string filename,
-		const char* key, const int key_len) {
+void Cryptography::xor_encryptToFile(const char* d, const size_t len, const std::string filename,
+		const char* key, const size_t key_len) {
 	char* copy = new char[len];
 	std::memcpy(copy, d, len);
 
@@ -70,7 +70,7 @@ void Cryptography::xor_encryptToFile(const char* d, const int len, const std::st
 	delete[] copy;
 }
 
-void Cryptography::cryptOrDecryptCharsXORKey(char* input, int size,
+void Cryptography::cryptOrDecryptCharsXORKey(char* input, size_t size,
 		pop::UI32 key) {
 	pop::UI32 * ptrUI32 = reinterpret_cast<pop::UI32*>(input);
 	for (unsigned int i = 0; i < std::floor(size / 4.); i++) {

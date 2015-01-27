@@ -3,9 +3,9 @@
 namespace pop {
 LinearLeastSquareRANSACModel::LinearLeastSquareRANSACModel(const Vec<Data >& data)
 {
-    Mat2F32 X(data.size(),data[0].X.size());
-    VecF32 Y(data.size());
-    for(unsigned int i =0;i<data.size();i++){
+    Mat2F32 X(static_cast<int>(data.size()),static_cast<int>(data[0].X.size()));
+    VecF32 Y(static_cast<int>(data.size()));
+    for(unsigned int i =0;i<static_cast<unsigned int>(data.size());i++){
         X.setRow(i,data[i].X);
         Y(i)=data[i].Y;
     }

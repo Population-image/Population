@@ -46,23 +46,23 @@ class POP_EXPORTS Cryptography
 {
 public:
 	// Encrypt the text text using the key key of size key_len. Returns an array of char of size len
-	static char* xor_encryptText(const std::string text, int* len, const char* key, const int key_len);
+	static char* xor_encryptText(const std::string text, size_t* len, const char* key, const size_t key_len);
 
 	// Decrypt the binary data d of size len using the key key of size key_len and return the decrypted data as a string
-	static std::string xor_decryptText(const char* d, const int len, const char* key, const int key_len);
+	static std::string xor_decryptText(const char* d, const size_t len, const char* key, const size_t key_len);
 
 	// Encrypt or decrypt the binary data d of size len in place using the key key of size key_len
-	static void xor_encryptOrDecryptBinary(char* d, const int len, const char* key, const int key_len);
+	static void xor_encryptOrDecryptBinary(char* d, const size_t len, const char* key, const size_t key_len);
 
     // Open the encrypted file filename, decrypt it, and return the result of the decryption as an array of char of size *len
-    static char* xor_decryptFile(const std::string filename, int *len, const char* key, const int key_len);
+    static char* xor_decryptFile(const std::string filename, size_t *len, const char* key, const size_t key_len);
 
 	// Encrypt d and write it in filename
-	static void xor_encryptToFile(const char* d, const int len, const std::string filename, const char* key, const int key_len);
+	static void xor_encryptToFile(const char* d, const size_t len, const std::string filename, const char* key, const size_t key_len);
 
     // (de)crypt the array input, of size size, in-place
 	// Obsolete, please use the ones above for a better key
-    static void cryptOrDecryptCharsXORKey(char *input, int size, pop::UI32 key =0xAAF588BB);
+    static void cryptOrDecryptCharsXORKey(char *input, size_t size, pop::UI32 key =0xAAF588BB);
     static void cryptOrDecryptFileXORKey(std::string inputfile,std::string outputfile, pop::UI32 key =0xAAF588BB);
 };
 }
