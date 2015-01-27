@@ -1006,6 +1006,12 @@ std::ostream& operator << (std::ostream& out, const pop::RGB<T1>& h)
     out<<h.r()<<"<C>"<<h.g()<<"<C>"<<h.b()<<"<C>";
     return out;
 }
+template <>
+inline std::ostream& operator << (std::ostream& out, const pop::RGB<UI8>& h)
+{
+    out<<(int)h.r()<<"<C>"<<(int)h.g()<<"<C>"<<(int)h.b()<<"<C>";
+    return out;
+}
 /*! stream extraction operator
 * \ingroup RGB
 * \param in  input stream

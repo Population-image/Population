@@ -250,12 +250,12 @@ private:
     }
 
     template<typename FloatType>
-    static VecN<4,std::pair<FloatType,Vec2I32> > _getWeightPosition(const  Vec2I32 x_domain,const  VecN<2,FloatType> &x_point,MatNBoundaryCondition boundary, pop::Int2Type<2>)
+    static VecN<PowerGP<2,2>::value,std::pair<FloatType,Vec2I32> > _getWeightPosition(const  Vec2I32 x_domain,const  VecN<2,FloatType> &x_point,MatNBoundaryCondition boundary, pop::Int2Type<2>)
     {
         VecN<4,std::pair<FloatType,Vec2I32> > v_out(std::make_pair(0.f, Vec2I32(0,0)));
         VecN<2,FloatType> x;
-        x(0)=x_point(0)+EPSILON;
-        x(1)=x_point(1)+EPSILON;
+        x(0)=x_point(0);
+        x(1)=x_point(1);
         bool all_hit=true;
         FloatType sum=0;
         Vec2I32 x1;
@@ -272,7 +272,7 @@ private:
             v_out(0).first =0;
             all_hit=false;
         }
-        x1(0)=std::ceil(x(0));
+        x1(0)=x(0)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
@@ -284,7 +284,7 @@ private:
             v_out(1).first =0;
             all_hit=false;
         }
-        x1(1)=std::ceil(x(1));
+        x1(1)=x(1)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));
@@ -296,7 +296,7 @@ private:
             v_out(2).first =0;
             all_hit=false;
         }
-        x1(0)=std::floor(x(0));
+        x1(0)=x1(0)-1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)));
@@ -318,13 +318,13 @@ private:
     }
 
     template<typename FloatType>
-    static  VecN<8,std::pair<FloatType,Vec3I32 > > _getWeightPosition(const Vec3I32 x_domain,const VecN<3,FloatType> &x_point,MatNBoundaryCondition boundary ,Int2Type<2>)
+    static  VecN<PowerGP<2,3>::value,std::pair<FloatType,Vec3I32 > > _getWeightPosition(const Vec3I32 x_domain,const VecN<3,FloatType> &x_point,MatNBoundaryCondition boundary ,Int2Type<3>)
     {
-        VecN<8,std::pair<FloatType,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
+        VecN<PowerGP<2,3>::value,std::pair<FloatType,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
         VecN<3,FloatType> x;
-        x(0)=x_point(0)+EPSILON;
-        x(1)=x_point(1)+EPSILON;
-        x(2)=x_point(1)+EPSILON;
+        x(0)=x_point(0);
+        x(1)=x_point(1);
+        x(2)=x_point(2);
         bool all_hit=true;
         FloatType sum=0;
         Vec3I32 x1;
@@ -342,7 +342,7 @@ private:
             v_out(0).first =0;
             all_hit=false;
         }
-        x1(0)=std::ceil(x(0));
+        x1(0)=x1(0)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));
@@ -354,7 +354,7 @@ private:
             v_out(1).first =0;
             all_hit=false;
         }
-        x1(1)=std::ceil(x(1));
+        x1(1)=x1(1)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
@@ -366,7 +366,7 @@ private:
             v_out(2).first =0;
             all_hit=false;
         }
-        x1(0)=std::floor(x(0));
+        x1(0)=x1(0)-1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x(2)-x1(2)));
@@ -378,9 +378,8 @@ private:
             v_out(3).first =0;
             all_hit=false;
         }
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
-        x1(2)=std::ceil(x(2));
+        x1(1)=x1(1)-1;
+        x1(2)=x1(2)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
@@ -392,7 +391,7 @@ private:
             v_out(4).first =0;
             all_hit=false;
         }
-        x1(0)=std::ceil(x(0));
+        x1(0)=x1(0)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)))*(1-(x1(2)-x(2)));
@@ -404,7 +403,7 @@ private:
             v_out(5).first =0;
             all_hit=false;
         }
-        x1(1)=std::ceil(x(1));
+        x1(1)=x1(1)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
@@ -416,7 +415,7 @@ private:
             v_out(6).first =0;
             all_hit=false;
         }
-        x1(0)=std::floor(x(0));
+        x1(0)=x1(0)-1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x1(1)-x(1)))*(1-(x1(2)-x(2)));
@@ -456,8 +455,9 @@ struct POP_EXPORTS MatNInterpolation
     typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
         if(_type==MATN_INTERPOLATION_NEAREST)
             return MatNInterpolationNearest::apply(m,x);
-        else
+        else{
             return MatNInterpolationBiliniear::apply(m,x);
+        }
     }
 };
 

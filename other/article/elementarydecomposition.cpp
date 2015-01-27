@@ -96,7 +96,11 @@ int main(){
     std::string dir = "/home/vincent/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
 #endif
     m.loadFromDirectory(dir.c_str());
+//    m.display();
+    m = GeometricalTransformation::scale(m,Vec3F32(2,2,2));
+    m.display();
     {
+
         Mat2UI8 plane = GeometricalTransformation::plane(m,120);
 
         m = m(Vec3I32(0,0,0),Vec3I32(50,50,50));

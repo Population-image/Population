@@ -63,11 +63,11 @@ void testMinOverlap(){
     DistributionDirac d(10);
     pop::RandomGeometry::sphere(germgrain,d);
     pop::RandomGeometry::sphere(germgrain2,d);
-    pop::RandomGeometry::continuousToDiscrete(germgrain).display("Boolean",false);
-    pop::RandomGeometry::continuousToDiscrete(germgrain2).display("Min Overlap");
+    pop::RandomGeometry::continuousToDiscrete(germgrain).display("Boolean",false,false);
+    pop::RandomGeometry::continuousToDiscrete(germgrain2).display("Min Overlap",true,false);
 }
 void testVoronoiTesselation3D(){
-    Vec3F32 domain(100,100,100);
+    Vec3F32 domain(200,200,200);
     ModelGermGrain3 germ = RandomGeometry::poissonPointProcess(domain,0.0001);
 
     Mat3UI32 label = RandomGeometry::germToMatrix(germ);
@@ -253,7 +253,7 @@ void testRandomColorDeadLeave(){
 
 void artAborigene(){
     Mat2RGBUI8 img;
-    img.load("art.jpg");
+    img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
     img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
     double radius=10;
     Vec2F32 domain;
@@ -276,14 +276,17 @@ void artAborigene(){
        if(aborigenart(it.x())==RGBUI8(0))
             aborigenart(it.x())=mean;
     }
-    aborigenart.display();
+    aborigenart.display("art");
     aborigenart.save("../../../art_aborigene.jpg");
    // aborigenart.save("/home/vincent/Desktop/Population/doc/image/AborigenLena.bmp");
 }
 int main()
 {
-    testAnnealing();
-//    artAborigene();
+    testVoronoiTesselation3D();
+    testMinOverlap();
+    //testUniformPoissonPointProcess2D();
+    //testAnnealing();
+    artAborigene();
 
     return 0;
 }

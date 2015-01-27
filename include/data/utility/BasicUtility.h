@@ -50,7 +50,7 @@ namespace pop
 */
 
 const F32 PI = 3.141592f;
-const F32 EPSILON = 0.000001f;
+const F32 EPSILON = 0.0001f;
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
 template<typename T>
