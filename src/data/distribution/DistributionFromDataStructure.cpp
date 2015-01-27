@@ -142,7 +142,7 @@ bool DistributionExpression::fromRegularExpression(std::string function)
     }
     func = function;
 
-    fparser.AddConstant("pi", 3.1415926535897932);
+    fparser.AddConstant("pi", static_cast<pop::F32>(3.1415926535897932));
     //
     I32 res = fparser.Parse(function, "x");
     //

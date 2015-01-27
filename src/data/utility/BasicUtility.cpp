@@ -120,10 +120,10 @@ std::string BasicUtility::getExtension(std::string file){
     //std::cerr<<"BasicUtility::getExtension, no extension in your file :" +file));
 }
 std::string BasicUtility::getBasefilename(std::string file){
-    int slash, dot;
+    size_t slash, dot;
     slash = -1;
     dot = file.size()-1;
-    int size =0;
+    size_t size =0;
     while(size ++, file[size]) {
         if(file[size] == '.') {
             dot = size;
@@ -239,10 +239,10 @@ std::string BasicUtility::replaceSlashByAntiSlash(std::string filepath){
 }
 int BasicUtility::editDistance(std::string s1,std::string s2){
     if(s1.size()==0)
-        return s2.size();
+        return static_cast<int>(s2.size());
     if(s2.size()==0)
-        return s1.size();
-    pop::Mat2F32 m(s1.size(),s2.size());
+        return static_cast<int>(s1.size());
+    pop::Mat2F32 m(static_cast<int>(s1.size()),static_cast<int>(s2.size()));
     for(unsigned int i =0;i<m.sizeI();i++){
         m(i,0)=i;
     }

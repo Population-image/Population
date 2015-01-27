@@ -29,7 +29,7 @@ NeuralNetworkFeedForward & NeuralNetworkFeedForward::operator=(const NeuralNetwo
                 NNLayerMatrix* inputlayer = dynamic_cast<NNLayerMatrix*>(layer);
                 this->addInputLayerMatrix(inputlayer->_neurons_matrix[0].getDomain()(0),inputlayer->_neurons_matrix[0].getDomain()(1),inputlayer->_method,inputlayer->_normalization_value);
             }else{
-                this->addInputLayer(layer->_neurons.size());
+                this->addInputLayer(static_cast<unsigned int>(layer->_neurons.size()));
             }
         }else{
             if(layer->_type==NNLayer::MATRIXCONVOLUTIONNAL){
@@ -66,7 +66,7 @@ NeuralNetworkFeedForward & NeuralNetworkFeedForward::operator=(const NeuralNetwo
             }
             else if(layer->_type==NNLayer::FULLYCONNECTED)
             {
-                this->addLayerFullyConnected(layer->_neurons.size(),-1);
+                this->addLayerFullyConnected(static_cast<unsigned int>(layer->_neurons.size()),-1);
                 NNLayer* my_layer = *(this->_layers.rbegin());
                 for(unsigned int index_w=0;index_w<layer->_weights.size();index_w++){
                     NNWeight * weight = layer->_weights[index_w];
@@ -137,7 +137,7 @@ void NeuralNetworkFeedForward::propagateBackSecondDerivate()
         neuron->_d2Err_dXn2 = 1;
     }
 
-    for(unsigned int i_layer=_layers.size()-1;i_layer>0;i_layer--){
+    for(unsigned int i_layer=static_cast<unsigned int>(_layers.size()-1);i_layer>0;i_layer--){
         NNLayer & layer = *(_layers[i_layer]);
         layer.propagateBackSecondDerivate();
     }
@@ -145,13 +145,13 @@ void NeuralNetworkFeedForward::propagateBackSecondDerivate()
 
 void NeuralNetworkFeedForward::learningFirstDerivate()
 {
-    for(unsigned int i_layer=_layers.size()-1;i_layer>0;i_layer--){
+    for(unsigned int i_layer=static_cast<unsigned int>(_layers.size()-1);i_layer>0;i_layer--){
         NNLayer & layer = *(_layers[i_layer]);
         layer.learningFirstDerivate();
     }
 }
 
-void NeuralNetworkFeedForward::addInputLayer(int nbr_neuron){
+void NeuralNetworkFeedForward::addInputLayer(unsigned int nbr_neuron){
     POP_DbgAssertMessage(_is_input_layer==false,"Add an input neuron before to add weighed layer");
     _is_input_layer = true;
     _layers.push_back( new NNLayer(nbr_neuron) );
@@ -184,7 +184,7 @@ void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,F3
 
     //normalize tbe number inverse square root of the connection feeding into the nodes)
     pop::DistributionNormal d(0,standart_deviation_weight/std::sqrt(layerprevious._neurons.size()*1.0));
-    unsigned int nbr_neuron_previous_layer = layerprevious._neurons.size();
+    unsigned int nbr_neuron_previous_layer = static_cast<unsigned int>(layerprevious._neurons.size());
     unsigned int nbr_weight = nbr_neuron*(nbr_neuron_previous_layer+1);
     for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
     {
@@ -231,7 +231,7 @@ void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsi
         // This layer is a convolutional connected layer
         // with nbr_neuron units.
         // (kernelsize*kernelsize+1)* nbr_map_previous_layer*nbr_map_layer
-        unsigned int nbr_map_previous = layerprevious->_neurons_matrix.size();
+        unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
 
         //normalize tbe number inverse square root of the connection feeding into the nodes)
@@ -286,7 +286,7 @@ void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,F32 st
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
-        unsigned int nbr_map_previous = layerprevious->_neurons_matrix.size();
+        unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
 
 
@@ -337,7 +337,7 @@ void NeuralNetworkFeedForward::addLayerSubScaling(unsigned int sub_scale_factor,
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
-        unsigned int nbr_map_previous = layerprevious->_neurons_matrix.size();
+        unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
         unsigned int height = (height_previous/sub_scale_factor);
         unsigned int width  = (width_previous/sub_scale_factor);
@@ -400,7 +400,7 @@ void NeuralNetworkFeedForward::addLayerMaxPooling(unsigned int sub_scale_factor)
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
-        unsigned int nbr_map_previous = layerprevious->_neurons_matrix.size();
+        unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
         unsigned int height = (height_previous/sub_scale_factor);
         unsigned int width  = (width_previous/sub_scale_factor);
@@ -467,7 +467,7 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
         // This layer is a convolutional connected layer
         // with nbr_neuron units.
         // (kernelsize*kernelsize+1)* nbr_map_previous_layer*nbr_map_layer
-        unsigned int nbr_map_previous = layerprevious->_neurons_matrix.size();
+        unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
 
         //normalize tbe number inverse square root of the connection feeding into the nodes)
@@ -1157,7 +1157,7 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
         n.addLayerIntegral(500,1);
         n.addLayerFullyConnected(100,1);
     }
-    n.addLayerFullyConnected(number_training.size(),1);
+    n.addLayerFullyConnected(static_cast<unsigned int>(number_training.size()),1);
 
     Vec<std::string> label_digit;
     for(int i=0;i<10;i++)
@@ -1222,13 +1222,13 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
                 //                m.display();
                 VecF32 vin = n.inputMatrixToInputNeuron(m);
                 vtraining_in.push_back(vin);
-                VecF32 v_out(number_training.size(),-1);
+                VecF32 v_out(static_cast<int>(number_training.size()),-1);
                 v_out(i)=1;
                 vtraining_out.push_back(v_out);
             }
             VecF32 vin = n.inputMatrixToInputNeuron(binary);
             vtraining_in.push_back(vin);
-            VecF32 v_out(number_training.size(),-1);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
             v_out(i)=1;
             vtraining_out.push_back(v_out);
 
@@ -1243,7 +1243,7 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
             Mat2UI8 binary = number_test(i)(j);
             VecF32 vin = n.inputMatrixToInputNeuron(binary);
             vtest_in.push_back(vin);
-            VecF32 v_out(number_test.size(),-1);
+            VecF32 v_out(static_cast<int>(number_test.size()),-1);
             v_out(i)=1;
             vtest_out.push_back(v_out);
             sum++;
@@ -1538,7 +1538,7 @@ void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuro
 
             VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain,method,normalization_value);
             v_neuron_in.push_back(vin);
-            VecF32 v_out(number_training.size(),-1);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
             v_out(i)=1;
             v_neuron_out.push_back(v_out);
 

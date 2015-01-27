@@ -597,7 +597,7 @@ public:
      * add input layer
      *
      */
-    void addInputLayer(int nbr_neuron);
+    void addInputLayer(unsigned int nbr_neuron);
     /*!
      * \param nbr_neuron number of neurons
      * \param standart_deviation_weight initialiasisation of the weigh with random variable following a centered normal probability distribution with this standart deviation

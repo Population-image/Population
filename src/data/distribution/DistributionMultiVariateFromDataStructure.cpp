@@ -32,7 +32,7 @@ void DistributionMultiVariateRegularStep::generateRepartition(){
 
 
 unsigned int DistributionMultiVariateRegularStep::getNbrVariable()const{
-    return _xmin.size();
+    return static_cast<unsigned int>(_xmin.size());
 }
 
 F32 DistributionMultiVariateRegularStep::operator ()(const VecF32&  v)const{
@@ -95,7 +95,7 @@ F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
     return v;
 }
 unsigned int DistributionMultiVariateNormal::getNbrVariable()const{
-    return _mean.size();
+    return static_cast<unsigned int>(_mean.size());
 }
 
 VecF32 DistributionMultiVariateNormal::randomVariable()const {
@@ -188,7 +188,7 @@ unsigned int DistributionMultiVariateUnitSphere::getNbrVariable()const{
     return _dim;
 }
 DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimension)
-    :DistributionMultiVariate(),d2pi(0,2*3.14159265),d2(-1,1)
+    :DistributionMultiVariate(),d2pi(0,static_cast<pop::F32>(2*3.14159265)),d2(-1,1)
 {
     _dim=dimension;
 }
@@ -225,7 +225,7 @@ DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()
 }
 
 unsigned int DistributionMultiVariateUniformInt::getNbrVariable()const{
-    return _xmin.size();
+    return static_cast<unsigned int>(_xmin.size());
 }
 DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax )
     :DistributionMultiVariate(),_d(0,1),_xmin(xmin),_xmax(xmax)
@@ -233,7 +233,7 @@ DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const Vec
 }
 
 VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
-    VecF32 v(_xmin.size());
+    VecF32 v(static_cast<int>(_xmin.size()));
 
     for(unsigned int i =0;i<v.size();i++){
         v(i)=std::floor(_d.randomVariable()*(_xmax(i)-_xmin(i))+_xmin(i));
@@ -262,6 +262,7 @@ DistributionMultiVariateProduct& DistributionMultiVariateProduct::operator=(cons
     for(unsigned int i=0;i<a._v_dist.size();i++){
         _v_dist.push_back(a._v_dist(i)->clone());
     }
+	return *this;
 }
 
 DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2){
@@ -299,6 +300,6 @@ VecF32 DistributionMultiVariateProduct::randomVariable()const{
     return random;
 }
 unsigned int DistributionMultiVariateProduct::getNbrVariable()const{
-    return _v_dist.size();
+    return static_cast<unsigned int>(_v_dist.size());
 }
 }

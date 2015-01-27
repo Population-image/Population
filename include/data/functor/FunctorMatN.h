@@ -104,7 +104,7 @@ struct POP_EXPORTS FunctorMatN
 #pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
 #endif
         {
-            radius = (kernel.size()-1)/2;
+            radius = static_cast<int>((kernel.size()-1)/2);
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif

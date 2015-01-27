@@ -248,8 +248,8 @@ Mat2F32 LinearAlgebra::eigenVectorGaussianElimination(const Mat2F32 &m,VecF32 v_
         Mat2F32 M = m - m2;
         _solvingLinearSystemGaussianEliminationNonInvertible(M);
         VecF32 v(m.sizeI());
-        v(v.size()-1)=1;
-        for(int i=v.size()-2;i>=0;i--){
+        v(static_cast<int>(v.size()-1))=1;
+        for(int i=static_cast<int>(v.size()-2);i>=0;i--){
             v(i) = - M(i,m.sizeJ()-1);
         }
         EigenVec.setCol(j,v);

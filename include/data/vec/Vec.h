@@ -40,6 +40,7 @@ in the Software.
 #include<algorithm>
 #include <numeric>
 #include<cmath>
+#include <functional> 
 #include"data/typeF/TypeF.h"
 #include"data/utility/BasicUtility.h"
 #include"data/typeF/Complex.h"

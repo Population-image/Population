@@ -192,15 +192,15 @@ Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<Ch
     //    graph.display();
     Vec<Vec<Mat2UI8> > v_word;
     Vec<Vec<std::pair<int,int> > > v_word_label;
-    Vec<int> v_hit(v_v_neigh.size(),-1);
-    for(unsigned int i=0;i<v_v_neigh.size();i++){
+    Vec<int> v_hit(static_cast<int>(v_v_neigh.size()),-1);
+    for(unsigned int i=0;i<static_cast<int>(v_v_neigh.size());i++){
         if(v_v_neigh(i).size()>0){
-            int index;
+            size_t index;
             if(v_hit(i)==-1){
-                v_hit(i)=v_word_label.size();
+                v_hit(i)=static_cast<pop::I32>(v_word_label.size());
                 index = v_word_label.size();
                 v_word_label.push_back(Vec<std::pair<int,int> >());
-                v_word_label(index).push_back(std::make_pair(v_cluster[i].center()(1) , i));
+                v_word_label(static_cast<unsigned int>(index)).push_back(std::make_pair(v_cluster[i].center()(1) , i));
                 //                v_word.push_back(Vec<Mat2UI8>());
                 //                v_word(index).push_back(labels(i-1));
                 //                std::cout<<i<<std::endl;
@@ -211,9 +211,9 @@ Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<Ch
             }
             for(unsigned int j=0;j<v_v_neigh[i].size();j++){
                 if(v_hit(v_v_neigh(i)(j))==-1){
-                    v_hit(v_v_neigh(i)(j))=index;
+					v_hit(v_v_neigh(i)(j))=static_cast<unsigned int>(index);
 
-                    v_word_label(index).push_back(std::make_pair(v_cluster[v_v_neigh(i)(j)].center()(1) , v_v_neigh(i)(j)) );
+                    v_word_label(static_cast<unsigned int>(index)).push_back(std::make_pair(v_cluster[v_v_neigh(i)(j)].center()(1) , v_v_neigh(i)(j)) );
                     //                    v_word(index).push_back(labels(v_v_neigh(i)(j)-1));
                     //                    std::cout<<v_v_neigh(i)(j)<<std::endl;
                     //                    labels(v_v_neigh(i)(j)-1).display();
