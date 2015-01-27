@@ -337,8 +337,8 @@ As example, this code produces
       * img.load("../image/spinodal.pgm");
       * Mat2F32 m = PDE::randomWalk(img);
       * m.saveAscii("random_walk.m","time\t D_0/D(t)\t D_0/D_x(t)\t D_0/D_y(t)\t D_0/D_z(t)");
-      * Distribution d(m);
-      * d.display();
+      * DistributionRegularStep d(m);
+      * d.display(d.getXmin(),d.getXmax());
       * \endcode
      * \image html spinodal_self_diffusion.png "Coefficient of self diffusion"
      */
@@ -410,7 +410,7 @@ As example, this code produces
       * Mat2UI8 img(512,512);
       * Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
 
-      * Distribution d(0,20,"UNIFORMINT");
+      * DistributionUniformInt d(0,20);
       * while(it.next()){
       *     img(it.x())=d.randomVariable();
       * }
@@ -426,7 +426,7 @@ As example, this code produces
       * \code
       * Vec3F32 domain(256);//2d field domain
       * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
-      * Distribution dnormal(30,20,"NORMAL");
+      * DistributionNormal dnormal(30,20);
       * RandomGeometry::sphere(grain,dnormal);
       * Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
       * Mat3UI8 img_VecN_grey;
@@ -469,7 +469,7 @@ As example, this code produces
       * \code
     Vec2F32 domain(512);//2d field domain
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
-    Distribution dnormal(30,5,"NORMAL");
+    DistributionNormal dnormal(30,5);
     RandomGeometry::sphere(grain,dnormal);
     Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
     Mat2UI8 solid,inverse;
@@ -559,8 +559,8 @@ As example, this code produces
       *  \f$1/k = \overrightarrow{\nabla}\cdot \frac{\overrightarrow{\nabla} \phi(x)}{|\overrightarrow{\nabla} \phi(x)|} \f$
       * \code
     F32 porosity=0.85;
-    Distribution d1(20,"DIRAC");
-    Distribution d2(25,"DIRAC");
+    DistributionDirac d1(20);
+    DistributionDirac d2(25);
     DistributionExpression dexp("4");
     d1 = dexp*d1+d2;
     d1 = pop::Statistics::toProbabilityDistribution(d1,10,40);
@@ -575,8 +575,8 @@ As example, this code produces
     img_VecN_grey = img_VecN;
     Mat3F32 curvature;
     Mat3F32 phasefield;
-    Distribution dcurvature = PDE::curvaturePhaseField(img_VecN_grey,curvature,phasefield,-50,-5);
-    dcurvature.display();
+    DistributionRegularStep dcurvature = PDE::curvaturePhaseField(img_VecN_grey,curvature,phasefield,-50,-5);
+    dcurvature.display(dcurvature.getXmin(),dcurvature.getXmax());
     img_VecN_grey = pop::Processing::greylevelRange(curvature,0,255);
     img_VecN = pop::Visualization::labelToRGBGradation(curvature);
     Scene3d scene;

@@ -52,7 +52,7 @@ F32 DistributionSign::operator()(F32 value)const {
 }
 
 F32 DistributionSign::randomVariable()const {
-    if(Distribution::irand.operator ()()%2==1)
+    if(Distribution::irand()%2==1)
         return 1;
     else
         return -1;

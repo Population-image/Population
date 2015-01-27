@@ -631,7 +631,7 @@ public:
         if(p==0){
             for(int i = 0;i<D;i++)
             {
-                value=maximum(static_cast<Type>(value),absolute(this->_dat[i]));
+                value=maximum(value,(F32)normValue(this->_dat[i]));
             }
 
         }else if(p==1){
@@ -668,7 +668,7 @@ public:
         if(p==0){
             for(int i = 0;i<D;i++)
             {
-                value=maximum(static_cast<Type>(value),absolute(this->_dat[i]));
+                value=maximum(value,(F32)normValue(this->_dat[i]));
             }
 
         }else if(p==1){

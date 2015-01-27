@@ -1677,6 +1677,7 @@ struct ProcessingAdvanced
         {
             if(index>=display_step-1){
                 display_step*=2;
+                std::cout<<"seed "<<index<<std::endl;
             }
             I32 i = rand()%((I32)vrand.size());
             typename FunctionRegion::E x = vrand[i];

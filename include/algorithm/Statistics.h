@@ -499,7 +499,7 @@ struct POP_EXPORTS Statistics
     static F32 maxValue(const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step=0.01);
 
     /*! \fn  static Distribution  integral(const DistributionMultiVariate &f, VecF32 xmin, VecF32 xmax,F32 step=0.01);
-     * \param f input distribution
+     * \param f input bi-variate distribution
      * \param xmin lower bound
      * \param xmax upper bound
      * \param step step
@@ -523,7 +523,7 @@ struct POP_EXPORTS Statistics
     */
     static DistributionMultiVariateRegularStep  integral(const DistributionMultiVariate &f, VecF32 xmin, VecF32 xmax,F32 step=0.01);
     /*! \fn DistributionMultiVariate toProbabilityDistribution(const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step);
-     * \param f input distribution
+     * \param f input bi-variate distribution
      * \param xmin lower bound
      * \param xmax upper bound
      * \param step step
@@ -546,27 +546,15 @@ struct POP_EXPORTS Statistics
 
 
     /*!
-     * \param f input bivariate distribution
+     * \param f input bi-variate distribution
      * \param xmin lower bound
      * \param xmax upper bound
      * \param step step
-     * \return matrix value
+     * \return F32
      *
-     * \code
-     * DistributionMultiVariate d("-100*(x-0.5)^2*(y-0.5)^2+2","x,y");
-
-     * VecF32 xmin(2),xmax(2);
-     * xmin(0)=0;xmin(1)=0;
-     * xmax(0)=1;xmax(1)=1;
-     * Mat2F32 m = Statistics::toMatrix(d,xmin,xmax,0.1);
-     * Scene3d scene;
-     * Visualization::topography(scene,m);
-     * Visualization::axis(scene,2,0.5,0);
-     * scene.display();
-     * \endcode
-     * \image html tomatrix.jpg
-     */
-    static Mat2F32 toMatrix( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step=0.01);
+     *  Convert the input distribution to a step function defined in the range (xmin,xmax) for optimisation purpose
+    */
+    static DistributionMultiVariateRegularStep toStepFunction( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step=1);
 
     //@}
 

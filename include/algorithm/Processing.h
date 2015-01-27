@@ -110,7 +110,7 @@ struct POP_EXPORTS Processing
      *
         \code
                 Mat2UI8 img(255,255);//2d grey-level matrix object
-                Distribution d( DistributionUniformInt(0,255));
+                DistributionUniformInt d(0,255);
                 Processing::randomField(img.getDomain(),d,img);
                 img.display();
         \endcode
@@ -537,7 +537,7 @@ struct POP_EXPORTS Processing
         \code
                 Mat2UI8 img;
                 img.load("../image/Lena.bmp");
-                Distribution d("(x/255)^3*255");
+                DistributionExpression d("(x/255)^3*255");
                 Mat2UI8 power2 =Processing::fofx(img,d);
                 power2.display();
         \endcode
@@ -2156,7 +2156,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * Watershed transformation on the topographic surface initialiased by the seeds restricted by the mask
      * \code
      * F32 porosity=0.3;
-     * Distribution dnormal(10,5,"NORMAL");//Poisson generator
+     * DistributionNormal dnormal(10,5);//Poisson generator
      * F32 moment_order_2 = Statistics::moment(dnormal,2,0,50);
      * F32 surface_expectation = moment_order_2*3.14159265;
      * Vec2F32 domain(512);//2d field domain
@@ -2336,21 +2336,21 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       *  the output is the voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ (work only for 1-norm and \f$\infty-norm\f$)\n
        * In this code, we generate a voronoi tesselation from a Poisson VecN process
       * \code
-                Mat2UI32 field(512,512);
+        Mat2UI32 field(512,512);
 
-                F32 densityVecNprocess=0.001;
-                F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
+        F32 densityVecNprocess=0.001;
+        F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
-                Distribution d(lambda,"POISSON");
-                int nbrVecNs = d.randomVariable();
-                Distribution d0(0,field.getDomain()(0)-1,"UNIFORMINT");
-                Distribution d1(0,field.getDomain()(1)-1,"UNIFORMINT");
-                for(int i=0;i<nbrVecNs;i++){
-                    field(d0.randomVariable(),d1.randomVariable())=i+1;
-                }
-                field = Processing::voronoiTesselation(field,0);
-                Mat2RGBUI8 visu= Visualization::labelToRandomRGB(field);
-                visu.display();
+        DistributionPoisson d(lambda);
+        int nbrVecNs = d.randomVariable();
+        DistributionUniformInt d0(0,field.getDomain()(0)-1);
+        DistributionUniformInt d1(0,field.getDomain()(1)-1);
+        for(int i=0;i<nbrVecNs;i++){
+            field(d0.randomVariable(),d1.randomVariable())=i+1;
+        }
+        field = Processing::voronoiTesselation(field,0);
+        Mat2RGBUI8 visu= Visualization::labelToRandomRGB(field);
+        visu.display();
         \endcode
         \image html voronoi2.png
       *
@@ -2382,21 +2382,21 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       *  Voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ calculated with the euclidean norm\n
       * In this code, we generate a voronoi tesselation from a Poisson VecN process
       * \code
-                Mat2UI32 field(512,512);
+        Mat2UI32 field(512,512);
 
-                F32 densityVecNprocess=0.001;
-                F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
+        F32 densityVecNprocess=0.001;
+        F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
-                Distribution d(lambda,"POISSON");
-                int nbrVecNs = d.randomVariable();
-                Distribution d0(0,field.getDomain()(0)-1,"UNIFORMINT");
-                Distribution d1(0,field.getDomain()(1)-1,"UNIFORMINT");
-                for(int i=0;i<nbrVecNs;i++){
-                    field(d0.randomVariable(),d1.randomVariable())=i+1;
-                }
-                field = Processing::voronoiTesselationEuclidean(field);
-                Mat2RGBUI8 visu= Visualization::labelToRandomRGB(field);
-                visu.display();
+        DistributionPoisson d(lambda);
+        int nbrVecNs = d.randomVariable();
+        DistributionUniformInt d0(0,field.getDomain()(0)-1);
+        DistributionUniformInt d1(0,field.getDomain()(1)-1);
+        for(int i=0;i<nbrVecNs;i++){
+            field(d0.randomVariable(),d1.randomVariable())=i+1;
+        }
+        field = Processing::voronoiTesselationEuclidean(field);
+        Mat2RGBUI8 visu= Visualization::labelToRandomRGB(field);
+        visu.display();
         \endcode
         \image html voronoi2eucl.png
 
@@ -2438,10 +2438,10 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * F32 densityVecNprocess=0.0001;
      * F32 lambda = densityVecNprocess*field.getDomain().multCoordinate();
 
-     * Distribution d(lambda,"POISSON");
+     * DistributionPoisson d(lambda);
      * int nbrVecNs = d.randomVariable();
-     * Distribution d0(0,field.getDomain()(0)-1,"UNIFORMINT");
-     * Distribution d1(0,field.getDomain()(1)-1,"UNIFORMINT");
+     * DistributionUniformInt d0(0,field.getDomain()(0)-1);
+     * DistributionUniformInt d1(0,field.getDomain()(1)-1);
      * for(int i=0;i<nbrVecNs;i++){
      *     field(d0.randomVariable(),d1.randomVariable())=i+1;
      * }

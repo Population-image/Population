@@ -13,270 +13,51 @@ unsigned long Distribution::length = 4;
 MTRand_int32 Distribution::irand(Distribution::init, Distribution::length);
 
 
+void Distribution::display(F32 xmin,F32 xmax)const{
+    DistributionDisplay disp;
+    disp.display(*this,xmin,xmax);
+}
+void DistributionDisplay::display( const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
+    Vec<const Distribution*> v_d;
+    v_d.push_back(&d);
+    display( v_d, xmin, xmax, ymin, ymax, sizex, sizey);
+}
+void DistributionDisplay::display( const Distribution & d1,const Distribution & d2,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
+    Vec<const Distribution*> v_d;
+    v_d.push_back(&d1);
+    v_d.push_back(&d2);
+    display( v_d, xmin, xmax, ymin, ymax, sizex, sizey);
+}
+void DistributionDisplay::display( const Distribution & d1,const Distribution & d2,const Distribution & d3,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
+    Vec<const Distribution*> v_d;
+    v_d.push_back(&d1);
+    v_d.push_back(&d2);
+    v_d.push_back(&d3);
+    display( v_d, xmin, xmax, ymin, ymax, sizex, sizey);
+}
+void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizewidth,int sizeheight){
 
-
-
-//void Distribution::setStep(F32 )const{
-
-//}
-
-
-//F32 Distribution::getStep()const{
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->getStep();
-//    else
-//        return 0.01;
-//}
-
-//F32 Distribution::getXmin()const{
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->getXmin();
-//    else
-//        return -NumericLimits<F32>::maximumRange();
-//}
-//F32 Distribution::getXmax()const{
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->getXmax();
-//    else
-//        return NumericLimits<F32>::maximumRange();
-//}
-//F32 Distribution::randomVariable(F32 value)const
-//{
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->operator ()(value);
-//    else{
-//        std::cerr<<"In Distribution::randomVariable(F32 value), empty distributio";
-//        return 0;
-//    }
-//}
-
-
-
-//F32 Distribution::operator()(F32 value)const {
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->operator ()(value);
-//    else{
-//        std::cerr<<"In Distribution::operator()(F32 value), empty distribution";
-//        return 0;
-//    }
-//}
-
-//F32 Distribution::randomVariable()const {
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->randomVariable();
-//    else{
-//        std::cerr<<"In Distribution::randomVariable(), empty distribution";
-//        return 0;
-//    }
-//}
-//F32 Distribution::operator()()const {
-//    return this->randomVariable();
-//}
-
-//Distribution * Distribution::clone()const {
-//    if(_deriveddistribution!=NULL)
-//        return _deriveddistribution->clone();
-//    else
-//        std::cerr<<"In Distribution::clone(), empty distribution";
-//    return NULL;
-//}
-
-//const Distribution * Distribution::___getPointerImplementation()const{
-
-//    return _deriveddistribution;
-
-//}
-
-//Distribution * Distribution::___getPointerImplementation(){
-
-//    return _deriveddistribution;
-
-//}
-
-//void Distribution::___setPointererImplementation(Distribution * d){
-
-//    delete _deriveddistribution;
-//    _deriveddistribution = d;
-//}
-
-//Distribution  Distribution::rho(const Distribution &d)const{
-//    DistributionArithmeticComposition *dist = new DistributionArithmeticComposition;
-//    dist->setDistributionLeft(*this);
-//    dist->setDistributionRight(d);
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//Distribution  Distribution::operator +(const Distribution& d)const
-//{
-//    DistributionArithmeticAddition *dist = new DistributionArithmeticAddition;
-//    dist->setDistributionLeft(*this);
-//    dist->setDistributionRight(d);
-
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//Distribution  Distribution::operator -(const Distribution& d)const
-//{
-//    DistributionArithmeticSubtraction *dist = new DistributionArithmeticSubtraction;
-//    dist->setDistributionLeft(*this);
-//    dist->setDistributionRight(d);
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//Distribution  Distribution::operator *(const Distribution& d)const
-//{
-//    DistributionArithmeticMultiplication *dist = new DistributionArithmeticMultiplication;
-//    dist->setDistributionLeft(*this);
-//    dist->setDistributionRight(d);
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//Distribution  Distribution::operator /(const Distribution& d)const
-//{
-//    DistributionArithmeticDivision *dist = new DistributionArithmeticDivision;
-//    dist->setDistributionLeft(*this);
-//    dist->setDistributionRight(d);
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-//Distribution  Distribution::operator -()const
-//{
-//    DistributionArithmeticSubtraction *dist = new DistributionArithmeticSubtraction;
-//    Distribution  exp ("0","EXPRESSION");
-//    dist->setDistributionLeft(exp);
-//    dist->setDistributionRight(*this);
-//    Distribution dout;
-//    dout.___setPointererImplementation(dist);
-//    return dout;
-//}
-
-//Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,Distribution & d3,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
-//    std::vector<Distribution> d;
-//    d.push_back(d1);
-//    d.push_back(d2);
-//    d.push_back(d3);
-//    return Distribution::multiDisplay( d,    xmin, xmax, ymin, ymax, sizex, sizey);
-//}
-//Mat2RGBUI8 Distribution::multiDisplay( Distribution & d1,Distribution & d2,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
-//    std::vector<Distribution> d;
-//    d.push_back(d1);
-//    d.push_back(d2);
-//    return Distribution::multiDisplay( d,    xmin, xmax, ymin, ymax, sizex, sizey);
-//}
-//Mat2RGBUI8 Distribution::multiDisplay( std::vector<Distribution> & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
-//    if(xmin == -NumericLimits<F32>::maximumRange()){
-//        xmin = d[0].getXmin();
-//        if(xmin == -NumericLimits<F32>::maximumRange())
-//            xmin = 0;
-//    }
-//    if(xmax == NumericLimits<F32>::maximumRange()){
-//        xmax = d[0].getXmax();
-//        if(xmax == NumericLimits<F32>::maximumRange())
-//            xmax = 1;
-//    }
-//    if(ymin == -NumericLimits<F32>::maximumRange()){
-//        ymin = pop::Statistics::minValue(d[0],xmin,xmax);
-//    }
-//    if(ymax == NumericLimits<F32>::maximumRange()){
-//        ymax = pop::Statistics::maxValue(d[0],xmin,xmax);
-//    }
-//    std::vector<RGBUI8> v_RGB;
-//    for(int i=0;i<(int)d.size();i++)
-//        v_RGB.push_back(RGBUI8::randomRGB());
-//    MatN<2,RGBUI8> img (sizey,sizex);
-//    const char * c = "Simple plot: left(right)-arrow to move x, up(down)-to move y and +(-) to (un)zoom";
-
-//    MatNDisplay main_disp;
-
-
-//    main_disp.display(img);
-//    main_disp.set_title(c);
-//    while (!main_disp.is_closed() ) {
-
-//        if(main_disp.is_keyARROWDOWN()){
-//            F32 diff =ymax-ymin;
-//            ymin -= diff*0.02;
-//            ymax -= diff*0.02;
-//        }
-//        if(main_disp.is_keyARROWUP())
-//        {
-//            F32 diff =ymax-ymin;
-//            ymin += diff*0.02;
-//            ymax += diff*0.02;
-//        }
-//        if(main_disp.is_keyARROWLEFT()){
-//            F32 diff =xmax-xmin;
-//            xmin -= diff*0.02;
-//            xmax -= diff*0.02;
-//        }
-//        if(main_disp.is_keyARROWRIGHT())
-//        {
-//            F32 diff =xmax-xmin;
-//            xmin += diff*0.02;
-//            xmax += diff*0.02;
-//        }
-//        if(main_disp.is_keyPADADD())
-//        {
-//            F32 diffx =xmax-xmin;
-//            F32 diffy =ymax-ymin;
-//            xmin += diffx*0.02;
-//            xmax -= diffx*0.02;
-//            ymin += diffy*0.02;
-//            ymax -= diffy*0.02;
-//        }
-//        if(main_disp.is_keyPADSUB())
-//        {
-//            F32 diffx =xmax-xmin;
-//            F32 diffy =ymax-ymin;
-//            xmin -= diffx*0.02;
-//            xmax += diffx*0.02;
-//            ymin -= diffy*0.02;
-//            ymax += diffy*0.02;
-//        }
-
-//        img=RGBUI8(0);
-//        Draw::axis(img, xmin, xmax, ymin, ymax,255);
-
-
-//        for(int i =0;i<(int)d.size();i++){
-//            VecN<2,int> x1,x2;
-//            x1(1)=img.getDomain()(1)-40;x2(1)=img.getDomain()(1)-20;
-//            x1(0)=(i+1)*10;x2(0)=(i+1)*10;
-
-//            Draw::line(img,x1,x2,v_RGB[i],1);
-//            Draw::text(img,BasicUtility::Any2String(i).c_str(),Vec2I32(x2(0)-5,x2(1)+5),v_RGB[i]);
-//            Draw::distribution(d[i], xmin, xmax, ymin, ymax,v_RGB[i],img);
-
-//        }
-//        main_disp.display(img).waitTime();
-//    }
-//    return img;
-//}
-
-void DistributionDisplay::display(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizewidth,int sizeheight){
-
-    if(ymin == -NumericLimits<F32>::maximumRange()){
-        ymin = pop::Statistics::minValue(d,xmin,xmax);
+    if(ymin == NumericLimits<F32>::minimumRange()){
+        ymin = NumericLimits<F32>::maximumRange();
+        for(unsigned int i=0;i<v_d.size();i++)
+            ymin = std::min(ymin,pop::Statistics::minValue(*v_d(i),xmin,xmax));
     }
     if(ymax == NumericLimits<F32>::maximumRange()){
-        ymax = pop::Statistics::maxValue(d,xmin,xmax);
+        ymax = NumericLimits<F32>::minimumRange();
+        for(unsigned int i=0;i<v_d.size();i++)
+            ymax = std::max(ymax,pop::Statistics::maxValue(*v_d(i),xmin,xmax));
     }
 
 
     MatN<2,unsigned char> img (sizeheight, sizewidth);
-    Draw::distribution(d, xmin, xmax, ymin, ymax,255,img);
+    for(unsigned int i=0;i<v_d.size();i++)
+        Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,255-i*40,img);
     Draw::axis(img, xmin, xmax, ymin, ymax,255);
 
     MatNDisplay main_disp;
-
-    main_disp.set_title("Simple plot: left(right)-arrow to move x, up(down)-to move y and +(-) to (un)zoom");
     main_disp.display(img);
     while (!main_disp.is_closed() ) {
+        main_disp.set_title("Simple plot: left(right)-arrow to move x, up(down)-to move y and +(-) to (un)zoom");
 
         if(main_disp.is_keyARROWDOWN()){
             F32 diff =ymax-ymin;
@@ -323,7 +104,8 @@ void DistributionDisplay::display(const Distribution & d,F32 xmin,F32 xmax,F32 y
         }
 
         img=0;
-        Draw::distribution(d, xmin, xmax, ymin, ymax,255,img);
+        for(unsigned int i=0;i<v_d.size();i++)
+            Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,255-i*40,img);
         Draw::axis(img, xmin, xmax, ymin, ymax,255);
         main_disp.display(img).waitTime();
     }

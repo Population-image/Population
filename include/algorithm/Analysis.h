@@ -73,10 +73,10 @@ in the Software.
      *     return 0;
      * }
      * \endcode
-     * Most of the algorithms return a matrix containing the information. To plot this information, you can convert it in Distribution and display it as follows:
+     * Most of the algorithms return a matrix containing the information. To plot this information, you can convert it in DistributionRegularStep and display it as follows:
      * \code
      * Mat2F32 mverpore = Analysis::REVPorosity(grain,VecN<3,F32>(grain.getDomain())*0.5,200);
-     * Distribution dverpor(mverpore);
+     * DistributionRegularStep dverpor(mverpore);
      * dverpor.display();
      * mverpore.saveAscii("ver.txt");
      * \endcode
@@ -102,7 +102,7 @@ in the Software.
      * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
      * mchord.deleteCol(1);
-     * Distribution dchord_solid(mchord);
+     * DistributionRegularStep dchord_solid(mchord);
      * std::cout<<"Charateristic length of solid space "<<Statistics::moment(dchord_solid,1,0,300,1)<<std::endl;//  \sum_{i=0}^{300} i*d(i)=27.2
      * \endcode
      * \image html spinodal_chord.png "Peak following by exponantial decrease (for the meaning of this signature see Chap 2, p 37. In Handbook of Porous Media. P. Levitz)"
@@ -268,7 +268,7 @@ struct POP_EXPORTS Analysis
      * Most of the algorithms return a matrix containing the information. To plot this information, you can convert it in Distribution and display it as follows:
      * \code
      * Mat2F32 mverpore = Analysis::REVPorosity(grain,VecN<3,F32>(grain.getDomain())*0.5,200);
-     * Distribution dverpor(mverpore);
+     * DistributionRegularStep dverpor(mverpore);
      * dverpor.display();
      * mverpore.saveAscii("ver.txt");
      * \endcode
@@ -294,7 +294,7 @@ struct POP_EXPORTS Analysis
      * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
      * mchord.deleteCol(1);
-     * Distribution dchord_solid(mchord);
+     * DistributionRegularStep dchord_solid(mchord);
      * std::cout<<"Charateristic length of solid space "<<Statistics::moment(dchord_solid,1,0,300,1)<<std::endl;//  \sum_{i=0}^{300} i*d(i)=27.2
      * \endcode
      * \image html spinodal_chord.png "Peak following by exponantial decrease (for the meaning of this signature see Chap 2, p 37. In Handbook of Porous Media. P. Levitz)"
@@ -426,7 +426,7 @@ struct POP_EXPORTS Analysis
      * For an extented analysis, you can decompose the structure in term of elmentary parts and to analyse statiscally this elements as follows:
      * \code
      * F32 porosity=0.2;
-     * Distribution dnormal(10,0.1,"NORMAL");//Poisson generator
+     * DistributionNormal dnormal(10,0.1);//Poisson generator
      * F32 moment_order_2 = pop::Statistics::moment(dnormal,2,0,1024);
      * F32 surface_expectation = moment_order_2*3.14159265;
      * Vec2F32 domain(2048);//2d field domain
@@ -452,16 +452,16 @@ struct POP_EXPORTS Analysis
      * PDE::allenCahn(water,porespace,5000);
      * water=pop::Processing::greylevelRemoveEmptyValue(water);
      * VecF32 varea = Analysis::areaByLabel(water);
-     * Distribution dvarea = pop::Statistics::computedStaticticsFromRealRealizations(varea,0.1);
-     * Mat2F32 mvarea = pop::Statistics::toMatrix(dvarea,dvarea.getXmin(),dvarea.getXmax(),dvarea.getStep());
+     * DistributionRegularStep dvarea = pop::Statistics::computedStaticticsFromRealRealizations(varea,0.1);
+     * Mat2F32 mvarea = dvarea.toMatrix();
      * mvarea.saveAscii("label_area.m");
      * VecF32 vcontact = Analysis::perimeterContactBetweenLabel(water);
-     * Distribution dcontact = pop::Statistics::computedStaticticsFromRealRealizations(vcontact,0.1);
-     * Mat2F32 mcontact = pop::Statistics::toMatrix(dcontact,dcontact.getXmin(),dcontact.getXmax(),dcontact.getStep());
+     * DistributionRegularStep dcontact = pop::Statistics::computedStaticticsFromRealRealizations(vcontact,0.1);
+     * Mat2F32 mcontact = dcontact.toMatrix();
      * mcontact.saveAscii("label_contact.m");
      * VecF32 vferet = Analysis::feretDiameterByLabel(water);
-     * Distribution dferet = pop::Statistics::computedStaticticsFromRealRealizations(vferet,0.1);
-     * Mat2F32 mferet = pop::Statistics::toMatrix(dferet,dferet.getXmin(),dferet.getXmax(),dferet.getStep());
+     * DistributionRegularStep dferet = pop::Statistics::computedStaticticsFromRealRealizations(vferet,0.1);
+     * Mat2F32 mferet = dferet.toMatrix();
      * mferet.saveAscii("label_feret.m");
      * \endcode
      *
@@ -518,39 +518,33 @@ struct POP_EXPORTS Analysis
      * M(i,0)=i and M(i,j) = \f$\frac{|X_{j-1}\cap B(x,i)|}{|B(x,i)|}\f$ where \f$ B(x,i)=\{x': |x'-x|<i \}\f$ the ball centered in x of radius i
      * and \f$X_{j}=\{x:f(x)=j \}\f$ the level set of f
      * \code
-    Mat2UI8 iex;
-    iex.load("../image/iex.pgm");
-    Mat2F32 mverpore = Analysis::REVHistogram(iex,VecN<2,F32>(iex.getDomain())*0.5,250);
+        Mat2UI8 iex;
+        iex.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+        Mat2F32 mverpore = Analysis::REVHistogram(iex,VecN<2,F32>(iex.getDomain())*0.5,250);
 
-    VecF32 vindex = mverpore.getCol(0);//get the first column containing the grey-level range
-    VecF32 v100 = mverpore.getCol(100);//get the col containing the histogram for r=100
-    VecF32 v150 = mverpore.getCol(150);
-    VecF32 v200 = mverpore.getCol(200);
-    VecF32 v250 = mverpore.getCol(250);
+        VecF32 vindex = mverpore.getCol(0);//get the first column containing the grey-level range
+        VecF32 v100 = mverpore.getCol(100);//get the col containing the histogram for r=100
+        VecF32 v150 = mverpore.getCol(150);
+        VecF32 v200 = mverpore.getCol(200);
 
-    Mat2F32 mhistoradius100(v100.size(),2);
-    mhistoradius100.setCol(0,vindex);
-    mhistoradius100.setCol(1,v100);
+        Mat2F32 mhistoradius100(v100.size(),2);
+        mhistoradius100.setCol(0,vindex);
+        mhistoradius100.setCol(1,v100);
 
-    Mat2F32 mhistoradius150(v150.size(),2);
-    mhistoradius150.setCol(0,vindex);
-    mhistoradius150.setCol(1,v150);
+        Mat2F32 mhistoradius150(v150.size(),2);
+        mhistoradius150.setCol(0,vindex);
+        mhistoradius150.setCol(1,v150);
 
-    Mat2F32 mhistoradius200(v200.size(),2);
-    mhistoradius200.setCol(0,vindex);
-    mhistoradius200.setCol(1,v200);
+        Mat2F32 mhistoradius200(v200.size(),2);
+        mhistoradius200.setCol(0,vindex);
+        mhistoradius200.setCol(1,v200);
 
-    Mat2F32 mhistoradius250(v250.size(),2);
-    mhistoradius250.setCol(0,vindex);
-    mhistoradius250.setCol(1,v250);
 
-    Distribution d100(mhistoradius100);
-    Distribution d150(mhistoradius150);
-    Distribution d200(mhistoradius200);
-    Distribution d250(mhistoradius250);
-    std::vector<Distribution> v;
-    v.push_back(d100);v.push_back(d150);v.push_back(d200);v.push_back(d250);
-    Distribution::multiDisplay(v);
+
+        DistributionRegularStep d100(mhistoradius100);
+        DistributionRegularStep d150(mhistoradius150);
+        DistributionRegularStep d200(mhistoradius200);
+        DistributionDisplay::display(d100,d150,d200,d100.getXmin(),d150.getXmax());
      * \endcode
      * \image html REVhistogram.png "Histogram in balls of different radius"
     */
@@ -767,8 +761,8 @@ struct POP_EXPORTS Analysis
      * img.load("../image/Lena.bmp");
      * Analysis analysis;
      * Mat2F32 m = analysis.histogram(img);
-     * Distribution d(m);
-     * d.display();
+     * DistributionRegularStep d(m);
+     * d.display(0,255);
      * \endcode
      * \sa Matrix Distribution
     */
@@ -790,8 +784,8 @@ struct POP_EXPORTS Analysis
      * img.load("../image/Lena.bmp");
      * Analysis analysis;
      * Mat2F32 m = analysis.area(img);
-     * Distribution d(m);
-     * d.display();
+     * DistributionRegularStep d(m);
+     * d.display(0,255);
      * \endcode
 
     */

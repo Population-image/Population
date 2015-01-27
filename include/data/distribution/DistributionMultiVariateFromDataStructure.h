@@ -52,37 +52,6 @@ in the Software.
 
 namespace pop
 {
-/// @cond DEV
-
-class POP_EXPORTS DistributionMultiVariateUniformInt:public DistributionMultiVariate
-{
-    /*!
-        \class pop::DistributionMultiVariateUniformInt
-        \ingroup DistributionMultiVariate
-        \brief uniform int
-        \author Tariel Vincent
-    */
-private:
-
-    DistributionUniformReal _d;
-public:
-    VecI32 _xmin;
-    VecI32 _xmax;
-    /*!
-    \fn DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax );
-    *
-    *   constructor the uniform int distribution between the range [xmin,xmax]
-    *
-    */
-    DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax );
-    VecF32 randomVariable()const ;
-    DistributionMultiVariateUniformInt * clone()const ;
-    unsigned int getNbrVariable()const;
-        virtual F32 operator()(const VecF32& v)const;
-};
-
-
-
 class POP_EXPORTS DistributionMultiVariateUnitSphere:public DistributionMultiVariate
 {
     /*!
@@ -127,7 +96,6 @@ private:
         \author Tariel Vincent
 
     * As DistributionRegularStep.Actually, we cannot convert a matrix to a DistributionMultiVariateRegularStep (a work to do)
-    * \sa DistributionMultiVariateRegularStep
      *
     */
 public:
@@ -136,9 +104,10 @@ public:
     VecF32 _xmin;
     MatN<2,F32> _mat2d;
     double _step;
-    DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step);
+    DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, const VecF32& xmin,F32 step);
     F32 operator ()(const VecF32&  value)const;
     DistributionMultiVariateRegularStep * clone()const ;
+    MatN<2,F32> toMatrix(VecF32& xmin,F32 &step)const;
     VecF32 randomVariable()const ;
     unsigned int getNbrVariable()const;
 };
@@ -149,7 +118,7 @@ class POP_EXPORTS DistributionMultiVariateNormal:public DistributionMultiVariate
 {
 private:
     /*!
-        \class pop::DistributionMultiVariateExpression
+        \class pop::DistributionMultiVariateNormal
         \ingroup DistributionMultiVariate
         \brief Multivariate normal distribution
         \author Tariel Vincent
@@ -199,8 +168,6 @@ public:
     unsigned int getNbrVariable()const;
 };
 
-
-
 class POP_EXPORTS DistributionMultiVariateExpression:public DistributionMultiVariate
 {
 private:
@@ -241,10 +208,14 @@ public:
 class DistributionMultiVariateProduct: public DistributionMultiVariate
 {
     /*!
-         \class pop::DistributionMerge
+         \class pop::DistributionMultiVariateProduct
          \brief h(x,y)=f(x)*g(y)
          \author Tariel Vincent
      *
+     * \code
+     *  DistributionMultiVariateProduct d(DistributionUniformReal(0,1),DistributionUniformReal(0,1));
+     *  std::cout<<d.randomVariable()<<std::endl;
+     * \endcode
      *
      */
 private:
@@ -252,6 +223,7 @@ private:
 public:
     ~DistributionMultiVariateProduct();
     DistributionMultiVariateProduct& operator=(const DistributionMultiVariateProduct&a);
+    DistributionMultiVariateProduct(const Distribution & dist1);
     DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2);
     DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3);
     DistributionMultiVariateProduct(const Vec<Distribution*> v_dist);
@@ -261,8 +233,5 @@ public:
     VecF32 randomVariable()const ;
     virtual unsigned int getNbrVariable()const;
 };
-
-
-/// @endcond
 }
 #endif // DISTRIBUTIONMULTIVARIATEFROMDATASTRUCTURE_H

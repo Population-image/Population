@@ -18,6 +18,16 @@ DistributionRegularStep::DistributionRegularStep(const Mat2F32 & matrix)
         generateRepartition();
     }
 }
+Mat2F32 DistributionRegularStep::toMatrix()const{
+    Mat2F32 m(this->_table.size(),2);
+    for(unsigned int i=0;i<m.sizeI();i++){
+        m(i,0) = this->_xmin + i*this->_spacing;
+        m(i,1) = this->_table[i];
+    }
+    return m;
+}
+
+
 F32 DistributionRegularStep::getXmin() const{
     return _xmin;
 }

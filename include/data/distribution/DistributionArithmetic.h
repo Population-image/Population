@@ -114,9 +114,37 @@ public:
     virtual F32 randomVariable()const;
 
  };
+
+
+ /*!
+ * \param d1 other Distribution
+ * \param d1 other Distribution
+ * \return   distribution
+ *
+ *  Division operator : h(x) = d1(x)+d2(x)
+ * \code
+         DistributionExpression d1("-2*x");
+         DistributionExpression d2("x^2+2");
+         DistributionArithmeticAddition div  = d1+d2;//d1 is equal to 2+x^2
+         DistributionDisplay::display(div,-2,2);
+ * \endcode
+ */
 DistributionArithmeticAddition operator +(const Distribution &d1,const Distribution &d2);
 DistributionArithmeticSubtraction operator -(const Distribution &d1,const Distribution &d2);
 DistributionArithmeticMultiplication operator *(const Distribution &d1,const Distribution &d2);
+/*!
+* \param d1 other Distribution
+* \param d1 other Distribution
+* \return   distribution
+*
+*  Division operator : h(x) = d1(x)/d2(x)
+* \code
+        DistributionExpression d1("1");
+        DistributionExpression d2("x^2+1");
+        DistributionArithmeticDivision div  = d1/d2;//d1 is equal to 1/(x^2-1)
+        DistributionDisplay::display(div,-2,2);
+* \endcode
+*/
 DistributionArithmeticDivision operator /(const Distribution &d1,const Distribution &d2);
 
 /*!
@@ -130,7 +158,7 @@ DistributionArithmeticDivision operator /(const Distribution &d1,const Distribut
         DistributionExpression d1("x^2");
         DistributionExpression d2("x^4");
         DistributionArithmeticMin dmin = maximum(d1,d2);//d1 is equal d1(x)=min(x^2,x^4)
-        d1.display(-2,2);
+        DistributionDisplay::display(dmin,-2,2);
 * \endcode
 */
 DistributionArithmeticMin minimum(const Distribution &d1,const Distribution &d2);
@@ -142,10 +170,10 @@ DistributionArithmeticMin minimum(const Distribution &d1,const Distribution &d2)
 *: public Distribution
 *  h(x) = max(f(x),g(x))
 * \code
-        Distribution d1("x^2");
-        Distribution d2("x^4");
-        d1 = maximum(d1,d2);//d1 is equal d1(x)=max(x^2,x^4)
-        d1.display(-2,2);
+        DistributionExpression d1("x^2");
+        DistributionExpression d2("x^4");
+        DistributionArithmeticMax dmax = maximum(d1,d2);//d1 is equal d1(x)=max(x^2,x^4)
+        DistributionDisplay::display(dmax,-2,2);
 * \endcode
 */
 DistributionArithmeticMax maximum(const Distribution &d1,const Distribution &d2);

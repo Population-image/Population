@@ -66,7 +66,7 @@ following code, we construct the boolean model with disk at a given expected por
 F32 porosity=0.4;
 F32 mean=20;
 F32 standard_deviation=7;
-Distribution dnormal (mean,standard_deviation,"NORMAL");//Normal distribution for disk radius
+DistributionNormal dnormal (mean,standard_deviation);//Normal distribution for disk radius
 F32 moment_order_2 = pop::Statistics::moment(dnormal,2,0,40);
 F32 surface_expectation = moment_order_2*3.14159265;
 Vec2F32 domain(1024);//2d field domain
@@ -175,7 +175,7 @@ public:
     F32 lambda= 0.001;// parameter of the Poisson point process
 
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
-    Distribution d (1,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
+    DistributionDirac d (1);//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
     RandomGeometry::sphere(grain,d);
     Mat2RGBUI8 img = RandomGeometry::continuousToDiscrete(grain);
     img.display();
@@ -216,7 +216,7 @@ public:
 
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,1);//generate the 2d Poisson point process
     * RandomGeometry::hardCoreFilter(grain,radius*2,false);
-    * Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
+    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
     * RandomGeometry::sphere(grain,d);
     * RandomGeometry::RGBFromMatrix(grain,img);
     * grain.setModel( DeadLeave);
@@ -254,7 +254,7 @@ public:
     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
     * grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
     * RandomGeometry::minOverlapFilter(grain,radius*2);
-    * Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
+    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
     * RandomGeometry::sphere(grain,d);
     * RandomGeometry::RGBFromMatrix(grain,img);
     * grain.setModel( DeadLeave);
@@ -292,7 +292,7 @@ public:
     * img = pop::Processing::gradientMagnitudeDeriche(img,0.5);
     * Mat2UI8 threshold = pop::Processing::threshold(img,10);
     * RandomGeometry::intersectionGrainToMask(grain,threshold);
-    * Distribution d (radius,"DIRAC");//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
+    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each VecN with mono-disperse sphere to display the result
     * RandomGeometry::sphere(grain,d);
     * RandomGeometry::RGBFromMatrix(grain,img);
     * grain.setModel( DeadLeave);
@@ -324,8 +324,8 @@ public:
     * \code
     * F32 porosity=0.25;
     *  std::string power_law="1/x^(3.1)";
-    * Distribution dpower(power_law.c_str());//Poisson generator
-    * dpower = pop::Statistics::toProbabilityDistribution(dpower,10,1024,0.1);
+    * DistributionExpression dexp(power_law.c_str());//Poisson generator
+    * DistributionRegularStep dpower = pop::Statistics::toProbabilityDistribution(dexp,10,1024,0.1);
 
     * F32 moment_order_2 = pop::Statistics::moment(dpower,2,0,1024);
     * F32 surface_expectation = moment_order_2*3.14159265;
@@ -357,26 +357,26 @@ public:
     * Dress the VecNs with box with a random radius following the probability distribution dist
     *
     * \code
-    Mat2RGBUI8 img;
-    img.load("../image/Lena.bmp");
-    Vec2F32 domain;
-    domain= img.getDomain();
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
+        Mat2RGBUI8 img;
+        img.load("../image/Lena.bmp");
+        Vec2F32 domain;
+        domain= img.getDomain();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
 
 
-    Distribution d("1/x^(3.1)");
-    Distribution dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
-    DistributionMultiVariate d_radius(dproba,dproba);
-    DistributionMultiVariate d_angle(Distribution(0,3.14159265*2,"UNIFORMREAL"));
+        DistributionExpression d("1/x^(3.1)");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
+        DistributionMultiVariateProduct d_radius(dproba,dproba);
+        DistributionMultiVariateProduct d_angle(DistributionUniformInt(0,PI*2));
 
 
-    RandomGeometry::box(grain,d_radius,d_angle);
-    RandomGeometry::RGBFromMatrix(grain,img);
-    grain.setModel( DeadLeave);
-    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+        RandomGeometry::box(grain,d_radius,d_angle);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
-    aborigenart.display();
+        aborigenart.display();
     * \endcode
     * \image html AborigenLenaBox.png
     */

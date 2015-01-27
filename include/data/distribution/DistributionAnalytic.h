@@ -46,14 +46,13 @@ in the Software.
 #include "data/distribution/Distribution.h"
 namespace pop
 {
-/// @cond DEV
+
 class POP_EXPORTS DistributionDiscrete
 {
 private:
     mutable F32 _step;
     /*!
         \class pop::DistributionDiscrete
-        \ingroup Distribution
         \brief allowing operations on discrete distributions
         \author Tariel Vincent
       *
@@ -285,7 +284,7 @@ class POP_EXPORTS DistributionPoisson:public Distribution, public DistributionDi
   * in a fixed interval of time and/or space if these events occur with a known average rate and independently of the time since the last event
   *
   * \f[ f(k; \lambda)=\frac{\lambda^k e^{-\lambda}}{k!}\f]
-  *
+  *RGB
   *
 */
 private:
@@ -354,8 +353,5 @@ public:
     DistributionTriangle * clone()const ;
     F32 operator()(F32 value)const ;
 };
-
-
-/// @endcond
 }
 #endif /* CFUNCTIONGENERATEALEA_H_ */

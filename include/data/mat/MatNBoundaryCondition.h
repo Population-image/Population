@@ -230,11 +230,12 @@ public:
     static  typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
 
         VecN<PowerGP<2,MatN::DIM>::value,std::pair<FloatType,VecN<MatN::DIM,I32> > > v_out =getWeightPosition(m.getDomain(),x);
-        typename FunctionTypeTraitsSubstituteF<typename MatN::F,FloatType>::Result value=0;
+        typedef typename FunctionTypeTraitsSubstituteF<typename MatN::F,F32>::Result  PixelTypeFloat;
+        PixelTypeFloat value=0;
         for( int i=0;i<PowerGP<2,MatN::DIM>::value;i++){
             value+=m(v_out(i).second)*v_out(i).first;
         }
-        return value;
+        return ArithmeticsSaturation<typename MatN::F,PixelTypeFloat>::Range(value);
     }
 
 

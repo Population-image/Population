@@ -6,7 +6,7 @@
 namespace pop{
 
 
-DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, VecF32& xmin,F32 step)
+DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y,const VecF32& xmin,F32 step)
     :DistributionMultiVariate(),uni(0,1)
 {
     _xmin= xmin;
@@ -27,7 +27,11 @@ void DistributionMultiVariateRegularStep::generateRepartition(){
         }
     }
 }
-
+MatN<2,F32> DistributionMultiVariateRegularStep::toMatrix(VecF32& xmin,F32 &step) const{
+    step = _step;
+    xmin = _xmin;
+    return _mat2d;
+}
 
 
 
@@ -192,7 +196,7 @@ DistributionMultiVariateUnitSphere::DistributionMultiVariateUnitSphere(int dimen
 {
     _dim=dimension;
 }
- F32 DistributionMultiVariateUnitSphere::operator()(const VecF32& )const{
+F32 DistributionMultiVariateUnitSphere::operator()(const VecF32& )const{
     std::cerr<<"Not implemented "<<std::endl;
     return 0;
 }
@@ -224,30 +228,6 @@ DistributionMultiVariateUnitSphere * DistributionMultiVariateUnitSphere::clone()
     return new DistributionMultiVariateUnitSphere(_dim);
 }
 
-unsigned int DistributionMultiVariateUniformInt::getNbrVariable()const{
-    return _xmin.size();
-}
-DistributionMultiVariateUniformInt::DistributionMultiVariateUniformInt(const VecI32& xmin,const VecI32& xmax )
-    :DistributionMultiVariate(),_d(0,1),_xmin(xmin),_xmax(xmax)
-{
-}
-
-VecF32 DistributionMultiVariateUniformInt::randomVariable()const {
-    VecF32 v(_xmin.size());
-
-    for(unsigned int i =0;i<v.size();i++){
-        v(i)=std::floor(_d.randomVariable()*(_xmax(i)-_xmin(i))+_xmin(i));
-    }
-    return v;
-}
-
-DistributionMultiVariateUniformInt * DistributionMultiVariateUniformInt::clone()const {
-    return new DistributionMultiVariateUniformInt(_xmin,_xmax);
-}
-F32 DistributionMultiVariateUniformInt::operator()(const VecF32& )const{
-   std::cerr<<"Not implemented "<<std::endl;
-   return 0;
-}
 DistributionMultiVariateProduct::~DistributionMultiVariateProduct(){
     for(unsigned int i=0;i<_v_dist.size();i++){
         if(_v_dist[i]!=NULL)delete _v_dist[i];
@@ -262,6 +242,9 @@ DistributionMultiVariateProduct& DistributionMultiVariateProduct::operator=(cons
     for(unsigned int i=0;i<a._v_dist.size();i++){
         _v_dist.push_back(a._v_dist(i)->clone());
     }
+}
+DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist){
+    _v_dist.push_back(dist.clone());
 }
 
 DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2){
@@ -282,15 +265,15 @@ DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Vec<Distr
 }
 
 DistributionMultiVariateProduct * DistributionMultiVariateProduct::clone()const {
-     return new DistributionMultiVariateProduct(_v_dist);
+    return new DistributionMultiVariateProduct(_v_dist);
 }
- F32 DistributionMultiVariateProduct::operator()(const VecF32&  value)const{
-     double sum=0;
-     for(unsigned int i=0;i<_v_dist.size();i++){
-         sum =_v_dist(i)->operator ()(value(i));
-     }
-     return sum;
- }
+F32 DistributionMultiVariateProduct::operator()(const VecF32&  value)const{
+    double sum=0;
+    for(unsigned int i=0;i<_v_dist.size();i++){
+        sum =_v_dist(i)->operator ()(value(i));
+    }
+    return sum;
+}
 VecF32 DistributionMultiVariateProduct::randomVariable()const{
     VecF32 random(this->getNbrVariable());
     for(unsigned int i=0;i<_v_dist.size();i++){

@@ -303,62 +303,6 @@ static int power2(T x)
 {
     return (x <= 0 ? 1 : 1 << x);
 }
-
-template<typename T1>
-T1 minimum(T1 v1,T1 v2){
-    return std::min(v1,v2);
-}
-template<typename T1>
-T1 maximum(T1 v1,T1 v2){
-    return std::max(v1,v2);
-}
-template<typename T1>
-T1 absolute(T1 v1){
-    return std::abs(static_cast<F32>(v1));
-}
-template<typename T1>
-F32 normValue(const T1& v1,int =2){
-    return std::abs(static_cast<F32>(v1));
-}
-template<typename T1>
-F32 normPowerValue(T1 v1,int p=2){
-    if(p==0||p==1)
-        return std::abs(static_cast<F32>(v1));
-    else if(p==2)
-        return v1*v1;
-    else
-        return std::pow(std::abs(static_cast<F32>(v1)),p);
-}
-template<typename T1>
-F32 distance(const T1& v1,const T1& v2, int p =2){
-    return normValue(v1-v2,p);
-}
-
-
-template <class T1, class T2>
-F32 productInner(const T1&  x1,const T2&  x2)
-{
-    return static_cast<F32>(x1)*static_cast<F32>(x2);
-}
-
-
-struct FunctoProductInner{
-    template <class T1, class T2>
-    F32 operator ()(const T1&  x1,const T2&  x2)
-    {
-        return static_cast<F32>(x1)*static_cast<F32>(x2);
-    }
-};
-
-template<typename T1>
-T1 round(T1 v1){
-    return std::floor(v1+0.5f);
-}
-template <class T1>
-T1  squareRoot(T1  x)
-{
-    return std::sqrt(x);
-}
 ////////////////////////////////////////////////////////////////////////////////
 // class template Int2Type
 // Converts each integral constant into a unique type

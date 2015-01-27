@@ -1125,16 +1125,17 @@ struct POP_EXPORTS Visualization
      * \param img topographic surface
      *
      * \code
-     * DistributionMultiVariate d("-100*(x-0.5)^2*(y-0.5)^2+2","x,y");
-
-     * VecF32 xmin(2),xmax(2);
-     * xmin(0)=0;xmin(1)=0;
-     * xmax(0)=1;xmax(1)=1;
-     * Mat2F32 m = Statistics::toMatrix(d,xmin,xmax,0.1);
-     * Scene3d scene;
-     * Visualization::topography(scene,m);
-     * Visualization::axis(scene,2,0.5,0);
-     * scene.display();
+        DistributionMultiVariateExpression d("-100*(x-0.5)^2*(y-0.5)^2+2","x,y");
+        VecF32 xmin(2),xmax(2);
+        xmin(0)=0;xmin(1)=0;
+        xmax(0)=1;xmax(1)=1;
+        DistributionMultiVariateRegularStep d_reg = Statistics::toStepFunction(d,xmin,xmax,0.1);
+        F32 step;
+        Mat2F32 m =d_reg.toMatrix(xmin,step);
+        Scene3d scene;
+        Visualization::topography(scene,m);
+        Visualization::axis(scene,2,0.5,0);
+        scene.display();
      * \endcode
      * \image html tomatrix.jpg
      */

@@ -843,13 +843,13 @@ pop::Vec<T1> minimum(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2){
 *
 */
 
-
+namespace Private {struct FunctoProductInner{template <class T1, class T2>F32 operator ()(const T1&  x1,const T2&  x2){return static_cast<F32>(x1)*static_cast<F32>(x2);}};}
 template<typename T1>
 F32  productInner(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
 {
     POP_DbgAssert( v1.size()==v2.size());
 
-    return std::inner_product(v1.begin(),v1.end(),v2.begin(),T1(0), std::plus<T1>(),FunctoProductInner());
+    return std::inner_product(v1.begin(),v1.end(),v2.begin(),T1(0), std::plus<T1>(),Private::FunctoProductInner());
 }
 
 /*!

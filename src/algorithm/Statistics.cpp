@@ -717,7 +717,8 @@ DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMult
 }
 DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step)
 {
-
+    if(f.getNbrVariable()!=2)
+        std::cerr<<"Only for two variate distribution";
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
 
     F32 sum=0;
@@ -733,16 +734,14 @@ DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const
     DistributionMultiVariateRegularStep d(m,xmin,step);
     return d;
 }
-
-Mat2F32 Statistics::toMatrix( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step){
+DistributionMultiVariateRegularStep Statistics::toStepFunction( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step){
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
     Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
     while(it.next()){
         VecF32 x = it.xInteger();
-        m (x(0),x(1)) = f.operator ()(it.x());
+         m (x(0),x(1)) = f.operator ()(it.x());
     }
-    return m;
-
+    DistributionMultiVariateRegularStep d(m,xmin,step);
+    return d;
 }
-
 }

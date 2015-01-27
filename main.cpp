@@ -17,13 +17,69 @@ struct Coordinate
 };
 int main(){
     {
+        Mat2RGBUI8 img;
+        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+        Vec2F32 domain;
+        domain= img.getDomain();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
+
+
+        DistributionExpression d("1/x^(3.1)");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
+        DistributionMultiVariateProduct d_radius(dproba,dproba);
+        DistributionMultiVariateProduct d_angle(DistributionUniformInt(0,PI*2));
+
+
+        RandomGeometry::box(grain,d_radius,d_angle);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+
+        aborigenart.display();
+    }
+    {
+        //        Mat2UI8 iex;
+        //        iex.load("../image/iex.pgm");
+        //        Mat2F32 mverpore = Analysis::REVHistogram(iex,VecN<2,F32>(iex.getDomain())*0.5,250);
+
+        //        VecF32 vindex = mverpore.getCol(0);//get the first column containing the grey-level range
+        //        VecF32 v100 = mverpore.getCol(100);//get the col containing the histogram for r=100
+        //        VecF32 v150 = mverpore.getCol(150);
+        //        VecF32 v200 = mverpore.getCol(200);
+        //        VecF32 v250 = mverpore.getCol(250);
+
+        //        Mat2F32 mhistoradius100(v100.size(),2);
+        //        mhistoradius100.setCol(0,vindex);
+        //        mhistoradius100.setCol(1,v100);
+
+        //        Mat2F32 mhistoradius150(v150.size(),2);
+        //        mhistoradius150.setCol(0,vindex);
+        //        mhistoradius150.setCol(1,v150);
+
+        //        Mat2F32 mhistoradius200(v200.size(),2);
+        //        mhistoradius200.setCol(0,vindex);
+        //        mhistoradius200.setCol(1,v200);
+
+        //        Mat2F32 mhistoradius250(v250.size(),2);
+        //        mhistoradius250.setCol(0,vindex);
+        //        mhistoradius250.setCol(1,v250);
+
+        //        Distribution d100(mhistoradius100);
+        //        Distribution d150(mhistoradius150);
+        //        Distribution d200(mhistoradius200);
+        //        Distribution d250(mhistoradius250);
+        //        std::vector<Distribution> v;
+        //        v.push_back(d100);v.push_back(d150);v.push_back(d200);v.push_back(d250);
+        //        Distribution::multiDisplay(v);
+    }
+    {
 
         DistributionMultiVariateProduct drgb(DistributionUniformInt(0,255),DistributionUniformInt(0,255),DistributionUniformInt(0,255));
         std::cout<<drgb.randomVariable()<<std::endl;
-        Mat2F32 mmm;
-        DistributionRegularStep d(mmm);
 
-        DistributionDisplay::display(d,0,2);
+
+
 
 
 
@@ -45,7 +101,7 @@ int main(){
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_PERIODIC);
         RandomGeometry::cylinder(grain,ddirac_radius,duniform_height);
         Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
-//        img_VecN.display();
+        //        img_VecN.display();
         Mat3UI8 img_VecN_grey;
         img_VecN_grey = img_VecN;
 

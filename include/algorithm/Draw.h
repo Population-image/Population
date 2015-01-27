@@ -878,8 +878,15 @@ struct POP_EXPORTS Draw
     static void axis(MatN<DIM,TypePixel> &img,F32 xmin,F32 xmax,F32 ymin, F32 ymax,typename MatN<DIM,TypePixel>::F value)
     {
 
+        double space = 15;
+        F32 y= img.getDomain()(0)-space;
+        if(ymin<0&&ymax>0)
+            y = (ymax)/(ymax-ymin)*img.getDomain()(0);
+        else if(ymin<0){
+            y= space;
+        }
 
-        F32 space=15;
+
 
         //drax x-coordinate
         F32 xmm =maximum(absolute(xmin),absolute(xmax))*(1+0.0001);
@@ -888,23 +895,28 @@ struct POP_EXPORTS Draw
         F32 value2 = std::pow((F32)10,l);
         //Drawline
         for(int i=0;i<img.getDomain()(1);i++){
-            img(img.getDomain()(0)-space,i)=value;
+            img(y,i)=value;
         }
         //DrawNumber
         int BAR=10;
         for(int k=0;k<BAR;k++){
             int i =1.0*k*img.getDomain()(1)/BAR;
-            img(img.getDomain()(0)-space+1,i)=value;
-            img(img.getDomain()(0)-space-1,i)=value;
+            img(y+1,i)=value;
+            img(y-1,i)=value;
             F32 x = xmin + k*(xmax-xmin)/BAR;
             int v = x/value2;
-            Draw::text(img,BasicUtility::Any2String(v),Vec2I32(img.getDomain()(0)-space/2-5,i-7),value);
+            Draw::text(img,BasicUtility::Any2String(v),Vec2I32(y+5,i-7),value);
         }
-        Draw::text(img,BasicUtility::Any2String(10),Vec2I32(img.getDomain()(0)-space/2-2,img.getDomain()(1)-space-5),value);
-        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(img.getDomain()(0)-space/2-7,img.getDomain()(1)-space+5),value);
+        Draw::text(img,BasicUtility::Any2String(10),Vec2I32(y+5,img.getDomain()(1)-space-5),value);
+        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(y+3,img.getDomain()(1)-space+5),value);
 
         space=30;
-
+        F32 x= 30;
+        if(xmin<0&&xmax>0)
+            x = (-xmin)/(xmax-xmin)*img.getDomain()(1);
+        else if(ymin<0){
+            x= img.getDomain()(1)-space;
+        }
         //drax y-coordinate
         F32 ymm =maximum(absolute(ymin),absolute(ymax))*(1+0.0001);
         l = std::floor( std::log(ymm)/std::log((F32)10));//max digit different to zero
@@ -912,19 +924,19 @@ struct POP_EXPORTS Draw
         value2 = std::pow((F32)10,l);
         //Drawline
         for(int j=0;j<img.getDomain()(0);j++){
-            img(j,space)=value;
+            img(j,x)=value;
         }
 
         for(int k=1;k<BAR;k++){
             int j =1.0*k*img.getDomain()(0)/BAR;
-            img(j,space+1)=value;
-            img(j,space-1)=value;
+            img(j,x+1)=value;
+            img(j,x-1)=value;
             F32 y = ymax + k*(ymin-ymax)/BAR;//Buttom to up (inverse that the matrix order)
             int v = y/value2;
-            Draw::text(img,BasicUtility::Any2String(v),Vec2I32(j-6,space-28),value,1);
+            Draw::text(img,BasicUtility::Any2String(v),Vec2I32(j-6,x-28),value,1);
         }
-        Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,space-28),value,1);
-        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,space-18),value,1);
+        Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,x-28),value,1);
+        Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,x-18),value,1);
     }
     template<int DIM,typename TypePixel>
     static void distribution(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,typename MatN<DIM,TypePixel>::F value,MatN<DIM,TypePixel> &img)
