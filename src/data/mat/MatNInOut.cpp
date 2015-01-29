@@ -263,7 +263,7 @@ bool  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename){
     img.std::vector<UI8>::resize(bimg.GetWidth()*bimg.GetHeight());
     for(unsigned int i=0;i<bimg.GetWidth();i++){
         for(unsigned int j=0;j<bimg.GetHeight();j++){
-            img(img.getDomain()(0)-1-j,i) =RGBUI8(static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Red,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Green,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Blue).lumi();
+            img(img.getDomain()(0)-1-j,i) =(UI8)RGBUI8(static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Red,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Green,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Blue).lumi();
         }
     }
     return true;

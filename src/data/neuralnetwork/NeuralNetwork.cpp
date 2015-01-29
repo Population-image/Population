@@ -6,8 +6,8 @@
 #include "PopulationConfig.h"
 
 namespace pop {
-#define SIGMOID(x) (1.7159*tanh(0.66666667*x))
-#define DSIGMOID(S) (0.66666667/1.7159*(1.7159+(S))*(1.7159-(S)))  // derivative of the sigmoid as a function of the sigmoid's output
+#define SIGMOID(x) (1.7159f*tanh(0.6666667f*x))
+#define DSIGMOID(S) (0.6666667f/1.7159f*(1.7159f+(S))*(1.7159f-(S)))  // derivative of the sigmoid as a function of the sigmoid's output
 ///////////////////////////////////////////////////////////////////////
 //
 //  NeuralNetwork class definition
@@ -183,7 +183,7 @@ void NeuralNetworkFeedForward::addLayerFullyConnected(unsigned int nbr_neuron,F3
 
 
     //normalize tbe number inverse square root of the connection feeding into the nodes)
-    pop::DistributionNormal d(0,standart_deviation_weight/std::sqrt(layerprevious._neurons.size()*1.0));
+    pop::DistributionNormal d(0,standart_deviation_weight/std::sqrt(layerprevious._neurons.size()*1.f));
     unsigned int nbr_neuron_previous_layer = static_cast<unsigned int>(layerprevious._neurons.size());
     unsigned int nbr_weight = nbr_neuron*(nbr_neuron_previous_layer+1);
     for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
@@ -297,7 +297,7 @@ void NeuralNetworkFeedForward::addLayerIntegral(unsigned int nbr_integral,F32 st
         _layers.push_back(layer);
 
         //normalize tbe number inverse square root of the connection feeding into the nodes)
-        pop::DistributionNormal d(0,standart_deviation_weight/std::sqrt(height_previous*width_previous*1.));
+        pop::DistributionNormal d(0,standart_deviation_weight/std::sqrt(height_previous*width_previous*1.f));
 
         unsigned int nbr_weight = nbr_integral*(height_previous*width_previous+1);
         for (unsigned int  i_weight=0; i_weight<nbr_weight; ++i_weight )
@@ -849,7 +849,7 @@ NNLayerMatrixMaxPooling::NNLayerMatrixMaxPooling(unsigned int nbr_map,unsigned i
 
 void NNLayerMatrix::setLearningRate(F32 eta){
     if(this->_type==MATRIXCONVOLUTIONNAL){
-        eta = eta/std::sqrt(_neurons_matrix(0).getDomain()(0)*_neurons_matrix(0).getDomain()(1)*1.);
+        eta = eta/std::sqrt(_neurons_matrix(0).getDomain()(0)*_neurons_matrix(0).getDomain()(1)*1.f);
     }
     NNLayer::setLearningRate(eta);
 }

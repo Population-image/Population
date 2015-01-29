@@ -227,10 +227,10 @@ struct POP_EXPORTS Draw
         pop::Mat2F32 mrot = GeometricalTransformation::rotation2D(-angle_radian);
 
         VecN<DIM,F32> x1,x2,x3,x4;
-        x1(0)=-1.0*size(0)/2;x1(1)=-1.0*size(1)/2;
-        x2(0)= 1.0*size(0)/2;x2(1)=-1.0*size(1)/2;
-        x3(0)= 1.0*size(0)/2;x3(1)= 1.0*size(1)/2;
-        x4(0)=-1.0*size(0)/2;x4(1)= 1.0*size(1)/2;
+        x1(0)=-1.f*size(0)/2;x1(1)=-1.f*size(1)/2;
+        x2(0)= 1.f*size(0)/2;x2(1)=-1.f*size(1)/2;
+        x3(0)= 1.f*size(0)/2;x3(1)= 1.f*size(1)/2;
+        x4(0)=-1.f*size(0)/2;x4(1)= 1.f*size(1)/2;
         x1 = mrot*x1;x2 = mrot*x2; x3 = mrot*x3; x4 = mrot*x4;
         x1 +=center; x2 +=center;  x3 +=center;  x4 +=center;
 
@@ -304,7 +304,7 @@ struct POP_EXPORTS Draw
         F32 distance = normValue(x2-x1);
         Point_Float d = Point_Float(x2-x1)/normValue(x2-x1);
         for(int r =0;r<=distance;r++){
-            Point_Float x = Point_Float(x1)+ d*r;
+            Point_Float x = Point_Float(x1)+ d*(F32)r;
             typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(img.getIteratorENeighborhood(width-1,2));
             itn.init(x);
             while(itn.next())
@@ -542,12 +542,12 @@ struct POP_EXPORTS Draw
 
             //            Draw::addBorder(mask_letter,1);
             Mat2F32 mrot = GeometricalTransformation::rotation2D(-angle_radian);
-            Vec2F32 transletter(0,add);
+            Vec2F32 transletter(0,(F32)add);
             transletter =  mrot*transletter;
             Mat2F32::IteratorEDomain it(mask_letter.getDomain()*scale_factor);
             while(it.next()){
                 Vec2F32 xletter = it.x();
-                xletter= xletter/scale_factor;
+                xletter= xletter/(F32)scale_factor;
                 if(mask_letter(xletter)!=0){
                     Vec2F32 xx = mrot*Vec2F32(it.x());
                     xx+=x;
@@ -878,10 +878,10 @@ struct POP_EXPORTS Draw
     static void axis(MatN<DIM,TypePixel> &img,F32 xmin,F32 xmax,F32 ymin, F32 ymax,typename MatN<DIM,TypePixel>::F value)
     {
 
-        double space = 15;
-        F32 y= img.getDomain()(0)-space;
+        int space = 15;
+        int y= img.getDomain()(0)-space;
         if(ymin<0&&ymax>0)
-            y = (ymax)/(ymax-ymin)*img.getDomain()(0);
+            y = static_cast<int>((1.f*ymax)/(ymax-ymin)*img.getDomain()(0));
         else if(ymin<0){
             y= space;
         }
@@ -889,8 +889,8 @@ struct POP_EXPORTS Draw
 
 
         //drax x-coordinate
-        F32 xmm =maximum(absolute(xmin),absolute(xmax))*(1+0.0001);
-        int l = std::floor( std::log(xmm)/std::log((F32)10));//max digit different to zero
+        F32 xmm =maximum(absolute(xmin),absolute(xmax))*(1+0.0001f);
+        int l = static_cast<int>(std::floor( std::log(xmm)/std::log((F32)10)));//max digit different to zero
         l -=2;//three significatif numbers
         F32 value2 = std::pow((F32)10,l);
         //Drawline
@@ -900,26 +900,26 @@ struct POP_EXPORTS Draw
         //DrawNumber
         int BAR=10;
         for(int k=0;k<BAR;k++){
-            int i =1.0*k*img.getDomain()(1)/BAR;
+            int i =static_cast<int>(1.f*k*img.getDomain()(1)/BAR);
             img(y+1,i)=value;
             img(y-1,i)=value;
             F32 x = xmin + k*(xmax-xmin)/BAR;
-            int v = x/value2;
+            int v = static_cast<int>(x/value2);
             Draw::text(img,BasicUtility::Any2String(v),Vec2I32(y+5,i-7),value);
         }
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(y+5,img.getDomain()(1)-space-5),value);
         Draw::text(img,BasicUtility::Any2String(l),Vec2I32(y+3,img.getDomain()(1)-space+5),value);
 
         space=30;
-        F32 x= 30;
+        int x= 30;
         if(xmin<0&&xmax>0)
-            x = (-xmin)/(xmax-xmin)*img.getDomain()(1);
+            x = static_cast<int>((-1.f*xmin)/(xmax-xmin)*img.getDomain()(1));
         else if(ymin<0){
             x= img.getDomain()(1)-space;
         }
         //drax y-coordinate
-        F32 ymm =maximum(absolute(ymin),absolute(ymax))*(1+0.0001);
-        l = std::floor( std::log(ymm)/std::log((F32)10));//max digit different to zero
+        F32 ymm =maximum(absolute(ymin),absolute(ymax))*(1+0.0001f);
+        l = static_cast<int>(std::floor( std::log(ymm)/std::log((F32)10)));//max digit different to zero
         l -=2;//three significatif numbers
         value2 = std::pow((F32)10,l);
         //Drawline
@@ -928,11 +928,11 @@ struct POP_EXPORTS Draw
         }
 
         for(int k=1;k<BAR;k++){
-            int j =1.0*k*img.getDomain()(0)/BAR;
+            int j =static_cast<int>(1.f*k*img.getDomain()(0)/BAR);
             img(j,x+1)=value;
             img(j,x-1)=value;
             F32 y = ymax + k*(ymin-ymax)/BAR;//Buttom to up (inverse that the matrix order)
-            int v = y/value2;
+            int v = static_cast<int>(y/value2);
             Draw::text(img,BasicUtility::Any2String(v),Vec2I32(j-6,x-28),value,1);
         }
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,x-28),value,1);
@@ -947,7 +947,7 @@ struct POP_EXPORTS Draw
         for(int i =0;i<sizex;i++){
             F32 x = xmin + i*(xmax-xmin)/sizex;
             F32 v =d.operator ()(x);
-            int j = (v-ymin)/(ymax-ymin)*sizey;
+            int j = static_cast<int>((v-ymin)/(ymax-ymin)*sizey);
             j = sizey-j;
             if(i==0)
                 jbefore = j;
@@ -967,7 +967,7 @@ struct POP_EXPORTS Draw
 
 
     pop::Mat2RGBUI8 MandelbrotSet(int size=512){
-        pop::Mat2RGBUI8 m(2*size,3.5*size);
+        pop::Mat2RGBUI8 m(2*size,static_cast<unsigned int>(3.5*size));
         unsigned int max_iteration = 1000;
         Vec<RGBUI8> v_palette;
 
@@ -983,8 +983,8 @@ struct POP_EXPORTS Draw
             for(int Py=0;Py<m.getDomain()(0);Py++ ){
 
                 //scale point  X scale (-2.5, 1))  and  Y scale (-1, 1))
-                F32 x0 = Px*1.0/m.getDomain()(1)*3.5-2.5;
-                F32 y0 = Py*1.0/m.getDomain()(0)*2-1;
+                F32 x0 = Px*1.f/m.getDomain()(1)*3.5f-2.5f;
+                F32 y0 = Py*1.f/m.getDomain()(0)*2.f-1.f;
                 F32 x=0;
                 F32 y=0;
 

@@ -216,7 +216,7 @@ public:
     erosion.display();
     \endcode
     -  \a IteratorE: utilisation of the IteratorENeighborhood concept. This class exposes an IteratorENeighborhood model
-    with its definition type, \a MatN::IteratorENeighborhood, and its defintion domain, \a MatN::getIteratorENeighborhood(F32 radius=1,F32 norm=1).
+    with its definition type, \a MatN::IteratorENeighborhood, and its defintion domain, \a MatN::getIteratorENeighborhood(F32 radius=1,int norm=1).
     For the IteratorENeighborhood object, the member \a next() advances to the next element in returning a boolean to indicate if the end of the collection is reached,
     the member \a x() returns the current element and the member \a init(const E & x)  initializes the neighborhood on the VecN x. For instance, the erosion code is:
     \code
@@ -1060,7 +1060,7 @@ public:
     *
     \sa IteratorENeighborhood
     */
-    IteratorENeighborhood getIteratorENeighborhood(F32 radius=1 ,F32 norm=1 )const;
+    IteratorENeighborhood getIteratorENeighborhood(F32 radius=1 ,int norm=1 )const;
     /*!
     * \param structural_element structural element
     * \param dilate number of dilation of the structural element
@@ -1920,7 +1920,7 @@ typename MatN<Dim,Type>::IteratorEROI MatN<Dim,Type>::getIteratorEROI()const
     return IteratorEROI(*this);
 }
 template<int Dim, typename Type>
-typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(F32 radius ,F32 norm )const
+typename MatN<Dim,Type>::IteratorENeighborhood MatN<Dim,Type>::getIteratorENeighborhood(F32 radius ,int norm )const
 {
     return IteratorENeighborhood(getDomain(),radius , norm);
 }

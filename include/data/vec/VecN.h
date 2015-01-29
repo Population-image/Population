@@ -130,7 +130,7 @@ public:
     VecN(const VecN<D1,G> & p )
     {
         for(int i = 0;i<minimum(D,D1);i++)
-            this->_dat[i]=p[i];
+            this->_dat[i]=static_cast<Type>(p[i]);
     }
     /*!
     * \param value input value
@@ -186,7 +186,7 @@ public:
     inline VecN  &operator =(const VecN<D,G>& x)
     {
         for(int i = 0;i<D;i++)
-            this->_dat[i]=x[i];
+            this->_dat[i]=static_cast<Type>(x[i]);
         return *this;
     }
     /*!

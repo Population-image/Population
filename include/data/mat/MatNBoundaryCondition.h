@@ -260,8 +260,8 @@ private:
         bool all_hit=true;
         FloatType sum=0;
         Vec2I32 x1;
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
+        x1(0)=static_cast<int>(std::floor(x(0)));
+        x1(1)=static_cast<int>(std::floor(x(1)));
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)));
@@ -273,7 +273,7 @@ private:
             v_out(0).first =0;
             all_hit=false;
         }
-        x1(0)=x(0)+1;
+        x1(0)=x1(0)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))* (1-(x(1)-x1(1)));
@@ -285,7 +285,7 @@ private:
             v_out(1).first =0;
             all_hit=false;
         }
-        x1(1)=x(1)+1;
+        x1(1)=x1(1)+1;
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x1(0)-x(0)))*(1-(x1(1)-x(1)));

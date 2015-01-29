@@ -47,7 +47,7 @@ DistributionIteratorERegularInterval::DistributionIteratorERegularInterval(F32 x
         xmax=xmin;
     _xmaxima = xmax;
     _step    = step;
-    _nbrstep = std::floor((_xmaxima-_xminima-0.0000001)/_step);
+    _nbrstep = static_cast<int>(std::floor((_xmaxima-_xminima-0.0001f)/_step));
     init();
 }
 int DistributionIteratorERegularInterval::size(){
@@ -85,8 +85,8 @@ DistributionMultiVariateIteratorE::DistributionMultiVariateIteratorE(const VecF3
     int multdim=1;
     _domain.resize(_xminima.size());
     for(unsigned int i=0;i<_xminima.size();i++){
-        _domain(i)=std::ceil((_xmaxima(i)-_xminima(i)+0.0001) /_step );
-        multdim *=_domain(i);
+        _domain(i)=std::ceil((_xmaxima(i)-_xminima(i)+0.0001f) /_step );
+        multdim *=static_cast<int>(_domain(i));
     }
 
     _nbrstep = multdim;
@@ -122,9 +122,9 @@ VecF32 DistributionMultiVariateIteratorE::x(){
     {
         int temp=1;
         for(size_t j=0;j<size-(i+1);j++)
-            temp*=_domain(i);
-        xx(size-(i+1)) = (indice/temp);
-        indice -= (xx(size-(i+1)) *temp);
+            temp*=static_cast<int>(_domain(i));
+        xx(size-(i+1)) = static_cast<F32>(indice/temp);
+        indice -= static_cast<int>(xx(size-(i+1)) *temp);
         xx(size-(i+1)) =xx(size-(i+1)) *_step + _xminima(size-(i+1)) ;
     }
     return xx;
@@ -137,9 +137,9 @@ VecF32 DistributionMultiVariateIteratorE::xInteger(){
     {
         int temp=1;
         for(unsigned int j=0;j<size-(i+1);j++)
-            temp*=_domain(i);
-        xx(size-(i+1)) = (indice/temp);
-        indice -= (xx(size-(i+1)) *temp);
+            temp*=static_cast<int>(_domain(i));
+        xx(size-(i+1)) = static_cast<F32>(indice/temp);
+        indice -= static_cast<int>(xx(size-(i+1)) *temp);
     }
     return xx;
 }
@@ -221,7 +221,7 @@ DistributionRegularStep Statistics::inverse(const Distribution &f, F32 xmin, F32
             x=(xnextmax-xnextmin)/2+xnextmin;
             __inverseVecN(x,f(x),xminustemp,yminus);
         }
-        xstep = x - xbefore+0.0001;
+        xstep = x - xbefore+0.0001f;
 
     }
     return DistributionRegularStep(m);
@@ -539,7 +539,7 @@ DistributionRegularStep Statistics::computedStaticticsFromIntegerRealizations( c
         m(vv(i)-vv(0),1)++;
     }
     for(unsigned int i=0;i<m.sizeI();i++){
-        m(i,0)=vv(0)+i;
+        m(i,0)=static_cast<F32>(vv(0)+i);
         m(i,1)/=size;
     }
     DistributionRegularStep dd(m);
@@ -556,10 +556,10 @@ DistributionRegularStep Statistics::computedStaticticsFromRealRealizationsWithWe
     if(max==NumericLimits<F32>::maximumRange()){
         max = *std::max_element(v.begin(),v.end());
     }
-    int nbr_step = std::floor((max-min)/step);
+    int nbr_step = static_cast<int>(std::floor((max-min)/step));
     Mat2F32 m(nbr_step,2);
     for(unsigned int i=0;i<v.size();i++){
-        int value = std::floor((v(i)-min)/step);
+        int value = static_cast<int>(std::floor((v(i)-min)/step));
         if(value<static_cast<int>(m.sizeI())&&value>=0)
             m(value,1)+=weight(i);
     }
@@ -584,10 +584,10 @@ DistributionRegularStep Statistics::computedStaticticsFromRealRealizations(  con
     if(max==NumericLimits<F32>::maximumRange()){
         max = *std::max_element(v.begin(),v.end());
     }
-    int nbr_step = std::floor((max-min)/step);
+    int nbr_step = static_cast<int>(std::floor((max-min)/step));
     Mat2F32 m(nbr_step,2);
     for(unsigned int i=0;i<v.size();i++){
-        int value = std::floor((v(i)-min)/step);
+        int value = static_cast<int>(std::floor((v(i)-min)/step));
         if(value<static_cast<int>(m.sizeI())&&value>=0)
             m(value,1)++;
     }
@@ -595,7 +595,7 @@ DistributionRegularStep Statistics::computedStaticticsFromRealRealizations(  con
     F32 incr = min;
     for(unsigned int i=0;i<m.sizeI();i++){
         m(i,0)=incr;
-        sum+=m(i,1);
+        sum+=static_cast<int>(m(i,1));
         incr+=step;
     }
     for(unsigned int i=0;i<m.sizeI();i++){
@@ -702,10 +702,10 @@ DistributionMultiVariateRegularStep  Statistics::integral(const DistributionMult
     if(f.getNbrVariable()!=2)
         std::cerr<<"Only for two variate distribution";
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
-    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
+    Mat2F32 m( Vec2I32(static_cast<int>(it._domain(0)),static_cast<int>(it._domain(1))));
     F32 steppower2 = step*step;
     while(it.next()){
-        VecF32 x = it.xInteger();
+        VecI32 x = it.xInteger();
         if(x(0)>0&&x(1)>0)
             m (x(0),x(1)) = f.operator ()(it.x())*steppower2+m (x(0)-1,x(1))+m (x(0),x(1)-1)-m (x(0)-1,x(1)-1);
         else if(x(0)>0)
@@ -729,9 +729,9 @@ DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const
         sum += absolute(f.operator ()(it.x()));
     }
     it.init();
-    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
+    Mat2F32 m( Vec2I32(static_cast<int>(it._domain(0)),static_cast<int>(it._domain(1))));
     while(it.next()){
-        VecF32 x = it.xInteger();
+        VecI32 x = it.xInteger();
         m (x(0),x(1)) = absolute(f.operator ()(it.x()))/sum;
     }
     DistributionMultiVariateRegularStep d(m,xmin,step);
@@ -739,9 +739,9 @@ DistributionMultiVariateRegularStep Statistics::toProbabilityDistribution( const
 }
 DistributionMultiVariateRegularStep Statistics::toStepFunction( const DistributionMultiVariate &f,VecF32 xmin, VecF32 xmax,F32 step){
     DistributionMultiVariateIteratorE it(xmin,xmax,step);
-    Mat2F32 m( Vec2I32(it._domain(0),it._domain(1)));
+    Mat2F32 m( Vec2I32(static_cast<int>(it._domain(0)),static_cast<int>(it._domain(1))));
     while(it.next()){
-        VecF32 x = it.xInteger();
+        VecI32 x = it.xInteger();
          m (x(0),x(1)) = f.operator ()(it.x());
     }
     DistributionMultiVariateRegularStep d(m,xmin,step);

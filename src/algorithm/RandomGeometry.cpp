@@ -62,14 +62,14 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
         std::cout<<"walker "<<index_walker<<std::endl;
         MatN<2,UI8 >::E randomwalker;
         //GENERATE INIT POSITION
-        int face= dface.randomVariable();
+        int face= static_cast<int>(dface.randomVariable());
         int noindex= face/2;
         for(int j =0;j<MatN<2,UI8 >::DIM;j++){
             if(j==noindex){
                 randomwalker(j)=(in.sizeI()-1)*(face%2);
             }
             else{
-                randomwalker(j)=dpos.randomVariable();
+                randomwalker(j)=static_cast<int>(dpos.randomVariable());
             }
         }
         bool touch=false;
@@ -79,7 +79,7 @@ MatN<2,UI8 > RandomGeometry::diffusionLimitedAggregation2D(int size,int nbrwalke
             do{
                 temp=randomwalker;
                 for(int i =0;i<MatN<2,UI8 >::DIM;i++){
-                    temp(i)+=(d.randomVariable()*2-1);
+                    temp(i)+=static_cast<int>((d.randomVariable()*2-1));
                 }
             }while(in.isValid(temp)==false);
             randomwalker = temp;
@@ -113,14 +113,14 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
 
         MatN<3,UI8 >::E randomwalker;
         //GENERATE INIT POSITION
-        int face= dface.randomVariable();
+        int face= static_cast<int>(dface.randomVariable());
         int noindex= face/2;
         for(int i =0;i<MatN<3,UI8 >::DIM;i++){
             if(i==noindex){
                 randomwalker(i)=(in.sizeI()-1)*(face%2);
             }
             else{
-                randomwalker(i)=dpos.randomVariable();
+                randomwalker(i)=static_cast<int>(dpos.randomVariable());
             }
         }
         bool touch=false;
@@ -130,7 +130,7 @@ MatN<3,UI8 > RandomGeometry::diffusionLimitedAggregation3D(int size,int nbrwalke
             do{
                 temp=randomwalker;
                 for(int i =0;i<MatN<3,UI8 >::DIM;i++){
-                    temp(i)+=(d.randomVariable()*2-1);
+                    temp(i)+=static_cast<int>((d.randomVariable()*2-1));
                 }
             }while(in.isValid(temp)==false);
             randomwalker = temp;
@@ -165,7 +165,7 @@ DistributionRegularStep RandomGeometry::generateProbabilitySpectralDensity(const
     DistributionRegularStep fintegral2 = Statistics::integral(f2,0,1,0.001f);
     Mat2F32 g(correlation.sizeI() ,2);
     for(unsigned int i= 0; i<correlation.sizeI();i++) {
-        g(i,0) = i;
+        g(i,0) = i*1.f;
         if(autocorrelation(i,0)>=0)
             g(i,1)=Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral,autocorrelation(i,0),0,1,0.001f);
         else
@@ -174,7 +174,7 @@ DistributionRegularStep RandomGeometry::generateProbabilitySpectralDensity(const
     F32 pi =3.14159265f;
     F32 step2 =0.001f;
     F32 maxrange=2;
-    Mat2F32 rho_k(maxrange/step2,2);
+    Mat2F32 rho_k(static_cast<int>(maxrange/step2),2);
     for(unsigned int i= 1; i<rho_k.sizeI();i++)
     {
         F32 sum=0;

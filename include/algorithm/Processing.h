@@ -1,7 +1,7 @@
 /******************************************************************************\
 |*                   Population library for C++ X.X.X                         *|
 |*----------------------------------------------------------------------------*|
-The Population License is similar to the MIT license in adding this clause:
+The Population License is similar to the MIT license in adding this int normclause:
 for any writing public or private that has resulted from the use of the
 software population, the reference of this book "Population library, 2012,
 Vincent Tariel" shall be included in it.
@@ -333,7 +333,7 @@ struct POP_EXPORTS Processing
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  thresholdToggleMappingMorphological(const MatN<DIM,TypePixel> & f,int radius=2,F32 norm=0){
+    static MatN<DIM,UI8>  thresholdToggleMappingMorphological(const MatN<DIM,TypePixel> & f,int radius=2,int norm=0){
         MatN<DIM,TypePixel> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
         MatN<DIM,TypePixel> dilation = Processing::dilationRegionGrowing(f,radius,norm);
         MatN<DIM,UI8> s(f.getDomain());
@@ -365,7 +365,7 @@ struct POP_EXPORTS Processing
      * \image html vitrinethresholdTMMS2.jpg
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8> thresholdToggleMappingMorphologicalFabrizio(const MatN<DIM,TypePixel>& f,F32 c=16,F32 p=0.8,int radius=2,F32 norm=1){
+    static MatN<DIM,UI8> thresholdToggleMappingMorphologicalFabrizio(const MatN<DIM,TypePixel>& f,F32 c=16,F32 p=0.8,int radius=2,int norm=1){
     MatN<DIM,TypePixel> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
     MatN<DIM,TypePixel> dilation = Processing::dilationRegionGrowing(f,radius,norm);
 
@@ -447,7 +447,7 @@ struct POP_EXPORTS Processing
 
 
         typename MatN<2,F32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
-        F32 area_minus1 = 1./((2*radius+1)*(2*radius+1));
+        F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
         while(it.next()){
             Vec2I32 xadd1=it.x()+Vec2I32(radius);
             Vec2I32 xadd2=it.x()+Vec2I32(-radius);
@@ -752,7 +752,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static Vec< VecN<DIM,I32> > minimaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -775,7 +775,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static MatN<DIM,UI32> minimaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -803,7 +803,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static Vec< VecN<DIM,I32> > maximaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -824,7 +824,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static MatN<DIM,UI32> maximaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -851,7 +851,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static Vec< VecN<DIM,I32> > extremaLocal(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -872,7 +872,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,F32 norm=0)
+    static MatN<DIM,UI32> extremaLocalMap(const MatN<DIM,TypePixel> & f,F32 radius=1,int norm=0)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -898,7 +898,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
+    static MatN<DIM,TypePixel> erosion(const MatN<DIM,TypePixel> & f,F32 radius,int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -960,7 +960,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
+    static MatN<DIM,TypePixel> dilation(const MatN<DIM,TypePixel> & f,F32 radius,int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1021,7 +1021,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
+    static MatN<DIM,TypePixel> median(const MatN<DIM,TypePixel> & f,F32 radius,int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1082,7 +1082,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \endcode
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
+    static MatN<DIM,TypePixel> mean(const MatN<DIM,TypePixel> & f,F32 radius,int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1143,7 +1143,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \sa dilation erosion
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,F32 radius,F32 norm=2)
+    static MatN<DIM,TypePixel> closing(const MatN<DIM,TypePixel> & f,F32 radius,int norm=2)
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain itg (f.getIteratorEDomain());
         typename MatN<DIM,TypePixel>::IteratorENeighborhood itn (f.getIteratorENeighborhood(radius,norm));
@@ -1460,7 +1460,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html windsurf_enhance.jpg
      */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> enhanceContrastToggleMapping(const MatN<DIM,TypePixel>& f,int radius=2,F32 norm=2){
+    static MatN<DIM,TypePixel> enhanceContrastToggleMapping(const MatN<DIM,TypePixel>& f,int radius=2,int norm=2){
         MatN<DIM,TypePixel> erosion  = Processing::erosion(f,radius,norm);
         MatN<DIM,TypePixel> dilation = Processing::dilation(f,radius,norm);
         typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();

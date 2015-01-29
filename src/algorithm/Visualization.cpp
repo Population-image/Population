@@ -539,7 +539,7 @@ void Visualization::_processCube(Visualization::_Cube cube, std::vector<std::pai
     }
 }
 F32 Visualization::_affectRGB(RGBUI8 c1,RGBUI8 c2){
-    F32 vv = c1.lumi()*1.0-c2.lumi()*1.0;
+    F32 vv = c1.lumi()*1.f-c2.lumi()*1.f;
     return vv;
 
 }
@@ -566,9 +566,9 @@ std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarch
 
 
     // Run the processCube function on every cube in the grid
-    for(pop::F32 x = stepX; x < sizeX-2*stepX; x += stepX) {
-        for(pop::F32 y = stepY; y < sizeY-2*stepY; y += stepY) {
-            for(pop::F32 z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
+    for(int x = stepX; x < sizeX-2*stepX; x += stepX) {
+        for(int y = stepY; y < sizeY-2*stepY; y += stepY) {
+            for(int z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
 
                 RGBUI8 cc=maximum(
                             voxels(VecN<3,int>(x,y,z)),maximum(
@@ -590,59 +590,58 @@ std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarch
                                                     voxels(VecN<3,int>(x,y+stepY,z+stepZ)))))))));
 
                 Visualization::_Cube c = {{
-                                             {x,y,z,
+                                             {(F32)x,(F32)y,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y,z,
+                                             {(F32)x+stepX,(F32)y,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),voxels(VecN<3,int>(x,y,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y,z+stepZ,
+                                             {(F32)x+stepX,(F32)y,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                                              },
-                                             {x,y,z+stepZ,
+                                             {(F32)x,(F32)y,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),voxels(VecN<3,int>(x,y,z))) / -stepZ
                                              },
-                                             {x,y+stepY,z,
+                                             {(F32)x,(F32)y+stepY,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),voxels(VecN<3,int>(x,y,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y+stepY,z,
+                                             {(F32)x+stepX,(F32)y+stepY,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y+stepY,z+stepZ,
+                                             {(F32)x+stepX,(F32)y+stepY,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                                              },
-                                             {x,y+stepY,z+stepZ,
+                                             {(F32)x,(F32)y+stepY,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
                                              }
                                          },{
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x,y,z)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x+stepX,y,z)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x+stepX,y,z+stepZ)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x,y,z+stepZ)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x,y+stepY,z)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x+stepX,y+stepY,z)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)).lumi()),
-                                             static_cast<pop::F32>(voxels(VecN<3,int>(x,y+stepY,z+stepZ)).lumi())
+											 voxels(VecN<3,int>(x,y,z)).lumi(),
+                                             voxels(VecN<3,int>(x+stepX,y,z)).lumi(),
+                                             voxels(VecN<3,int>(x+stepX,y,z+stepZ)).lumi(),
+                                             voxels(VecN<3,int>(x,y,z+stepZ)).lumi(),
+                                             voxels(VecN<3,int>(x,y+stepY,z)).lumi(),
+                                             voxels(VecN<3,int>(x+stepX,y+stepY,z)).lumi(),
+                                             voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)).lumi(),
+                                             voxels(VecN<3,int>(x,y+stepY,z+stepZ)).lumi()
                                          }};
                 if(ccmin.lumi()>=1)
-                    _processCubeIso(c, vertexList,cc,ccmin.lumi());
-
+                    _processCubeIso(c, vertexList,cc,(pop::UI8)ccmin.lumi());
             }
         }
     }
@@ -673,9 +672,9 @@ std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarch
 
 
     // Run the processCube function on every cube in the grid
-    for(pop::F32 x = stepX; x < sizeX-2*stepX; x += stepX) {
-        for(pop::F32 y = stepY; y < sizeY-2*stepY; y += stepY) {
-            for(pop::F32 z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
+    for(int x = stepX; x < sizeX-2*stepX; x += stepX) {
+        for(int y = stepY; y < sizeY-2*stepY; y += stepY) {
+            for(int z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
 
                 RGBUI8 cc=maximum(
                             voxels(VecN<3,int>(x,y,z)),maximum(
@@ -687,42 +686,42 @@ std::vector<std::pair<Visualization::_vertex,RGBUI8 > > Visualization::_runMarch
                                                     voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),
                                                     voxels(VecN<3,int>(x,y+stepY,z+stepZ)))))))));
                 Visualization::_Cube c = {{
-                                             {x,y,z,
+                                             {(F32)x,(F32)y,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z)),voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z)),voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y,z+stepZ)),voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y,z,
+                                             {(F32)x+stepX,(F32)y,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z)),    voxels(VecN<3,int>(x,y,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y,z+stepZ,
+                                             {(F32)x+stepX,(F32)y,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                                              },
-                                             {x,y,z+stepZ,
+                                             {(F32)x,(F32)y,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y,z+stepZ)),voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y,z+2*stepZ)),    voxels(VecN<3,int>(x,y,z))) / -stepZ
                                              },
-                                             {x,y+stepY,z,
+                                             {(F32)x,(F32)y+stepY,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z)),voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z)),   voxels(VecN<3,int>(x,y,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y+stepY,z,
+                                             {(F32)x+stepX,(F32)y+stepY,(F32)z,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z)),    voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
                                              },
-                                             {x+stepX,y+stepY,z+stepZ,
+                                             {(F32)x+stepX,(F32)y+stepY,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ)),voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ)),voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                                              },
-                                             {x,y+stepY,z+stepZ,
+                                             {(F32)x,(F32)y+stepY,(F32)z+stepZ,
                                               _affectRGB(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ)),voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
                                               _affectRGB(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ)),    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
                                               _affectRGB(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ)),    voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ
@@ -821,46 +820,46 @@ std::vector<Visualization::_vertex > Visualization::_runMarchingCubes2(const Mat
 
 
     // Run the processCube function on every cube in the grid
-    for(pop::F32 x = stepX; x < sizeX-2*stepX; x += stepX) {
-        for(pop::F32 y = stepY; y < sizeY-2*stepY; y += stepY) {
-            for(pop::F32 z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
+    for(int x = stepX; x < sizeX-2*stepX; x += stepX) {
+        for(int y = stepY; y < sizeY-2*stepY; y += stepY) {
+            for(int z = stepZ; z < sizeZ-2*stepZ; z += stepZ) {
                 _cubeF c = {{
-                               {x,y,z,
+                               {(F32)x,(F32)y,(F32)z,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y,z))-voxels(VecN<3,int>(x-stepX,y,z))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x,y+stepY,z))-voxels(VecN<3,int>(x,y-stepY,z))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x,y,z+stepZ))-voxels(VecN<3,int>(x,y,z-stepZ))) / -stepZ
                                },
-                               {x+stepX,y,z,
+                               {(F32)x+stepX,(F32)y,(F32)z,
                                 (F32)(voxels(VecN<3,int>(x+2*stepX,y,z))-    voxels(VecN<3,int>(x,y,z))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z))-voxels(VecN<3,int>(x+stepX,y-stepY,z))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y,z+stepZ))-voxels(VecN<3,int>(x+stepX,y,z-stepZ))) / -stepZ
                                },
-                               {x+stepX,y,z+stepZ,
+                               {(F32)x+stepX,(F32)y,(F32)z+stepZ,
                                 (F32)(voxels(VecN<3,int>(x+2*stepX,y,z+stepZ))-    voxels(VecN<3,int>(x,y,z+stepZ))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))-voxels(VecN<3,int>(x+stepX,y-stepY,z+stepZ))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y,z+2*stepZ))-    voxels(VecN<3,int>(x+stepX,y,z))) / -stepZ
                                },
-                               {x,y,z+stepZ,
+                               {(F32)x,(F32)y,(F32)z+stepZ,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y,z+stepZ))-voxels(VecN<3,int>(x-stepX,y,z+stepZ))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x,y+stepY,z+stepZ))-voxels(VecN<3,int>(x,y-stepY,z+stepZ))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x,y,z+2*stepZ))-   voxels(VecN<3,int>(x,y,z))) / -stepZ
                                },
-                               {x,y+stepY,z,
+                               {(F32)x,(F32)y+stepY,(F32)z,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z))-voxels(VecN<3,int>(x-stepX,y+stepY,z))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x,y+2*stepY,z))-voxels(VecN<3,int>(x,y,z))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x,y+stepY,z+stepZ))-voxels(VecN<3,int>(x,y+stepY,z-stepZ))) / -stepZ
                                },
-                               {x+stepX,y+stepY,z,
+                               {(F32)x+stepX,(F32)y+stepY,(F32)z,
                                 (F32)(voxels(VecN<3,int>(x+2*stepX,y+stepY,z))-voxels(VecN<3,int>(x,y+stepY,z))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+2*stepY,z))-voxels(VecN<3,int>(x+stepX,y,z))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))-voxels(VecN<3,int>(x+stepX,y+stepY,z-stepZ))) / -stepZ
                                },
-                               {x+stepX,y+stepY,z+stepZ,
+                               {(F32)x+stepX,(F32)y+stepY,(F32)z+stepZ,
                                 (F32)(voxels(VecN<3,int>(x+2*stepX,y+stepY,z+stepZ))-voxels(VecN<3,int>(x,y+stepY,z+stepZ))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+2*stepY,z+stepZ))-voxels(VecN<3,int>(x+stepX,y,z+stepZ))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z+2*stepZ))-voxels(VecN<3,int>(x+stepX,y+stepY,z))) / -stepZ
                                },
-                               {x,y+stepY,z+stepZ,
+                               {(F32)x,(F32)y+stepY,(F32)z+stepZ,
                                 (F32)(voxels(VecN<3,int>(x+stepX,y+stepY,z+stepZ))-voxels(VecN<3,int>(x-stepX,y+stepY,z+stepZ))) / -stepX,
                                 (F32)(voxels(VecN<3,int>(x,y+2*stepY,z+stepZ))-voxels(VecN<3,int>(x,y,z+stepZ))) / -stepY,
                                 (F32)(voxels(VecN<3,int>(x,y+stepY,z+2*stepZ))-voxels(VecN<3,int>(x,y+stepY,z))) / -stepZ

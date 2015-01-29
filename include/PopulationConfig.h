@@ -14,17 +14,10 @@ namespace pop{
 // Disable silly warnings on some Microsoft VC++ compilers.
 #ifdef _MSC_VER
 #define NOMINMAX
-//#pragma warning(push)
-#pragma warning(disable: 4311)
-#pragma warning(disable: 4312)
-#pragma warning(disable: 4800)
-#pragma warning(disable: 4804)
-#pragma warning(disable: 4996)
-#pragma warning(disable: 4290)
-#pragma warning(disable: 4244)
+#pragma warning(push)
 #pragma warning(disable: 4251)
-#define _CRT_SECURE_NO_DEPRECATE 1
-#define _CRT_NONSTDC_NO_DEPRECATE 1
+//#define _CRT_SECURE_NO_DEPRECATE 1
+//#define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
 #if defined(unix)        || defined(__unix)      || defined(__unix__) \

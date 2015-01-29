@@ -54,13 +54,13 @@ std::string BasicUtility::Any2String(bool Value){
 
 std::string BasicUtility::IntFixedDigit2String(unsigned int value,int digitnumber)
 {
-    long int  number =std::pow (10.,digitnumber);
+    long int  number =(long int)std::pow (10.,digitnumber);
     long int tempvalue = value/number;
     value-=tempvalue*number;
     std::string s;
     for(int i =digitnumber-1;i>=0;i--)
     {
-        number =std::pow (10.,i);
+        number =(long int)std::pow (10.,i);
         tempvalue = value/number;
         value-=tempvalue*number;
         std::string str;
@@ -242,7 +242,7 @@ int BasicUtility::editDistance(std::string s1,std::string s2){
         return static_cast<int>(s2.size());
     if(s2.size()==0)
         return static_cast<int>(s1.size());
-    pop::Mat2F32 m(static_cast<int>(s1.size()),static_cast<int>(s2.size()));
+	pop::Mat2UI16 m(static_cast<int>(s1.size()),static_cast<int>(s2.size()));
     for(unsigned int i =0;i<m.sizeI();i++){
         m(i,0)=i;
     }
@@ -304,18 +304,18 @@ F32 minimum(F32 v1,F32 v2){return std::min(v1,v2);}
 F64 minimum(F64 v1,F64 v2){return std::min(v1,v2);}
 
 
-F32 absolute(UI8 v1){return v1;}
-F32 absolute(UI16 v1){return v1;}
-F32 absolute(UI32 v1){return v1;}
+F32 absolute(UI8 v1){return (F32)v1;}
+F32 absolute(UI16 v1){return (F32)v1;}
+F32 absolute(UI32 v1){return (F32)v1;}
 F32 absolute(I8 v1){return std::abs(static_cast<F32>(v1));}
 F32 absolute(I16 v1){return std::abs(static_cast<F32>(v1));}
 F32 absolute(I32 v1){return std::abs(static_cast<F32>(v1));}
 F32 absolute(F32 v1){return std::abs(v1);}
 F64 absolute(F64 v1){return std::abs(v1);}
 
-F32 normValue(UI8 v1,int ){return v1;}
-F32 normValue(UI16 v1,int ){return v1;}
-F32 normValue(UI32 v1,int ){return v1;}
+F32 normValue(UI8 v1,int ){return (F32)v1;}
+F32 normValue(UI16 v1,int ){return (F32)v1;}
+F32 normValue(UI32 v1,int ){return (F32)v1;}
 F32 normValue(I8 v1,int ){return std::abs(static_cast<F32>(v1));}
 F32 normValue(I16 v1,int ){return std::abs(static_cast<F32>(v1));}
 F32 normValue(I32 v1,int){return std::abs(static_cast<F32>(v1));}
@@ -326,7 +326,7 @@ F32 normPowerValue(UI8 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }
@@ -334,7 +334,7 @@ F32 normPowerValue(UI16 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }
@@ -342,7 +342,7 @@ F32 normPowerValue(UI32 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }
@@ -350,7 +350,7 @@ F32 normPowerValue(I8 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }
@@ -358,7 +358,7 @@ F32 normPowerValue(I16 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }
@@ -366,7 +366,7 @@ F32 normPowerValue(I32 v1,int p){
     if(p==0||p==1)
         return normValue(v1);
     else if(p==2)
-        return v1*v1;
+        return (F32)v1*(F32)v1;
     else
         return std::pow(normValue(v1),p);
 }

@@ -176,9 +176,10 @@ protected:
 
     void initBall(){
         _tab.clear();
-        VecN ddomain (2*_radius+1);
-        VecN r (_radius);
-        F32 radiuspower2=_radius*_radius;
+		int radius = static_cast<int>(std::floor(_radius));
+        VecN ddomain (2*radius+1);
+        VecN r (radius);
+        F32 radiuspower2=static_cast<F32>(radius*radius);
         MatNIteratorEDomain<VecN> it(ddomain);
         while(it.next())
         {
@@ -193,7 +194,7 @@ protected:
 public:
     bool _isball;
     F32 _radius;
-    F32 _norm;
+    int _norm;
     typedef std::pair<VecN,Vec<VecN> > Domain;
 
     MatNIteratorENeighborhood(){
@@ -215,7 +216,7 @@ public:
     MatNIteratorENeighborhood(const VecN &domain,Vec<VecN> v_neighborhood)
         :_domain(domain),_tab(v_neighborhood),_init(true),_isball(false){}
 
-    MatNIteratorENeighborhood(const VecN &domain,  F32 radius , F32 norm)
+    MatNIteratorENeighborhood(const VecN &domain,  F32 radius , int norm)
         :_domain(domain),_init(true),_isball(true),_radius(radius),_norm(norm){
         initBall();
     }
@@ -227,7 +228,7 @@ public:
     {
         return std::make_pair(_domain,_tab);
     }
-    bool isEqual(const VecN &domain,  F32 radius , F32 norm){
+    bool isEqual(const VecN &domain,  F32 radius , int norm){
         if(_domain==domain&&_radius==radius&&_norm==norm)
             return true;
         else

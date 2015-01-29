@@ -201,7 +201,7 @@ struct POP_EXPORTS FunctorMatN
         //initialisation one-dimension
         F32 sum=0;
         for(int i=0;i<static_cast<int>(gaussian_kernel.size());i++){
-            F32  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+            F32  value =std::exp(-0.5f*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
             gaussian_kernel[i]=value;
             sum+=value;
         }
@@ -222,7 +222,7 @@ struct POP_EXPORTS FunctorMatN
         F32 sum=0;
         while(it.next()){
             F32 dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
-            F32  value = std::exp(-0.5*dist/(sigma*sigma));
+            F32  value = std::exp(-0.5f*dist/(sigma*sigma));
             gaussian_kernel(it.x())=value;
             sum+=pop::absolute(value);
         }
@@ -242,7 +242,7 @@ struct POP_EXPORTS FunctorMatN
         //initialisation one-dimension
         F32 sum=0;
         for(int i=0;i<static_cast<int>(gaussian_kernel.size());i++){
-            F32  value =(radius_kernel-i)*std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+            F32  value =(radius_kernel-i)*std::exp(-0.5f*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
             gaussian_kernel[i]=value;
             if(value>=0)
                 sum+=value;
@@ -263,7 +263,7 @@ struct POP_EXPORTS FunctorMatN
         F32 sum=0;
         while(it.next()){
             F32 dist = (it.x()-VecN<DIM,int>(radius_kernel)).normPower(2);
-            F32  value = (it.x()-VecN<DIM,int>(radius_kernel))(direction)*std::exp(-0.5*dist/(sigma*sigma));
+            F32  value = (it.x()-VecN<DIM,int>(radius_kernel))(direction)*std::exp(-0.5f*dist/(sigma*sigma));
             gaussian_kernel(it.x())=value;
             sum+=value;
         }

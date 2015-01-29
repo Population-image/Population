@@ -230,9 +230,9 @@ public:
     template <class U1>
     RGB &  operator =( const RGB<U1> &p)
     {
-        _data[0]=p.r();
-        _data[1]=p.g();
-        _data[2]=p.b();
+        _data[0]=static_cast<Type>(p.r());
+        _data[1]=static_cast<Type>(p.g());
+        _data[2]=static_cast<Type>(p.b());
         return *this;
     }
 
@@ -474,7 +474,7 @@ public:
     * return the luminance of this RGB  (0.299*this->r() + 0.587*this->g() + 0.114*this->b())
     */
     F32 lumi()const{
-        return 0.299*this->r() + 0.587*this->g() + 0.114*this->b()+0.000001;
+        return 0.299f*this->r() + 0.587f*this->g() + 0.114f*this->b()+0.001f;
     }
 
     /*!
@@ -884,7 +884,7 @@ struct ArithmeticsSaturation<Scalar,RGB<T> >
 {
     static Scalar  Range(const RGB<T>& p)
     {
-        return ArithmeticsSaturation<Scalar,T>::Range(p.lumi());
+        return ArithmeticsSaturation<Scalar,T>::Range((T)p.lumi());
     }
 };
 

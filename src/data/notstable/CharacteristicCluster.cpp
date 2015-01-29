@@ -32,21 +32,21 @@ void CharacteristicCluster::addPoint(const Vec2I32 & x){
 
 F32 CharacteristicClusterDistanceMass::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a._mass!=0&&b._mass!=0)
-        return std::abs(a._mass-b._mass)*1./std::min(a._mass,b._mass);
+        return std::abs(a._mass-b._mass)*1.f/std::min(a._mass,b._mass);
     else
         return std::numeric_limits<F32>::max();
 }
 
 F32 CharacteristicClusterDistanceHeight::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(0)!=0&&b.size()(0)!=0)
-        return std::abs(a.size()(0)-b.size()(0))*1./std::min(a.size()(0),b.size()(0));
+        return std::abs(a.size()(0)-b.size()(0))*1.f/std::min(a.size()(0),b.size()(0));
     else
         return std::numeric_limits<F32>::max();
 }
 
 F32 CharacteristicClusterDistanceWidth::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(1)!=0&&b.size()(1)!=0)
-        return std::abs(a.size()(1)-b.size()(1))*1./std::min(a.size()(1),b.size()(1));
+        return std::abs(a.size()(1)-b.size()(1))*1.f/std::min(a.size()(1),b.size()(1));
     else
         return std::numeric_limits<F32>::max();
 }
@@ -54,14 +54,14 @@ F32 CharacteristicClusterDistanceWidth::operator ()(const CharacteristicCluster&
 
 F32 CharacteristicClusterDistanceWidthInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(1)!=0&&b.size()(1)!=0)
-        return std::abs(a.center()(1)-b.center()(1))*1./std::max(a.size()(1),b.size()(1));
+        return std::abs(a.center()(1)-b.center()(1))*1.f/std::max(a.size()(1),b.size()(1));
     else
         return std::numeric_limits<F32>::max();
 }
 
 F32 CharacteristicClusterDistanceHeightInterval::operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b){
     if(a.size()(0)!=0&&b.size()(0)!=0)
-        return std::abs(a.center()(0)-b.center()(0))*1./std::max(a.size()(0),b.size()(0));
+        return std::abs(a.center()(0)-b.center()(0))*1.f/std::max(a.size()(0),b.size()(0));
     else
         return std::numeric_limits<F32>::max();
 }
@@ -70,7 +70,7 @@ F32 CharacteristicClusterDistanceHeightInterval::operator ()(const Characteristi
 
 
 CharacteristicClusterFilter::CharacteristicClusterFilter()
-    :_min(0),_max(std::numeric_limits<int>::max())
+    :_min(0),_max(std::numeric_limits<F32>::max())
 {
 
 }
@@ -93,7 +93,7 @@ bool CharacteristicClusterFilterWidth::operator ()(const CharacteristicCluster& 
 }
 bool CharacteristicClusterFilterAsymmetryHeightPerWidth::operator ()(const CharacteristicCluster& a){
     if(a.size()(0)!=0){
-        F32 ratio =a.size()(0)*1.0/a.size()(1);
+        F32 ratio =a.size()(0)*1.f/a.size()(1);
         return (ratio>=_min&&ratio<_max);
     }
     else

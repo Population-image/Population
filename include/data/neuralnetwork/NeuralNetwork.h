@@ -907,7 +907,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             mrf(xx+trans)=mr(xx);
         }
         if(normalization_value==0){
-            F32 diff = (maxi-mini)/2.;
+            F32 diff = (maxi-mini)/2.f;
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff-1;
             }
@@ -957,7 +957,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             mini=std::min(mini,mrf(xx));
         }
         if(normalization_value==0){
-            F32 diff = (maxi-mini)/2.;
+            F32 diff = (maxi-mini)/2.f;
             ForEachDomain2D(xxx,mrf){
                 mrf(xxx) = (mrf(xxx)-mini)/diff-1;
             }

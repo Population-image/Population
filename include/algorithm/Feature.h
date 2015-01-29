@@ -91,16 +91,16 @@ public:
     {
         F32 DEG2RAD=0.017453293f;
         //Create the accu
-        F32 hough_h = ((sqrt(2.0) * (F32)(binary.sizeI()>binary.sizeJ()?binary.sizeI():binary.sizeJ())) / 2.0);
-        int heigh = hough_h * 2.0; // -r -> +r
+        F32 hough_h = ((sqrt(2.f) * (F32)(binary.sizeI()>binary.sizeJ()?binary.sizeI():binary.sizeJ())) / 2.f);
+        int heigh = static_cast<int>(hough_h * 2.f); // -r -> +r
         int width = 180;
         Mat2F32 accu (heigh,width);
-        F32 center_x = binary.sizeJ()/2;
-        F32 center_y = binary.sizeI()/2;
+        F32 center_x = binary.sizeJ()/2.f;
+        F32 center_y = binary.sizeI()/2.f;
         for(unsigned int i=0;i<binary.sizeI();i++){
             for(unsigned int j=0;j<binary.sizeJ();j++){
                 if( binary(i,j) > 125){
-                    for(F32 t=0;t<180;t++){
+                    for(int t=0;t<180;t++){
                         F32 r = ( (j- center_x) * std::cos((F32)t * DEG2RAD)) + ((i - center_y) * std::sin((F32)t * DEG2RAD));
                         r = r + hough_h;
                         unsigned int r_min= static_cast<unsigned int>(std::floor(r));
@@ -130,7 +130,7 @@ public:
         edge.display("edge",false);
         Mat2F32 hough = Feature::transformHough(edge);
         hough.display("hough",false);
-        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
+        std::vector< std::pair<Vec2F32, Vec2F32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
         Mat2RGBUI8 m_hough(m);
         for(unsigned int i=0;i<v_lines.size();i++){
             Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  RGBUI8(255,0,0),2);
@@ -139,9 +139,9 @@ public:
     * \endcode
     * \image html hough.png
     */
-    static inline std::vector< std::pair<Vec2I32, Vec2I32 > > HoughToLines(Mat2F32 hough,Mat2UI8 binary,  F32 threshold=0.7, int radius_maximum_neightborhood=4)
+    static inline std::vector< std::pair<Vec2F32, Vec2F32 > > HoughToLines(Mat2F32 hough,Mat2UI8 binary,  F32 threshold=0.7, F32 radius_maximum_neightborhood=4)
     {
-        std::vector< std::pair<Vec2I32, Vec2I32 > > lines;
+        std::vector< std::pair<Vec2F32, Vec2F32 > > lines;
         F32 DEG2RAD=0.017453293f;
         Mat2F32::IteratorENeighborhood it=hough.getIteratorENeighborhood(radius_maximum_neightborhood,2);
         ForEachDomain2D(x,hough){
@@ -156,22 +156,22 @@ public:
                     }
                 }
                 if(max_local==true){
-                    Vec2I32 x1,x2;
-                    F32 radius  = x(0);
-                    F32 angle   = x(1);
+                    Vec2F32 x1,x2;
+                    F32 radius  = static_cast<F32>(x(0));
+                    F32 angle   = static_cast<F32>(x(1));
 
                     if(angle>45&&angle<135){
-                        F32 value1=binary.sizeJ()/2;
-                        x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
-                        x1(1) = value1 + binary.sizeJ()/2;
-                        x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2;
-                        x2(1) = (-value1) + binary.sizeJ()/2;
+                        F32 value1=binary.sizeJ()/2.f;
+                        x1(0) = (-cos(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2.f;
+                        x1(1) = value1 + binary.sizeJ()/2.f;
+                        x2(0) = (-cos(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/sin(angle* DEG2RAD)+binary.sizeI()/2.f;
+                        x2(1) = (-value1) + binary.sizeJ()/2.f;
                     }else{
-                        F32 value1=binary.sizeI()/2;
-                        x1(1) = (-sin(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
-                        x1(0) = value1 + binary.sizeI()/2;
-                        x2(1) = (-sin(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2;
-                        x2(0) = -(value1) + binary.sizeI()/2;
+                        F32 value1=binary.sizeI()/2.f;
+                        x1(1) = (-sin(angle* DEG2RAD)*value1+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2.f;
+                        x1(0) = value1 + binary.sizeI()/2.f;
+                        x2(1) = (-sin(angle* DEG2RAD)*(-value1)+ radius-hough.sizeI()/2)/cos(angle* DEG2RAD)+binary.sizeJ()/2.f;
+                        x2(0) = -(value1) + binary.sizeI()/2.f;
                     }
                     lines.push_back(std::make_pair(x1,x2));
                 }

@@ -13,10 +13,7 @@ unsigned long Distribution::length = 4;
 MTRand_int32 Distribution::irand(Distribution::init, Distribution::length);
 
 
-void Distribution::display(F32 xmin,F32 xmax)const{
-    DistributionDisplay disp;
-    disp.display(*this,xmin,xmax);
-}
+
 void DistributionDisplay::display( const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
     Vec<const Distribution*> v_d;
     v_d.push_back(&d);
@@ -61,43 +58,43 @@ void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax
 
         if(main_disp.is_keyARROWDOWN()){
             F32 diff =ymax-ymin;
-            ymin -= diff*0.02;
-            ymax -= diff*0.02;
+            ymin -= diff*0.02f;
+            ymax -= diff*0.02f;
         }
         else if(main_disp.is_keyARROWUP())
         {
             F32 diff =ymax-ymin;
-            ymin += diff*0.02;
-            ymax += diff*0.02;
+            ymin += diff*0.02f;
+            ymax += diff*0.02f;
         }
         else if(main_disp.is_keyARROWLEFT()){
             F32 diff =xmax-xmin;
-            xmin -= diff*0.02;
-            xmax -= diff*0.02;
+            xmin -= diff*0.02f;
+            xmax -= diff*0.02f;
         }
         else if(main_disp.is_keyARROWRIGHT())
         {
             F32 diff =xmax-xmin;
-            xmin += diff*0.02;
-            xmax += diff*0.02;
+            xmin += diff*0.02f;
+            xmax += diff*0.02f;
         }
         else if(main_disp.is_keyPADADD())
         {
             F32 diffx =xmax-xmin;
             F32 diffy =ymax-ymin;
-            xmin += diffx*0.02;
-            xmax -= diffx*0.02;
-            ymin += diffy*0.02;
-            ymax -= diffy*0.02;
+            xmin += diffx*0.02f;
+            xmax -= diffx*0.02f;
+            ymin += diffy*0.02f;
+            ymax -= diffy*0.02f;
         }
         else if(main_disp.is_keyPADSUB())
         {
             F32 diffx =xmax-xmin;
             F32 diffy =ymax-ymin;
-            xmin -= diffx*0.02;
-            xmax += diffx*0.02;
-            ymin -= diffy*0.02;
-            ymax += diffy*0.02;
+            xmin -= diffx*0.02f;
+            xmax += diffx*0.02f;
+            ymin -= diffy*0.02f;
+            ymax += diffy*0.02f;
         }else if(main_disp.is_keyS())
         {
             img.save("snaphot.png");
@@ -110,5 +107,8 @@ void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax
         main_disp.display(img).waitTime();
     }
 
+}
+void Distribution::display(F32 xmin,F32 xmax)const{
+    DistributionDisplay::display(*this,xmin,xmax);
 }
 }

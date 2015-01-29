@@ -43,74 +43,74 @@ in the Software.
 
 namespace pop
 {
-UI8 maximum(UI8 v1,UI8 v2);
-UI16 maximum(UI16 v1,UI16 v2);
-UI32 maximum(UI32 v1,UI32 v2);
-I8 maximum(I8 v1,I8 v2);
-I16 maximum(I16 v1,I16 v2);
-I32 maximum(I32 v1,I32 v2);
-F32 maximum(F32 v1,F32 v2);
-F64 maximum(F64 v1,F64 v2);
+POP_EXPORTS UI8 maximum(UI8 v1,UI8 v2);
+POP_EXPORTS UI16 maximum(UI16 v1,UI16 v2);
+POP_EXPORTS UI32 maximum(UI32 v1,UI32 v2);
+POP_EXPORTS I8 maximum(I8 v1,I8 v2);
+POP_EXPORTS I16 maximum(I16 v1,I16 v2);
+POP_EXPORTS I32 maximum(I32 v1,I32 v2);
+POP_EXPORTS F32 maximum(F32 v1,F32 v2);
+POP_EXPORTS F64 maximum(F64 v1,F64 v2);
 
-UI8 minimum(UI8 v1,UI8 v2);
-UI16 minimum(UI16 v1,UI16 v2);
-UI32 minimum(UI32 v1,UI32 v2);
-I8 minimum(I8 v1,I8 v2);
-I16 minimum(I16 v1,I16 v2);
-I32 minimum(I32 v1,I32 v2);
-F32 minimum(F32 v1,F32 v2);
-F64 minimum(F64 v1,F64 v2);
+POP_EXPORTS UI8 minimum(UI8 v1,UI8 v2);
+POP_EXPORTS UI16 minimum(UI16 v1,UI16 v2);
+POP_EXPORTS UI32 minimum(UI32 v1,UI32 v2);
+POP_EXPORTS I8 minimum(I8 v1,I8 v2);
+POP_EXPORTS I16 minimum(I16 v1,I16 v2);
+POP_EXPORTS I32 minimum(I32 v1,I32 v2);
+POP_EXPORTS F32 minimum(F32 v1,F32 v2);
+POP_EXPORTS F64 minimum(F64 v1,F64 v2);
 
-F32 absolute(UI8 v1);
-F32 absolute(UI16 v1);
-F32 absolute(UI32 v1);
-F32 absolute(I8 v1);
-F32 absolute(I16 v1);
-F32 absolute(I32 v1);
-F32 absolute(F32 v1);
-F64 absolute(F64 v1);
+POP_EXPORTS F32 absolute(UI8 v1);
+POP_EXPORTS F32 absolute(UI16 v1);
+POP_EXPORTS F32 absolute(UI32 v1);
+POP_EXPORTS F32 absolute(I8 v1);
+POP_EXPORTS F32 absolute(I16 v1);
+POP_EXPORTS F32 absolute(I32 v1);
+POP_EXPORTS F32 absolute(F32 v1);
+POP_EXPORTS F64 absolute(F64 v1);
 
-F32 normValue(UI8 v1,int =2);
-F32 normValue(UI16 v1,int =2);
-F32 normValue(UI32 v1,int =2);
-F32 normValue(I8 v1,int =2);
-F32 normValue(I16 v1,int =2);
-F32 normValue(I32 v1,int =2);
-F32 normValue(F32 v1,int =2);
-F64 normValue(F64 v1,int =2);
+POP_EXPORTS F32 normValue(UI8 v1,int =2);
+POP_EXPORTS F32 normValue(UI16 v1,int =2);
+POP_EXPORTS F32 normValue(UI32 v1,int =2);
+POP_EXPORTS F32 normValue(I8 v1,int =2);
+POP_EXPORTS F32 normValue(I16 v1,int =2);
+POP_EXPORTS F32 normValue(I32 v1,int =2);
+POP_EXPORTS F32 normValue(F32 v1,int =2);
+POP_EXPORTS F64 normValue(F64 v1,int =2);
 
-F32 normPowerValue(UI8 v1,int =2);
-F32 normPowerValue(UI16 v1,int =2);
-F32 normPowerValue(UI32 v1,int =2);
-F32 normPowerValue(I8 v1,int =2);
-F32 normPowerValue(I16 v1,int =2);
-F32 normPowerValue(I32 v1,int =2);
-F32 normPowerValue(F32 v1,int =2);
-F64 normPowerValue(F64 v1,int =2);
+POP_EXPORTS F32 normPowerValue(UI8 v1,int =2);
+POP_EXPORTS F32 normPowerValue(UI16 v1,int =2);
+POP_EXPORTS F32 normPowerValue(UI32 v1,int =2);
+POP_EXPORTS F32 normPowerValue(I8 v1,int =2);
+POP_EXPORTS F32 normPowerValue(I16 v1,int =2);
+POP_EXPORTS F32 normPowerValue(I32 v1,int =2);
+POP_EXPORTS F32 normPowerValue(F32 v1,int =2);
+POP_EXPORTS F64 normPowerValue(F64 v1,int =2);
 
-F32 distance(UI8 v1,UI8 v2, int p =2);
-F32 distance(UI16 v1,UI16 v2, int p =2);
-F32 distance(UI32 v1,UI32 v2, int p =2);
-F32 distance(I8 v1,I8 v2, int p =2);
-F32 distance(I16 v1,I16 v2, int p =2);
-F32 distance(I32 v1,I32 v2, int p =2);
-F32 distance(F32 v1,F32 v2, int p =2);
-F64 distance(F64 v1,F64 v2, int p =2);
+POP_EXPORTS F32 distance(UI8 v1,UI8 v2, int p =2);
+POP_EXPORTS F32 distance(UI16 v1,UI16 v2, int p =2);
+POP_EXPORTS F32 distance(UI32 v1,UI32 v2, int p =2);
+POP_EXPORTS F32 distance(I8 v1,I8 v2, int p =2);
+POP_EXPORTS F32 distance(I16 v1,I16 v2, int p =2);
+POP_EXPORTS F32 distance(I32 v1,I32 v2, int p =2);
+POP_EXPORTS F32 distance(F32 v1,F32 v2, int p =2);
+POP_EXPORTS F64 distance(F64 v1,F64 v2, int p =2);
 
-F32 productInner(UI8 v1,UI8 v2);
-F32 productInner(UI16 v1,UI16 v2);
-F32 productInner(UI32 v1,UI32 v2);
-F32 productInner(I8 v1,I8 v2);
-F32 productInner(I16 v1,I16 v2);
-F32 productInner(I32 v1,I32 v2);
-F32 productInner(F32 v1,F32 v2);
-F64 productInner(F64 v1,F64 v2);
+POP_EXPORTS F32 productInner(UI8 v1,UI8 v2);
+POP_EXPORTS F32 productInner(UI16 v1,UI16 v2);
+POP_EXPORTS F32 productInner(UI32 v1,UI32 v2);
+POP_EXPORTS F32 productInner(I8 v1,I8 v2);
+POP_EXPORTS F32 productInner(I16 v1,I16 v2);
+POP_EXPORTS F32 productInner(I32 v1,I32 v2);
+POP_EXPORTS F32 productInner(F32 v1,F32 v2);
+POP_EXPORTS F64 productInner(F64 v1,F64 v2);
 
-F32 round(F32 v1);
-F64 round(F64 v1);
+POP_EXPORTS F32 round(F32 v1);
+POP_EXPORTS F64 round(F64 v1);
 
-F32 squareRoot(F32 v1);
-F64 squareRoot(F64 v1);
+POP_EXPORTS F32 squareRoot(F32 v1);
+POP_EXPORTS F64 squareRoot(F64 v1);
 
 template<typename T>
 class NumericLimits

@@ -35,7 +35,7 @@ std::string Cryptography::xor_decryptText(const char* d, const size_t len,
 // Encrypt or decrypt the binary data d of size len in place using the key key of size key_len
 void Cryptography::xor_encryptOrDecryptBinary(char* d, const size_t len,
 		const char* key, const size_t key_len) {
-	for (int i = 0; i < len; i++) {
+	for (unsigned int i = 0; i < len; i++) {
 		d[i] = d[i] ^ key[i % key_len];
 	}
 }

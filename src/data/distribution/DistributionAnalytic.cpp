@@ -93,7 +93,7 @@ DistributionUniformInt::DistributionUniformInt(int min, int max)
 }
 F32 DistributionUniformInt::randomVariable()const 
 {
-    return _xmin + Distribution::irand.operator ()()%(1+_xmax-_xmin);
+    return _xmin + static_cast<F32>(Distribution::irand.operator ()()%(1+_xmax-_xmin));
 }
 F32 DistributionUniformInt::operator()(F32 value)const 
 {
@@ -123,19 +123,19 @@ F32 DistributionNormal::randomVariable()const
     F32 x1, x2, w;
 
     do {
-        x1 = 2.0 * _real.randomVariable()- 1.0;
-        x2 = 2.0 * _real.randomVariable() - 1.0;
+        x1 = 2.f * _real.randomVariable()- 1.f;
+        x2 = 2.f * _real.randomVariable() - 1.f;
         w = x1 * x1 + x2 * x2;
 
     } while ( w >= 1.0 );
 
-    w = std::sqrt( (-2.0 * std::log ( w ) ) / w );
+    w = std::sqrt( (-2.f * std::log ( w ) ) / w );
     return (x1 * w)*_standard_deviation + _mean;
 }
 F32 DistributionNormal::operator()(F32 value)const 
 {
 
-    return (1/std::sqrt((2*3.141592654*_standard_deviation*_standard_deviation)))*std::exp(-(value-_mean)*(value-_mean)/(2*_standard_deviation*_standard_deviation));
+    return (1/std::sqrt((2*3.141592654f*_standard_deviation*_standard_deviation)))*std::exp(-(value-_mean)*(value-_mean)/(2*_standard_deviation*_standard_deviation));
 }
 
 //Binomial
@@ -153,7 +153,7 @@ DistributionBinomial::DistributionBinomial(F32 probability, int number_times)
 
 F32 DistributionBinomial::randomVariable()const 
 {
-    int sum =0;
+    F32 sum =0;
     for(int i=0;i<_number_times;i++)
         if(distreal01.randomVariable()<_probability)sum++;
     return sum;
@@ -237,8 +237,8 @@ void DistributionPoisson::init()
     }
     else
     {
-        this->flambdalargemult = new DistributionPoisson(_maxlambda);
-        this->mult= std::floor(_lambda/_maxlambda);
+        this->flambdalargemult = new DistributionPoisson((F32)_maxlambda);
+        this->mult= (I32)std::floor(_lambda/_maxlambda);
         F32 rest = _lambda - this->mult*_maxlambda;
         this->flambdalargerest = new DistributionPoisson(rest);
     }
@@ -252,12 +252,10 @@ F32 DistributionPoisson::randomVariable()const
     F32 uni=distreal01.randomVariable();
     if(_lambda<=_maxlambda)
     {
-        return int(std::lower_bound(v_table.begin(),v_table.end(),uni)-v_table.begin());
+        return (F32)int(std::lower_bound(v_table.begin(),v_table.end(),uni)-v_table.begin());
     }
-    else
-    {
-
-        int value=0;
+    else{
+        F32 value=0;
         for(int i=0;i<this->mult;i++)
             value+=this->flambdalargemult->randomVariable();
         value+=this->flambdalargerest->randomVariable();
@@ -286,7 +284,7 @@ F32 DistributionPoisson::randomVariable(F32 lambda)const
             probability = probability * lambda/k;
             cummulative_distribution +=probability;
         }
-        return k;
+        return (F32)k;
     }
 }
 
@@ -295,7 +293,7 @@ F32 DistributionPoisson::operator()(F32 value)const
 {
     int index=-1;
     if(value>=0)
-        index = std::floor(value);
+        index = static_cast<int>(std::floor(value));
     else
         return 0;
     if(index==-1)
@@ -306,7 +304,7 @@ F32 DistributionPoisson::operator()(F32 value)const
     {
         _exp*= lambda/k;
     }
-    return _exp/this->getStep();
+    return static_cast<F32>(_exp/this->getStep());
 
 }
 

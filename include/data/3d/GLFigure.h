@@ -260,7 +260,7 @@ private:
      /*! \var _transparencymode
       *  if transparency_mode=1 no transparent, otherwise yes
       */
-     int _transparencymode;
+     bool _transparencymode;
 public:
 
 

@@ -288,7 +288,7 @@ class POP_EXPORTS DistributionPoisson:public Distribution, public DistributionDi
   *
 */
 private:
-    std::vector<F32> v_table;
+    std::vector<F64> v_table;
     F32 _lambda;
     int _maxlambda;
     DistributionPoisson  *flambdalargemult;

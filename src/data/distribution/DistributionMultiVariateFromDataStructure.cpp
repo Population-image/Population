@@ -18,7 +18,7 @@ DistributionMultiVariateRegularStep::DistributionMultiVariateRegularStep(const M
 void DistributionMultiVariateRegularStep::generateRepartition(){
     if(_xmin.size()==2){
         _repartition.resize(_mat2d.getDomain().multCoordinate());
-        F32 value = std::accumulate(_mat2d.begin(),_mat2d.end(),0.);
+        F32 value = std::accumulate(_mat2d.begin(),_mat2d.end(),0.f);
 
         F32 sumtemp =0;
         for(int i =0;i<_mat2d.getDomain().multCoordinate();i++){
@@ -92,10 +92,10 @@ F32 DistributionMultiVariateNormal::operator ()(const VecF32&  value)const{
 
     VecF32 V= value - _mean;
     VecF32 V1 = _sigma_minus_one*V;
-    F32 v = -0.5*productInner(V,V1);
+    F32 v = -0.5f*productInner(V,V1);
     v =std::exp(v);
     v/=(std::sqrt(absolute(_determinant_sigma)));
-    v/=(std::pow(2*3.141592654,this->getNbrVariable()/2));
+    v/=(std::pow(2*3.1415926f,this->getNbrVariable()/2.f));
     return v;
 }
 unsigned int DistributionMultiVariateNormal::getNbrVariable()const{
@@ -268,7 +268,7 @@ DistributionMultiVariateProduct * DistributionMultiVariateProduct::clone()const 
     return new DistributionMultiVariateProduct(_v_dist);
 }
 F32 DistributionMultiVariateProduct::operator()(const VecF32&  value)const{
-    double sum=0;
+    F32 sum=0;
     for(unsigned int i=0;i<_v_dist.size();i++){
         sum =_v_dist(i)->operator ()(value(i));
     }

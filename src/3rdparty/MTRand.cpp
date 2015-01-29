@@ -99,4 +99,4 @@ MTRand::MTRand(unsigned long seed_value) : MTRand_int32(seed_value) {}
 MTRand::MTRand(const unsigned long* seed_ptr, int size) : MTRand_int32(seed_ptr, size) {}
 MTRand::~MTRand() {}
 pop::F32 MTRand::operator()() {
-  return static_cast<pop::F32>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+  return static_cast<pop::F32>(rand_int32()) * (1.f / 4294967296.f); } // divided by 2^32

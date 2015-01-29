@@ -199,7 +199,7 @@ struct AnalysisAdvanced
     {
         Mat2F32 m;
         while(itg.next()){
-            int value = normValue(f(itg.x()));
+            int value = static_cast<int>(normValue(f(itg.x())));
             if(value>=static_cast<int>(m.sizeI())){
                 m.resizeInformation(value+1,2);
             }
@@ -208,11 +208,11 @@ struct AnalysisAdvanced
         }
         int count =0;
         for(unsigned int i =0;i<m.sizeI();i++){
-            count +=m(i,1);
+            count +=static_cast<int>(m(i,1));
         }
         for(unsigned int i =0;i<m.sizeI();i++){
             m(i,1)/=count;
-            m(i,0)=i;
+            m(i,0)=static_cast<F32>(i);
         }
         return m;
     }

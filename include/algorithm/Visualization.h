@@ -117,9 +117,9 @@ struct POP_EXPORTS Visualization
                 else if (i==255)v=RGBUI8(120,120,120);
                 else
                 {
-                    r = absolute((value1*i+56));
-                    g = absolute((value2*i+53));
-                    b = absolute((value3*i+11));
+                    r = (I32)absolute((value1*i+56));
+                    g = (I32)absolute((value2*i+53));
+                    b = (I32)absolute((value3*i+11));
                     v=RGBUI8(r%255,g%255,b%255);
                 }
                 fRGB(it.x())=v;
@@ -401,7 +401,7 @@ struct POP_EXPORTS Visualization
             else if(i==2)v[i]=RGB<F32>(0,255,0);
             else if(i==3)v[i]=RGB<F32>(0,0,255);
             else
-                v[i]=RGB<F32>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
+                v[i]=RGB<F32>(static_cast<F32>(rand()%256),static_cast<F32>(rand()%256),static_cast<F32>(rand()%256));//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
 
         }
         MatN<DIM,RGBUI8> foreground(label.getDomain());

@@ -23,7 +23,7 @@ using namespace FUNCTIONPARSERTYPES;
 #endif
 
 #ifndef M_PI
-#define M_PI 3.1415926535897932384626433832795
+#define M_PI 3.14159265f
 #endif
 
 //=========================================================================
@@ -194,11 +194,11 @@ namespace
 
     inline pop::F32 DegreesToRadians(pop::F32 degrees)
     {
-        return degrees*(M_PI/180.0);
+        return degrees*(M_PI/180.f);
     }
     inline pop::F32 RadiansToDegrees(pop::F32 radians)
     {
-        return radians*(180.0/M_PI);
+        return radians*(180.f/M_PI);
     }
 }
 
@@ -679,7 +679,7 @@ const char* FunctionParser::CompileElement(const char* function)
     if(isdigit(c) || c=='.') // Number
     {
         char* endPtr;
-        const pop::F32 val = strtod(function, &endPtr);
+        const pop::F32 val = static_cast<const pop::F32>(strtod(function, &endPtr));
         if(endPtr == function) return SetErrorType(SYNTAX_ERROR, function);
 
         data->Immed.push_back(val);
@@ -1158,7 +1158,7 @@ pop::F32 FunctionParser::Eval(const pop::F32* Vars)
                   --SP; break;
               }
 
-          case   cInt: Stack[SP] = floor(Stack[SP]+.5); break;
+          case   cInt: Stack[SP] = floor(Stack[SP]+.5f); break;
 
           case   cLog:
 #                    ifndef FP_NO_EVALUATION_CHECKS
@@ -1170,7 +1170,7 @@ pop::F32 FunctionParser::Eval(const pop::F32* Vars)
 #                    ifndef FP_NO_EVALUATION_CHECKS
                        if(Stack[SP] <= 0) { evalErrorType=3; return 0; }
 #                    endif
-                       Stack[SP] = log(Stack[SP]) * 1.4426950408889634074;
+                       Stack[SP] = log(Stack[SP]) * 1.4426950408889634074f;
                        //Stack[SP] = log2(Stack[SP]);
                        break;
 
@@ -1338,7 +1338,7 @@ pop::F32 FunctionParser::Eval(const pop::F32* Vars)
 #           ifndef FP_NO_EVALUATION_CHECKS
               if(Stack[SP] == 0.0) { evalErrorType=1; return 0; }
 #           endif
-              Stack[SP] = 1.0/Stack[SP];
+              Stack[SP] = 1.0f/Stack[SP];
               break;
 
           case   cSqr:
@@ -1373,7 +1373,7 @@ pop::F32 FunctionParser::Eval(const pop::F32* Vars)
 #                      ifndef FP_NO_EVALUATION_CHECKS
                          if(Stack[SP] == 0) { evalErrorType=1; return 0; }
 #                      endif
-                         Stack[SP] = 1.0 / std::sqrt(Stack[SP]); break;
+                         Stack[SP] = 1.0f / std::sqrt(Stack[SP]); break;
 #endif
 
           case cNop: break;

@@ -404,7 +404,7 @@ struct ProcessingAdvanced
         MatN<DIM,UI8> outcast(f.getDomain());
         it.init();
         while(it.next()){
-            outcast(it.x())= std::pow( (f(it.x())+d.randomVariable())/256,pow_current)*256;
+			outcast(it.x())= ArithmeticsSaturation<UI8,F32>::Range(std::pow( (f(it.x())+d.randomVariable())/256,pow_current)*256);
         }
         return outcast;
     }

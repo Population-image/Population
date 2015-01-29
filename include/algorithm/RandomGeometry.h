@@ -932,7 +932,7 @@ private:
             return true;
         else
         {
-            F32 v1 = rand()*1.0/RAND_MAX;
+            F32 v1 = rand()*1.f/RAND_MAX;
             F32 v2 = std::exp((energycurrent-energynext)*temperature_inverse);
             if(v1<v2)
                 return true;
@@ -1100,7 +1100,7 @@ private:
         F32 sum=0;
         for(int i =0;i<(int)v1.size();i++){
             for(int j =0;j<(int)v1[i].size();j++){
-                F32 diff = 1.0*v1[i][j]/nbr_pixel_by_phase1[i]-1.0*v2[i][j]/nbr_pixel_by_phase2[i];
+                F32 diff = 1.f*v1[i][j]/nbr_pixel_by_phase1[i]-1.f*v2[i][j]/nbr_pixel_by_phase2[i];
                 sum+=(diff*diff);
             }
         }
@@ -1114,7 +1114,7 @@ private:
                 for(int k =0;k<(int)v1[i][j].size();k++){
 
                     //                    sum+=absolute(1.0*v1[i][i][k]/v1[i][i][0]-1.0*v2[i][i][k]/v2[i][i][0]);
-                    F32 diff = 1.0*v1[i][j][k]/v1[i][i][0]-1.0*v2[i][j][k]/v2[i][i][0];
+                    F32 diff = 1.f*v1[i][j][k]/v1[i][i][0]-1.f*v2[i][j][k]/v2[i][i][0];
                     //                    if(i==j)
                     sum+=(diff*diff);
                     //                    else

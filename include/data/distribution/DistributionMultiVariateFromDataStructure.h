@@ -103,7 +103,7 @@ public:
     std::vector<F32 >_repartition;
     VecF32 _xmin;
     MatN<2,F32> _mat2d;
-    double _step;
+    F32 _step;
     DistributionMultiVariateRegularStep(const MatN<2,F32> data_x_y, const VecF32& xmin,F32 step);
     F32 operator ()(const VecF32&  value)const;
     DistributionMultiVariateRegularStep * clone()const ;

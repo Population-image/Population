@@ -143,7 +143,7 @@ public:
 
         Mat2RGBUI8  img(in);
 
-        VecN<2,pop::F32> scale(600./img.getDomain()(0));
+        VecN<2,pop::F32> scale(600.f/img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale);
 
         lowvalue =RGBUI8(125,125,125);
@@ -205,8 +205,8 @@ public:
                 if(highvalue.b()<255)
                     highvalue.b()++;
             }else if(window.button()){
-                int i =1.0*window.mouse_y()/window.height()*img.getDomain()(0);
-                int j =1.0*window.mouse_x()/window.width()*img.getDomain()(1);
+                int i =static_cast<int>(1.f*window.mouse_y()/window.height()*img.getDomain()(0));
+                int j =static_cast<int>(1.f*window.mouse_x()/window.width()*img.getDomain()(1));
                 if(img.isValid(i,j)){
                     value=  img(i,j);
                     click=true;

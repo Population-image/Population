@@ -36,8 +36,8 @@ std::string OCR::_parseTextByContrast(const Mat2UI8 & m,int nbr_pixels_width_car
 
 
     CharacteristicClusterFilterMass filter_mass;
-    filter_mass._min = nbr_pixels_width_caracter*10;
-    filter_mass._max = nbr_pixels_width_caracter*1000;
+    filter_mass._min = nbr_pixels_width_caracter*10.f;
+    filter_mass._max = nbr_pixels_width_caracter*1000.f;
 
     CharacteristicClusterFilterAsymmetryHeightPerWidth filter_asymmetry;
     filter_asymmetry._min =0.5;
@@ -104,7 +104,7 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
             _isrecognized=false;
         else
             _isrecognized=true;
-        _confidence = value_max*100;
+        _confidence = static_cast<int>(value_max*100);
         std::string c= _n.label2String()[label_max];
         return c[0];
 

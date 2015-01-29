@@ -52,11 +52,11 @@ void DistributionRegularStep::smoothGaussian(F32 sigma){
     std::vector<F32 > _table_temp;
     _table_temp = this->_table;
     std::vector<F32> v_value_one_dimension;
-    int radius_kernel=2*sigma;
+    int radius_kernel=static_cast<int>(2*sigma);
     //initialisation one-dimension
     F32 sum=0;
     for(int i=0;i<2*radius_kernel+1;i++){
-        F32  value =std::exp(-0.5*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
+        F32  value =std::exp(-0.5f*(radius_kernel-i)*(radius_kernel-i)/(sigma*sigma));
         v_value_one_dimension.push_back(value);
         sum+=value;
     }
@@ -86,7 +86,7 @@ void DistributionRegularStep::smoothGaussian(F32 sigma){
 
 F32 DistributionRegularStep::operator ()(F32 value)const 
 {
-    int index = std::floor((value-_xmin)/_spacing);
+    int index = static_cast<int>(std::floor((value-_xmin)/_spacing));
     if(index<0||index>=(int)_table.size())
         return 0;
     else

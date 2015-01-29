@@ -158,7 +158,7 @@ namespace tthread {
 /// program may deadlock if the thread that owns a mutex object calls lock()
 /// on that object).
 /// @see recursive_mutex
-class mutex {
+class POP_EXPORTS mutex {
   public:
     /// Constructor.
     mutex()
