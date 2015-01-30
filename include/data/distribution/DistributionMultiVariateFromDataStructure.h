@@ -226,6 +226,7 @@ public:
     DistributionMultiVariateProduct(const Distribution & dist1);
     DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2);
     DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3);
+    DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3,const Distribution & dist4);
     DistributionMultiVariateProduct(const Vec<Distribution*> v_dist);
 
     virtual DistributionMultiVariateProduct * clone()const ;

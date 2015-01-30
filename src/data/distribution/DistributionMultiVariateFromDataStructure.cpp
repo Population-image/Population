@@ -241,7 +241,7 @@ DistributionMultiVariateProduct& DistributionMultiVariateProduct::operator=(cons
     for(unsigned int i=0;i<a._v_dist.size();i++){
         _v_dist.push_back(a._v_dist(i)->clone());
     }
-	return *this;
+    return *this;
 }
 DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist){
     _v_dist.push_back(dist.clone());
@@ -257,7 +257,12 @@ DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribut
     _v_dist.push_back(dist2.clone());
     _v_dist.push_back(dist3.clone());
 }
-
+DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Distribution & dist1,const Distribution & dist2,const Distribution & dist3,const Distribution & dist4){
+    _v_dist.push_back(dist1.clone());
+    _v_dist.push_back(dist2.clone());
+    _v_dist.push_back(dist3.clone());
+    _v_dist.push_back(dist4.clone());
+}
 DistributionMultiVariateProduct::DistributionMultiVariateProduct(const Vec<Distribution*> v_dist){
     for(unsigned int i=0;i<v_dist.size();i++){
         _v_dist.push_back(v_dist(i)->clone());

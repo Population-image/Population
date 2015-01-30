@@ -17,6 +17,70 @@ struct Coordinate
 };
 int main(){
     {
+        F32 radius=10;
+        DistributionDirac ddirac_radius(radius);
+
+        F32 heightmix=40;
+        F32 heightmax=70;
+        DistributionUniformReal duniform_height(heightmix,heightmax);
+
+        Vec3F32 domain(256);//2d field domain
+
+        ModelGermGrain3 grain1 = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
+
+        RandomGeometry::cylinder(grain1,ddirac_radius,duniform_height);
+
+
+        ModelGermGrain3 grain2 = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
+        DistributionMultiVariateProduct v_radius_ellipsoid(DistributionUniformReal(5,25),DistributionUniformReal(5,25),DistributionUniformReal(5,25);
+        RandomGeometry::ellipsoid(grain2,v_radius_ellipsoid,v_orientation);
+
+        RandomGeometry::addition(grain1,grain2);
+
+        Mat3RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain2);
+        Mat3UI8 img_germ_grey;
+        img_germ_grey = img_germ;
+        img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
+        Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,5);
+        phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
+        Scene3d scene;
+        pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+        pop::Visualization::lineCube(scene,img_VecN);
+        scene.display();
+    }
+    {
+        F32 porosity=0.8;
+        F32 radiusmin=5;
+        F32 radiusmax=15;
+        DistributionUniformReal duniform_radius(radiusmin,radiusmax);
+
+        F32 moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
+        //4/3*pi*E^3(R)
+        F32 volume_expectation = moment_order3*4/3.*3.14159265;
+        Vec3F32 domain(200);//2d field domain
+        F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
+
+        ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
+        DistributionMultiVariateProduct radius(duniform_radius,duniform_radius,duniform_radius );
+        DistributionMultiVariateProduct angle(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI));
+
+        RandomGeometry::ellipsoid(grain,radius,angle);
+        Mat3RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain);
+        Mat3UI8 img_germ_grey;
+        img_germ_grey = img_germ;
+
+        Mat2F32 m=  Analysis::histogram(img_germ_grey);
+        std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
+
+        img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
+        Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,10);
+        phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
+        Scene3d scene;
+        pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+        pop::Visualization::lineCube(scene,img_germ);
+        scene.display();
+    }
+    {
         Mat2RGBUI8 img;
         img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
         Vec2F32 domain;
