@@ -193,7 +193,7 @@ Vec<Vec<Mat2UI8> > applyGraphCluster(const pop::Mat2UI32& labelled_image, Vec<Ch
     Vec<Vec<Mat2UI8> > v_word;
     Vec<Vec<std::pair<int,int> > > v_word_label;
     Vec<int> v_hit(static_cast<int>(v_v_neigh.size()),-1);
-    for(unsigned int i=0;i<static_cast<int>(v_v_neigh.size());i++){
+    for(unsigned int i=0;i<static_cast<unsigned int>(v_v_neigh.size());i++){
         if(v_v_neigh(i).size()>0){
             size_t index;
             if(v_hit(i)==-1){
