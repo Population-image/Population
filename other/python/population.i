@@ -28,4 +28,3 @@ U second;
 #pragma SWIG nowarn=302,314,317,362,389,509
 //###Processing###
 %include populationfull.i
-

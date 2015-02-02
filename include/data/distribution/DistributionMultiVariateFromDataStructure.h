@@ -129,15 +129,7 @@ private:
     F32 sigmax=3;
     F32 sigmay=1;
     F32 rho = -0.7;
-    DistributionMultiVariateNormal multi;
-    VecF32 v(2);
-
-    v(0)=mux;
-    v(1)=muy;
-    Mat2F32 m(2,2);
-    m(0,0)=sigmax*sigmax;    m(0,1)=sigmax*sigmay*rho;
-    m(1,0)=sigmax*sigmay*rho;m(1,1)=sigmay*sigmay;
-    multi.fromMeanVecAndCovarianceMatrix(v,m);
+    DistributionMultiVariateNormal multi(mux,muy,sigmax,sigmay,rho);
 
     Mat2UI8 img(512,512);
     MatNDisplay windows;
@@ -164,6 +156,7 @@ public:
     virtual F32 operator ()(const VecF32&  value)const;
     VecF32 randomVariable()const ;
     virtual DistributionMultiVariateNormal * clone()const ;
+    DistributionMultiVariateNormal(F32 mu_x,F32 mu_y,F32 sigma_x,F32 sigma_y,F32 rho);
     DistributionMultiVariateNormal(VecF32 mean, Mat2F32 covariance);
     unsigned int getNbrVariable()const;
 };

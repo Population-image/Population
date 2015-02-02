@@ -6,7 +6,8 @@ add_executable( runtest runtest.cpp poptest.h ${POPULATION_SOURCES})
 target_link_libraries(runtest ${POPULATION_LIBRARY})
 
 
-
+add_executable( adaboost adaboost.cpp  ${POPULATION_SOURCES})
+target_link_libraries(adaboost ${POPULATION_LIBRARY})
 
 
 

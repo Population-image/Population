@@ -70,13 +70,6 @@ public:
     bool isInStepIntervale(F32 value,F32 hitvalue) const;
 };
 
-
-
-
-
-
-
-
 class POP_EXPORTS DistributionSign:public Distribution, public DistributionDiscrete
 {
     /*!

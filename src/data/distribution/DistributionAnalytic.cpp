@@ -52,7 +52,7 @@ F32 DistributionSign::operator()(F32 value)const {
 }
 
 F32 DistributionSign::randomVariable()const {
-    if(Distribution::irand()%2==1)
+    if(Distribution::irand()()%2==1)
         return 1;
     else
         return -1;
@@ -76,7 +76,7 @@ F32 DistributionUniformReal::operator()(F32 value)const
 }
 F32 DistributionUniformReal::randomVariable()const 
 {
-    F32 value = (_xmax-_xmin)* static_cast<F32>(irand())/ static_cast<F32>(MTRand_int32::maxValue());
+    F32 value = (_xmax-_xmin)* static_cast<F32>(irand()())/ static_cast<F32>(MTRand_int32::maxValue());
     return _xmin + value;
 }
 
@@ -93,7 +93,7 @@ DistributionUniformInt::DistributionUniformInt(int min, int max)
 }
 F32 DistributionUniformInt::randomVariable()const 
 {
-    return _xmin + static_cast<F32>(Distribution::irand.operator ()()%(1+_xmax-_xmin));
+    return _xmin + static_cast<F32>(Distribution::irand().operator ()()%(1+_xmax-_xmin));
 }
 F32 DistributionUniformInt::operator()(F32 value)const 
 {

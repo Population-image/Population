@@ -207,28 +207,21 @@ public:
     *
     * The resulting point process is a hard-core point process with minimal inter-germ distance R. The following code presents an art application
     *  \code
-    * Mat2RGBUI8 img;
-    * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
-    * F32 radius=10;
-    * Vec2F32 domain;
-    * domain= img.getDomain();
+        Mat2RGBUI8 img;
+        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+        F32 radius=10;
+        Vec2F32 domain;
+        domain= img.getDomain();
 
-    * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,1);//generate the 2d Poisson point process
-    * RandomGeometry::hardCoreFilter(grain,radius*2,false);
-    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
-    * RandomGeometry::sphere(grain,d);
-    * RandomGeometry::RGBFromMatrix(grain,img);
-    * grain.setModel( DeadLeave);
-    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
-    * RGBUI8 mean = Analysis::meanValue(img);
-    * std::cout<<mean<<std::endl;
-    * Mat2RGBUI8::IteratorEDomain it(img.getIteratorEDomain());
-    * while(it.next()){
-    *    if(aborigenart(it.x())==RGBUI8(0))
-    *         aborigenart(it.x())=mean;
-    * }
-    * aborigenart.display();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,2);//generate the 2d Poisson point process
+        RandomGeometry::hardCoreFilter(grain,radius*2);
+        DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
+        RandomGeometry::sphere(grain,d);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+        aborigenart.display();
     * \endcode
     * \image html AborigenLena.png
     * \sa ModelGermGrain
@@ -244,29 +237,22 @@ public:
     * The resulting point process is the min-overlap point process where each germ has at least one neighborhood germ at distance smaller than R.
     *  \code
     * //Initial field with a local porosity equal to img(x)/255
-    * Mat2RGBUI8 img;
-    * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
-    * F32 radius=10;
-    * Vec2F32 domain;
-    * domain= img.getDomain();
+        Mat2RGBUI8 img;
+        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+        F32 radius=10;
+        Vec2F32 domain;
+        domain= img.getDomain();
 
-    * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
-    * grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    * RandomGeometry::minOverlapFilter(grain,radius*2);
-    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
-    * RandomGeometry::sphere(grain,d);
-    * RandomGeometry::RGBFromMatrix(grain,img);
-    * grain.setModel( DeadLeave);
-    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
-
-    * RGBUI8 mean = Analysis::meanValue(img);
-    * Mat2RGBUI8::IteratorEDomain it(img.getIteratorEDomain());
-    * while(it.next()){
-    *     if(aborigenart(it.x())==RGBUI8(0))
-    *         aborigenart(it.x())=mean;
-    * }
-    * aborigenart.display();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        RandomGeometry::minOverlapFilter(grain,radius*2);
+        DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
+        RandomGeometry::sphere(grain,d);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+        aborigenart.display();
     * \endcode
     * \image html AborigenLenaFloculation.png
     * \sa ModelGermGrain
@@ -281,25 +267,24 @@ public:
     *
     * The resulting point process is the intersectionpoint process where each germ has a center x such that img(x) is not equal to zero
     *  \code
-    * //Initial field with a local porosity equal to img(x)/255
-    * Mat2RGBUI8 img;
-    * img.load("../image/Lena.bmp");
-    * img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
-    * F32 radius=15;
-    * Vec2F32 domain;
-    * domain= img.getDomain();
-    * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
-    * img = pop::Processing::gradientMagnitudeDeriche(img,0.5);
-    * Mat2UI8 threshold = pop::Processing::threshold(img,10);
-    * RandomGeometry::intersectionGrainToMask(grain,threshold);
-    * DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
-    * RandomGeometry::sphere(grain,d);
-    * RandomGeometry::RGBFromMatrix(grain,img);
-    * grain.setModel( DeadLeave);
-    * grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    * Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+        Mat2RGBUI8 img;
+        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
+        F32 radius=15;
+        Vec2F32 domain;
+        domain= img.getDomain();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
+        Mat2UI8 grad = pop::Processing::gradientMagnitudeDeriche(img,0.5);
+        Mat2UI8 threshold = pop::Processing::threshold(grad,15);
+        RandomGeometry::intersectionGrainToMask(grain,threshold);
+        DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
+        RandomGeometry::sphere(grain,d);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
-    * aborigenart.display();
+        aborigenart.display();
     * \endcode
     * \image html AborigenLenaGradient.png
     */
@@ -322,25 +307,26 @@ public:
     * dress the germs with sphere with a random radius following the probability distribution dist
     *
     * \code
-    * F32 porosity=0.25;
-    *  std::string power_law="1/x^(3.1)";
-    * DistributionExpression dexp(power_law.c_str());//Poisson generator
-    * DistributionRegularStep dpower = pop::Statistics::toProbabilityDistribution(dexp,10,1024,0.1);
+        F32 porosity=0.25;
+         std::string power_law="1/x^(3.1)";
+        DistributionExpression dexp(power_law.c_str());//Poisson generator
+        DistributionRegularStep dpower = pop::Statistics::toProbabilityDistribution(dexp,10,1024,0.1);
 
-    * F32 moment_order_2 = pop::Statistics::moment(dpower,2,0,1024);
-    * F32 surface_expectation = moment_order_2*3.14159265;
-    * Vec2F32 domain(4048);//2d field domain
-    * F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
-    * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
-    * RandomGeometry::sphere(grain,dpower);
-    * Mat2RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain);
-    * Mat2UI8 img_germ_grey;
-    * img_germ_grey = img_germ;
-    * Mat2F32 m=  Analysis::histogram(img_germ_grey);
-    * std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
-    * Mat2UI32 img_label = pop::Processing::clusterToLabel(img_germ_grey,0);
-    * img_germ = pop::Visualization::labelToRandomRGB(img_label)  ;
-    * img_germ.scale(512,512);
+        F32 moment_order_2 = pop::Statistics::moment(dpower,2,0,1024);
+        F32 surface_expectation = moment_order_2*PI;
+        Vec2F32 domain(4048);//2d field domain
+        F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
+        RandomGeometry::sphere(grain,dpower);
+        Mat2RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain);
+        Mat2UI8 img_germ_grey;
+        img_germ_grey = img_germ;
+        Mat2F32 m=  Analysis::histogram(img_germ_grey);
+        std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
+        Mat2UI32 img_label = pop::Processing::clusterToLabel(img_germ_grey,0);
+        img_germ = pop::Visualization::labelToRandomRGB(img_label)  ;
+        img_germ.display();
+        return 1;
     * \endcode
     * \image html PowerLawCluster.png
     */
@@ -598,43 +584,31 @@ public:
     * addition of the grains
     *
     * \code
-    F32 radius=10;
-    Distribution ddirac_radius(radius,"DIRAC");
+        F32 radius=8;
+        DistributionDirac ddirac_radius(radius);
 
-    F32 heightmix=40;
-    F32 heightmax=70;
-    Distribution duniform_height(heightmix,heightmax,"UNIFORMREAL");
+        F32 heightmix=20;
+        F32 heightmax=25;
+        DistributionUniformReal duniform_height(heightmix,heightmax);
 
-    Vec3F32 domain(256);//2d field domain
+        Vec3F32 domain(200);//2d field domain
 
-    ModelGermGrain3 grain1 = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
+        ModelGermGrain3 grain1 = RandomGeometry::poissonPointProcess(domain,0.00002);//generate the 2d Poisson point process
 
-    Vec<Distribution> v_orientation;
-    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
-    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
-    v_orientation.push_back(Distribution(0,3.14159265,"UNIFORMREAL"));
-    RandomGeometry::cylinder(grain1,ddirac_radius,duniform_height,v_orientation);
+        RandomGeometry::cylinder(grain1,ddirac_radius,duniform_height);
 
 
-    ModelGermGrain3 grain2 = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
-    Vec<Distribution> v_radius_ellipsoid;
-    v_radius_ellipsoid.push_back(Distribution (5,25,"UNIFORMREAL"));
-    v_radius_ellipsoid.push_back(Distribution (5,25,"UNIFORMREAL"));
-    v_radius_ellipsoid.push_back(Distribution (5,25,"UNIFORMREAL"));
-    RandomGeometry::ellipsoid(grain2,v_radius_ellipsoid,v_orientation);
+        ModelGermGrain3 grain2 = RandomGeometry::poissonPointProcess(domain,0.00002);//generate the 2d Poisson point process
+        DistributionMultiVariateProduct v_radius_ellipsoid(DistributionUniformReal(5,25),DistributionUniformReal(5,25),DistributionUniformReal(5,25));
+        RandomGeometry::ellipsoid(grain2,v_radius_ellipsoid,DistributionMultiVariateProduct(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI)));
 
-    RandomGeometry::addition(grain1,grain2);
+        RandomGeometry::addition(grain1,grain2);
 
-    Mat3RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain2);
-    Mat3UI8 img_germ_grey;
-    img_germ_grey = img_germ;
-    img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
-    Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,15);
-    phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
-    Scene3d scene;
-    pop::Visualization::marchingCubeLevelSet(scene,phasefield);
-    pop::Visualization::lineCube(scene,img_VecN);
-    scene.display();
+        Mat3RGBUI8 img_germ = RandomGeometry::continuousToDiscrete(grain2);
+        Scene3d scene;
+        pop::Visualization::marchingCube(scene,img_germ);
+        pop::Visualization::lineCube(scene,img_germ);
+        scene.display();
     * \endcode
     * \image html additiongrain.png
     */
@@ -653,23 +627,17 @@ public:
     * affect a black and white RGB randomly to the grains
     *
     * \code
-    Vec2F32 domain(512,512);
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
+        Vec2F32 domain(512,512);
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
 
-    Distribution d("1/x^3");
-    Distribution dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
-    Vec<Distribution> v_radius;
-    v_radius.push_back(dproba);
-    v_radius.push_back(dproba);
-    Vec<Distribution> v_angle;
-    v_angle.push_back(Distribution(0,3.14159265*2,"UNIFORMREAL"));
-
-    RandomGeometry::box(grain,v_radius,v_angle);
-    RandomGeometry::RGBRandomBlackOrWhite(grain);
-    grain.setModel( DeadLeave);
-    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
-    deadleave_blackwhite.display();
+        DistributionExpression d("1/x^3");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
+        RandomGeometry::box(grain,DistributionMultiVariateProduct(dproba,dproba),DistributionMultiVariateProduct(DistributionUniformReal(0,PI)));
+        RandomGeometry::RGBRandomBlackOrWhite(grain);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_PERIODIC);
+        Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
+        deadleave_blackwhite.display();
     * \endcode
     * \image html deadleave_blackwhite.png
     */
@@ -684,25 +652,19 @@ public:
     * affect a RGB randomly following the input distributions
     *
     * \code
-    Vec2F32 domain(512,512);
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.001);//generate the 2d Poisson point process
+        Vec2F32 domain(512,512);
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
 
-    Distribution d("1/x^3");
-    Distribution dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
-    Vec<Distribution> v_radius;
-    v_radius.push_back(dproba);
-    v_radius.push_back(dproba);
-    Vec<Distribution> v_angle;
-    v_angle.push_back(Distribution(0,3.14159265*2,"UNIFORMREAL"));
+        DistributionExpression d("1/x^2");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,512);
+        RandomGeometry::box(grain,DistributionMultiVariateProduct(dproba,dproba),DistributionMultiVariateProduct(DistributionUniformReal(0,PI)));
+        DistributionMultiVariateProduct d_rgb (DistributionUniformInt(0,255),DistributionUniformInt(0,255),DistributionUniformInt(0,255));
 
-    RandomGeometry::box(grain,v_radius,v_angle);
-    DistributionMultiVariate dmulti(DistributionUniformInt(0,255));
-    DistributionMultiVariate dcoupled(dmulti,3);
-    RandomGeometry::RGBRandom(grain,dcoupled);
-    grain.setModel( DeadLeave);
-    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
-    deadleave_blackwhite.display();
+        RandomGeometry::RGBRandom(grain,d_rgb);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_PERIODIC);
+        Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
+        deadleave_blackwhite.display();
     * \endcode
     * \image html deadleave_random.png
     */
@@ -717,26 +679,26 @@ public:
     * Dress the grains with a RGB coming from the input matrix such that the grain RGB at the position x as the RGB img(x)
     *
     * \code
-    Mat2RGBUI8 img;
-    img.load("../image/Lena.bmp");
-    Vec2F32 domain;
-    domain= img.getDomain();
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson point process
-    Distribution d("1/x^(3.1)");
-    Distribution dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
-    Vec<Distribution> v_radius;
-    v_radius.push_back(dproba);
-    v_radius.push_back(dproba);
-    Vec<Distribution> v_angle;
-    v_angle.push_back(Distribution(0,3.14159265*2,"UNIFORMREAL"));
+        Mat2RGBUI8 img;
+        img.load("../image/Lena.bmp");
+        Vec2F32 domain;
+        domain= img.getDomain();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
 
-    RandomGeometry::box(grain,v_radius,v_angle);
-    RandomGeometry::RGBFromMatrix(grain,img);
-    grain.setModel( DeadLeave);
-    grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-    Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
-    aborigenart.display();
+        DistributionExpression d("1/x^(3.1)");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
+        DistributionMultiVariateProduct d_radius(dproba,dproba);
+        DistributionMultiVariateProduct d_angle(DistributionUniformInt(0,PI*2));
+
+
+        RandomGeometry::box(grain,d_radius,d_angle);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
+        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+        Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
+
+        aborigenart.display();
     * \endcode
     * \image html AborigenLenaBox.png
     */
@@ -753,28 +715,28 @@ public:
       - a random direction
     *
     * \code
-    Mat2RGBUI8 img;
-    img.load("../image/Lena.bmp");
-    Vec2F32 domain;
-    domain= img.getDomain();
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
-    Distribution d("1/x^3");
-    Distribution dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
+        Mat2RGBUI8 img;
+        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        Vec2F32 domain;
+        domain= img.getDomain();
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
+        DistributionExpression d("1/x^3");
+        DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
 
-    RandomGeometry::sphere(grain,dproba);
-    RandomGeometry::RGBFromMatrix(grain,img);
-    grain.setModel( DeadLeave);
+        RandomGeometry::sphere(grain,dproba);
+        RandomGeometry::RGBFromMatrix(grain,img);
+        grain.setModel( DeadLeave);
 
-    int i=0;
-    MatNDisplay windows;
-    do{
-        grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
-        Mat2RGBUI8 art = RandomGeometry::continuousToDiscrete(grain);
-        windows.display(art);
-        RandomGeometry::randomWalk(grain,4);
-        art.save(std::string("art"+BasicUtility::IntFixedDigit2String(i,4)+".bmp").c_str());
-        i++;
-    }while(!windows.is_closed());
+        int i=0;
+        MatNDisplay windows;
+        do{
+            grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
+            Mat2RGBUI8 art = RandomGeometry::continuousToDiscrete(grain);
+            windows.display(art);
+            RandomGeometry::randomWalk(grain,4);
+            art.save(std::string("art"+BasicUtility::IntFixedDigit2String(i,4)+".bmp").c_str());
+            i++;
+        }while(!windows.is_closed());
     * \endcode
     * \image html art.gif
     */
@@ -871,8 +833,8 @@ public:
     *
     *  see chapter 5 of my Pdd thesis http://tel.archives-ouvertes.fr/tel-00516939/
     * \code
-    Mat2UI8 ref;
-    ref.load("/home/vincent/Desktop/CI_4_0205_18_00_seg.pgm");
+        Mat2UI8 ref;
+        ref.load("/home/vincent/Desktop/CI_4_0205_18_00_seg.pgm");
         ref= Processing::greylevelRemoveEmptyValue(ref);
         Mat2F32 m = Analysis::histogram(ref);
         VecN<3,int> p(256,256,256);

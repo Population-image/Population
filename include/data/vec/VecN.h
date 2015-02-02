@@ -165,6 +165,20 @@ public:
         this->_dat[2]=value2;
     }
     /*!
+    * \param value0 input value for the first channel
+    * \param value1 input value for the second channel
+    * \param value2 input value for the third channel
+    * \param value3 input value for the fourth channel
+    *
+    */
+    VecN(  Type  value0,Type  value1,Type  value2,Type value3 )
+    {
+        this->_dat[0]=value0;
+        this->_dat[1]=value1;
+        this->_dat[2]=value2;
+        this->_dat[3]=value3;
+    }
+    /*!
     * \param x input Vec
     *
     * constructor with a vector

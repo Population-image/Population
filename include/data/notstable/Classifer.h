@@ -12,54 +12,20 @@
 #include "algorithm/Draw.h"
 namespace pop{
 
-/*! \ingroup Data
-* \defgroup Classifier Classifier
-* @{
-*/
-// A classifier
-//    abstract class
-template <typename FeatureType>
-class Classifier {
-    /*!
-        \class pop::Classifier
-        \brief  Interface for the labelling classification
-        \author Tariel Vincent
 
-        From an object feature, we can identify to which of the labelling it belongs
-    */
-public:
-    typedef FeatureType  Feature;
-    /*!
-     \brief operator retruning the label of the feature
-     \param feature feature object
-     */
-//    virtual int operator()(const  FeatureType& feature) = 0;
-};
-
-template <typename FeatureType>
-class ClassifierTraining : public Classifier<FeatureType>
-{
-
-public:
-    typedef FeatureType  Feature;
-    virtual void  setWeight(const Vec<F32>v_weight)=0;
-//    virtual F32 getError()const = 0;
-//    virtual bool isGoodAffectation(unsigned int label)const=0;
-//    virtual unsigned int getSizeTrainingSet()const=0;
-};
-struct CoefficentSort
-{
-   F32 _coefficient;
-   int _label;
-
-};
-inline bool operator < (const CoefficentSort & a,const CoefficentSort & b){
-    if(a._coefficient<b._coefficient)return true;
-    else return false;
-}
 template<typename FeatureToScalar>
-class ClassiferThreshold : public ClassifierTraining<typename FeatureToScalar::Feature>
+class ClassiferThresholdWeak
 {
+private:
+    struct CoefficentSort
+    {
+       F32 _coefficient;
+       int _label;
+       inline bool operator < (const CoefficentSort & b)const{
+           if(this->_coefficient<b._coefficient)return true;
+           else return false;
+       }
+    };
 public:
 
     Vec<CoefficentSort> _v_coefficient_sort;
@@ -74,10 +40,16 @@ public:
 public:
     typedef typename FeatureToScalar::Feature  Feature;
 
-    virtual bool isGoodAffectation(unsigned int label)const{
-        return operator ()(_v_coefficient[label]);
+    bool isGoodAffectation(unsigned int label)const{
+        if(label>=_v_affectation.size()||label>=_v_coefficient.size()){
+            std::cout<<"error"<<std::endl;
+        }
+        if(scalar2Class(_v_coefficient[label])==_v_affectation(label))
+            return true;
+        else
+            return false;
     }
-    void setTraining(const Vec<F32> v_coefficient,const Vec<int> v_affectation){
+    void setTraining(const Vec<F32> v_coefficient,const Vec<bool> v_affectation){
         _v_coefficient = v_coefficient;
         _v_affectation = v_affectation;
         _v_coefficient_sort.clear();
@@ -92,17 +64,15 @@ public:
     void setFeatureToScalar(const FeatureToScalar&featuretovalue){
         _featuretovalue = featuretovalue;
     }
+    const FeatureToScalar& getFeatureToScalar()const{
+        return _featuretovalue;
+    }
 
     void setWeight(const Vec<F32>v_weight){
         _v_weight = v_weight;
     }
 
     F32 getError()const{
-        F32 error=0;
-        for(unsigned int i=0;i<_v_coefficient.size();i++){
-            if(isGoodAffectation(i)==false)
-                error +=_v_weight[i];
-        }
         return _error;
     }
     void training(){
@@ -167,32 +137,35 @@ public:
         }
     }
 
-//    int operator()(const Feature& value){
-//        return operator ()(_featuretovalue.operator ()(value));
-//    }
-    int operator()(F32 value)const{
+    bool operator()(const Feature& value){
+        return scalar2Class(_featuretovalue.operator ()(value));
+    }
+    bool scalar2Class(F32 value)const{
         bool hit=(value<=_threshold);
         if(_sign==true)
             return hit;
         else
             return !hit;
     }
+    unsigned int getSizeTrainingSet()const{
+        return _v_affectation.size();
+    }
 };
 
 template<typename ClassifierTraining>
-class ClassiferAdaBoost:public Classifier<typename ClassifierTraining::Feature>
+class ClassiferAdaBoost
 {
 
 public:
+   typename ClassifierTraining::Feature value;
 
-
-    ClassiferAdaBoost(F32 threshold=0.4);
-    void training( std::vector<ClassifierTraining>& classifier, int T);
-    int operator()(const typename ClassifierTraining::Feature &feature);
+    ClassiferAdaBoost(F32 threshold=0);
+    void training( Vec<ClassifierTraining>& classifier, int T);
+    bool operator()(const typename ClassifierTraining::Feature &feature);
 private:
 
-    std::vector<ClassifierTraining> _weak_classifier;
-    std::vector<F32> _weigh_alpha;
+    Vec<ClassifierTraining> _weak_classifier;
+    Vec<F32> _weigh_alpha;
     F32 _threshold;
 
 };
@@ -205,16 +178,16 @@ ClassiferAdaBoost<ClassifierTraining>::ClassiferAdaBoost(F32 threshold)
 }
 
 template<typename ClassifierTraining>
-void ClassiferAdaBoost<ClassifierTraining>::training( std::vector<ClassifierTraining>& classifier, int T){
+void ClassiferAdaBoost<ClassifierTraining>::training( Vec<ClassifierTraining>& classifier, int T){
 
 
     Vec<F32> elected(classifier.size(),0);
-    Vec<F32> weigh(classifier[0].getSizeTrainingSet(),1./classifier[0].getSizeTrainingSet());
+    Vec<F32> weigh(classifier[0].getSizeTrainingSet(),1.f/classifier[0].getSizeTrainingSet());
     for(int t=0;t<T;t++){
         std::cout<<"training "<<t<<std::endl;
         //normalisze the weight
 
-        F32 sum=std::accumulate(weigh.begin(),weigh.end(),0);
+        F32 sum=std::accumulate(weigh.begin(),weigh.end(),0.f);
         weigh=weigh*(1/sum);
 
         F32 error=NumericLimits<F32>::maximumRange();
@@ -223,6 +196,7 @@ void ClassiferAdaBoost<ClassifierTraining>::training( std::vector<ClassifierTrai
         for (unsigned int i = 0; i < classifier.size();i++){
             if(elected[i]==0){
                 classifier[i].setWeight(weigh);
+                classifier[i].training();
                 F32 error_temp = classifier[i].getError();
                 if(error_temp<error){
                     label_elected = i;
@@ -255,25 +229,19 @@ void ClassiferAdaBoost<ClassifierTraining>::training( std::vector<ClassifierTrai
 
 }
 template<typename ClassifierTraining>
-int ClassiferAdaBoost<ClassifierTraining>::operator()(const typename ClassifierTraining::Feature &feature) {
+bool ClassiferAdaBoost<ClassifierTraining>::operator()(const typename ClassifierTraining::Feature &feature) {
     F32 val=0;
     for (unsigned int i=0;i < _weak_classifier.size();  i++){
-        if(_weak_classifier[i](feature)==1)
+        if(_weak_classifier[i](feature)==true)
             val+=_weigh_alpha[i];
         else
             val-=_weigh_alpha[i];
     }
     if (val>_threshold)
-        return 1;  // label +1
+        return true;  // label +1
     else
-        return 0; // label 0
+        return false; // label 0
 }
-
-
-/*!
-@}
-*/
-
 }
 
 #endif // CLASSIFER_H

@@ -4,7 +4,9 @@
 #include"data/distribution/DistributionFromDataStructure.h"
 #include"data/utility/BasicUtility.h"
 namespace pop{
-
+DistributionRegularStep::DistributionRegularStep()
+    :uni(0,1)
+{}
 DistributionRegularStep::DistributionRegularStep(const Mat2F32 & matrix)
     :uni(0,1)
 {

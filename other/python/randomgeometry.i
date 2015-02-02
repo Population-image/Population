@@ -3,8 +3,8 @@ typedef pop::RandomGeometry RandomGeometry;
 %template(poissonPointProcess) pop::RandomGeometry::poissonPointProcess<2>;
 %template(poissonPointProcess) pop::RandomGeometry::poissonPointProcess<3>;
 
-%template(poissonPointProcessNonUniform) pop::RandomGeometry::poissonPointProcessNonUniform<2,pop::F64>;
-%template(poissonPointProcessNonUniform) pop::RandomGeometry::poissonPointProcessNonUniform<3,pop::F64>;
+%template(poissonPointProcessNonUniform) pop::RandomGeometry::poissonPointProcessNonUniform<2,pop::F32>;
+%template(poissonPointProcessNonUniform) pop::RandomGeometry::poissonPointProcessNonUniform<3,pop::F32>;
 
 
 %template(hardCoreFilter) pop::RandomGeometry::hardCoreFilter<2>;

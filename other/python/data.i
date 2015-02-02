@@ -129,9 +129,6 @@ struct isVectoriel{
 //###Distribution###
 
 %include"../../include/data/distribution/Distribution.h"
-namespace std{
-%template(vectorDistribution) vector<pop::Distribution>;
-}
 %include"../../include/data/distribution/DistributionAnalytic.h"
 %include"../../include/data/distribution/DistributionFromDataStructure.h"
 %include"../../include/data/distribution/DistributionMultiVariate.h"

@@ -75,6 +75,18 @@ VecF32 DistributionMultiVariateRegularStep::randomVariable()const {
 
 }
 
+DistributionMultiVariateNormal::DistributionMultiVariateNormal(F32 mux,F32 muy,F32 sigmax,F32 sigmay,F32 rho)
+    :DistributionMultiVariate(),_sigma(2,2),_mean(2),_standard_normal(0,1)
+{
+    _mean(0)=mux;
+    _mean(1)=muy;
+
+    _sigma(0,0)=sigmax*sigmax;    _sigma(0,1)=sigmax*sigmay*rho;
+    _sigma(1,0)=sigmax*sigmay*rho;_sigma(1,1)=sigmay*sigmay;
+    _sigma_minus_one=LinearAlgebra::inverseGaussianElimination(_sigma);
+    _determinant_sigma = _sigma.determinant();
+    _a = LinearAlgebra::AATransposeEqualMDecomposition(_sigma);
+}
 
 DistributionMultiVariateNormal::DistributionMultiVariateNormal(VecF32 mean, Mat2F32 covariance)
     :DistributionMultiVariate(),_standard_normal(0,1)

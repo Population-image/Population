@@ -103,11 +103,12 @@ class POP_EXPORTS Distribution
 
     */
 private:
-   static unsigned long init[4];
-    static unsigned long length;
+    static unsigned long _init[4];
+    static unsigned long _length;
+    static MTRand_int32 _irand;
 public:
+    static MTRand_int32 &irand();
 
-    static MTRand_int32 irand;
     /*!
     \fn virtual ~Distribution();
     *

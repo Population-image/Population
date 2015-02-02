@@ -8,11 +8,13 @@
 #include"algorithm/Statistics.h"
 namespace pop
 {
-unsigned long Distribution::init[] = {static_cast<unsigned long>(time(NULL)), 0x234, 0x345, 0x456};
-unsigned long Distribution::length = 4;
-MTRand_int32 Distribution::irand(Distribution::init, Distribution::length);
+unsigned long Distribution::_init[] = {static_cast<unsigned long>(time(NULL)), 0x234, 0x345, 0x456};
+unsigned long Distribution::_length = 4;
+MTRand_int32 Distribution::_irand(Distribution::_init, Distribution::_length);
 
-
+MTRand_int32 &Distribution::irand(){
+    return _irand;
+}
 
 void DistributionDisplay::display( const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,int sizex,int sizey){
     Vec<const Distribution*> v_d;

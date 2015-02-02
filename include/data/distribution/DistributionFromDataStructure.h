@@ -78,7 +78,7 @@ private:
     std::vector<F32 >_repartition;
     void generateRepartition();
 public:
-
+    DistributionRegularStep();
     /*!
     * \fn DistributionRegularStep(const Mat2F32 & matrix);
     *
@@ -88,7 +88,6 @@ public:
     DistributionRegularStep(const Mat2F32 & matrix);
 
     Mat2F32 toMatrix()const;
-
     virtual F32 operator ()(F32 value)const ;
     virtual DistributionRegularStep * clone()const ;
     virtual F32 randomVariable()const ;

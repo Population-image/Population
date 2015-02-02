@@ -49,13 +49,13 @@ void forEachFunctorGenerator(Function_E_F & g,Generator_F  func){
     forEachFunctorGenerator(g,func,it);
 }
 template<typename Function1_E_F,typename Function2_E_F,typename FunctorUnary_F_F,typename IteratorE>
-void forEachFunctorUnaryF(const Function1_E_F & f,Function2_E_F & g,FunctorUnary_F_F  func, IteratorE  it){
+void forEachFunctorUnaryF(const Function1_E_F & f,Function2_E_F & g,FunctorUnary_F_F & func, IteratorE  it){
     while(it.next()){
         g(it.x())=func(f(it.x()));
     }
 }
 template<typename Function1_E_F,typename Function2_E_F,typename FunctorUnary_F_F>
-void forEachFunctorUnaryF(const Function1_E_F & f,Function2_E_F & g,FunctorUnary_F_F  func){
+void forEachFunctorUnaryF(const Function1_E_F & f,Function2_E_F & g,FunctorUnary_F_F & func){
     typename Function1_E_F::IteratorEDomain it=f.getIteratorEDomain();
     forEachFunctorUnaryF(f,g,func,it);
 }
