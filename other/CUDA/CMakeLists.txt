@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-#project( CUDA_test )
-#link_directories (${POPULATION_LIB_DIR})
-#include_directories(${POPULATION_INCLUDE_DIRS})
-#add_executable( CUDA_test CUDA_test.cpp ${POPULATION_SOURCES})
-#target_link_libraries(CUDA_test ${POPULATION_LIBRARY})
 
 ############################################################
 #													 	   #
@@ -20,8 +15,10 @@ cmake_minimum_required(VERSION 2.6)
 ############################################################
 
 
+link_directories (${POPULATION_LIB_DIR})
+include_directories(${POPULATION_INCLUDE_DIRS})
 CUDA_ADD_LIBRARY(TestLib STATIC popcuda.h popcuda.cc)
-CUDA_COMPILE(CUDA_TEST microtime.h cuda_test.h cuda_test.cu)
-ADD_EXECUTABLE(CUDA_test CUDA_test.cpp ${CUDA_TEST})
+CUDA_COMPILE(CUDA_TEST microtime.h cuda_test.h cuda_test.cu c_neural_net.h c_neural_net.cu)
+ADD_EXECUTABLE(CUDA_test CUDA_test.cpp ${CUDA_TEST} ${POPULATION_SOURCES})
 ADD_DEPENDENCIES(CUDA_test TestLib)
-TARGET_LINK_LIBRARIES(CUDA_test TestLib)
+TARGET_LINK_LIBRARIES(CUDA_test TestLib ${POPULATION_LIBRARY})
