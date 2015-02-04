@@ -187,7 +187,7 @@ struct POP_EXPORTS Processing
        will help you to find the suitable parameter
     */
     template<int DIM,typename TypePixel>
-    static MatN<DIM,UI8>  threshold(const MatN<DIM,TypePixel> & f,typename MatN<DIM,TypePixel>::F ymin,typename MatN<DIM,TypePixel>::F ymax=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange() ){
+    static MatN<DIM,UI8>  threshold(const MatN<DIM,TypePixel> & f,typename MatN<DIM,TypePixel>::F ymin,typename MatN<DIM,TypePixel>::F ymax=NumericLimits<TypePixel>::maximumRange() ){
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return ProcessingAdvanced::threshold(f,ymin,ymax,it);
     }
@@ -599,7 +599,7 @@ struct POP_EXPORTS Processing
     */
 
     template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
+    static MatN<DIM,TypePixel> greylevelRange(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::F min=NumericLimits<TypePixel>::minimumRange(),typename MatN<DIM,TypePixel>::F max=NumericLimits<TypePixel>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
         return ProcessingAdvanced::greylevelRange(f,it,min,max);

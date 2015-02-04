@@ -717,7 +717,7 @@ struct POP_EXPORTS Draw
     * \image html euteldist.jpg "distance function used to estimate the geometrical tortuosity"
     */
     template<int DIM,typename TypePixel>
-    static void setFace( MatN<DIM,TypePixel> & h,int coordinate,int leftorright,typename MatN<DIM,TypePixel>::F value=NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange())
+    static void setFace( MatN<DIM,TypePixel> & h,int coordinate,int leftorright,typename MatN<DIM,TypePixel>::F value=NumericLimits<TypePixel>::maximumRange())
     {
         typename MatN<DIM,TypePixel>::E d = h.getDomain();
         d(coordinate)=1;
@@ -785,7 +785,7 @@ struct POP_EXPORTS Draw
     * \image html lenaborderadd.jpg
     */
     template<int DIM,typename TypePixel>
-    static void addBorder( MatN<DIM,TypePixel> & f,int widthborder, const typename MatN<DIM,TypePixel>::F& border_value=typename MatN<DIM,TypePixel>::F(0),MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
+    static void addBorder( MatN<DIM,TypePixel> & f,int widthborder, const typename MatN<DIM,TypePixel>::F& border_value=TypePixel(0),MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
     {
         if(DIM==2){
             MatN<DIM,TypePixel> out(f.getDomain()+2*widthborder,border_value);

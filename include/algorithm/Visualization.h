@@ -949,7 +949,7 @@ struct POP_EXPORTS Visualization
     */
 
     template<typename TypeVoxel1>
-    static void cubeExtruded(Scene3d & scene, const MatN<3,TypeVoxel1> & m,const MatN<3,UI8>& extrusion =MatN<3,UI8>());
+    static void cubeExtruded(Scene3d & scene, const MatN<3,TypeVoxel1> & m,const Mat3UI8 &extrusion =Mat3UI8(0,0));
 
 
     /*!
@@ -1307,9 +1307,9 @@ private:
 };
 
 template<typename TypeVoxel1>
-void Visualization::cubeExtruded(Scene3d & scene, const MatN<3,TypeVoxel1> & m,const MatN<3,UI8>& extrustion ){
+void Visualization::cubeExtruded(Scene3d & scene, const MatN<3,TypeVoxel1> & m, const Mat3UI8 & extrustion ){
 
-    MatN<3,UI8> extrustion1(extrustion);
+    Mat3UI8 extrustion1(extrustion);
     if(extrustion1.isEmpty()==true){
         extrustion1.resize(m.getDomain());
         ForEachDomain3D(x,extrustion1){
@@ -1321,11 +1321,11 @@ void Visualization::cubeExtruded(Scene3d & scene, const MatN<3,TypeVoxel1> & m,c
     }
 
 
-    MatN<3,UI8> extrustion2(extrustion1.getDomain()+2);
+    Mat3UI8 extrustion2(extrustion1.getDomain()+2);
     ForEachDomain3D(xx,extrustion1){
         extrustion2(xx+1)=extrustion1(xx);
     }
-    typename MatN<3,UI8>::IteratorENeighborhood itn = extrustion2.getIteratorENeighborhood(1,1);
+    typename Mat3UI8::IteratorENeighborhood itn = extrustion2.getIteratorENeighborhood(1,1);
     Vec<GeometricalFigure*> vec;
     ForEachDomain3D(x,extrustion1)
     {
