@@ -502,6 +502,7 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
                             for(unsigned int i_heigh_kernel=0;i_heigh_kernel<kernelsize;i_heigh_kernel++)
                             {
 
+                               //XXX PL: à quoi sert step_previous ?
                                 int i_width_previous =  i_width*2 + step_previous + i_width_kernel - step_previous;
                                 int i_height_previous =  i_height*2 + step_previous + i_heigh_kernel - step_previous;
 

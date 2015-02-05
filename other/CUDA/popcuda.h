@@ -18,11 +18,11 @@ bool isCudaAvailable();
 /*
  * gpuErrorCheck is a macro to wrap every CUDA call and verify that they succeded. See http://stackoverflow.com/questions/14038589/what-is-the-canonical-way-to-check-for-errors-using-the-cuda-runtime-api
  * To use it:
- * 	gpuErrchk( cudaMalloc(&a_d, size*sizeof(int)) );
+ * 	gpuErrorCheck( cudaMalloc(&a_d, size*sizeof(int)) );
  * Or, for a kernel:
  * kernel<<<1,1>>>(a);
- * gpuErrchk( cudaPeekAtLastError() );
- * gpuErrchk( cudaDeviceSynchronize() );
+ * gpuErrorCheck( cudaPeekAtLastError() );
+ * gpuErrorCheck( cudaDeviceSynchronize() );
  */
 #if defined(HAVE_CUDA)
 #define gpuErrorCheck(ans) { gpuAssert((ans), __FILE__, __LINE__); }
