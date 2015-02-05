@@ -50,13 +50,12 @@ namespace pop
 
 struct ProcessingAdvanced
 {
-    template<typename Function,int DIM>
-    static Function  integral(const Function & f,Int2Type<DIM>);
-    template<typename Function>
-    static Function  integral(const Function & f,Int2Type<2>)
+
+    template<typename PixelType>
+    static MatN<2,PixelType>  integral(const MatN<2,PixelType> & f)
     {
-        Function s (f.getDomain());
-        Function out(f.getDomain());
+        MatN<2,PixelType> s (f.getDomain());
+        MatN<2,PixelType> out(f.getDomain());
         for(int i=0;i<f.getDomain()(0);i++){
             for(int j=0;j<f.getDomain()(1);j++){
                 if(j==0){
@@ -75,12 +74,12 @@ struct ProcessingAdvanced
         }
         return out;
     }
-    template<typename Function>
-    static Function  integral(const Function & f,Int2Type<3>)
+    template<typename VoxelType>
+    static MatN<3,VoxelType>  integral(const MatN<3,VoxelType> & f)
     {
-        Function s (f.getDomain());
-        Function integral2d (f.getDomain());
-        Function out(f.getDomain());
+        MatN<3,VoxelType> s (f.getDomain());
+        MatN<3,VoxelType> integral2d (f.getDomain());
+        MatN<3,VoxelType> out(f.getDomain());
         for(int i=0;i<f.getDomain()(0);i++){
             for(int j=0;j<f.getDomain()(1);j++){
                 for(int k=0;k<f.getDomain()(2);k++){

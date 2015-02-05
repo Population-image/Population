@@ -931,8 +931,8 @@ struct POP_EXPORTS Draw
             int j =static_cast<int>(1.f*k*img.getDomain()(0)/BAR);
             img(j,x+1)=value;
             img(j,x-1)=value;
-            F32 y = ymax + k*(ymin-ymax)/BAR;//Buttom to up (inverse that the matrix order)
-            int v = static_cast<int>(y/value2);
+            F32 y2 = ymax + k*(ymin-ymax)/BAR;//Buttom to up (inverse that the matrix order)
+            int v = static_cast<int>(y2/value2);
             Draw::text(img,BasicUtility::Any2String(v),Vec2I32(j-6,x-28),value,1);
         }
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,x-28),value,1);
