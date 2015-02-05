@@ -101,7 +101,7 @@ struct POP_EXPORTS FunctorMatN
         Type_F32 value;
         Vec2I32 x;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k,dir,value,x,radius)
+#pragma omp parallel shared(h) private(i,j,k,dir,value,x,radius)
 #endif
         {
             radius = static_cast<int>((kernel.size()-1)/2);
