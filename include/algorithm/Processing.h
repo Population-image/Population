@@ -679,7 +679,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename TypePixel>
     static MatN<DIM,TypePixel> integral(const MatN<DIM,TypePixel> & f)
     {
-        return ProcessingAdvanced::integral(f,Int2Type<DIM>());
+        return ProcessingAdvanced::integral(f);
     }
     /*!
      *  \brief  integral of the matrix http://research.microsoft.com/~viola/Pubs/Detect/violaJones_IJCV.pdf
@@ -703,7 +703,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename TypePixel>
     static MatN<DIM,TypePixel> integralPower2(const MatN<DIM,TypePixel> & f)
     {
-        return ProcessingAdvanced::integral(f.multTermByTerm(f),Int2Type<DIM>());
+        return ProcessingAdvanced::integral(f.multTermByTerm(f));
     }
 
     /*!

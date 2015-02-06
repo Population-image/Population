@@ -20,6 +20,5 @@ In the directory population, we have
 - population.pro    : qt project file to build an application
 - populationsrc.pri : qt project containing the file list
 - populationconfig.pri: qt project containg the project configuation
-- populationcore.pri: list of all .cpp/.h files required to build population library
 - ReadMe            : a read me file   
 */ 
