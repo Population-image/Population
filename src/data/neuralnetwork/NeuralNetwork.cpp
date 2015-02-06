@@ -1285,7 +1285,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n, 
                 error++;
         }
 
-        std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<"\t"<<getCurrentTime()<<std::endl;
+        std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<"\t"<<getCurrentTime();
     }
 }
 
@@ -1322,7 +1322,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         }
         n.save(("neuralnetwork"+BasicUtility::IntFixedDigit2String(i,2)+".xml").c_str() );
 
-        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<"\t"<<getCurrentTime()<<std::endl;
+        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<"\t"<<getCurrentTime();
         eta *=0.9f;
         n.setLearningRate(eta);
     }
