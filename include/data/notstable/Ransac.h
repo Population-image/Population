@@ -46,7 +46,6 @@ std::cout<<m.getError()<<std::endl;
 template<typename Model>
 POP_EXPORTS void ransac(Vec<typename Model::Data> & data,unsigned int nbriteration,F32 threshold,unsigned int minnbrdatatoassertmodel,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
     typedef typename Model::Data DataModel;
-    Distribution d;
     for(unsigned int iterations=0;iterations<nbriteration;iterations++){
         std::random_shuffle ( data.begin(), data.end() ,Distribution::irand());
         Vec<DataModel> consensus_set (data.begin(),data.begin()+best_model.getNumberDataFitModel());
@@ -72,7 +71,6 @@ template<typename Model>
 POP_EXPORTS void ransacMaxDataFitModel(Vec<typename Model::Data> & data,unsigned int nbriteration,F32 threshold,Model &best_model,Vec<typename Model::Data>&best_consensus_set){
     typedef typename Model::Data DataModel;
     unsigned int minnbrdatatoassertmodel =1;
-    Distribution d;
     for(unsigned int iterations=0;iterations<nbriteration;iterations++){
         std::random_shuffle ( data.begin(), data.end() , Distribution::irand());
         Vec<DataModel> consensus_set (data.begin(),data.begin()+best_model.getNumberDataFitModel());

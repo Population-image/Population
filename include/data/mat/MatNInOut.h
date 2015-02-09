@@ -520,8 +520,9 @@ bool MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
         is.seekg (0, is.end);
         unsigned int length = is.tellg();
         is.seekg (0, is.beg);
-        if(length>=sizeof(Result)*in.getDomain().multCoordinate())
-            MatNInOutPgm::readRaw(in,is);
+        if(length>=sizeof(Result)*in.getDomain().multCoordinate()) {
+            return MatNInOutPgm::readRaw(in,is);
+        }
         else{
             std::cerr<<"In MatN::loadRaw, the file should be equal or superior to sizeof(Type)*in.getDomain().multCoordinate()";
             return false;
@@ -564,8 +565,6 @@ bool MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
     else{
         return  _load(in,file);
     }
-    return false;
-
 }
 template<int DIM,typename Type>
 bool MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension)
