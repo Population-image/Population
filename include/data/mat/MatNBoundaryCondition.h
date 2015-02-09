@@ -237,8 +237,6 @@ public:
         }
         return ArithmeticsSaturation<typename MatN::F,PixelTypeFloat>::Range(value);
     }
-
-
     template<int DIM,typename FloatType>
     static VecN<PowerGP<2,DIM>::value,std::pair<FloatType,VecN<DIM,I32> > >  getWeightPosition(const VecN<DIM,I32> &x_domain,const VecN<DIM,FloatType> & x,MatNBoundaryCondition boundary=MatNBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED)){
         return  _getWeightPosition(x_domain,x,boundary, pop::Int2Type<DIM>()) ;

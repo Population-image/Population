@@ -9,12 +9,12 @@ class NeuralNetworkFullyConnected
 {
 public:
     double sigmoid(double x){ return 1.7159*tanh(0.66666667*x);}
-    //    double derived_sigmoid(double S){ return 1.7159*(1+(0.66666667*S))*(1.7159-(0.66666667*S));}  // derivative of the sigmoid as a function of the sigmoid's output
-
     double derived_sigmoid(double S){ return 0.666667f/1.7159f*(1.7159f+(S))*(1.7159f-(S));}  // derivative of the sigmoid as a function of the sigmoid's output
 
 
-    void createNetwork(std::vector<unsigned int> v_layer){
+    void createNetwork(Vec<unsigned int> v_layer){
+        _layers = v_layer;_X.clear();_Y.clear();_W.clear();_d_E_X.clear();_d_E_Y.clear();_d_E_W.clear();
+
         for(unsigned int i=0;i<v_layer.size();i++){
             int size_layer =v_layer[i];
             if(i!=v_layer.size()-1)
@@ -81,6 +81,23 @@ public:
         }
 
     }
+    void save(const char * file){
+        std::ofstream  out(file);
+        out<<_layers;
+        for(unsigned int i=0;i<_W.size();i++){
+            MatNInOutPgm::writeRawData(_W(i) ,out);
+        }
+    }
+    void load(const char * file){
+        std::ifstream  is(file,std::iostream::binary);
+        _layers.clear();
+        is>>_layers;
+        this->createNetwork(_layers);
+        for(unsigned int i=0;i<_W.size();i++){
+            MatNInOutPgm::readRaw(_W(i) ,is);
+        }
+    }
+
     double _eta;
     Vec<pop::VecF32>  _X;
     Vec<pop::VecF32>  _Y;
@@ -88,6 +105,7 @@ public:
     Vec<pop::VecF32>  _d_E_X;
     Vec<pop::VecF32>  _d_E_Y;
     Vec<pop::Mat2F32> _d_E_W;
+    Vec<unsigned>  _layers;
 };
 
 
@@ -156,23 +174,25 @@ void neuralnetwortest(){
     Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST( "/home/vincent/Desktop/train-images.idx3-ubyte","/home/vincent/Desktop/train-labels.idx1-ubyte");
     Vec<Vec<Mat2UI8> > number_test =  TrainingNeuralNetwork::loadMNIST("/home/vincent/Desktop/t10k-images.idx3-ubyte","/home/vincent/Desktop/t10k-labels.idx1-ubyte");
 
-//    number_training.resize(10);
-//    number_test.resize(2);
-//    for(unsigned int i=0;i<number_training.size();i++){
-//        number_training(i).resize(400);
-//        number_test(i).resize(50);
-//    }
+    //    number_training.resize(10);
+    //    number_test.resize(2);
+    //    for(unsigned int i=0;i<number_training.size();i++){
+    //        number_training(i).resize(400);
+    //        number_test(i).resize(50);
+    //    }
 
 
 
     double size_in=number_training(0)(0).getDomain()(0)*number_training(0)(0).getDomain()(1);
     std::cout<<"size trainings: "<<number_training(0).size()<<std::endl;
-    std::cout<<"1000*1000"<<std::endl;
-    std::vector<unsigned int> v_layer;
+    std::string net_struc = "400_300_200_100";
+    std::cout<<net_struc<<std::endl;
+    Vec<unsigned int> v_layer;
     v_layer.push_back(size_in);
-    v_layer.push_back(1000);
-    v_layer.push_back(1000);
-//    v_layer.push_back(500);
+    v_layer.push_back(400);
+    v_layer.push_back(300);
+    v_layer.push_back(200);
+    v_layer.push_back(100);
     v_layer.push_back(number_training.size());
     network.createNetwork(v_layer);
     network._eta = 0.001;
@@ -230,9 +250,12 @@ void neuralnetwortest(){
                 error_test++;
             }
         }
+        network.save((net_struc+"_"+pop::BasicUtility::Any2String(i)+".net").c_str());
         network._eta *=0.9;
+        if(network._eta<0.00001)
+            network._eta = 0.0001f;
         std::cout<<i<<"\t"<<error_training*1./v_global_rand.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network._eta <<std::endl;
-//        std::cout<<i<<"\t"<<error_training2*1./v_global_rand.size()<<std::endl;
+        //        std::cout<<i<<"\t"<<error_training2*1./v_global_rand.size()<<std::endl;
     }
 }
 #endif
