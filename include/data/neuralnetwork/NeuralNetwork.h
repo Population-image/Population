@@ -801,8 +801,8 @@ struct POP_EXPORTS TrainingNeuralNetwork
      * \endcode
     */
 
-    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta=0.001,unsigned int nbr_epoch=100,bool display_error_classification=false);
-    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,const Vec<VecF32>& testins,const Vec<VecF32>& testouts,F32 eta=0.001,unsigned int nbr_epoch=20,bool display_error_classification=true);
+    static void trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta=0.001,unsigned int nbr_epoch=100);
+    static void trainingFirstDerivative(NeuralNetworkFeedForward&n, const Vec<VecF32>& trainingins, const Vec<VecF32>& trainingouts, const Vec<VecF32>& testins, const Vec<VecF32>& testouts, F32 eta=0.001, unsigned int nbr_epoch=20);
     //@}
     //-------------------------------------
     //

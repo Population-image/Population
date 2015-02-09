@@ -2089,7 +2089,7 @@ MatN<Dim,Type>  MatN<Dim,Type>::operator*(const MatN<Dim,Type> &m)const
     int i,j;
     typename MatN::const_iterator this_it,mtrans_it;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(m,mtrans,mout) private(i,j,sum,this_it,mtrans_it)
+#pragma omp parallel shared(mtrans,mout) private(i,j,sum,this_it,mtrans_it)
 #endif
     {
 #if defined(HAVE_OPENMP)

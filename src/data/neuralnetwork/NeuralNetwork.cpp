@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "data/neuralnetwork/NeuralNetwork.h"
 #include "data/distribution/DistributionAnalytic.h"
 #include "data/mat/MatN.h"
@@ -1251,16 +1253,23 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
         }
     }
 
-    trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01f,50,true);
+    trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01f,50);
 }
-void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,F32 eta,unsigned int nbr_epoch,bool display_error_classification)
+
+static std::string getCurrentTime() {
+    time_t rawtime;
+    time(&rawtime);
+    struct tm * timeinfo = localtime(&rawtime);
+    return std::string(asctime(timeinfo));
+}
+
+void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n, const Vec<VecF32>& trainingins, const Vec<VecF32>& trainingouts, F32 eta, unsigned int nbr_epoch)
 {
     n.setLearningRate(eta);
     std::vector<int> v_global_rand(trainingins.size());
     for(unsigned int i=0;i<v_global_rand.size();i++)
         v_global_rand[i]=i;
-    if(display_error_classification==true)
-        std::cout<<"iter_epoch\t error_train"<<std::endl;
+    std::cout<<"iter_epoch\t error_train"<<std::endl;
 
     for(unsigned int i=0;i<nbr_epoch;i++){
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
@@ -1270,26 +1279,23 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
             n.propagateFront(trainingins(v_global_rand[j]),vout);
             n.propagateBackFirstDerivate(trainingouts(v_global_rand[j]));
             n.learningFirstDerivate();
-            if(display_error_classification==true){
-                int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-                int label2 = std::distance(trainingouts(v_global_rand[j]).begin(),std::max_element(trainingouts(v_global_rand[j]).begin(),trainingouts(v_global_rand[j]).end()));
-                if(label1!=label2)
-                    error++;
-            }
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(trainingouts(v_global_rand[j]).begin(),std::max_element(trainingouts(v_global_rand[j]).begin(),trainingouts(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error++;
         }
-        if(display_error_classification==true)
-            std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<std::endl;
+
+        std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<"\t"<<getCurrentTime();
     }
 }
 
-void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,const Vec<VecF32>& testins,const Vec<VecF32>& testouts,F32 eta,unsigned int nbr_epoch,bool display_error_classification)
+void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,const Vec<VecF32>& trainingins,const Vec<VecF32>& trainingouts,const Vec<VecF32>& testins,const Vec<VecF32>& testouts,F32 eta,unsigned int nbr_epoch)
 {
     n.setLearningRate(eta);
     std::vector<int> v_global_rand(trainingins.size());
     for(unsigned int i=0;i<v_global_rand.size();i++)
         v_global_rand[i]=i;
-    if(display_error_classification==true)
-        std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+    std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
 
     for(unsigned int i=0;i<nbr_epoch;i++){
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
@@ -1299,28 +1305,24 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
             n.propagateFront(trainingins(v_global_rand[j]),vout);
             n.propagateBackFirstDerivate(trainingouts(v_global_rand[j]));
             n.learningFirstDerivate();
-            if(display_error_classification==true){
-                int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-                int label2 = std::distance(trainingouts(v_global_rand[j]).begin(),std::max_element(trainingouts(v_global_rand[j]).begin(),trainingouts(v_global_rand[j]).end()));
-                if(label1!=label2)
-                    error_training++;
-            }
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(trainingouts(v_global_rand[j]).begin(),std::max_element(trainingouts(v_global_rand[j]).begin(),trainingouts(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error_training++;
         }
         //        std::cout<<testins.size()<<std::endl;
 
         for(unsigned int j=0;j<testins.size();j++){
             VecF32 vout;
             n.propagateFront(testins(j),vout);
-            if(display_error_classification==true){
-                int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-                int label2 = std::distance(testouts(j).begin(),std::max_element(testouts(j).begin(),testouts(j).end()));
-                if(label1!=label2)
-                    error_test++;
-            }
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(testouts(j).begin(),std::max_element(testouts(j).begin(),testouts(j).end()));
+            if(label1!=label2)
+                error_test++;
         }
         n.save(("neuralnetwork"+BasicUtility::IntFixedDigit2String(i,2)+".xml").c_str() );
-        if(display_error_classification==true)
-            std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<std::endl;
+
+        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<"\t"<<getCurrentTime();
         eta *=0.9f;
         n.setLearningRate(eta);
     }
