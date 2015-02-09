@@ -22,18 +22,22 @@ struct layer {
 };
 
 struct neural_network {
+	double _eta;
 	unsigned int nb_layers;
 	struct layer* layers;
-	double _eta;
 };
 
-static double sigmoid(double x){ return 1.7159*tanh(0.66666667*x); }
-static double derived_sigmoid(double S){ return 0.666667f/1.7159f*(1.7159f+(S))*(1.7159f-(S)); }
+static float sigmoid(float x){ return 1.7159f*tanh(0.66666667f*x); }
+static float derived_sigmoid(float S){ return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
 
 struct neural_network* createNetwork(std::vector<unsigned int> v_layer, double eta);
 void propagateFront(struct neural_network* network, const pop::VecF32& in , pop::VecF32 &out);
 void propagateBackFirstDerivate(struct neural_network* network, const pop::VecF32& desired_output);
 void deleteNetwork(struct neural_network* network);
+
+struct neural_network* copyNetworkToGPU(struct neural_network* h_net);
+struct neural_network* copyNetworkFromGPU(struct neural_network* d_net);
+void deleteNetworkOnGPU(struct neural_network* network);
 
 #if defined(HAVE_CUDA)
 #endif
