@@ -112,7 +112,6 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/mat/MatNDisplay.cpp \
            $${PWD}/src/data/mat/MatNInOut.cpp \
            $${PWD}/src/data/neuralnetwork/NeuralNetwork.cpp \
-           $${PWD}/src/data/notstable/CharacteristicCluster.cpp \
            $${PWD}/src/data/notstable/Ransac.cpp \
            $${PWD}/src/data/ocr/OCR.cpp \
            $${PWD}/src/data/utility/BasicUtility.cpp \

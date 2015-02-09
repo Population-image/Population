@@ -18,6 +18,7 @@ public:
         for(unsigned int i=0;i<v_layer.size();i++){
             int size_layer =v_layer[i];
             if(i!=v_layer.size()-1)
+//               _X.push_back(VecF32(size_layer,1));//no add the neuro
                 _X.push_back(VecF32(size_layer+1,1));//add the neuron with constant value 1
             else
                 _X.push_back(VecF32(size_layer,1));//except for the last one
@@ -174,21 +175,26 @@ void neuralnetwortest(){
     Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST( "/home/vincent/Desktop/train-images.idx3-ubyte","/home/vincent/Desktop/train-labels.idx1-ubyte");
     Vec<Vec<Mat2UI8> > number_test =  TrainingNeuralNetwork::loadMNIST("/home/vincent/Desktop/t10k-images.idx3-ubyte","/home/vincent/Desktop/t10k-labels.idx1-ubyte");
 
-    //    number_training.resize(10);
-    //    number_test.resize(2);
-    //    for(unsigned int i=0;i<number_training.size();i++){
-    //        number_training(i).resize(400);
-    //        number_test(i).resize(50);
-    //    }
+//    number_training.resize(10);
+//    number_test.resize(10);
+//    for(unsigned int i=0;i<number_training.size();i++){
+//        number_training(i).resize(1000);
+//        number_test(i).resize(50);
+//    }
 
 
 
     double size_in=number_training(0)(0).getDomain()(0)*number_training(0)(0).getDomain()(1);
     std::cout<<"size trainings: "<<number_training(0).size()<<std::endl;
-    std::string net_struc = "400_300_200_100";
+    std::string net_struc = "Mass -1,1 400_300_200_100";
     std::cout<<net_struc<<std::endl;
     Vec<unsigned int> v_layer;
     v_layer.push_back(size_in);
+    //    v_layer.push_back(400);
+    //    v_layer.push_back(300);
+    //    v_layer.push_back(200);
+    //    v_layer.push_back(100);
+
     v_layer.push_back(400);
     v_layer.push_back(300);
     v_layer.push_back(200);
@@ -203,19 +209,18 @@ void neuralnetwortest(){
     n2.addLayerFullyConnected(100);
     n2.addLayerFullyConnected(100);
     n2.addLayerFullyConnected(number_training.size());
-    n2.setLearningRate(0.01);
+    n2.setLearningRate(0.001);
 
 
     Vec<VecF32> vtraining_in;
     Vec<VecF32> vtraining_out;
 
 
-    double ratio = 1;
-    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne,ratio);
+    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne);
 
     Vec<VecF32> vtest_in;
     Vec<VecF32> vtest_out;
-    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne,1);
+    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne);
 
     number_training.clear();
     number_test.clear();
@@ -252,8 +257,8 @@ void neuralnetwortest(){
         }
         network.save((net_struc+"_"+pop::BasicUtility::Any2String(i)+".net").c_str());
         network._eta *=0.9;
-        if(network._eta<0.00001)
-            network._eta = 0.0001f;
+        if(network._eta<0.000001)
+            network._eta = 0.000001f;
         std::cout<<i<<"\t"<<error_training*1./v_global_rand.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network._eta <<std::endl;
         //        std::cout<<i<<"\t"<<error_training2*1./v_global_rand.size()<<std::endl;
     }

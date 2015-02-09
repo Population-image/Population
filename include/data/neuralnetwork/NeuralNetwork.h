@@ -854,7 +854,7 @@ struct POP_EXPORTS TrainingNeuralNetwork
                                                                             F32 beta_angle_degree_shear=15,
                                                                             F32 gamma_x_scale=15,
                                                                             F32 gamma_y_scale=15);
-    static void  convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, F32 ratio=1);
+    static void  convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value);
 
 
 private:
