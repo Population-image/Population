@@ -2,14 +2,13 @@
 #define VIDEOVLC_H
 
 #include"PopulationConfig.h"
-
 #if defined(HAVE_VLC)
-
 #include"string"
 #include"data/mat/MatN.h"
 #include "data/video/Video.h"
 
-#include <vlc/vlc.h>
+class libvlc_instance_t;
+class libvlc_media_player_t;
 
 namespace pop
 {
@@ -21,7 +20,6 @@ class POP_EXPORTS VideoVLC: public Video
 private:
     libvlc_instance_t* instance;
     libvlc_media_player_t* mediaPlayer;
-    libvlc_event_manager_t* eventManager;
     std::string file_playing;
     bool isplaying;
     int my_index;
@@ -33,20 +31,17 @@ public:
     VideoVLC();
     VideoVLC(const VideoVLC& vlc);
     virtual ~VideoVLC();
-    bool open(const std::string &filename);
+    bool open(const std::string & filename);
     bool grabMatrixGrey();
     Mat2UI8 &retrieveMatrixGrey();
     bool grabMatrixRGB();
     Mat2RGBUI8 &retrieveMatrixRGB();
+    bool tryOpen(const std::string & filename);
     bool isFile()const;
-    bool isPlaying() const;
 
 private:
     void release();
 };
-
 }
-
 #endif
-
 #endif // VIDEOVLC_H
