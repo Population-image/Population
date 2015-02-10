@@ -59,9 +59,19 @@ class POP_EXPORTS DistributionMultiVariateUnitSphere:public DistributionMultiVar
         \ingroup DistributionMultiVariate
         \brief unit sphere distribution
         \author Tariel Vincent
-      * Sphere VecN Picking http://mathworld.wolfram.com/SphereVecNPicking.html
+      * Sphere point Picking http://mathworld.wolfram.com/SphereVecNPicking.html
       *
-      *
+      * \code
+        DistributionMultiVariateUnitSphere d(2);
+        Mat2UI8 m(200,200);
+        MatNDisplay disp;
+        while(1==1)
+        {
+            Vec2F32 x = d.randomVariable()*75+m.getDomain()/2;
+            m(x)=FunctorF::FunctorAdditionF2<UI8,UI8,UI8>::op(10,m(x));
+            disp.display(m);
+        }
+      * \endcode
       *
     */
 private:

@@ -42,6 +42,9 @@ void testUniformPoissonPointProcess3D(){
     scene.display();
 }
 void testNonUniformPoissonPointProcess2D() {
+
+
+
     Mat2UI8 img("../Lena.bmp");
     Mat2F32 imgf(img);
     imgf=imgf/255.;
@@ -202,21 +205,21 @@ void testRegularTetrahedron(){
 
 void testProbilityDistributionNormal(double porosity_volume_fraction=0.6){
 
-        DistributionNormal d(20,10);
-        double grain_volume_expectation = 4./3.*pop::PI*Statistics::moment(d,3,0,50);
-        double lambda = -std::log(porosity_volume_fraction)/grain_volume_expectation;
+    DistributionNormal d(20,10);
+    double grain_volume_expectation = 4./3.*pop::PI*Statistics::moment(d,3,0,50);
+    double lambda = -std::log(porosity_volume_fraction)/grain_volume_expectation;
 
 
-        Vec3F32 domain(256,256,256);//3d field domain
-        ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 3d Poisson point process
-        RandomGeometry::sphere(grain,d);
-        Mat3UI8 lattice = RandomGeometry::continuousToDiscrete(grain);
-        std::cout<<"realization porosity: "<<Analysis::histogram(lattice)(0,1)<<std::endl;
-        std::cout<<"expected porosity: "<<porosity_volume_fraction<<std::endl;
-        Scene3d scene;
-        pop::Visualization::marchingCube(scene,lattice);
-        pop::Visualization::lineCube(scene,lattice);
-        scene.display();
+    Vec3F32 domain(256,256,256);//3d field domain
+    ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 3d Poisson point process
+    RandomGeometry::sphere(grain,d);
+    Mat3UI8 lattice = RandomGeometry::continuousToDiscrete(grain);
+    std::cout<<"realization porosity: "<<Analysis::histogram(lattice)(0,1)<<std::endl;
+    std::cout<<"expected porosity: "<<porosity_volume_fraction<<std::endl;
+    Scene3d scene;
+    pop::Visualization::marchingCube(scene,lattice);
+    pop::Visualization::lineCube(scene,lattice);
+    scene.display();
 }
 
 void testProbilityDistributionPowerLaw(double porosity_volume_fraction=0.6){
@@ -273,15 +276,57 @@ void artAborigene(){
     std::cout<<mean<<std::endl;
     it.init();
     while(it.next()){
-       if(aborigenart(it.x())==RGBUI8(0))
+        if(aborigenart(it.x())==RGBUI8(0))
             aborigenart(it.x())=mean;
     }
     aborigenart.display("art");
     aborigenart.save("../../../art_aborigene.jpg");
-   // aborigenart.save("/home/vincent/Desktop/Population/doc/image/AborigenLena.bmp");
+    // aborigenart.save("/home/vincent/Desktop/Population/doc/image/AborigenLena.bmp");
 }
 int main()
 {
+    {
+        Vec2F32 domain(512,512);//2d field domain
+        double lambda= 0.0004;// parameter of the Poisson VecN process
+
+        ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
+        DistributionDirac d (30);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+        RandomGeometry::sphere(grain,d);
+        Mat2UI8 img = RandomGeometry::continuousToDiscrete(grain);
+        img = img.opposite();
+        img.display();
+        img = Processing::greylevelRemoveEmptyValue(img);//scale the binary level from [0-255] to [0-1]
+
+//        Mat2F32 m_corr_simulated = Analysis::correlation(img,300,10000);
+//        std::cout<<m_corr_simulated<<std::endl;
+//        DistributionRegularStep d_corr_simulation(m_corr_simulated);
+        Mat2F32 m_corr = Analysis::correlationDirectionByFFT(img);
+        m_corr = m_corr(Vec2I32(0,0),Vec2I32(100,100));
+        Visualization::labelToRGBGradation(m_corr).display();
+//        DistributionDisplay::display(d_corr_simulation,0,200);
+        return 1;
+    }
+    F32 lambda=1./10;
+    DistributionExponential d(lambda);
+    Mat2F32 m_corr_model(1000,2);
+    double porosity=0.5;
+    for(unsigned int i=0;i<m_corr_model.sizeI();i++){
+        m_corr_model(i,0)=i;
+        m_corr_model(i,1)=d(i)*(porosity-porosity*porosity)/d(0) +porosity*porosity;
+    }
+    std::cout<<m_corr_model<<std::endl;
+    Vec2I32 domain(256,256);
+    Mat2F32 gaussian_field;
+    Mat2UI8 m_thresholded =  RandomGeometry::gaussianThesholdedRandomField(m_corr_model,domain,gaussian_field);
+    m_thresholded.display();
+    m_thresholded = Processing::greylevelRemoveEmptyValue(m_thresholded);//scale the binary level from [0-255] to [0-1]
+
+    Mat2F32 m_corr_simulated = Analysis::correlation(m_thresholded,300,10000);
+    DistributionRegularStep d_corr_model(m_corr_model);
+    DistributionRegularStep d_corr_simulation(m_corr_simulated);
+    DistributionDisplay::display(d_corr_model,d_corr_simulation,0,200);
+    std::cout<<m_corr_simulated<<std::endl;
+    //
     testVoronoiTesselation3D();
     testMinOverlap();
     //testUniformPoissonPointProcess2D();

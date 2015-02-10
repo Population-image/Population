@@ -349,9 +349,9 @@ void MatNInOutPgm::writeHeader(const MatN<D,T> &in,std::ostream & out,bool ascii
 template<I32 D,typename T>
 bool MatNInOutPgm::readRaw(MatN<D,T> &in,std::istream &File )
 {
-    T * t =&( in.operator()(0));
+    T * t = in.data();
     File.read(reinterpret_cast<char*>(t), sizeof(T)*in.getDomain().multCoordinate());
-        return true;
+    return true;
 }
 
 
@@ -367,7 +367,7 @@ bool MatNInOutPgm::readAscii(MatN<D,T> &in,std::istream &File )
 template<I32 D,typename T>
 void MatNInOutPgm::writeRawData(const MatN<D,T> &in,std::ostream &File )
 {
-    const T * t =&( in.operator()(0));
+    const T * t =in.data();
     File.write(reinterpret_cast<const char*>(t), sizeof(T)*(in).getDomain().multCoordinate());
 }
 

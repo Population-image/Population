@@ -5,97 +5,17 @@
 #include"data/ocr/OCR.h"
 #include"data/mat/MatNDisplay.h"
 namespace pop {
-
-//TODO remove this part
-
-class POP_EXPORTS CharacteristicCluster
-{
-public:
-    CharacteristicCluster();
-    void setLabel(int label);
-    void addPoint(const Vec2I32 & x);
-    Vec2I32 size()const;
-    Vec2I32 center()const;
-    int _label;
-    int _mass;
-    Vec2I32 _min;
-    Vec2I32 _max;
-    Vec2F32 _barycentre;
-};
-
-
-
-struct POP_EXPORTS CharacteristicClusterDistance{
-    virtual ~CharacteristicClusterDistance();
-    virtual F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b)=0;
-};
-struct POP_EXPORTS CharacteristicClusterDistanceMass : public CharacteristicClusterDistance{
-    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
-};
-struct POP_EXPORTS CharacteristicClusterDistanceHeight : public CharacteristicClusterDistance{
-    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
-};
-struct POP_EXPORTS CharacteristicClusterDistanceWidth : public CharacteristicClusterDistance{
-    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
-};
-struct POP_EXPORTS CharacteristicClusterDistanceWidthInterval : public CharacteristicClusterDistance{
-    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
-};
-struct POP_EXPORTS CharacteristicClusterDistanceHeightInterval : public CharacteristicClusterDistance{
-    F32 operator ()(const CharacteristicCluster& a,const CharacteristicCluster& b);
-};
-
-struct POP_EXPORTS CharacteristicClusterFilter{
-    F32 _min;
-    F32 _max;
-    CharacteristicClusterFilter();
-    virtual ~CharacteristicClusterFilter();
-    virtual bool operator ()(const CharacteristicCluster& a);
-};
-struct POP_EXPORTS CharacteristicClusterFilterMass : public CharacteristicClusterFilter{
-
-    bool operator ()(const CharacteristicCluster& a);
-};
-struct POP_EXPORTS CharacteristicClusterFilterHeight : public CharacteristicClusterFilter{
-
-    bool operator ()(const CharacteristicCluster& a);
-};
-struct POP_EXPORTS CharacteristicClusterFilterWidth : public CharacteristicClusterFilter{
-
-    bool operator ()(const CharacteristicCluster& a);
-};
-struct POP_EXPORTS CharacteristicClusterFilterAsymmetryHeightPerWidth : public CharacteristicClusterFilter{
-
-    bool operator ()(const CharacteristicCluster& a);
-};
-namespace Private{
-    bool sortMyFunction (std::pair<F32,int> i,std::pair<F32,int> j);
-    bool sortMyFunctionLeft (std::pair<int,int>  i,std::pair<int,int> j) ;
-}
-
-Vec<CharacteristicCluster> applyCharacteristicClusterFilter(const Vec<CharacteristicCluster>& v_cluster, CharacteristicClusterFilter * filter);
-
-pop::Mat2UI32 POP_EXPORTS applyClusterFilter(const pop::Mat2UI32& labelled_image,const Vec<CharacteristicClusterFilter*> v_filter  );
-Vec<Vec<Mat2UI8> > POP_EXPORTS applyGraphCluster(const pop::Mat2UI32& labelled_image, pop::Vec<CharacteristicClusterDistance*> v_dist,  pop::Vec<F32> v_weight,F32 threshold  );
-
-
-
-
-//version 2
-
-
-
 class CharacteristicMass
 {
 private:
     int _mass;
 public:
-    CharacteristicMass();
+    inline CharacteristicMass()    :_mass(0){}
     template<typename Position>
     void addPoint(const Position & ){
         _mass++;
     }
-    int getMass()const;
+    inline int getMass()const{ return _mass;}
 };
 
 
@@ -169,10 +89,9 @@ class CharacteristicLabel
 private:
     int _label;
 public:
-    void setLabel(int label);
-    int getLabel()const;
-    //void addPoint(const typename Function::E & ){
-//    }
+    inline void setLabel(int label){_label = label; }
+    inline int getLabel()const{return _label;
+}
 };
 
 template<typename TypeCharacteristic >

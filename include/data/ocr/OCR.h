@@ -15,7 +15,7 @@ class POP_EXPORTS OCR
 public:
     virtual ~OCR();
 
-    std::string parseText(const Mat2UI8 & binary,int nbr_pixels_width_caracter);
+
     /*!
     \brief apply the OCR on a binary matrix containing a single caracter
     \param binary binary input matrix

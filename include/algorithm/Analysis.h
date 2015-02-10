@@ -881,14 +881,28 @@ struct POP_EXPORTS Analysis
      * \param f input labelled matrix
      * \param nbrtest nbrtest for sampling
      * \param length max length for the correlation
-     * \return  Mat2F32 M
+     * \return  correlation ffunction
      *
      *
      *  M(i<length,0)=i, M(i,j) =P(f(x)=j and f(x+r)=j) with r any vector of size i. To estimate this value, we sample nbrtest*length*dim times.
-    */
+     *
+     *
+     * \code
+        Mat2UI8 img;//2d grey-level image object
+        img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
+        img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
+        F32 value;
+        Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
+        threshold = Processing::greylevelRemoveEmptyValue(threshold);//scale the binary level from [0-255] to [0-1]
+        Mat2F32 m_corr_simulated = Analysis::correlation(threshold,200);
+        std::cout<<m_corr_simulated<<std::endl;
+        m_corr_simulated.saveAscii("m_corre.m");
+        return 1;
+     * \endcode
+     */
 
     template<int DIM,typename TypePixel>
-    static  Mat2F32 correlation(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
+    static  Mat2F32 correlation(const MatN<DIM,TypePixel> & f, int length=200, int nbrtest=100000 )
     {
         if(nbrtest<100)
             nbrtest=100;
@@ -924,10 +938,8 @@ struct POP_EXPORTS Analysis
                     typename MatN<DIM,TypePixel>::E z=y;
                     if(f.isValid(z))
                     {
-
                         TypePixel etat2 = f(z);
-
-                        for(TypePixel k=1;k<=value+1;k++)
+                        for(int k=1;k<=(int)value+1;k++)
                         {
                             mcount(r,k)++;
                             if(k==etat1+1&& etat1 ==  etat2)

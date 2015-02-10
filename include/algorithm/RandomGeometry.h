@@ -807,8 +807,6 @@ public:
     template<int DIM>
     static MatN<DIM,UI8> gaussianThesholdedRandomField(const Mat2F32 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F32> & gaussianfield);
 
-
-
     /*!
     * \brief generate a random structure at the given volume fraction
     * \param domainmodel domain of the model
@@ -1575,6 +1573,7 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F32 &mcorr
     DistributionRegularStep Pmagnitude = RandomGeometry::generateProbabilitySpectralDensity(mcorre,beta);
 
     DistributionUniformReal d2pi(0,2*3.14159265);
+    DistributionUniformReal d_0_1(0,1);
     DistributionMultiVariateUnitSphere dpshere(DIM);
     int number_cosinus=1000;
     Vec< VecN<DIM, F32> > direction(number_cosinus);
@@ -1584,7 +1583,7 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F32 &mcorr
     for(int i=0;i<number_cosinus;i++){
         F32 p = d2pi.randomVariable();
         phase[i] = p;
-        module[i] = Pmagnitude.randomVariable();
+        module[i] = Pmagnitude.randomVariable()+d_0_1.randomVariable();
         direction[i]= dpshere.randomVariable();
     }
 

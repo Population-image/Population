@@ -1531,12 +1531,12 @@ Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix
     }
     return v_out_i;
 }
-void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value, F32 ratio){
+void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
 
-    ratio =std::max(0.f,std::min(1.f,ratio));
-    //    std::cout<<number_training.size()*ratio<<
+
+
     for(unsigned int i=0;i<number_training.size();i++){
-        for(unsigned int j=0;j<number_training(i).size()*ratio;j++){
+        for(unsigned int j=0;j<number_training(i).size();j++){
             Mat2UI8 binary = number_training(i)(j);
 
             VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain,method,normalization_value);
