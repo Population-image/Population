@@ -3,8 +3,6 @@
 #include"3rdparty/OldVideoVLC.h"
 #include"3rdparty/VideoFFMPEG.h"
 
-#include <iostream>
-
 namespace pop {
 bool ConvertRV32ToGrey::init =false;
 UI8 ConvertRV32ToGrey::_look_up_table[256][256][256];
