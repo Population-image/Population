@@ -54,7 +54,7 @@ public:
     Mat2UI8 &retrieveMatrixGrey();
     bool grabMatrixRGB();
     Mat2RGBUI8 &retrieveMatrixRGB();
-        bool isFile()const;
+    bool isFile()const;
 };
 }
 #endif
