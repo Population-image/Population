@@ -5,14 +5,15 @@
 #include <iostream>
 
 #include "c_neural_net.h"
+#include "popcuda.h"
 #include "Population.h"
 #include "microtime.h"
 
 struct neural_network* createNetwork(std::vector<unsigned int> v_layer, double eta) {
 	struct neural_network* network = new struct neural_network;
 
-	network->nb_layers = v_layer.size();
-	network->layers = new struct layer[network->nb_layers];
+	network->_nb_layers = v_layer.size();
+	network->layers = new struct layer[network->_nb_layers];
 	network->_eta = eta;
 
 	for(unsigned int i=0;i<v_layer.size();i++){
@@ -52,11 +53,12 @@ struct neural_network* createNetwork(std::vector<unsigned int> v_layer, double e
 					l._W[j][k] = n.randomVariable();
 				}
 			}
-			l._d_E_W = NULL;
 		} else {
+			l._W_height = 0;
+			l._W_width = 0;
 			l._W = NULL;
-			l._d_E_W = NULL;
 		}
+		l._d_E_W = NULL;
 	}
 
 	return network;
@@ -91,10 +93,10 @@ void printWeightMatrix(pop::F32** M, unsigned int height, unsigned int width, st
 
 void printNetwork(struct neural_network* network) {
 	std::cout << "####################" << std::endl;
-	std::cout << "Number of layers: " << network->nb_layers << std::endl;
+	std::cout << "Number of layers: " << network->_nb_layers << std::endl;
 	std::cout << "Eta: " << network->_eta << std::endl;
 
-	for (unsigned int l=0; l<network->nb_layers; l++) {
+	for (unsigned int l=0; l<network->_nb_layers; l++) {
 		struct layer& layer = network->layers[l];
 
 		std::cout << "\n-- Layer " << l << ":" << std::endl;
@@ -112,11 +114,7 @@ void printNetwork(struct neural_network* network) {
 void propagateFront(struct neural_network* network, const pop::VecF32& in , pop::VecF32 &out) {
 	std::copy(in.begin(),in.end(), network->layers[0]._X);
 
-	//TODO: send network to gpu
-
-	//TODO: do these computations on GPU
-
-	for (unsigned int l=0; l<network->nb_layers-1; l++) {
+	for (unsigned int l=0; l<network->_nb_layers-1; l++) {
 		struct layer& prev_layer = network->layers[l];
 		struct layer& layer = network->layers[l+1];
 
@@ -134,9 +132,7 @@ void propagateFront(struct neural_network* network, const pop::VecF32& in , pop:
 		}
 	}
 
-	//TODO: retrieve network from gpu
-
-	struct layer& last_layer = network->layers[network->nb_layers-1];
+	struct layer& last_layer = network->layers[network->_nb_layers-1];
 	if (out.size() != last_layer._X_size) {
 		out.resize(last_layer._X_size);
 	}
@@ -144,13 +140,13 @@ void propagateFront(struct neural_network* network, const pop::VecF32& in , pop:
 }
 
 void propagateBackFirstDerivate(struct neural_network* network, const pop::VecF32& desired_output) {
-	for (unsigned int l=0; l<network->nb_layers; l++) {
+	for (unsigned int l=0; l<network->_nb_layers; l++) {
 		struct layer& layer = network->layers[l];
-		if (layer._X != NULL && layer._d_E_X == NULL) {
+		if (layer._d_E_X == NULL) {
 			layer._d_E_X = new pop::F32[layer._X_size];
 			memcpy(layer._d_E_X, layer._X, sizeof(layer._X[0]) * layer._X_size);
 		}
-		if (layer._Y != NULL && layer._d_E_Y == NULL) {
+		if (layer._d_E_Y == NULL) {
 			layer._d_E_Y = new pop::F32[layer._Y_size];
 			memcpy(layer._d_E_Y, layer._Y, sizeof(layer._X[0]) * layer._Y_size);
 		}
@@ -163,16 +159,12 @@ void propagateBackFirstDerivate(struct neural_network* network, const pop::VecF3
 		}
 	}
 
-	//TODO: send network to GPU
-
-	//TODO: perform computations on GPU
-
-	for (unsigned int l=network->nb_layers-1; l>0; l--) {
+	for (unsigned int l=network->_nb_layers-1; l>0; l--) {
 		struct layer& layer = network->layers[l];
 		struct layer& prev_layer = network->layers[l-1];
 
 		// _d_E_X[l] = _X[l] - desired_output
-		if (l == network->nb_layers-1){
+		if (l == network->_nb_layers-1){
 			for (unsigned int j=0; j<layer._X_size; j++) {
 				layer._d_E_X[j] = layer._X[j] - desired_output[j];
 			}
@@ -200,12 +192,10 @@ void propagateBackFirstDerivate(struct neural_network* network, const pop::VecF3
 			}
 		}
 	}
-
-	//TODO: retrieve network from gpu
 }
 
 void deleteNetwork(struct neural_network* network) {
-	for (int i=0; i<network->nb_layers; i++) {
+	for (int i=0; i<network->_nb_layers; i++) {
 		struct layer& l = network->layers[i];
 
 		delete[] l._X;
@@ -233,6 +223,88 @@ void deleteNetwork(struct neural_network* network) {
 		}
 	}
 	delete[] network->layers;
+	delete network;
+}
+
+struct neural_network* copyNetworkToGPU(struct neural_network* h_net) {
+	cudaMallocManaged(&h_net, sizeof(*h_net));
+	return h_net;
+
+
+
+
+	/*
+	struct layer {
+		unsigned int _X_size; // size of _X and _d_E_X
+		unsigned int _Y_size; // size of _Y and _d_E_Y
+		unsigned int _W_width; // width of _W and _d_E_W
+		unsigned int _W_height; // height of _W and _d_E_W
+		pop::F32* _X;
+		pop::F32* _Y;
+		pop::F32** _W;
+		pop::F32* _d_E_X;
+		pop::F32* _d_E_Y;
+		pop::F32** _d_E_W;
+	};
+
+	struct neural_network {
+		double _eta;
+		unsigned int nb_layers;
+		struct layer* layers;
+	};
+*/
+}
+
+struct neural_network* copyNetworkFromGPU(struct neural_network* d_net) {
+	struct neural_network* h_net;
+
+	//TODO
+
+	return h_net;
+
+}
+
+void deleteNetworkOnGPU(struct neural_network* network) {
+	//TODO
+/*
+	for (int i=0; i<network->nb_layers; i++) {
+		struct layer& l = network->layers[i];
+
+		delete[] l._X;
+		if (l._d_E_X != NULL) {
+			delete[] l._d_E_X;
+		}
+
+		delete[] l._Y;
+		if (l._d_E_Y != NULL) {
+			delete[] l._d_E_Y;
+		}
+
+		if (l._W != NULL) {
+			for (unsigned int j=0; j<l._W_height; j++) {
+				delete[] l._W[j];
+			}
+			delete[] l._W;
+		}
+
+		if (l._d_E_W != NULL) {
+			for (unsigned int j=0; j<l._W_height; j++) {
+				delete[] l._d_E_W[j];
+			}
+			cudaFree(l._d_E_W);
+		}
+	}
+	cudaFree(network->layers);
+	delete network;
+	*/
+}
+
+__global__ void exploreNetwork(struct neural_network *network) {
+	printf("Number of layers: %d, eta: %f\n", network->_nb_layers, network->_eta);
+	for (unsigned int l=0; l<network->_nb_layers; l++) {
+		struct layer& layer = network->layers[l];
+		printf("Layer %d, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
+	}
 }
 
 void test_neural_net(void) {
@@ -244,6 +316,14 @@ void test_neural_net(void) {
 	v_layer.push_back(3);
 	v_layer.push_back(1);
 	network = createNetwork(v_layer, 0.01);
+
+	//TODO: send neural net to gpu
+	copyNetworkToGPU(network);
+	exploreNetwork<<<1, 1>>>(network);
+	gpuErrorCheck( cudaPeekAtLastError() );
+	gpuErrorCheck( cudaDeviceSynchronize() );
+
+	return;
 
 	//create the training set
 	// (-1,-1)->-1

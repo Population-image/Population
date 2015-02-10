@@ -23,7 +23,7 @@ struct layer {
 
 struct neural_network {
 	double _eta;
-	unsigned int nb_layers;
+	unsigned int _nb_layers;
 	struct layer* layers;
 };
 
@@ -38,6 +38,8 @@ void deleteNetwork(struct neural_network* network);
 struct neural_network* copyNetworkToGPU(struct neural_network* h_net);
 struct neural_network* copyNetworkFromGPU(struct neural_network* d_net);
 void deleteNetworkOnGPU(struct neural_network* network);
+
+void printNetwork(struct neural_network* network);
 
 #if defined(HAVE_CUDA)
 #endif
