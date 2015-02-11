@@ -8,34 +8,6 @@
 
 namespace pop
 {
-
-struct ConvertRV32ToGrey{
-    static bool init;
-    static UI8 _look_up_table[256][256][256];
-    static UI8 lumi(const pop::VecN<4,UI8> &rgb){
-        if(init==false){
-            init= true;
-            for(unsigned int i=0;i<256;i++){
-                for(unsigned int j=0;j<256;j++){
-                    for(unsigned int k=0;k<256;k++){
-                        _look_up_table[i][j][k]=ArithmeticsSaturation<pop::UI8,F32>::Range(0.299*i + 0.587*j + 0.114*k+0.000001);
-                    }
-                }
-            }
-        }
-        return _look_up_table[rgb(2)][rgb(1)][rgb(0)];
-    }
-};
-bool ConvertRV32ToGrey::init =false;
-UI8 ConvertRV32ToGrey::_look_up_table[256][256][256];
-
-struct ConvertRV32ToRGBUI8
-{
-    static RGBUI8 lumi(const pop::VecN<4,UI8> &rgb){
-        return RGBUI8(rgb(2),rgb(1),rgb(0));
-    }
-};
-
 struct ctx
 {
     bool playing_started;
