@@ -186,7 +186,7 @@ void neuralnetwortest(){
 
     double size_in=number_training(0)(0).getDomain()(0)*number_training(0)(0).getDomain()(1);
     std::cout<<"size trainings: "<<number_training(0).size()<<std::endl;
-    std::string net_struc = "Mass -1,1 400_300_200_100";
+    std::string net_struc = "BoundingBox -1,1 400_300_200_100";
     std::cout<<net_struc<<std::endl;
     Vec<unsigned int> v_layer;
     v_layer.push_back(size_in);
@@ -216,11 +216,11 @@ void neuralnetwortest(){
     Vec<VecF32> vtraining_out;
 
 
-    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne);
+    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),NNLayerMatrix::BoundingBox,NNLayerMatrix::MinusOneToOne);
 
     Vec<VecF32> vtest_in;
     Vec<VecF32> vtest_out;
-    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),NNLayerMatrix::Mass,NNLayerMatrix::MinusOneToOne);
+    TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),NNLayerMatrix::BoundingBox,NNLayerMatrix::MinusOneToOne);
 
     number_training.clear();
     number_test.clear();
