@@ -6,15 +6,13 @@
 #include "c_neural_net.h"
 
 int main(){
-	test_neural_net();
-	return 0;
-
 #if defined(HAVE_CUDA)
 	std::cout << "You have CUDA support.";
 
 	if (popcuda::isCudaAvailable()) {
 		std::cout << " And you have a CUDA device." << std::endl << std::endl;
-		cuda_test();
+		//cuda_test();
+		test_neural_net();
 	} else {
 		std::cout << " But you don't have a CUDA device." << std::endl;
 	}

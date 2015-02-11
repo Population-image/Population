@@ -98,7 +98,49 @@ public:
             MatNInOutPgm::readRaw(_W(i) ,is);
         }
     }
+    void printNeuronVector(pop::VecF32 V, std::string label) {
+        std::cout << label << "(" << V.size() << ") = [";
+        std::cout << V << "]" << std::endl;
+    }
 
+    void printWeightMatrix(pop::Mat2F32 M, std::string label) {
+        std::cout << label << "(" << M.sizeI() << ", " << M.sizeJ() << ") = [" << std::endl;
+        std::cout << M << "]" << std::endl;
+    }
+
+    void printNetwork(void) {
+        std::cout << "####################" << std::endl;
+        std::cout << "Number of layers: " << _X.size() << std::endl;
+        std::cout << "Eta: " << _eta << std::endl;
+
+        for (unsigned int l=0; l<_X.size(); l++) {
+            std::cout << "\n-- Layer " << l << ":" << std::endl;
+
+            printNeuronVector(_X[l], "_X");
+            printNeuronVector(_Y[l], "_Y");
+            if(_d_E_X.size()==0){
+                std::cout << "_d_E_X = NULL" << std::endl;
+                std::cout << "_d_E_Y = NULL" << std::endl;
+            } else {
+                printNeuronVector(_d_E_X[l], "_d_E_X");
+                printNeuronVector(_d_E_Y[l], "_d_E_Y");
+            }
+            if (l != 0) {
+                printWeightMatrix(_W[l-1], "_W");
+                if(_d_E_X.size()==0){
+                    std::cout << "_d_E_W = NULL" << std::endl;
+                } else {
+                    printWeightMatrix(_d_E_W[l-1], "_d_E_W");
+                }
+            } else {
+                std::cout << "_W = NULL" << std::endl;
+                std::cout << "_d_E_W = NULL" << std::endl;
+            }
+        }
+
+        std::cout << "####################" << std::endl;
+
+    }
     double _eta;
     Vec<pop::VecF32>  _X;
     Vec<pop::VecF32>  _Y;
