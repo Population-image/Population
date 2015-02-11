@@ -15,7 +15,7 @@ namespace pop
 
 
 struct ctx;
-class POP_EXPORTS OldVideoVLC: public Video
+class POP_EXPORTS VideoVLCDeprecated: public Video
 {
 private:
     libvlc_instance_t* instance;
@@ -28,9 +28,9 @@ private:
     pop::Mat2RGBUI8 imgcolor;
         bool _isfile;
 public:
-    OldVideoVLC();
-    OldVideoVLC(const OldVideoVLC& vlc);
-    virtual ~OldVideoVLC();
+    VideoVLCDeprecated();
+    VideoVLCDeprecated(const VideoVLCDeprecated& vlc);
+    virtual ~VideoVLCDeprecated();
     bool open(const std::string & filename);
     bool grabMatrixGrey();
     Mat2UI8 &retrieveMatrixGrey();

@@ -48,7 +48,7 @@ public:
      \brief The different implementations of Video.
     */
     enum VideoImpl{
-        OLDVLC,
+        VLCDEPRECATED,
         VLC,
         FFMPEG
     };

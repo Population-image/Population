@@ -1,6 +1,6 @@
 #include"data/video/Video.h"
 #include"3rdparty/VideoVLC.h"
-#include"3rdparty/OldVideoVLC.h"
+#include "3rdparty/VideoVLCDeprecated.h"
 #include"3rdparty/VideoFFMPEG.h"
 
 namespace pop {
@@ -14,9 +14,9 @@ Video * Video::create(VideoImpl impl){
 #else
         return NULL;
 #endif
-    } else if(impl==Video::OLDVLC){
+    } else if(impl==Video::VLCDEPRECATED){
 #if defined(HAVE_VLC)
-        return new OldVideoVLC();
+        return new VideoVLCDeprecated();
 #else
         return NULL;
 #endif

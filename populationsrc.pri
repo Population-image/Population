@@ -38,7 +38,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/3rdparty/tinythread.h \
            $${PWD}/include/3rdparty/VideoFFMPEG.h \
            $${PWD}/include/3rdparty/VideoVLC.h \
-           $${PWD}/include/3rdparty/OldVideoVLC.h \
+           $${PWD}/include/3rdparty/VideoVLCDeprecated.h \
            $${PWD}/include/data/3d/GLFigure.h \
            $${PWD}/include/data/distribution/Distribution.h \
            $${PWD}/include/data/distribution/DistributionAnalytic.h \
@@ -101,7 +101,7 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/3rdparty/tinythread.cpp \
            $${PWD}/src/3rdparty/VideoFFMPEG.cpp \
            $${PWD}/src/3rdparty/VideoVLC.cpp \
-           $${PWD}/src/3rdparty/OldVideoVLC.cpp \
+           $${PWD}/src/3rdparty/VideoVLCDeprecated.cpp \
            $${PWD}/src/data/3d/GLFigure.cpp \
            $${PWD}/src/data/distribution/Distribution.cpp \
            $${PWD}/src/data/distribution/DistributionAnalytic.cpp \

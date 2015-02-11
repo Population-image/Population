@@ -1,4 +1,4 @@
-#include "3rdparty/OldVideoVLC.h"
+#include "3rdparty/VideoVLCDeprecated.h"
 #if defined(HAVE_VLC)
 #include "vlc/libvlc.h"
 #include "vlc/vlc.h"
@@ -34,7 +34,7 @@ static void unlock_vlc(void *data, void *id, void *const *){
 
 
 //libvlc_instance_t* OldVideoVLC::impl::instance = libvlc_new(0,NULL);
-OldVideoVLC::OldVideoVLC()
+VideoVLCDeprecated::VideoVLCDeprecated()
 {
     instance = libvlc_new(0,NULL);
     mediaPlayer = NULL;
@@ -46,12 +46,12 @@ OldVideoVLC::OldVideoVLC()
     isplaying = false;
     _isfile =true;
 }
-OldVideoVLC::OldVideoVLC(const OldVideoVLC & v)
+VideoVLCDeprecated::VideoVLCDeprecated(const VideoVLCDeprecated & v)
 {
     this->open(v.file_playing);
 }
 
-void OldVideoVLC::release(){
+void VideoVLCDeprecated::release(){
     if(mediaPlayer!=NULL){
         if(libvlc_media_player_is_playing(mediaPlayer))
             libvlc_media_player_stop(mediaPlayer);
@@ -60,7 +60,7 @@ void OldVideoVLC::release(){
     }
 }
 
-OldVideoVLC::~OldVideoVLC()
+VideoVLCDeprecated::~VideoVLCDeprecated()
 {
     release();
     delete context->pmutex;
@@ -69,7 +69,7 @@ OldVideoVLC::~OldVideoVLC()
     delete context;
     libvlc_release(instance);
 }
-bool OldVideoVLC::open(const std::string & path){
+bool VideoVLCDeprecated::open(const std::string & path){
     release();
     if(path=="")
         return false;
@@ -163,7 +163,7 @@ bool OldVideoVLC::open(const std::string & path){
         return false;
     }
 }
-bool OldVideoVLC::tryOpen(const std::string & path){
+bool VideoVLCDeprecated::tryOpen(const std::string & path){
     if(path=="")
         return false;
     libvlc_media_t* media = NULL;
@@ -212,7 +212,7 @@ bool OldVideoVLC::tryOpen(const std::string & path){
     }else
         return false;
 }
-bool OldVideoVLC::grabMatrixGrey(){
+bool VideoVLCDeprecated::grabMatrixGrey(){
     if(isplaying==true){
         if(my_index!=*context->index){
             my_index=*context->index;
@@ -240,17 +240,17 @@ bool OldVideoVLC::grabMatrixGrey(){
         return false;
     }
 }
-Mat2UI8& OldVideoVLC::retrieveMatrixGrey(){
+Mat2UI8& VideoVLCDeprecated::retrieveMatrixGrey(){
     context->pmutex->lock();
     imggrey.resize(context->image_RV32->getDomain());
     std::transform(context->image_RV32->begin(),context->image_RV32->end(),imggrey.begin(),ConvertRV32ToGrey::lumi);
     context->pmutex->unlock();
     return imggrey;
 }
-bool OldVideoVLC::isFile() const{
+bool VideoVLCDeprecated::isFile() const{
     return _isfile;
 }
-bool OldVideoVLC::grabMatrixRGB(){
+bool VideoVLCDeprecated::grabMatrixRGB(){
     if(isplaying==true){
         while(my_index==*context->index){
 #if Pop_OS==2
@@ -267,7 +267,7 @@ bool OldVideoVLC::grabMatrixRGB(){
         return false;
     }
 }
-Mat2RGBUI8& OldVideoVLC::retrieveMatrixRGB(){
+Mat2RGBUI8& VideoVLCDeprecated::retrieveMatrixRGB(){
     context->pmutex->lock();
     imgcolor.resize(context->image_RV32->getDomain());
     std::transform(context->image_RV32->begin(),context->image_RV32->end(),imgcolor.begin(),ConvertRV32ToRGBUI8::lumi);
