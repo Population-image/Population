@@ -7,28 +7,34 @@
 #include "data/neuralnetwork/NeuralNetwork.h"
 
 void test_neural_net(void);
+void test_neural_net_cpu(void);
+void test_cublas(void);
 
 struct layer {
 	unsigned int _X_size; // size of _X and _d_E_X
 	unsigned int _Y_size; // size of _Y and _d_E_Y
 	unsigned int _W_width; // width of _W and _d_E_W
 	unsigned int _W_height; // height of _W and _d_E_W
+	bool _errors_initialized;
 	pop::F32* _X;
 	pop::F32* _Y;
-	pop::F32** _W;
+	pop::F32* _W;
 	pop::F32* _d_E_X;
 	pop::F32* _d_E_Y;
-	pop::F32** _d_E_W;
+	pop::F32* _d_E_W;
 };
 
 struct neural_network {
 	double _eta;
 	unsigned int _nb_layers;
-	struct layer* layers;
+	struct layer* _layers;
 };
 
 static float sigmoid(float x){ return 1.7159f*tanh(0.66666667f*x); }
 static float derived_sigmoid(float S){ return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
+
+static __device__ float sigmoid_gpu(float x){ return 1.7159f*tanh(0.66666667f*x); }
+static __device__ float derived_sigmoid_gpu(float S){ return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
 
 struct neural_network* createNetwork(std::vector<unsigned int> v_layer, double eta);
 void propagateFront(struct neural_network* network, const pop::VecF32& in , pop::VecF32 &out);
