@@ -296,7 +296,7 @@ pop::UI8 ConvertRV32ToGrey::lumi(const pop::VecN<4,pop::UI8> &rgb){
     return _look_up_table[rgb(2)][rgb(1)][rgb(0)];
 }
 
-static pop::RGBUI8 ConvertRV32ToRGBUI8::lumi(const pop::VecN<4,pop::UI8> &rgb){
+pop::RGBUI8 ConvertRV32ToRGBUI8::lumi(const pop::VecN<4,pop::UI8> &rgb){
     return pop::RGBUI8(rgb(2),rgb(1),rgb(0));
 }
 

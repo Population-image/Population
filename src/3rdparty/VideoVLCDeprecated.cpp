@@ -1,4 +1,5 @@
 #include "3rdparty/VideoVLCDeprecated.h"
+#include "3rdparty/VideoVLC.h"
 #if defined(HAVE_VLC)
 #include "vlc/libvlc.h"
 #include "vlc/vlc.h"
