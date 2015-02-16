@@ -30,15 +30,15 @@ POP_OPTION(WITH_CUDA         "Include Cuda"      OFF   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
 # Population build components
 # ===================================================
-POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF )
+POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
+POP_OPTION(BUILD_EXPORT      "export library" ON )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
-POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
-POP_OPTION(BUILD_TEMP        "Build experimental code" ON )
+POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
+POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_EXPORT      "export library" OFF )
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
