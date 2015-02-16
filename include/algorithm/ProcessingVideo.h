@@ -5,7 +5,7 @@ namespace pop
 {
 
 
-template<int DIM,typename TypePixel>
+template<int DIM,typename PixelType>
 class  TrackingVideoYang
 {
     /*!
@@ -42,8 +42,8 @@ public:
     TrackingVideoYang(){
         init();
     }
-    MatN<DIM,TypePixel> processFrame( const MatN<DIM,TypePixel>& in,F32 sigma=2,F32 Tf=3,typename MatN<DIM,TypePixel>::F lambda=10,F32 alpha=0.1,F32 T=10){
-        MatN<DIM,TypePixel> img(in);
+    MatN<DIM,PixelType> processFrame( const MatN<DIM,PixelType>& in,F32 sigma=2,F32 Tf=3,typename MatN<DIM,PixelType>::F lambda=10,F32 alpha=0.1,F32 T=10){
+        MatN<DIM,PixelType> img(in);
         img = pop::Processing::smoothGaussian(img,sigma);
         if(!(in.getDomain()==_background.getDomain()))
         {
@@ -58,8 +58,8 @@ public:
             return _dynamicmatric;
         }else{
             _dynamicMatrixModifiedTaoAlgorithm(img,_img_old,_dynamicmatric,_background,Tf,lambda,alpha);
-            MatN<DIM,TypePixel> moving(img.getDomain());
-            typename MatN<DIM,TypePixel>::IteratorEDomain it(_background.getIteratorEDomain());
+            MatN<DIM,PixelType> moving(img.getDomain());
+            typename MatN<DIM,PixelType>::IteratorEDomain it(_background.getIteratorEDomain());
             while(it.next()){
                 if(normValue((F32)img(it.x())-_background(it.x()))>T){
                     moving(it.x())=255;
@@ -72,16 +72,16 @@ public:
         }
     }
 private:
-    MatN<DIM,TypePixel> _dynamicmatric;
-    MatN<DIM,TypePixel> _img_old;
-    MatN<DIM,TypePixel> _background;
+    MatN<DIM,PixelType> _dynamicmatric;
+    MatN<DIM,PixelType> _img_old;
+    MatN<DIM,PixelType> _background;
     bool _first ;
-    void _dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,TypePixel> & frame_timet,const MatN<DIM,TypePixel> & frame_timet_minus_deltat,MatN<DIM,TypePixel> & dynamic_matrix,MatN<DIM,TypePixel> &background,F32 Tf=10,typename MatN<DIM,TypePixel>::F lambda=10,F32 alpha=0.2)
+    void _dynamicMatrixModifiedTaoAlgorithm(const MatN<DIM,PixelType> & frame_timet,const MatN<DIM,PixelType> & frame_timet_minus_deltat,MatN<DIM,PixelType> & dynamic_matrix,MatN<DIM,PixelType> &background,F32 Tf=10,typename MatN<DIM,PixelType>::F lambda=10,F32 alpha=0.2)
     {
 
         //frameToFrameDifferenceImage
-        MatN<DIM,TypePixel> frametoframefifferenceimage(frame_timet);
-        typename MatN<DIM,TypePixel>::IteratorEDomain it = frametoframefifferenceimage.getIteratorEDomain();
+        MatN<DIM,PixelType> frametoframefifferenceimage(frame_timet);
+        typename MatN<DIM,PixelType>::IteratorEDomain it = frametoframefifferenceimage.getIteratorEDomain();
 
         while(it.next()){
             F32 value1 = normValue(frame_timet(it.x()));

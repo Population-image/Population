@@ -76,7 +76,7 @@ public:
 };
 
 
-template<int DIM, typename Type>
+template<int DIM, typename CoordinateType>
 class VecN;
 
 /*! \ingroup Data
@@ -89,8 +89,8 @@ class VecN;
 * \defgroup Vec Vec{I32,F32}
 * \brief  template class for tuple of numbers of variable size
 */
-template<typename Type>
-class POP_EXPORTS Vec : public std::vector<Type>
+template<typename CoordinateType>
+class POP_EXPORTS Vec : public std::vector<CoordinateType>
 {
 private:
     /*!
@@ -98,7 +98,7 @@ private:
      * \ingroup Vec
      * \brief tuple of numbers of variable size for the representation of the coordinate vector
      * \author Tariel Vincent
-     * \tparam Type number type
+     * \tparam CoordinateType number type
      *
      * Vec is an extension of the std::vector to include classical arithmetic operations of linear algebra.
      * \code
@@ -127,7 +127,7 @@ public:
     \typedef F
     * number type
     */
-    typedef Type F;
+    typedef CoordinateType F;
     /*!
     \typedef Domain
     * Domain=int The domain of definition of a Vec is the number of elements
@@ -136,18 +136,18 @@ public:
 
 
     typedef VecNIteratorEDomain IteratorEDomain;
-    typedef typename std::vector<Type>::value_type					 value_type;
-    typedef typename std::vector<Type>::pointer           pointer;
-    typedef typename std::vector<Type>::const_pointer     const_pointer;
-    typedef typename std::vector<Type>::reference         reference;
-    typedef typename std::vector<Type>::const_reference   const_reference;
-    typedef typename std::vector<Type>::iterator iterator;
-    typedef typename std::vector<Type>::const_iterator const_iterator;
-    typedef typename std::vector<Type>::const_reverse_iterator  const_reverse_iterator;
-    typedef typename std::vector<Type>::reverse_iterator		 reverse_iterator;
-    typedef typename std::vector<Type>::size_type					 size_type;
-    typedef typename std::vector<Type>::difference_type				 difference_type;
-    typedef typename std::vector<Type>::allocator_type                        		 allocator_type;
+    typedef typename std::vector<CoordinateType>::value_type					 value_type;
+    typedef typename std::vector<CoordinateType>::pointer           pointer;
+    typedef typename std::vector<CoordinateType>::const_pointer     const_pointer;
+    typedef typename std::vector<CoordinateType>::reference         reference;
+    typedef typename std::vector<CoordinateType>::const_reference   const_reference;
+    typedef typename std::vector<CoordinateType>::iterator iterator;
+    typedef typename std::vector<CoordinateType>::const_iterator const_iterator;
+    typedef typename std::vector<CoordinateType>::const_reverse_iterator  const_reverse_iterator;
+    typedef typename std::vector<CoordinateType>::reverse_iterator		 reverse_iterator;
+    typedef typename std::vector<CoordinateType>::size_type					 size_type;
+    typedef typename std::vector<CoordinateType>::difference_type				 difference_type;
+    typedef typename std::vector<CoordinateType>::allocator_type                        		 allocator_type;
     /*!
     *
     * default constructor
@@ -158,8 +158,8 @@ public:
     *
     *  copy constructor
     */
-    template<typename Type1>
-    Vec(const Vec<Type1> &v);
+    template<typename CoordinateType1>
+    Vec(const Vec<CoordinateType1> &v);
 
     Vec(const Vec &v);
 
@@ -167,8 +167,8 @@ public:
     *
     *  constructor the Vec from a std::vector
     */
-    template<typename Type1>
-    Vec(const std::vector<Type1> &v);
+    template<typename CoordinateType1>
+    Vec(const std::vector<CoordinateType1> &v);
 
     /*!
     * \param  size_vec number of elements
@@ -176,7 +176,7 @@ public:
     *
     *  constructor a vector with the given size
     */
-    explicit Vec(int size_vec, Type value=Type());
+    explicit Vec(int size_vec, CoordinateType value=CoordinateType());
 
 
     /*!
@@ -185,8 +185,8 @@ public:
     *  constructor from a VecN
     * \sa VecN
     */
-    template<typename Type1>
-    Vec(const VecN<1,Type1>& x){
+    template<typename CoordinateType1>
+    Vec(const VecN<1,CoordinateType1>& x){
         (*this).resize(1);
 
         (*this)[0]=x[0];
@@ -197,8 +197,8 @@ public:
     *  constructor from a VecN for type conversion
     * \sa VecN
     */
-    template<typename Type1>
-    Vec(const VecN<2,Type1>& x){
+    template<typename CoordinateType1>
+    Vec(const VecN<2,CoordinateType1>& x){
         (*this).resize(2);
         (*this)[0]=x[0];
         (*this)[1]=x[1];
@@ -209,23 +209,23 @@ public:
     *  constructor from a VecN for type conversion
     * \sa VecN
     */
-    template<typename Type1>
-    Vec(const VecN<3,Type1>& x){
+    template<typename CoordinateType1>
+    Vec(const VecN<3,CoordinateType1>& x){
         (*this).resize(3);
         (*this)[0]=x[0];
         (*this)[1]=x[1];
         (*this)[2]=x[2];
     }
-    template<typename Type1>
-    Vec(const VecN<4,Type1>& x){
+    template<typename CoordinateType1>
+    Vec(const VecN<4,CoordinateType1>& x){
         (*this).resize(4);
         (*this)[0]=x[0];
         (*this)[1]=x[1];
         (*this)[2]=x[2];
         (*this)[3]=x[3];
     }
-    template<typename Type1>
-    Vec(const VecN<5,Type1>& x){
+    template<typename CoordinateType1>
+    Vec(const VecN<5,CoordinateType1>& x){
         (*this).resize(5);
         (*this)[0]=x[0];
         (*this)[1]=x[1];
@@ -246,7 +246,7 @@ public:
     template<typename _InputIterator>
       Vec(_InputIterator __first, _InputIterator __last,
          const allocator_type& __a =  allocator_type())
-  : std::vector<Type>(__first,__last,__a)
+  : std::vector<CoordinateType>(__first,__last,__a)
       { }
 
 
@@ -263,7 +263,7 @@ public:
     *
     *  return the value reference of the i entry
     */
-    Type & operator ()(unsigned int  i);
+    CoordinateType & operator ()(unsigned int  i);
 
     /*!
     * \param i element entry
@@ -271,7 +271,7 @@ public:
     *
     *  return the const value reference of the i entry
     */
-    const Type & operator ()(unsigned int  i)const;
+    const CoordinateType & operator ()(unsigned int  i)const;
 
     /*!
     * \param v  input vector
@@ -279,7 +279,7 @@ public:
     *
     *  Addition assignment
     */
-    Vec<Type>&  operator+=(const Vec<Type>& v);
+    Vec<CoordinateType>&  operator+=(const Vec<CoordinateType>& v);
 
     /*!
     * \param value   value
@@ -287,7 +287,7 @@ public:
     *
     *  vout(i)=vin(i)+v
     */
-    Vec&  operator+=(Type value);
+    Vec&  operator+=(CoordinateType value);
 
     /*!
     * \param v other vector
@@ -295,13 +295,13 @@ public:
     *
     *  Addition mout(i)=(*this)(i)+v1(i)
     */
-    Vec<Type>  operator+(const Vec<Type>& v)const ;
+    Vec<CoordinateType>  operator+(const Vec<CoordinateType>& v)const ;
     /*!
     * \return output vector
     *
     *  Addition mout(i)=v(i)+value
     */
-    Vec  operator+(Type value)const;
+    Vec  operator+(CoordinateType value)const;
 
     /*!
     * \param v  input vector
@@ -309,26 +309,26 @@ public:
     *
     *  Subtraction assignment
     */
-    Vec<Type>&  operator-=(const Vec<Type>& v);
+    Vec<CoordinateType>&  operator-=(const Vec<CoordinateType>& v);
     /*!
     * \param value  scalar value
     * \return reference of the outputVec vector
     *  vout(i)=vin(i)-v
     */
-    Vec&  operator-=(Type value);
+    Vec&  operator-=(CoordinateType value);
     /*!
     * \param v other vector
     * \return output vector
     *
     *  Subtraction mout(i)=(*this)(i)-v1(i)
     */
-    Vec<Type>  operator-(const Vec<Type>& v)const ;
+    Vec<CoordinateType>  operator-(const Vec<CoordinateType>& v)const ;
     /*!
      * \return output vector
      *
      *   unary - operator -> mout(i)=-(*this)(i)
      */
-    Vec<Type>  operator-();
+    Vec<CoordinateType>  operator-();
 
     /*!
      * \param value input value
@@ -336,7 +336,7 @@ public:
      *
      *  Division mout(i)=(*this)(i)-value
      */
-    Vec  operator-(Type value)const;
+    Vec  operator-(CoordinateType value)const;
 
 
     /*!
@@ -348,14 +348,14 @@ public:
     * vout(i)*=v(i)
     *
     */
-    Vec<Type>&  operator*=(const Vec<Type>& v);
+    Vec<CoordinateType>&  operator*=(const Vec<CoordinateType>& v);
     /*!
      * \param value  input value
      * \return reference of the output vector
      *
      *  v(i)*=value
      */
-    Vec&  operator*=(Type value);
+    Vec&  operator*=(CoordinateType value);
 
     /*!
      * \param value input value
@@ -363,7 +363,7 @@ public:
      *
      *  Multiplication mout(i)=v(i)*value
      */
-    Vec  operator*(Type value)const;
+    Vec  operator*(CoordinateType value)const;
 
     /*!
      * \param v input vector
@@ -372,7 +372,7 @@ public:
      *  Multiplication term by term mout(i)=this(i)*v(i)*value
      * \sa productInner(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
      */
-    Vec<Type>  operator*(const Vec<Type>& v)const;
+    Vec<CoordinateType>  operator*(const Vec<CoordinateType>& v)const;
 
     /*!
      * \param v input vector
@@ -380,7 +380,7 @@ public:
      *
      *  vout(i)/=v(i)
      */
-    Vec<Type>& operator/=(const Vec<Type>& v);
+    Vec<CoordinateType>& operator/=(const Vec<CoordinateType>& v);
 
     /*!
      * \param value  input value
@@ -388,7 +388,7 @@ public:
      *
      *  v(i)/=value
      */
-    Vec& operator/=(Type value);
+    Vec& operator/=(CoordinateType value);
 
     /*!
      * \param v input vector
@@ -396,7 +396,7 @@ public:
      *
      *  Division mout(i)=this(i)/v(i)
      */
-    Vec<Type> operator/(const Vec<Type>& v)const;
+    Vec<CoordinateType> operator/(const Vec<CoordinateType>& v)const;
 
     /*!
      * \param value input value
@@ -404,7 +404,7 @@ public:
      *
      *  Division mout(i)=v(i)/value
      */
-    Vec operator/(Type value)const;
+    Vec operator/(CoordinateType value)const;
 
 
 
@@ -431,7 +431,7 @@ public:
     *
     *  return \f$ \Pi_i v(i) \f$
     */
-    Type multCoordinate();
+    CoordinateType multCoordinate();
 
     /*!
     \param file input file
@@ -455,10 +455,10 @@ public:
     */
     Vec * clone();
 #ifdef HAVE_SWIG
-    void setValue(int index, Type value){
+    void setValue(int index, CoordinateType value){
         (*this)[index]=value;
     }
-    Type getValue(int index)const{
+    CoordinateType getValue(int index)const{
         return (*this)[index];
     }
 #endif
@@ -473,55 +473,55 @@ public:
 typedef Vec<ComplexF32> VecComplexF32;
 typedef Vec<F32> VecF32;
 typedef Vec<I32> VecI32;
-template<typename Type>
-Vec<Type>::Vec()
+template<typename CoordinateType>
+Vec<CoordinateType>::Vec()
 {
 }
-template<typename Type>
-Vec<Type>::Vec(const Vec<Type> &v)
-    :std::vector<Type>(v)
+template<typename CoordinateType>
+Vec<CoordinateType>::Vec(const Vec<CoordinateType> &v)
+    :std::vector<CoordinateType>(v)
 {
 }
 
-template<typename Type>template<typename Type1>
-Vec<Type>::Vec(const Vec<Type1> &v)
+template<typename CoordinateType>template<typename CoordinateType1>
+Vec<CoordinateType>::Vec(const Vec<CoordinateType1> &v)
 {
     this->resize(v.size());
-    std::transform(v.begin(),v.end(),this->begin(),ArithmeticsSaturation<Type,Type1>::Range);
+    std::transform(v.begin(),v.end(),this->begin(),ArithmeticsSaturation<CoordinateType,CoordinateType1>::Range);
 }
-template<typename Type>template<typename Type1>
-Vec<Type>::Vec(const std::vector<Type1> &v)
-    :std::vector<Type>(v)
+template<typename CoordinateType>template<typename CoordinateType1>
+Vec<CoordinateType>::Vec(const std::vector<CoordinateType1> &v)
+    :std::vector<CoordinateType>(v)
 {
 }
-template<typename Type>
-Vec<Type> * Vec<Type>::clone(){
+template<typename CoordinateType>
+Vec<CoordinateType> * Vec<CoordinateType>::clone(){
     return new Vec(*this);
 }
 
-template<typename Type>
-Vec<Type>::Vec(int size_vec,Type value)
-    :std::vector<Type>(size_vec,value)
+template<typename CoordinateType>
+Vec<CoordinateType>::Vec(int size_vec,CoordinateType value)
+    :std::vector<CoordinateType>(size_vec,value)
 {
 }
-template<typename Type>
-typename Vec<Type>::Domain Vec<Type>::getDomain()const{
+template<typename CoordinateType>
+typename Vec<CoordinateType>::Domain Vec<CoordinateType>::getDomain()const{
     return (int)(*this).size();
 }
 
-template<typename Type>
-const Type & Vec<Type>::operator ()(unsigned int  i)const{
+template<typename CoordinateType>
+const CoordinateType & Vec<CoordinateType>::operator ()(unsigned int  i)const{
     POP_DbgAssert(  i<this->size());
     return (*this)[i];
 }
-template<typename Type>
-Type & Vec<Type>::operator ()(unsigned int  i){
+template<typename CoordinateType>
+CoordinateType & Vec<CoordinateType>::operator ()(unsigned int  i){
     POP_DbgAssert( i<this->size());
     return (*this)[i];
 }
 
-template<typename Type>
-void Vec<Type>::load(std::string file){
+template<typename CoordinateType>
+void Vec<CoordinateType>::load(std::string file){
     std::ifstream  in(file.c_str());
     if (in.fail())
     {
@@ -532,8 +532,8 @@ void Vec<Type>::load(std::string file){
         in>>*this;
     }
 }
-template<typename Type>
-void Vec<Type>::save(std::string file)const {
+template<typename CoordinateType>
+void Vec<CoordinateType>::save(std::string file)const {
     std::ofstream  out(file.c_str());
     if (out.fail())
     {
@@ -545,9 +545,9 @@ void Vec<Type>::save(std::string file)const {
         out<<*this;
     }
 }
-template<typename Type>
-F32 Vec<Type>::norm(int p)const{
-    Private::sumNorm<Type> op(p);
+template<typename CoordinateType>
+F32 Vec<CoordinateType>::norm(int p)const{
+    Private::sumNorm<CoordinateType> op(p);
     if(p==0||p==1)
         return std::accumulate(this->begin(),this->end(),0.f,op);
     if(p==2)
@@ -555,140 +555,140 @@ F32 Vec<Type>::norm(int p)const{
     else
         return std::pow(std::accumulate(this->begin(),this->end(),0.f,op),1.f/p);
 }
-template<typename Type>
-F32 Vec<Type>::normPower(int p)const{
-    Private::sumNorm<Type> op(p);
+template<typename CoordinateType>
+F32 Vec<CoordinateType>::normPower(int p)const{
+    Private::sumNorm<CoordinateType> op(p);
     return std::accumulate(this->begin(),this->end(),0.f,op);
 
 }
-template<typename Type>
-Type Vec<Type>::multCoordinate(){
-    Type sum=1;
+template<typename CoordinateType>
+CoordinateType Vec<CoordinateType>::multCoordinate(){
+    CoordinateType sum=1;
     for(unsigned int i=0;i<this->size();i++)
         sum*=this->operator ()(i);
     return sum;
 }
-template<typename Type>
-void Vec<Type>::display(){
+template<typename CoordinateType>
+void Vec<CoordinateType>::display(){
     std::cout<<*this<<std::endl;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator+=(const Vec<Type>& v)
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator+=(const Vec<CoordinateType>& v)
 {
     POP_DbgAssert( this->size()==v.size());
-    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::plus<Type>());
+    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::plus<CoordinateType>());
     return *this;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator-=(const Vec<Type>& v)
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator-=(const Vec<CoordinateType>& v)
 {
     POP_DbgAssert( this->size()==v.size());
-    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::minus<Type>());
+    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::minus<CoordinateType>());
     return *this;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator*=(const Vec<Type>& v)
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator*=(const Vec<CoordinateType>& v)
 {
     POP_DbgAssert( this->size()==v.size());
-    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::multiplies<Type>());
+    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::multiplies<CoordinateType>());
     return *this;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator/=(const Vec<Type>& v)
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator/=(const Vec<CoordinateType>& v)
 {
     POP_DbgAssert( this->size()==v.size());
-    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::divides<Type>());
+    std::transform(this->begin(),this->end(),v.begin(),this->begin(),std::divides<CoordinateType>());
     return *this;
 }
 
 
-template<typename Type>
-Vec<Type>  Vec<Type>::operator+(const Vec<Type>& v)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator+(const Vec<CoordinateType>& v)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout+=v;
     return vout;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator-(const Vec<Type>& v)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator-(const Vec<CoordinateType>& v)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout-=v;
     return vout;
 }
 
-template<typename Type>
-Vec<Type>  Vec<Type>::operator*(const Vec<Type>& v)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator*(const Vec<CoordinateType>& v)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout*=v;
     return vout;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator/(const Vec<Type>& v)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator/(const Vec<CoordinateType>& v)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout/=v;
     return vout;
 }
 
-template<typename Type>
-Vec<Type>  Vec<Type>::operator-()
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator-()
 {
-    Vec<Type> vout(this->getDomain());
-    std::transform(this->begin(),this->end(),vout.begin(),std::negate<Type>());
+    Vec<CoordinateType> vout(this->getDomain());
+    std::transform(this->begin(),this->end(),vout.begin(),std::negate<CoordinateType>());
     return vout;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator/=(Type v){
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator/=(CoordinateType v){
     for(unsigned int i=0;i<this->size();i++)
         this->operator ()(i)/=v;
     return *this;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator*=(Type v){
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator*=(CoordinateType v){
     for(unsigned int i=0;i<this->size();i++)
         this->operator ()(i)*=v;
     return *this;
 }
 
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator+=(Type v){
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator+=(CoordinateType v){
     for(unsigned int i=0;i<this->size();i++)
         this->operator ()(i)+=v;
     return *this;
 }
-template<typename Type>
-Vec<Type>&  Vec<Type>::operator-=(Type v){
+template<typename CoordinateType>
+Vec<CoordinateType>&  Vec<CoordinateType>::operator-=(CoordinateType v){
     for(unsigned int i=0;i<this->size();i++)
         this->operator ()(i)-=v;
     return *this;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator+(Type value)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator+(CoordinateType value)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout+=value;
     return vout;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator-(Type value)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator-(CoordinateType value)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout-=value;
     return vout;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator*(Type value)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator*(CoordinateType value)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout*=value;
     return vout;
 }
-template<typename Type>
-Vec<Type>  Vec<Type>::operator/(Type value)const
+template<typename CoordinateType>
+Vec<CoordinateType>  Vec<CoordinateType>::operator/(CoordinateType value)const
 {
-    Vec<Type> vout(*this);
+    Vec<CoordinateType> vout(*this);
     vout/=value;
     return vout;
 }
@@ -780,8 +780,8 @@ F32 normPowerValue(const pop::Vec<T1>& v1,int p=2){
 * \return norm
 *
 */
-template<typename Type1>
-F32 distance(const pop::Vec<Type1>& u, const pop::Vec<Type1>&  v,int p=2)
+template<typename CoordinateType1>
+F32 distance(const pop::Vec<CoordinateType1>& u, const pop::Vec<CoordinateType1>&  v,int p=2)
 {
     return normValue(u-v,p);
 }

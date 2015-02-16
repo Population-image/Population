@@ -51,7 +51,7 @@ namespace pop
 * \defgroup Complex  Complex{F32}
 * \brief template class for complex numbers in cartesian form
 */
-template<class Type>
+template<class ScalarType>
 class POP_EXPORTS Complex
 {
     /*!
@@ -59,7 +59,7 @@ class POP_EXPORTS Complex
         \brief Complex number a+ib
         \author Tariel Vincent
         \ingroup Complex
-        \tparam Type Number type
+        \tparam ScalarType Number type
         *
         *
         * A complex number is a number that can be put in the form a + bi, where a and b are  numbers and i is called the imaginary unit, where i^2 = −1.
@@ -77,7 +77,7 @@ class POP_EXPORTS Complex
         * \sa http://en.wikipedia.org/wiki/Complex_number
     */
 private:
-    Type _data[2];
+    ScalarType _data[2];
 public:
     /*! \var DIM
      * Space dimension equal to 2
@@ -94,7 +94,7 @@ public:
     \typedef F
     * type of the numbers
     */
-    typedef Type F;
+    typedef ScalarType F;
 
 
     /*!
@@ -123,7 +123,7 @@ public:
     *
     * constructor the complex number c = real_value + i* img_value
     */
-    Complex(const  Type & real_value,const Type & img_value=0)
+    Complex(const  ScalarType & real_value,const ScalarType & img_value=0)
     {
         _data[0]=real_value;
         _data[1]=img_value;
@@ -134,10 +134,10 @@ public:
     *
     * Access to the element at the given index i=0=real, i=1=imaginary
     */
-    Type & operator ()(int i){
+    ScalarType & operator ()(int i){
         return _data[i];
     }
-    const Type & operator ()(int i)const{
+    const ScalarType & operator ()(int i)const{
         return _data[i];
     }
     /*!
@@ -145,7 +145,7 @@ public:
     *
     * access to the real part
     */
-    Type & real()
+    ScalarType & real()
     {
         return _data[0];
     }
@@ -154,16 +154,16 @@ public:
     *
     * access to the imaginary part
     */
-    Type & img()
+    ScalarType & img()
     {
         return _data[1];
     }
-    const Type & real()
+    const ScalarType & real()
     const
     {
         return _data[0];
     }
-    const Type & img()
+    const ScalarType & img()
     const
     {
         return _data[1];
@@ -211,7 +211,7 @@ public:
     *
     * Adds all channels of this complex by the factor \sa value
     */
-    inline Complex & operator +=(Type value)
+    inline Complex & operator +=(ScalarType value)
     {
         this->real() += value;
         this->img() += value;
@@ -235,7 +235,7 @@ public:
     *
     * Substract all channels of this complex by the factor \sa value
     */
-    inline Complex & operator -=(Type value)
+    inline Complex & operator -=(ScalarType value)
     {
         this->real() -= value;
         this->img() -= value;
@@ -261,7 +261,7 @@ public:
     */
     inline Complex & operator *=(const Complex &p)
     {
-        Type temp= productInner(this->real(),p.real())-productInner(this->img(),p.img());
+        ScalarType temp= productInner(this->real(),p.real())-productInner(this->img(),p.img());
         this->img() = productInner(this->real(),p.img())+productInner(this->img(),p.real());
         this->real() = temp;
         return *this;
@@ -272,7 +272,7 @@ public:
     *
     * Multiply all channels of this complex by the factor \sa value
     */
-    inline Complex & operator *=(Type value)
+    inline Complex & operator *=(ScalarType value)
     {
         this->real() *= value;
         this->img()*= value;
@@ -286,17 +286,17 @@ public:
     */
     inline Complex & operator /=(const Complex &p)
     {
-        Type mod1= std::sqrt(productInner(this->real(),this->real())+productInner(this->img(),this->img()));
-        Type angle1 = std::acos(this->real()/mod1);
+        ScalarType mod1= std::sqrt(productInner(this->real(),this->real())+productInner(this->img(),this->img()));
+        ScalarType angle1 = std::acos(this->real()/mod1);
         if(this->img()<0)angle1=-angle1;
 
-        Type mod2= std::sqrt(productInner(p.real(),p.real())+productInner(p.img(),p.img()));
-        Type angle2 = std::acos(p.real()/mod2);
+        ScalarType mod2= std::sqrt(productInner(p.real(),p.real())+productInner(p.img(),p.img()));
+        ScalarType angle2 = std::acos(p.real()/mod2);
         if(p.img()<0)angle2=-angle2;
 
 
-        Type sumangle = angle1 + angle2;
-        Type divmod   = mod1/mod2;
+        ScalarType sumangle = angle1 + angle2;
+        ScalarType divmod   = mod1/mod2;
         this->real() = divmod * std::cos(sumangle);
         this->img() = divmod * std::sin(sumangle);
         return *this;
@@ -307,7 +307,7 @@ public:
     *
     * Divide all channels of this complex by the factor \sa value
     */
-    inline Complex & operator /=(Type value)
+    inline Complex & operator /=(ScalarType value)
     {
         this->real() /= value;
         this->img()/= value;
@@ -331,7 +331,7 @@ public:
     *
     * Multiply this complex by the contents of \a value.
     */
-    Complex  operator*(Type  value)const
+    Complex  operator*(ScalarType  value)const
     {
         Complex  x(*this);
         x*=value;
@@ -343,7 +343,7 @@ public:
         x/=x1;
         return x;
     }
-    Complex  operator/(Type  value)const
+    Complex  operator/(ScalarType  value)const
     {
         Complex  x(*this);
         x/=value;
@@ -367,7 +367,7 @@ public:
     *
     * Add this complex by the contents of \a value.
     */
-    Complex  operator+(Type  value)const
+    Complex  operator+(ScalarType  value)const
     {
         Complex  x(*this);
         x+=value;
@@ -391,7 +391,7 @@ public:
     *
     * Substract this complex by the contents of \a value.
     */
-    Complex  operator-(Type  value)const
+    Complex  operator-(ScalarType  value)const
     {
         Complex  x(*this);
         x-=value;
@@ -526,11 +526,11 @@ public:
             return normPowerValue(this->real(),p)+normPowerValue(this->img(),p);
     }
 #ifdef HAVE_SWIG
-    void setValue(int index, Type value){
+    void setValue(int index, ScalarType value){
         _data[index]=value;
     }
 
-    Type getValue(int index)const{
+    ScalarType getValue(int index)const{
         return _data[index];
     }
 #endif
@@ -571,8 +571,8 @@ Complex<T1>  operator-(T1  x2,const Complex<T1>&  x1)
 }
 
 
-template<typename Type>
-struct isVectoriel<Complex<Type> >{
+template<typename PixelType>
+struct isVectoriel<Complex<PixelType> >{
     enum { value =true};
 };
 template<typename TypeIn,typename TypeOut>

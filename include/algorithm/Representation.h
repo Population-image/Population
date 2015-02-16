@@ -293,10 +293,10 @@ struct POP_EXPORTS Representation
      * \brief truncate the matrix in order to have domain multiple of 2 for each coordinate
      *
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> truncateMulitple2(const MatN<DIM,TypePixel> & in)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> truncateMulitple2(const MatN<DIM,PixelType> & in)
     {
-        typename MatN<DIM,TypePixel>::E x;
+        typename MatN<DIM,PixelType>::E x;
         for(int i=0;i<DIM;i++){
             int j=1;
             while(j<=in.getDomain()(i)){
@@ -304,8 +304,8 @@ struct POP_EXPORTS Representation
             }
             x(i) = j/2;
         }
-        MatN<DIM,TypePixel> out(x);
-        typename MatN<DIM,TypePixel>::IteratorEDomain it       (out.getIteratorEDomain());
+        MatN<DIM,PixelType> out(x);
+        typename MatN<DIM,PixelType>::IteratorEDomain it       (out.getIteratorEDomain());
         while(it.next()){
             out(it.x())= in(it.x());
         }
@@ -313,23 +313,23 @@ struct POP_EXPORTS Representation
     }
     //@}
 private:
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel>   FFTOneDimension(const MatN<DIM,TypePixel> & in,int direction ){
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType>   FFTOneDimension(const MatN<DIM,PixelType> & in,int direction ){
         if(in.getDomain()(0)>1){
 
-            typename MatN<DIM,TypePixel>::E x;
+            typename MatN<DIM,PixelType>::E x;
             x =in.getDomain();
             x(0)/=2;
-            MatN<DIM,TypePixel>  fodd (x);
-            MatN<DIM,TypePixel> feven (x);
+            MatN<DIM,PixelType>  fodd (x);
+            MatN<DIM,PixelType> feven (x);
 
             for(int i =0; i< fodd.getDomain()(0);i++){
                 (fodd)(i)= (in)(2*i);
                 (feven)(i)= (in)(2*i+1);
             }
-            MatN<DIM,TypePixel>  Fodd = Representation::FFTOneDimension(fodd,direction);
-            MatN<DIM,TypePixel>  Feven = Representation::FFTOneDimension(feven,direction);
-            MatN<DIM,TypePixel> out (in.getDomain());
+            MatN<DIM,PixelType>  Fodd = Representation::FFTOneDimension(fodd,direction);
+            MatN<DIM,PixelType>  Feven = Representation::FFTOneDimension(feven,direction);
+            MatN<DIM,PixelType> out (in.getDomain());
             int half = in.getDomain()(0)/2;
 
             ComplexF32  w1,w;
@@ -351,9 +351,9 @@ private:
         }
         else
         {
-            typename MatN<DIM,TypePixel>::E x;
+            typename MatN<DIM,PixelType>::E x;
             x(0)=1;
-            MatN<DIM,TypePixel> out (x);
+            MatN<DIM,PixelType> out (x);
             x(0)=0;
             (out) (x) = (in) (x);
             return out;

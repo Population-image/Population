@@ -47,6 +47,25 @@ private:
 
 }
 
+/*!
+ * \brief The ConvertRV32ToGrey struct is used as a rainbow table to speed up the call to lumi()
+ */
+class ConvertRV32ToGrey{
+private:
+    static bool init;
+    static pop::UI8 _look_up_table[256][256][256];
+    static pop::UI8 lumi(const pop::VecN<4,pop::UI8> &rgb);
+};
+
+/*!
+ * \brief The ConvertRV32ToRGBUI8 struct is used to speed up the call to lumi()
+ */
+struct ConvertRV32ToRGBUI8
+{
+    static pop::RGBUI8 lumi(const pop::VecN<4,pop::UI8> &rgb);
+};
+
+
 #endif
 
 #endif // VIDEOVLC_H

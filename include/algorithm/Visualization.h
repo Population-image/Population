@@ -90,11 +90,11 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html outilcluster.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> labelToRandomRGB(const MatN<DIM,TypePixel> & f )
+    template<int DIM,typename PixelType>
+    static MatN<DIM,RGBUI8> labelToRandomRGB(const MatN<DIM,PixelType> & f )
     {
         MatN<DIM,RGBUI8> fRGB(f.getDomain());
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
 
         I32 value1=234;
         I32 value2=27;
@@ -148,13 +148,13 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html outdistance.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> labelToRGBGradation (const MatN<DIM,TypePixel> & f,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0)  )
+    template<int DIM,typename PixelType>
+    static MatN<DIM,RGBUI8> labelToRGBGradation (const MatN<DIM,PixelType> & f,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0)  )
     {
         MatN<DIM,RGBUI8> fRGB(f.getDomain());
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
-        typename MatN<DIM,TypePixel>::F maxi = NumericLimits<typename MatN<DIM,TypePixel>::F>::minimumRange();
-        typename MatN<DIM,TypePixel>::F mini = NumericLimits<typename MatN<DIM,TypePixel>::F>::maximumRange();
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::F maxi = NumericLimits<typename MatN<DIM,PixelType>::F>::minimumRange();
+        typename MatN<DIM,PixelType>::F mini = NumericLimits<typename MatN<DIM,PixelType>::F>::maximumRange();
         while(it.next()){
             if(f(it.x())!=0){
                 maxi = maximum(maxi,f(it.x()));
@@ -213,13 +213,13 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html average.png
     */
-    template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,TypePixel2> labelAverageRGB(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img)
+    template<int DIM,typename PixelType1,typename PixelType2>
+    static MatN<DIM,PixelType2> labelAverageRGB(const MatN<DIM,PixelType1> & label,const MatN<DIM,PixelType2> & img)
     {
         FunctionAssert(label,img,"Visualization::labelAverageRGB");
-        typename MatN<DIM,TypePixel1>::IteratorEDomain it (img.getIteratorEDomain());
-        MatN<DIM,typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F32>::Result> in(img);
-        std::vector<typename FunctionTypeTraitsSubstituteF<TypePixel2 ,F32>::Result> vaverage;
+        typename MatN<DIM,PixelType1>::IteratorEDomain it (img.getIteratorEDomain());
+        MatN<DIM,typename FunctionTypeTraitsSubstituteF<PixelType2 ,F32>::Result> in(img);
+        std::vector<typename FunctionTypeTraitsSubstituteF<PixelType2 ,F32>::Result> vaverage;
         std::vector<UI32> voccurence;
         it.init();
         while(it.next())
@@ -232,12 +232,12 @@ struct POP_EXPORTS Visualization
             vaverage[label(it.x())]=vaverage[label(it.x())]+in(it.x());
             voccurence[label(it.x())]++;
         }
-        MatN<DIM,TypePixel2> average(label.getDomain());
+        MatN<DIM,PixelType2> average(label.getDomain());
         it.init();
         while(it.next())
         {
             F32 div = (1./voccurence[label(it.x())]);
-            typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,TypePixel2>::F ,F32>::Result value(vaverage[label(it.x())]);
+            typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,PixelType2>::F ,F32>::Result value(vaverage[label(it.x())]);
             value = value*div;
             average(it.x())=value;
         }
@@ -278,14 +278,14 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html foregroundboundary.png
     */
-    template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,RGBUI8> labelForegroundBoundary(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,int width=1,int norm=1)
+    template<int DIM,typename PixelType1,typename PixelType2>
+    static MatN<DIM,RGBUI8> labelForegroundBoundary(const MatN<DIM,PixelType1> & label,const MatN<DIM,PixelType2> & img,int width=1,int norm=1)
     {
-        MatN<DIM,TypePixel1>  labelb(label.getDomain());
-        typename MatN<DIM,TypePixel1>::IteratorEDomain it (label.getIteratorEDomain());
-        typename MatN<DIM,TypePixel1>::IteratorENeighborhood itn(label.getIteratorENeighborhood(width,norm));
+        MatN<DIM,PixelType1>  labelb(label.getDomain());
+        typename MatN<DIM,PixelType1>::IteratorEDomain it (label.getIteratorEDomain());
+        typename MatN<DIM,PixelType1>::IteratorENeighborhood itn(label.getIteratorENeighborhood(width,norm));
         while(it.next()){
-            typename MatN<DIM,TypePixel1>::F l = label(it.x());
+            typename MatN<DIM,PixelType1>::F l = label(it.x());
             itn.init(it.x());
             bool diff=false;
             while(itn.next()){
@@ -299,10 +299,10 @@ struct POP_EXPORTS Visualization
 
 
 
-        FunctorF::FunctorAccumulatorMin<typename MatN<DIM,TypePixel1>::F > funcmini;
+        FunctorF::FunctorAccumulatorMin<typename MatN<DIM,PixelType1>::F > funcmini;
         it.init();
         I32 min = forEachFunctorAccumulator(labelb,funcmini,it);
-        FunctorF::FunctorAccumulatorMax<typename MatN<DIM,TypePixel1>::F > funcmaxi;
+        FunctorF::FunctorAccumulatorMax<typename MatN<DIM,PixelType1>::F > funcmaxi;
         it.init();
         I32 max = forEachFunctorAccumulator(labelb,funcmaxi,it);
 
@@ -374,16 +374,16 @@ struct POP_EXPORTS Visualization
      * \image html foreground.png
     */
 
-    template<int DIM,typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,TypePixel1> & label,const MatN<DIM,TypePixel2> & img,F32 ratio=0.5)
+    template<int DIM,typename PixelType1,typename PixelType2>
+    static MatN<DIM,RGBUI8> labelForeground(const MatN<DIM,PixelType1> & label,const MatN<DIM,PixelType2> & img,F32 ratio=0.5)
     {
         FunctionAssert(label,img,"Visualization::labelForeground");
-        typename MatN<DIM,TypePixel1>::IteratorEDomain it (label.getIteratorEDomain());
+        typename MatN<DIM,PixelType1>::IteratorEDomain it (label.getIteratorEDomain());
 
-        FunctorF::FunctorAccumulatorMin<typename MatN<DIM,TypePixel1>::F > funcmini;
+        FunctorF::FunctorAccumulatorMin<typename MatN<DIM,PixelType1>::F > funcmini;
         it.init();
         I32 min = forEachFunctorAccumulator(label,funcmini,it);
-        FunctorF::FunctorAccumulatorMax<typename MatN<DIM,TypePixel1>::F > funcmaxi;
+        FunctorF::FunctorAccumulatorMax<typename MatN<DIM,PixelType1>::F > funcmaxi;
         it.init();
         I32 max = forEachFunctorAccumulator(label,funcmaxi,it);
 
@@ -448,8 +448,8 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html cube.png
     */
-    template<typename TypePixel>
-    static void cube(Scene3d& scene,const MatN<3,TypePixel> & m)
+    template<typename PixelType>
+    static void cube(Scene3d& scene,const MatN<3,PixelType> & m)
     {
 
 
@@ -479,8 +479,8 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html cubeline.png
     */
-    template<typename TypePixel>
-    static void lineCube(Scene3d& scene,const MatN<3,TypePixel> & img,F32 width=2,RGBUI8 RGB=RGBUI8(255,0,0))
+    template<typename PixelType>
+    static void lineCube(Scene3d& scene,const MatN<3,PixelType> & img,F32 width=2,RGBUI8 RGB=RGBUI8(255,0,0))
     {
 
         int d0 = img.getDomain()(0);
@@ -667,8 +667,8 @@ struct POP_EXPORTS Visualization
      * \endcode
      * \image html marchingcube.png
     */
-    template<typename TypePixel>
-    static void marchingCube(Scene3d& scene,const MatN<3,TypePixel> & img )
+    template<typename PixelType>
+    static void marchingCube(Scene3d& scene,const MatN<3,PixelType> & img )
     {
 
         MatN<3,RGBUI8 >   binc;
@@ -843,11 +843,11 @@ struct POP_EXPORTS Visualization
      * \image html cube.png "initial image"
      * \image html spinodal_skeleton.png "Topological skeleton"
     */
-    template<typename TypePixel>
-    static void voxelSurface(Scene3d & scene , const MatN<3,TypePixel> & img)
+    template<typename PixelType>
+    static void voxelSurface(Scene3d & scene , const MatN<3,PixelType> & img)
     {
-        MatN<3,TypePixel> f(img.getDomain()+2);
-        typename MatN<3,TypePixel>::IteratorEDomain it (img.getIteratorEDomain());
+        MatN<3,PixelType> f(img.getDomain()+2);
+        typename MatN<3,PixelType>::IteratorEDomain it (img.getIteratorEDomain());
 
         while(it.next())
         {
@@ -856,14 +856,14 @@ struct POP_EXPORTS Visualization
             f(x)=img(it.x());
         }
 
-        typename MatN<3,TypePixel>::IteratorEDomain itg(f.getIteratorEDomain());
-        typename MatN<3,TypePixel>::IteratorENeighborhood itn(f.getIteratorENeighborhood(1,1));
+        typename MatN<3,PixelType>::IteratorEDomain itg(f.getIteratorEDomain());
+        typename MatN<3,PixelType>::IteratorENeighborhood itn(f.getIteratorENeighborhood(1,1));
 
         while(itg.next()){
-            if(f(itg.x())!=typename MatN<3,TypePixel>::F(0) ){
+            if(f(itg.x())!=typename MatN<3,PixelType>::F(0) ){
                 itn.init(itg.x());
                 while(itn.next()){
-                    if(f(itn.x())==typename MatN<3,TypePixel>::F(0)){
+                    if(f(itn.x())==typename MatN<3,PixelType>::F(0)){
                         FigureUnitSquare * square = new FigureUnitSquare();
                         RGBUI8 c(f(itg.x()));
                         square->setRGB(c);
@@ -977,8 +977,8 @@ struct POP_EXPORTS Visualization
      * \image html planegl.png
     */
 
-    template<typename TypePixel>
-    static void  plane(Scene3d &scene, const MatN<3,TypePixel> & img,int slice=0, int direction=2,int normal_way=1,Vec3F32 trans = Vec3F32())
+    template<typename PixelType>
+    static void  plane(Scene3d &scene, const MatN<3,PixelType> & img,int slice=0, int direction=2,int normal_way=1,Vec3F32 trans = Vec3F32())
     {
 
 
@@ -992,12 +992,12 @@ struct POP_EXPORTS Visualization
             slice =0;
 
 
-        MatN<2,TypePixel> hyperff(img.getDomain().removeCoordinate(direction));
-        typename MatN<2,TypePixel> ::IteratorEDomain it_plane(hyperff.getIteratorEDomain());
+        MatN<2,PixelType> hyperff(img.getDomain().removeCoordinate(direction));
+        typename MatN<2,PixelType> ::IteratorEDomain it_plane(hyperff.getIteratorEDomain());
         while(it_plane.next()){
             hyperff(it_plane.x()) = img(it_plane.x().addCoordinate(direction,slice));
         }
-        typename MatN<2,TypePixel>::IteratorEDomain it (hyperff.getIteratorEDomain());
+        typename MatN<2,PixelType>::IteratorEDomain it (hyperff.getIteratorEDomain());
         VecN<3,F32 > normal;
         if(normal_way==1)
             normal(direction)=1;
@@ -1140,10 +1140,10 @@ struct POP_EXPORTS Visualization
      * \image html tomatrix.jpg
      */
 
-    template<typename Type>
-    static void  topography(Scene3d &scene, const MatN<2,Type> & img)
+    template<typename PixelType>
+    static void  topography(Scene3d &scene, const MatN<2,PixelType> & img)
     {
-        Type maxi = 0;
+        PixelType maxi = 0;
         ForEachDomain2D(x,img){
             maxi = maximum(maxi,img(x));
             Vec2I32 x1(x),x2(x),x3(x);
@@ -1239,11 +1239,11 @@ struct POP_EXPORTS Visualization
     The matrix is the final matrix of this animation:
     \image html outilvelocity.gif
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,RGBUI8> vectorField2DToArrows(const MatN<DIM,VecN<DIM,TypePixel> > & vectorfield,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0),int step=30,F32 length=90){
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(vectorfield.getIteratorEDomain());
-        TypePixel maxi = NumericLimits<TypePixel   >::minimumRange();
-        TypePixel mini = NumericLimits<TypePixel   >::maximumRange();
+    template<int DIM,typename PixelType>
+    static MatN<DIM,RGBUI8> vectorField2DToArrows(const MatN<DIM,VecN<DIM,PixelType> > & vectorfield,RGBUI8 cmin=RGBUI8(0,0,255),RGBUI8 cmax=RGBUI8(255,0,0),int step=30,F32 length=90){
+        typename MatN<DIM,PixelType>::IteratorEDomain it(vectorfield.getIteratorEDomain());
+        PixelType maxi = NumericLimits<PixelType   >::minimumRange();
+        PixelType mini = NumericLimits<PixelType   >::maximumRange();
         while(it.next()){
             maxi = maximum(maxi,vectorfield(it.x()).norm());
             mini = minimum(mini,vectorfield(it.x()).norm());

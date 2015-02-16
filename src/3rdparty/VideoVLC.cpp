@@ -280,6 +280,25 @@ Mat2RGBUI8& VideoVLC::retrieveMatrixRGB(){
 bool VideoVLC::isPlaying() const {
     return (!context->playing_started) || (libvlc_media_player_is_playing(mediaPlayer) && !context->end_reached);
 }
+bool ConvertRV32ToGrey::init =false;
+UI8 ConvertRV32ToGrey::_look_up_table[256][256][256];
+pop::UI8 ConvertRV32ToGrey::lumi(const pop::VecN<4,pop::UI8> &rgb){
+    if(init==false){
+        init= true;
+        for(unsigned int i=0;i<256;i++){
+            for(unsigned int j=0;j<256;j++){
+                for(unsigned int k=0;k<256;k++){
+                    _look_up_table[i][j][k]=ArithmeticsSaturation<pop::UI8,pop::F64>::Range(0.299*i + 0.587*j + 0.114*k+0.000001);
+                }
+            }
+        }
+    }
+    return _look_up_table[rgb(2)][rgb(1)][rgb(0)];
+}
+
+static pop::RGBUI8 ConvertRV32ToRGBUI8::lumi(const pop::VecN<4,pop::UI8> &rgb){
+    return pop::RGBUI8(rgb(2),rgb(1),rgb(0));
+}
 
 }
 

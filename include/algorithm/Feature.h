@@ -201,8 +201,8 @@ public:
     * \endcode
     * \image html lenaharris.jpg
     */
-    template<int DIM,typename TypePixel>
-    static Vec<KeyPoint<DIM> > keyPointHarris(const MatN<DIM,TypePixel> & img,F32 sigma = 2,F32 kappa=0.20)
+    template<int DIM,typename PixelType>
+    static Vec<KeyPoint<DIM> > keyPointHarris(const MatN<DIM,PixelType> & img,F32 sigma = 2,F32 kappa=0.20)
     {
 
         MatN<DIM,F32> imgf(img);
@@ -252,8 +252,8 @@ public:
     *
     *
     */
-    template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,Type> & pyramid_gaussian,F32 threshold_low_contrast=0.04,F32 ratio_edge_response=10)
+    template<int DIM,typename PixelType>
+    static Vec<KeyPointPyramid<DIM> > keyPointSIFT(const Pyramid<DIM,PixelType> & pyramid_gaussian,F32 threshold_low_contrast=0.04,F32 ratio_edge_response=10)
     {
         Pyramid<DIM,F32>         pyramid_difference=  Feature::pyramidDifference(pyramid_gaussian);
         Vec<KeyPointPyramid<DIM> > extrema   =   Feature::pyramidExtrema(pyramid_difference);
@@ -286,14 +286,14 @@ public:
         * \image html SphereOfSphere.png
         */
 
-    template<int DIM,typename Type>
-    static Vec<Descriptor<KeyPointPyramid<DIM> > > descriptorPyramidPieChart(const Pyramid<DIM,Type>& pyramid_G,const Vec<KeyPointPyramid<DIM> >   & keypoints, F32 sigma=1.6,F32 scale_factor_gaussien=4,int nbr_orientation=6)
+    template<int DIM,typename PixelType>
+    static Vec<Descriptor<KeyPointPyramid<DIM> > > descriptorPyramidPieChart(const Pyramid<DIM,PixelType>& pyramid_G,const Vec<KeyPointPyramid<DIM> >   & keypoints, F32 sigma=1.6,F32 scale_factor_gaussien=4,int nbr_orientation=6)
     {
         Vec<Descriptor<KeyPointPyramid<DIM> > > descriptors;
 
 
-        const MatN<DIM+1,Type> & octaveinit = pyramid_G.octave(0);
-        typename MatN<DIM,Type>::IteratorENeighborhood itn (pyramid_G.getLayer(0,0).getIteratorENeighborhood(sigma*2*3*scale_factor_gaussien,2));
+        const MatN<DIM+1,PixelType> & octaveinit = pyramid_G.octave(0);
+        typename MatN<DIM,PixelType>::IteratorENeighborhood itn (pyramid_G.getLayer(0,0).getIteratorENeighborhood(sigma*2*3*scale_factor_gaussien,2));
         F32 k = std::pow( 2., 1. / (octaveinit.getDomain()(DIM)-pyramid_G.getNbrExtraLayerPerOctave()) );
 
 
@@ -302,7 +302,7 @@ public:
             const KeyPointPyramid<DIM>  & keypoint =keypoints[index_extrema];
             int octave =keypoint.octave();
             F32 layer=round(keypoint.layer());
-            MatN<DIM,Type> plane= pyramid_G.getLayer(octave,layer);
+            MatN<DIM,PixelType> plane= pyramid_G.getLayer(octave,layer);
             itn.setDomainMatN(plane.getDomain());
             VecN<DIM,F32> x =keypoint.xInPyramid();
             itn.init(round(x));
@@ -318,12 +318,12 @@ public:
         }
         return descriptors;
     }
-    template<int DIM,typename Type,typename TKeyPoint>
-    static Vec<Descriptor<TKeyPoint> > descriptorPieChart(const MatN<DIM,Type>& f,const Vec<TKeyPoint >   & keypoints, F32 radius=10,int nbr_orientation=6)
+    template<int DIM,typename PixelType,typename TKeyPoint>
+    static Vec<Descriptor<TKeyPoint> > descriptorPieChart(const MatN<DIM,PixelType>& f,const Vec<TKeyPoint >   & keypoints, F32 radius=10,int nbr_orientation=6)
     {
         MatN<DIM,F32> img(f);
         Vec<Descriptor<TKeyPoint> > descriptors;
-        typename MatN<DIM,Type>::IteratorENeighborhood itn (img.getIteratorENeighborhood(radius*2,2));
+        typename MatN<DIM,PixelType>::IteratorENeighborhood itn (img.getIteratorENeighborhood(radius*2,2));
 
         for(int index_extrema=0;index_extrema<(int)keypoints.size();index_extrema++){
             const TKeyPoint  & keypoint =keypoints[index_extrema];
@@ -446,8 +446,8 @@ public:
     * \endcode
     *
     */
-    template<int DIM,typename Type>
-    static Pyramid<DIM,F32 > pyramidGaussian(const MatN<DIM,Type> & img,  F32 sigma=1.6,F32 sigma_init=0.5,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
+    template<int DIM,typename PixelType>
+    static Pyramid<DIM,F32 > pyramidGaussian(const MatN<DIM,PixelType> & img,  F32 sigma=1.6,F32 sigma_init=0.5,int number_octave=-1,int number_layers_per_octave=3,int number_extra_layer_per_octave=3)
     {
         MatN<DIM,F32> I(img);
 
@@ -503,9 +503,9 @@ public:
 
 
     */
-    template<int DIM,typename Type>
-    static Pyramid<DIM,Type > pyramidDifference(const Pyramid<DIM,Type > & pyramid){
-        Pyramid<DIM,Type > pyramiddiff;
+    template<int DIM,typename PixelType>
+    static Pyramid<DIM,PixelType> pyramidDifference(const Pyramid<DIM,PixelType> & pyramid){
+        Pyramid<DIM,PixelType> pyramiddiff;
         for(unsigned int index_octave=0;index_octave<pyramid.nbrOctave();index_octave++){
             pyramiddiff.pushOctave(pyramid.octave(index_octave).getDomain(),pyramid.nbrLayers(index_octave) -1);
             for(unsigned int scale=0;scale<pyramiddiff.nbrLayers(index_octave);scale++){
@@ -523,19 +523,19 @@ public:
     * \param nbr_layer_per_octave number of layers per octave
     * \return extrema of the pyramid
     */
-    template<int DIM,typename Type>
-    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,Type>& pyramid_DofG,F32 contrast_threshold=0.04, int border=5,unsigned int nbr_layer_per_octave=3){
+    template<int DIM,typename PixelType>
+    static  Vec<KeyPointPyramid<DIM> > pyramidExtrema(const Pyramid<DIM,PixelType>& pyramid_DofG,F32 contrast_threshold=0.04, int border=5,unsigned int nbr_layer_per_octave=3){
         F32 threshold = 0.5*contrast_threshold/(pyramid_DofG.nbrLayers(0)-2);
         Vec<KeyPointPyramid<DIM> >  extrema;
         for(unsigned int index_octave=0;index_octave<pyramid_DofG.nbrOctave();index_octave++){
-            const MatN<DIM+1,Type> & foctave = pyramid_DofG.octave(index_octave);
-            VecN<DIM+1,Type> xmin(border);
+            const MatN<DIM+1,PixelType> & foctave = pyramid_DofG.octave(index_octave);
+            VecN<DIM+1,PixelType> xmin(border);
             xmin(DIM)=1;
-            VecN<DIM+1,Type> xmax(foctave.getDomain()-1-border);
+            VecN<DIM+1,PixelType> xmax(foctave.getDomain()-1-border);
             xmax(DIM)= foctave.getDomain()(DIM)-2;
 
-            typename MatN<DIM+1,Type>::IteratorERectangle itg (foctave.getIteratorERectangle(xmin,xmax));
-            typename MatN<DIM+1,Type>::IteratorENeighborhood itn (foctave.getIteratorENeighborhood(1,0));
+            typename MatN<DIM+1,PixelType>::IteratorERectangle itg (foctave.getIteratorERectangle(xmin,xmax));
+            typename MatN<DIM+1,PixelType>::IteratorENeighborhood itn (foctave.getIteratorENeighborhood(1,0));
             while(itg.next()){
                 F32 value = foctave(itg.x());
                 if(std::abs(value)>threshold)
@@ -581,8 +581,8 @@ public:
     * \return extrema after the adjustements (the VecNs are located with float type for more precisions)
     */
 
-    template<int DIM,typename Type>
-    static   Vec<KeyPointPyramid<DIM> >  pyramidExtremaAdjust(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, int border=5, int max_iteration=5){
+    template<int DIM,typename PixelType>
+    static   Vec<KeyPointPyramid<DIM> >  pyramidExtremaAdjust(const Pyramid<DIM,PixelType> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, int border=5, int max_iteration=5){
 
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust;
         FunctorPDE::Gradient<> grad;
@@ -625,8 +625,8 @@ public:
     * \return extrema without unstable extrema
     */
 
-    template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,Type> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, F32 contrast_threshold=0.04)
+    template<int DIM,typename PixelType>
+    static Vec<KeyPointPyramid<DIM> >   pyramidExtremaThresholdLowContrast(const Pyramid<DIM,PixelType> & pyramid_DofG,const Vec<KeyPointPyramid<DIM> >  & extrema, F32 contrast_threshold=0.04)
     {
 
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust2;
@@ -649,8 +649,8 @@ public:
     * \return extrema without unstable extrema
 
     */
-    template<int DIM,typename Type>
-    static Vec<KeyPointPyramid<DIM> >  pyramidExtremaThresholdEdgeResponse(const Pyramid<DIM,Type>& pyramid_DofG,const Vec<KeyPointPyramid<DIM> >   & extrema, F32 ratio_threshold=10)
+    template<int DIM,typename PixelType>
+    static Vec<KeyPointPyramid<DIM> >  pyramidExtremaThresholdEdgeResponse(const Pyramid<DIM,PixelType>& pyramid_DofG,const Vec<KeyPointPyramid<DIM> >   & extrema, F32 ratio_threshold=10)
     {
         Vec<KeyPointPyramid<DIM> > v_extrema_adjust3;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
@@ -703,8 +703,8 @@ public:
     \image html Image2.jpg
     \image html Panorama.jpg
     */
-    template<typename TypePixel>
-    static MatN<2,TypePixel> panoramic(const Vec<MatN<2,TypePixel> >  & V_img_fromleft_toright,int mode_transformation=1,F32 distmax=1,unsigned int number_match_point=100,unsigned int min_overlap=20){
+    template<typename PixelType>
+    static MatN<2,PixelType> panoramic(const Vec<MatN<2,PixelType> >  & V_img_fromleft_toright,int mode_transformation=1,F32 distmax=1,unsigned int number_match_point=100,unsigned int min_overlap=20){
         typedef KeyPointPyramid<2> KeyPointAlgo;
         Vec<Vec<DescriptorMatch<Descriptor<KeyPointAlgo > > > >  matchs;
         for(unsigned int i=0;i<V_img_fromleft_toright.size()-1;i++){
@@ -739,7 +739,7 @@ public:
             }
         }
         Mat2x33F32 Mmult = Mat2x33F32::identity();
-        MatN<2,TypePixel> panoramic(V_img_fromleft_toright[0]);
+        MatN<2,PixelType> panoramic(V_img_fromleft_toright[0]);
         for(unsigned int i=0;i<v_hom.size();i++){
 
             Mmult = v_hom[i]*Mmult;
@@ -763,8 +763,8 @@ public:
     * \param radius circle radius
     * \return output matrix
    */
-    template<int DIM,typename Type,typename TKeyPoint>
-    static MatN<DIM,RGBUI8>  drawKeyPointsCircle(const MatN<DIM,Type> & f,const Vec<TKeyPoint >    & key_points,int radius=2)
+    template<int DIM,typename PixelType,typename TKeyPoint>
+    static MatN<DIM,RGBUI8>  drawKeyPointsCircle(const MatN<DIM,PixelType> & f,const Vec<TKeyPoint >    & key_points,int radius=2)
     {
         MatN<DIM,RGBUI8> h(f);
         for(unsigned int index_extrema=0;index_extrema<key_points.size();index_extrema++){
@@ -782,8 +782,8 @@ public:
     * \param sigma sigma filter of the gaussian pyramid
     * \return output matrix
    */
-    template<int DIM,typename Type,typename TDescriptor>
-    static MatN<DIM,RGBUI8>  drawDescriptorArrow(const MatN<DIM,Type> & f,const Vec<TDescriptor >    & descriptors,int length=20,F32 sigma=1.6)
+    template<int DIM,typename PixelType,typename TDescriptor>
+    static MatN<DIM,RGBUI8>  drawDescriptorArrow(const MatN<DIM,PixelType> & f,const Vec<TDescriptor >    & descriptors,int length=20,F32 sigma=1.6)
     {
         MatN<DIM,RGBUI8> h(f);
         for(unsigned int index_extrema=0;index_extrema<descriptors.size();index_extrema++){
@@ -808,8 +808,8 @@ public:
     * \return matrix representing the matched descriptors
     */
 
-    template<int DIM,typename Type,typename Descriptor>
-    static MatN<DIM,RGBUI8>  drawDescriptorMatch(const MatN<DIM,Type> & f,const MatN<DIM,Type> & g,const Vec<DescriptorMatch<Descriptor >   >   & match_descriptor,unsigned int line_width=1)
+    template<int DIM,typename PixelType,typename Descriptor>
+    static MatN<DIM,RGBUI8>  drawDescriptorMatch(const MatN<DIM,PixelType> & f,const MatN<DIM,PixelType> & g,const Vec<DescriptorMatch<Descriptor >   >   & match_descriptor,unsigned int line_width=1)
     {
         MatN<DIM,RGBUI8> imgrgb =Draw::mergeTwoMatrixHorizontal(f,g);
         for(unsigned int i=0;i<match_descriptor.size();i++){
@@ -846,19 +846,19 @@ public:
      * cout<<Statistics::orientationPrincipalMean(v_orientation)<<endl;
      * \endcode
     */
-    template<int DIM,typename Type>
-    static VecN<DIM,Type> orientationPrincipalMean(const Vec<VecN<DIM,Type> > & v_orientions, const Vec<Type > & weight=std::vector<Type >(0))
+    template<int DIM,typename PixelType>
+    static VecN<DIM,PixelType> orientationPrincipalMean(const Vec<VecN<DIM,PixelType> > & v_orientions, const Vec<PixelType> & weight=std::vector<PixelType >(0))
     {
 
         if(weight.size()==0){
-            VecN<DIM,Type> sum_of_elems= std::accumulate(v_orientions.begin(),v_orientions.end(),VecN<DIM,Type>())*(1./v_orientions.size());
+            VecN<DIM,PixelType> sum_of_elems= std::accumulate(v_orientions.begin(),v_orientions.end(),VecN<DIM,PixelType>())*(1./v_orientions.size());
             return sum_of_elems*(1/sum_of_elems.norm());
         }
         else
         {
-            VecN<DIM,Type>  sum_of_elems(0);
-            typename std::vector<Type >::const_iterator jw=weight.begin();
-            typename std::vector<VecN<DIM,Type> >::const_iterator jo=v_orientions.begin();
+            VecN<DIM,PixelType>  sum_of_elems(0);
+            typename std::vector<PixelType>::const_iterator jw=weight.begin();
+            typename std::vector<VecN<DIM,PixelType> >::const_iterator jo=v_orientions.begin();
             for(;jo!=v_orientions.end();++jo,++jw)
                 sum_of_elems += ((*jo)*(*jw));
             return sum_of_elems*(1./sum_of_elems.norm());
@@ -883,8 +883,8 @@ public:
      * cout<<Statistics::orientationPrincipalHistogram(v_orientation)<<endl;
      * \endcode
     */
-    template<typename Type>
-    static VecN<2,Type> orientationPrincipalHistogram(const Vec<VecN<2,Type> > & v_orientions, const Vec<Type > & weight,int nbr_angle=36)
+    template<typename PixelType>
+    static VecN<2,PixelType> orientationPrincipalHistogram(const Vec<VecN<2,PixelType> > & v_orientions, const Vec<PixelType> & weight,int nbr_angle=36)
     {
         Vec<F32> repartition(nbr_angle);
         Vec<F32> angles;
@@ -901,15 +901,15 @@ public:
             v_affect.push_back(indice);
         }
         I32 index_max = I32 (std::max_element(repartition.begin(),repartition.end())-repartition.begin());
-        VecN<2,Type>  sum_of_elems(0);
+        VecN<2,PixelType>  sum_of_elems(0);
         for(unsigned int i=0;i<v_orientions.size();i++){
             if(v_affect[i]==index_max)
                 sum_of_elems += (v_orientions[i]*weight[i]);
         }
         return sum_of_elems*(1./sum_of_elems.norm());
     }
-    template<int DIM,typename TypePixel,typename IteratorNeigh>
-    static VecN<DIM,F32>   orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,F32 sigma)
+    template<int DIM,typename PixelType,typename IteratorNeigh>
+    static VecN<DIM,F32>   orientationMeanDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,PixelType>& f, IteratorNeigh& itn,F32 sigma)
     {
         FunctorPDE::Gradient<> gradient;
         Vec<F32>  gradient_magnitude;
@@ -928,8 +928,8 @@ public:
         }
         return orientationPrincipalMean(gradient_orientation,gradient_magnitude);
     }
-    template<int DIM,typename TypePixel,typename IteratorNeigh>
-    static Mat2F32   pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,TypePixel>& f, IteratorNeigh& itn,VecN<DIM,F32> &orientation,int nbr_orientation, F32 sigma)
+    template<int DIM,typename PixelType,typename IteratorNeigh>
+    static Mat2F32   pieChartInPieChartDoubleWeighByGradienMagnitudeAndGaussianCircularWindow(const MatN<DIM,PixelType>& f, IteratorNeigh& itn,VecN<DIM,F32> &orientation,int nbr_orientation, F32 sigma)
     {
         FunctorPDE::Gradient<> gradient;
         PieChartInPieChart<DIM> disk(orientation,nbr_orientation);

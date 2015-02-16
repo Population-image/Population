@@ -162,44 +162,44 @@ struct ArithmeticsTrait;
 
 
 namespace Private{
-template<typename Type,int isVect>
+template<typename PixelType,int isVect>
 struct TypeTraitsTypeScalarTest;
 
-template<typename Type>
-struct TypeTraitsTypeScalarTest<Type,true>{
-    typedef typename Type::F Result;
+template<typename PixelType>
+struct TypeTraitsTypeScalarTest<PixelType,true>{
+    typedef typename PixelType::F Result;
 };
-template<typename Type>
-struct TypeTraitsTypeScalarTest<Type,false>{
-    typedef  Type Result;
+template<typename PixelType>
+struct TypeTraitsTypeScalarTest<PixelType,false>{
+    typedef  PixelType Result;
 };
 
-template<typename Type1,typename Type2,int isVect1,int isVect2>
+template<typename Type1,typename PixelType2,int isVect1,int isVect2>
 struct ArithmeticsTraitTest;
 
-template<typename Type1,typename Type2>
-struct ArithmeticsTraitTest<Type1,Type2,false,false>
+template<typename PixelType1,typename PixelType2>
+struct ArithmeticsTraitTest<PixelType1,PixelType2,false,false>
 {
-    typedef Type1 Result;
+    typedef PixelType1 Result;
 };
-template<typename Type1,typename Type2>
-struct ArithmeticsTraitTest<Type1,Type2,true,false>
+template<typename PixelType1,typename PixelType2>
+struct ArithmeticsTraitTest<PixelType1,PixelType2,true,false>
 {
-    typedef typename TypeTraitsTypeScalar<Type1 >::Result Type1Scalar;
-    typedef typename FunctionTypeTraitsSubstituteF<Type1,typename ArithmeticsTrait<Type1Scalar,Type2>::Result>::Result Result;
+    typedef typename TypeTraitsTypeScalar<PixelType1 >::Result PixelType1Scalar;
+    typedef typename FunctionTypeTraitsSubstituteF<PixelType1,typename ArithmeticsTrait<PixelType1Scalar,PixelType2>::Result>::Result Result;
 };
-template<typename Type1,typename Type2>
-struct ArithmeticsTraitTest<Type1,Type2,false, true>
+template<typename PixelType1,typename PixelType2>
+struct ArithmeticsTraitTest<PixelType1,PixelType2,false, true>
 {
-    typedef typename TypeTraitsTypeScalar<Type2>::Result Type2Scalar;
-    typedef typename FunctionTypeTraitsSubstituteF<Type2,typename ArithmeticsTrait<Type1,Type2Scalar>::Result>::Result Result;
+    typedef typename TypeTraitsTypeScalar<PixelType2>::Result PixelType2Scalar;
+    typedef typename FunctionTypeTraitsSubstituteF<PixelType2,typename ArithmeticsTrait<PixelType1,PixelType2Scalar>::Result>::Result Result;
 };
-template<typename Type1,typename Type2>
-struct ArithmeticsTraitTest<Type1,Type2,true, true>
+template<typename PixelType1,typename PixelType2>
+struct ArithmeticsTraitTest<PixelType1,PixelType2,true, true>
 {
-    typedef typename TypeTraitsTypeScalar<Type1 >::Result Type1Scalar;
-    typedef typename TypeTraitsTypeScalar<Type2  >::Result Type2Scalar;
-    typedef typename FunctionTypeTraitsSubstituteF<Type1,typename ArithmeticsTrait<Type1Scalar,Type2Scalar>::Result>::Result Result;
+    typedef typename TypeTraitsTypeScalar<PixelType1 >::Result PixelType1Scalar;
+    typedef typename TypeTraitsTypeScalar<PixelType2  >::Result PixelType2Scalar;
+    typedef typename FunctionTypeTraitsSubstituteF<PixelType1,typename ArithmeticsTrait<PixelType1Scalar,PixelType2Scalar>::Result>::Result Result;
 };
 
 }

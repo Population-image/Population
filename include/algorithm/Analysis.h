@@ -549,10 +549,10 @@ struct POP_EXPORTS Analysis
      * \image html REVhistogram.png "Histogram in balls of different radius"
     */
 
-    template<int DIM,typename TypePixel>
-    static  Mat2F32 REVHistogram(const MatN<DIM,TypePixel> & f, typename MatN<DIM,TypePixel>::E x, int rmax=10000,int norm=2 )
+    template<int DIM,typename PixelType>
+    static  Mat2F32 REVHistogram(const MatN<DIM,PixelType> & f, typename MatN<DIM,PixelType>::E x, int rmax=10000,int norm=2 )
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain ittotal(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain ittotal(f.getIteratorEDomain());
         int max_value = Analysis::maxValue(f);
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
@@ -567,14 +567,14 @@ struct POP_EXPORTS Analysis
 
         for( int r =0;r<rmax;r++){
             m.resizeInformation(m.sizeI(),m.sizeJ()+1);
-            typename MatN<DIM,TypePixel>::E R( r*2+1);
-            typename MatN<DIM,TypePixel>::IteratorEDomain it(R);
+            typename MatN<DIM,PixelType>::E R( r*2+1);
+            typename MatN<DIM,PixelType>::IteratorEDomain it(R);
             bool inside =true;
-            typename MatN<DIM,TypePixel>::E add =x- r;
+            typename MatN<DIM,PixelType>::E add =x- r;
             while(it.next()&&inside==true){
-                typename MatN<DIM,TypePixel>::E xprime = it.x()-r;
+                typename MatN<DIM,PixelType>::E xprime = it.x()-r;
                 if(xprime.norm(norm)<=r){
-                    typename MatN<DIM,TypePixel>::E xxprime = it.x()+add;
+                    typename MatN<DIM,PixelType>::E xxprime = it.x()+add;
                     if(f.isValid(xxprime)){
                         m(f(xxprime),r+1) ++;
                     }else{
@@ -680,10 +680,10 @@ struct POP_EXPORTS Analysis
      \endcode
      produces this output 255\<C\>246\<C\>205\<C\>.
     */
-    template<int DIM,typename TypePixel>
-    static  TypePixel  maxValue(const MatN<DIM,TypePixel> & f){
+    template<int DIM,typename PixelType>
+    static  PixelType  maxValue(const MatN<DIM,PixelType> & f){
 
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::maxValue(f,it);
     }
 
@@ -702,10 +702,10 @@ struct POP_EXPORTS Analysis
      \endcode
      produces this output 53<C\>0\<C\>46\<C\>.
     */
-    template<int DIM,typename TypePixel>
-    static  TypePixel  minValue(const MatN<DIM,TypePixel> & f){
+    template<int DIM,typename PixelType>
+    static  PixelType  minValue(const MatN<DIM,PixelType> & f){
 
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::minValue(f,it);
     }
     /*!
@@ -722,10 +722,10 @@ struct POP_EXPORTS Analysis
     std::cout<<mean<<std::endl;
     \endcode
     */
-    template<int DIM,typename TypePixel>
-    static F32 meanValue(const MatN<DIM,TypePixel> & f)
+    template<int DIM,typename PixelType>
+    static F32 meanValue(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::meanValue( f,it);
     }
     /*!
@@ -743,10 +743,10 @@ struct POP_EXPORTS Analysis
     \endcode
 
     */
-    template<int DIM,typename TypePixel>
-    static F32 standardDeviationValue(const MatN<DIM,TypePixel> & f)
+    template<int DIM,typename PixelType>
+    static F32 standardDeviationValue(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::standardDeviationValue( f,it);
     }
 
@@ -766,10 +766,10 @@ struct POP_EXPORTS Analysis
      * \endcode
      * \sa Matrix Distribution
     */
-    template<int DIM,typename TypePixel>
-    static Mat2F32 histogram(const MatN<DIM,TypePixel> & f)
+    template<int DIM,typename PixelType>
+    static Mat2F32 histogram(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::histogram(f,it);
     }
 
@@ -789,10 +789,10 @@ struct POP_EXPORTS Analysis
      * \endcode
 
     */
-    template<int DIM,typename TypePixel>
-    static Mat2F32 area(const MatN<DIM,TypePixel> & f)
+    template<int DIM,typename PixelType>
+    static Mat2F32 area(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         return AnalysisAdvanced::area(f,it);
     }
     /*!
@@ -804,11 +804,11 @@ struct POP_EXPORTS Analysis
      *  and at one other pixel adjacent by an other phase :
      * \f[s_i=\frac{\sum_{x\in\Omega}\sum_{y\in N(x)}1_{f(x)=i}1_{f(y)\neq i}   }{2|\Omega|}\f] where N(x) is the 4-connex pixel  of x in 2D,  the 6-connex voxel  of x in 3D.
      */
-    template<int DIM,typename TypePixel>
-    static Mat2F32 perimeter(const MatN<DIM,TypePixel> & f)
+    template<int DIM,typename PixelType>
+    static Mat2F32 perimeter(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain itg(f.getIteratorEDomain());
-        typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(f.getIteratorENeighborhood(1,1));
+        typename MatN<DIM,PixelType>::IteratorEDomain itg(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorENeighborhood itn(f.getIteratorENeighborhood(1,1));
         return AnalysisAdvanced::perimeter(f,itg,itn);
     }
 
@@ -901,8 +901,8 @@ struct POP_EXPORTS Analysis
      * \endcode
      */
 
-    template<int DIM,typename TypePixel>
-    static  Mat2F32 correlation(const MatN<DIM,TypePixel> & f, int length=200, int nbrtest=100000 )
+    template<int DIM,typename PixelType>
+    static  Mat2F32 correlation(const MatN<DIM,PixelType> & f, int length=200, int nbrtest=100000 )
     {
         if(nbrtest<100)
             nbrtest=100;
@@ -915,7 +915,7 @@ struct POP_EXPORTS Analysis
         if(length>maxsize)
             length=maxsize-1;
 
-        TypePixel value = Analysis::maxValue(f);
+        PixelType value = Analysis::maxValue(f);
 
         Mat2F32 m(length+1,value+2),mcount(length+1,value+2);
         std::vector<DistributionUniformInt> dist;
@@ -924,21 +924,21 @@ struct POP_EXPORTS Analysis
 
         for(int index_test=0;index_test<nbrtest;index_test++)
         {
-            typename MatN<DIM,TypePixel>::E  x ;
+            typename MatN<DIM,PixelType>::E  x ;
             for(int ii=0;ii<DIM;ii++)
                 x(ii)=dist[ii].randomVariable();
-            TypePixel etat1 = f(x);
+            PixelType etat1 = f(x);
             for(int i=0;i<DIM;i++)
             {
-                typename MatN<DIM,TypePixel>::E y=x;
+                typename MatN<DIM,PixelType>::E y=x;
                 y(i)=x(i)-length;
                 for(;y(i)<=x(i)+length;y(i)++)
                 {
                     int r = absolute(y(i)-x(i));
-                    typename MatN<DIM,TypePixel>::E z=y;
+                    typename MatN<DIM,PixelType>::E z=y;
                     if(f.isValid(z))
                     {
-                        TypePixel etat2 = f(z);
+                        PixelType etat2 = f(z);
                         for(int k=1;k<=(int)value+1;k++)
                         {
                             mcount(r,k)++;
@@ -974,10 +974,10 @@ struct POP_EXPORTS Analysis
      *
      *  M(i<length,0)=i, M(i,1)=\f$ \frac{\operatorname{E}[(f(x) - \mu)(f(x+i) - \mu)]}{\sigma^2}\f$ with \f$\mu\f$ the mean value and \f$\sigma\f$ the standard deviation see http://en.wikipedia.org/wiki/Autocorrelation. To estimate this value, we sample nbrtest*length*dim times.
     */
-    template<int DIM,typename TypePixel>
-    static  Mat2F32 autoCorrelationFunctionGreyLevel(const MatN<DIM,TypePixel> & f, int length=100, int nbrtest=100000 )
+    template<int DIM,typename PixelType>
+    static  Mat2F32 autoCorrelationFunctionGreyLevel(const MatN<DIM,PixelType> & f, int length=100, int nbrtest=100000 )
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(f.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
         int maxsize = NumericLimits<int>::maximumRange();
         for(int i =0;i<DIM;i++){
             maxsize = minimum(maxsize,f.getDomain()(i));
@@ -994,17 +994,17 @@ struct POP_EXPORTS Analysis
             dist.push_back(DistributionUniformInt(0,f.getDomain()(i)-1));
         for(int index_test=0;index_test<nbrtest;index_test++)
         {
-            typename MatN<DIM,TypePixel>::E  x ;
+            typename MatN<DIM,PixelType>::E  x ;
             for(int i=0;i<DIM;i++)
                 x(i)=dist[i].randomVariable();
             for(int i=0;i<DIM;i++)
             {
-                typename MatN<DIM,TypePixel>::E y=x;
+                typename MatN<DIM,PixelType>::E y=x;
                 y(i)-=length;
                 for(;y(i)<=x(i)+length;y(i)++)
                 {
                     int r = absolute(y(i)-x(i));
-                    typename MatN<DIM,TypePixel>::E z=y;
+                    typename MatN<DIM,PixelType>::E z=y;
                     if(f.isValid(z))
                     {
                         m(r,1)+= (f(x)-mu)*(f(z)-mu)/(sigma*sigma) ;
@@ -1032,13 +1032,13 @@ struct POP_EXPORTS Analysis
      *  calculated the 2-VecNd correlation function in any direction by FFT  P = FFT^(-1)(FFT(f)FFT(f)^*)
     */
 
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,TypePixel> & f){
+    template<int DIM,typename PixelType>
+    static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,PixelType> & f){
 
-        MatN<DIM,TypePixel> bint;
+        MatN<DIM,PixelType> bint;
         bint = pop::Representation::truncateMulitple2(f);
         MatN<DIM,F32> binfloat(bint);
-        typename MatN<DIM,TypePixel>::IteratorEDomain it (binfloat.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it (binfloat.getIteratorEDomain());
         binfloat = pop::ProcessingAdvanced::greylevelRange(binfloat,it,0,1);
 
 
@@ -1066,8 +1066,8 @@ struct POP_EXPORTS Analysis
      *
      * P(i,0)=i and P(i,1) = Proba(|c|=i) with c a random chord, To estimate it, we random n chords\n
     */
-    template<int DIM,typename TypePixel>
-    static Mat2F32 chord(const MatN<DIM,TypePixel> & f, int nbrchord=20000000)
+    template<int DIM,typename PixelType>
+    static Mat2F32 chord(const MatN<DIM,PixelType> & f, int nbrchord=20000000)
     {
         Mat2F32 m;
         std::vector<DistributionUniformInt> random_dist;
@@ -1077,14 +1077,14 @@ struct POP_EXPORTS Analysis
         for(int index_test=0;index_test<nbrchord;index_test++)
         {
             int direction = c.randomVariable();
-            typename MatN<DIM,TypePixel>::E  x ;
+            typename MatN<DIM,PixelType>::E  x ;
             for(int i=0;i<DIM;i++)
                 x(i)=random_dist[i].randomVariable();
             int phase = f(x);
             bool boundary =false;
             int dist =-1;
             int phasetemp = phase;
-            typename MatN<DIM,TypePixel>::E y1 =x;
+            typename MatN<DIM,PixelType>::E y1 =x;
             while(phase==phasetemp)
             {
                 y1(direction)++;
@@ -1099,7 +1099,7 @@ struct POP_EXPORTS Analysis
                     phasetemp=phase+1;
                 }
             }
-            typename MatN<DIM,TypePixel>::E y2 =x;
+            typename MatN<DIM,PixelType>::E y2 =x;
             phasetemp = phase;
             while(phase==phasetemp)
             {
@@ -1416,7 +1416,7 @@ struct POP_EXPORTS Analysis
      *  A(i,0)=i and A(i,1) = R for the maximum erosion of the binary set with tha ball of radius R such that it exists  path included
      * in the eroded binary set touching the two opposites faces for the i-coordinate
      * Numerically, by increasing the radius of ball, we compute the erosion of the binary set until no percolation
-     * \sa percolation(const MatN<DIM,TypePixel> & bin,int norm,MatN<DIM,TypePixel> & max_cluster) pop::Processing::clusterMax(const FunctionBinary & bin, int norm)
+     * \sa percolation(const MatN<DIM,PixelType> & bin,int norm,MatN<DIM,PixelType> & max_cluster) pop::Processing::clusterMax(const FunctionBinary & bin, int norm)
     */
     template<int DIM>
     static Mat2F32 percolationErosion(const  MatN<DIM,UI8>   & bin,int norm=1){
@@ -1623,7 +1623,7 @@ struct POP_EXPORTS Analysis
      * extract the vecteces and the edges from the topological skeleton
      *
      *  extract the vecteces and the edges from the topological skeleton
-     \sa thinningAtConstantTopology( const MatN<DIM,TypePixel> & bin,const char * file_topo24)
+     \sa thinningAtConstantTopology( const MatN<DIM,PixelType> & bin,const char * file_topo24)
     */
     template<int DIM>
     static std::pair<MatN<DIM,UI8>,MatN<DIM,UI8> > fromSkeletonToVertexAndEdge(const MatN<DIM,UI8> & skeleton)
@@ -1654,7 +1654,7 @@ struct POP_EXPORTS Analysis
         return std::make_pair(vertex,edge);
     }
 
-    /*! GraphAdjencyList<Vec3I32> linkEdgeVertex(  const MatN<DIM,TypePixel> & vertex,const MatN<DIM,TypePixel> & edge,int & tore)
+    /*! GraphAdjencyList<Vec3I32> linkEdgeVertex(  const MatN<DIM,PixelType> & vertex,const MatN<DIM,PixelType> & edge,int & tore)
      * \param vertex labelled verteces
      * \param edge labelled edge
      * \param tore number of tores
@@ -1666,12 +1666,12 @@ struct POP_EXPORTS Analysis
      *
      \sa VertexAndEdgeFromSkeleton Cluster2Label GraphAdjencyList
     */
-    template<int DIM,typename TypePixel>
-    static GraphAdjencyList<Vec3I32> linkEdgeVertex(  const MatN<DIM,TypePixel> & vertex,const MatN<DIM,TypePixel> & edge,int & tore)
+    template<int DIM,typename PixelType>
+    static GraphAdjencyList<Vec3I32> linkEdgeVertex(  const MatN<DIM,PixelType> & vertex,const MatN<DIM,PixelType> & edge,int & tore)
     {
 
-        typename MatN<DIM,TypePixel>::IteratorEDomain b(vertex.getIteratorEDomain());
-        typename MatN<DIM,TypePixel>::IteratorENeighborhood V(edge.getIteratorENeighborhood(1,0));
+        typename MatN<DIM,PixelType>::IteratorEDomain b(vertex.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorENeighborhood V(edge.getIteratorENeighborhood(1,0));
         GraphAdjencyList<Vec3I32> g;
 
         std::vector<std::pair<int,int> > v_link;
@@ -1774,8 +1774,8 @@ struct POP_EXPORTS Analysis
      *
      * V(i)=|{x:f(x)=i-1}| with area=M(i,0) where we count the areas of each label
     */
-    template<int DIM,typename TypePixel>
-    static VecI32 areaByLabel(const MatN<DIM,TypePixel> & label)
+    template<int DIM,typename PixelType>
+    static VecI32 areaByLabel(const MatN<DIM,PixelType> & label)
     {
         return AnalysisAdvanced::areaByLabel(label,label.getIteratorEDomain());
     }
@@ -1785,15 +1785,15 @@ struct POP_EXPORTS Analysis
      *
      * V(i)=Perimter({x:f(x)=i-1}) where we count the perimeters of each label
     */
-    template<int DIM,typename TypePixel>
-    static VecI32 perimeterByLabel(const MatN<DIM,TypePixel> & label)
+    template<int DIM,typename PixelType>
+    static VecI32 perimeterByLabel(const MatN<DIM,PixelType> & label)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
-        typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
+        typename MatN<DIM,PixelType>::IteratorEDomain itg(label.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
         VecI32 v;
         while(itg.next()){
             if(label(itg.x())!=0){
-                if(label(itg.x())>(TypePixel)v.size()){
+                if(label(itg.x())>(PixelType)v.size()){
                     v.resize(label(itg.x()));
                 }
                 itn.init(itg.x());
@@ -1813,11 +1813,11 @@ struct POP_EXPORTS Analysis
      *
      * we count the perimemter between contact labels
     */
-    template<int DIM,typename TypePixel>
-    static VecI32 perimeterContactBetweenLabel(const MatN<DIM,TypePixel> & label)
+    template<int DIM,typename PixelType>
+    static VecI32 perimeterContactBetweenLabel(const MatN<DIM,PixelType> & label)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
-        typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
+        typename MatN<DIM,PixelType>::IteratorEDomain itg(label.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorENeighborhood itn(label.getIteratorENeighborhood(1,1));
         VecI32 v;
         while(itg.next()){
             if(label(itg.x())!=0){
@@ -1844,12 +1844,12 @@ struct POP_EXPORTS Analysis
      *
      *  We count the feret dimater for each label where for norm=1 , D= 1/n*sum_i diameter(i) and otherwise D= (mult_i diameter(i))^{1/n}
     */
-    template<int DIM,typename TypePixel>
-    static VecF32 feretDiameterByLabel(const MatN<DIM,TypePixel> & label, int norm=1)
+    template<int DIM,typename PixelType>
+    static VecF32 feretDiameterByLabel(const MatN<DIM,PixelType> & label, int norm=1)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain itg(label.getIteratorEDomain());
-        std::vector<typename MatN<DIM,TypePixel>::E> v_xmin;
-        std::vector<typename MatN<DIM,TypePixel>::E> v_xmax;
+        typename MatN<DIM,PixelType>::IteratorEDomain itg(label.getIteratorEDomain());
+        std::vector<typename MatN<DIM,PixelType>::E> v_xmin;
+        std::vector<typename MatN<DIM,PixelType>::E> v_xmax;
         while(itg.next()){
 
             if(label(itg.x())!=0){
@@ -1895,10 +1895,10 @@ struct POP_EXPORTS Analysis
      *  Extract each label of the input matrix to form a std::vector of binary matrixs
     */
 
-    template<int DIM,typename TypePixel>
-    static pop::Vec<MatN<DIM,UI8>  > labelToMatrices(const MatN<DIM,TypePixel> & label,  pop::Vec<typename MatN<DIM,TypePixel>::E> & v_xmin,pop::Vec<typename MatN<DIM,TypePixel>::E>&  v_xmax)
+    template<int DIM,typename PixelType>
+    static pop::Vec<MatN<DIM,UI8>  > labelToMatrices(const MatN<DIM,PixelType> & label,  pop::Vec<typename MatN<DIM,PixelType>::E> & v_xmin,pop::Vec<typename MatN<DIM,PixelType>::E>&  v_xmax)
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it (label.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it (label.getIteratorEDomain());
         return AnalysisAdvanced::labelToMatrices(label,  v_xmin, v_xmax, it);
     }
     //@}

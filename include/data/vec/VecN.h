@@ -47,7 +47,7 @@ namespace pop
 * \defgroup VecN Vec{2,3}{I32,F32}
 * \brief template class for tuple of numbers of fixed size for representing a point or a vector
 */
-template <int D=2, class  Type=int>
+template <int D=2, class  CoordinateType=int>
 class  POP_EXPORTS VecN
 {
     /*!
@@ -56,7 +56,7 @@ class  POP_EXPORTS VecN
         \author Tariel Vincent
         \ingroup VecN
         \tparam D Space dimension (size of the vector)
-        \tparam  Type  element type
+        \tparam  CoordinateType  element type
 
         The template class \a VecN is a fixed-size arrays of consecutive elements of the same type taking two template parameters:
          - one constant value to set the array size
@@ -93,7 +93,7 @@ class  POP_EXPORTS VecN
         A fixed-size array allows code optimization with a specialization for D=2 and D=3.
     */
 private:
-    Type _dat[D];
+    CoordinateType _dat[D];
 public:
     /*! \var DIM
      * Space dimension
@@ -108,17 +108,16 @@ public:
     \typedef F
     * type of the consecutive elements
     */
-    typedef  Type F;
+    typedef  CoordinateType F;
 
     /*!
-    \fn VecN()
     *
     * default constructor
     */
     VecN()
     {
         for(int i = 0;i<D;i++)
-            this->_dat[i]=Type();
+            this->_dat[i]=CoordinateType();
     }
 
     /*!
@@ -130,14 +129,14 @@ public:
     VecN(const VecN<D1,G> & p )
     {
         for(int i = 0;i<minimum(D,D1);i++)
-            this->_dat[i]=static_cast<Type>(p[i]);
+            this->_dat[i]=static_cast<CoordinateType>(p[i]);
     }
     /*!
     * \param value input value
     *
     * all elements are equal to this value
     */
-    VecN(  Type  value )
+    VecN(  CoordinateType  value )
     {
         for(int i = 0;i<D;i++)
             this->_dat[i]=value;
@@ -147,7 +146,7 @@ public:
     * \param value1 input value for the second channel
     *
     */
-    VecN(  Type  value0,Type  value1 )
+    VecN(  CoordinateType  value0,CoordinateType  value1 )
     {
         this->_dat[0]=value0;
         this->_dat[1]=value1;
@@ -158,7 +157,7 @@ public:
     * \param value2 input value for the third channel
     *
     */
-    VecN(  Type  value0,Type  value1,Type  value2 )
+    VecN(  CoordinateType  value0,CoordinateType  value1,CoordinateType  value2 )
     {
         this->_dat[0]=value0;
         this->_dat[1]=value1;
@@ -171,7 +170,7 @@ public:
     * \param value3 input value for the fourth channel
     *
     */
-    VecN(  Type  value0,Type  value1,Type  value2,Type value3 )
+    VecN(  CoordinateType  value0,CoordinateType  value1,CoordinateType  value2,CoordinateType value3 )
     {
         this->_dat[0]=value0;
         this->_dat[1]=value1;
@@ -200,17 +199,16 @@ public:
     inline VecN  &operator =(const VecN<D,G>& x)
     {
         for(int i = 0;i<D;i++)
-            this->_dat[i]=static_cast<Type>(x[i]);
+            this->_dat[i]=static_cast<CoordinateType>(x[i]);
         return *this;
     }
     /*!
-    \fn inline VecN & operator =(  Type value)
     * \param value factor
     * \return this VecN
     *
     * Basic assignment of all elements of VecN by the factor \a value
     */
-    inline VecN  &operator =(  Type value)
+    inline VecN  &operator =(  CoordinateType value)
     {
 
         for(int i = 0;i<D;i++)
@@ -235,7 +233,7 @@ public:
     *
     * Adds all element of this VecN of this VecN by the factor \a value
     */
-    inline VecN & operator +=( Type value)
+    inline VecN & operator +=( CoordinateType value)
     {
         for(int i = 0;i<D;i++)
             this->_dat[i]+=value;
@@ -258,7 +256,7 @@ public:
     *
     * addition of the factor \a value to all elements of this VecN
     */
-    inline VecN  operator+( Type value)const{
+    inline VecN  operator+( CoordinateType value)const{
         VecN  x(*this);
         x+=value;
         return x;
@@ -281,7 +279,7 @@ public:
     *
     * Subtracts all element of this VecN of this VecN by the factor \a value
     */
-    inline VecN & operator -=( Type value)
+    inline VecN & operator -=( CoordinateType value)
     {
         for(int i = 0;i<D;i++)
             this->_dat[i]-=value;
@@ -304,7 +302,7 @@ public:
     *
     * Subtraction  to all elements of this VecN by the factor \a value  \f$(u_1-value,u_2-value)  \f$
     */
-    inline VecN   operator-( Type  value)const{
+    inline VecN   operator-( CoordinateType  value)const{
         VecN  x(*this);
         x-=value;
         return x;
@@ -337,7 +335,7 @@ public:
     *
     * Multiplies all elements of this VecN by factor.
     */
-    inline VecN & operator *=( Type value)
+    inline VecN & operator *=( CoordinateType value)
     {
         for(int i = 0;i<D;i++)
             this->_dat[i]*=value;
@@ -361,7 +359,7 @@ public:
     *
     * multiplication of the factor \a value to all elements of this VecN
     */
-    inline VecN  operator*( Type  value)const{
+    inline VecN  operator*( CoordinateType  value)const{
         VecN  x(*this);
         x*=value;
         return x;
@@ -386,7 +384,7 @@ public:
     * Divides all elements of this VecN by factor \a value
     */
 
-    inline VecN & operator /=(  Type value)
+    inline VecN & operator /=(  CoordinateType value)
     {
         for(int i = 0;i<D;i++)
             this->_dat[i]/=value;
@@ -411,7 +409,7 @@ public:
     *
     * division by the factor \a value to all elements of this VecN \a  \f$(u_1/value,u_2/value) \f$
     */
-    inline VecN   operator/( Type value)const{
+    inline VecN   operator/( CoordinateType value)const{
         VecN  x(*this);
         x/=value;
         return x;
@@ -512,7 +510,6 @@ public:
         return false;
     }
     /*!
-    \fn bool  operator <(const VecN& x)const
     * \param x other VecN
     * \return boolean
     *
@@ -543,7 +540,6 @@ public:
     }
 
     /*!
-    \fn  inline bool  operator ==(const VecN& x)const
     * \param x other VecN
     * \return boolean
     *
@@ -556,20 +552,18 @@ public:
         return true;
     }
     /*!
-    \fn inline bool operator ==(  Type value)const
     * \param value factor
     * \return boolean
     *
     * return true for all elements of this VecN is equal to the factor, false otherwise
     */
-    inline bool operator ==(  Type value)const
+    inline bool operator ==(  CoordinateType value)const
     {
         for(int i = 0;i<D;i++)
             if(this->_dat[i]!=value) return false;
         return true;
     }
     /*!
-    \fn bool  operator !=(const VecN& x)const
     * \param x other VecN
     * \return boolean
     *
@@ -580,59 +574,55 @@ public:
         return !this->operator ==(x);
     }
 
-    inline const  Type & operator []( int i)
+    inline const  CoordinateType & operator []( int i)
     const
     {
         POP_DbgAssert( i>=0&& i<DIM);
         return   this->_dat[i];
     }
     /*!
-    \fn  inline   Type & operator []( int i)
     * \param i index
     * \return element
     *
     * Access to the element at the given index
     */
-    inline   Type & operator []( int i)
+    inline   CoordinateType & operator []( int i)
 
     {
         POP_DbgAssert( i>=0&& i<DIM);
         return   this->_dat[i];
     }
-    inline const  Type & operator ()( int i)
+    inline const  CoordinateType & operator ()( int i)
     const
     {
         POP_DbgAssert( i>=0&& i<DIM);
         return   this->_dat[i];
     }
     /*!
-    \fn  inline   Type & operator ()( int i)
     * \param i index
     * \return element
     *
     * Access to the element at the given index
     */
-    inline   Type & operator ()( int i)
+    inline   CoordinateType & operator ()( int i)
 
     {
         POP_DbgAssert( i>=0&& i<DIM);
         return   this->_dat[i];
     }
     /*!
-    \fn  inline  Type multCoordinate()const
     * \return coordinate multiplication
     *
     * Multiplies all elements of this VecNs for instance x=(5,6,20) x.multCoordinate()=5*6*20=600
     */
-    inline  Type multCoordinate()const
+    inline  CoordinateType multCoordinate()const
     {
-        Type value=1;
+        CoordinateType value=1;
         for(int i = 0;i<D;i++)
             value*=this->_dat[i];
         return value;
     }
     /*!
-    \fn  F32  norm(int p)const
     \ param p norm
     * \return p-norm
     *
@@ -670,7 +660,6 @@ public:
     }
 
     /*!
-    \fn  F32 normPower(int p)const
     * \return p-norm power p
     *
     * returns the p-norm at power 2pof this VecN for instance for x = (7,-2), we have x.normPower(2)=7*7+-2*-2=53
@@ -705,36 +694,33 @@ public:
     }
 
     /*!
-    \fn   Type minCoordinate()const
     * \return min coordinate
     *
     * returns the min coordinate for  x = (7,-2), we have x.minCoordinate()=min(7,-2)=-2
     *
     */
-    Type minCoordinate()const
+    CoordinateType minCoordinate()const
     {
-        Type value =this->_dat[0];
+        CoordinateType value =this->_dat[0];
         for(int i = 1;i<D;i++)
             value=minimum(this->_dat[i],value);
         return value;
     }
     /*!
-    \fn   Type maxCoordinate()const
     * \return min coordinate
     *
     * returns the min coordinate for  x = (7,-2), we have x.minCoordinate()=max(7,-2)=7
     *
     */
-    Type maxCoordinate()const
+    CoordinateType maxCoordinate()const
     {
-        Type value =this->_dat[0];
+        CoordinateType value =this->_dat[0];
         for(int i = 1;i<D;i++)
             value=maximum(this->_dat[i],value);
         return value;
     }
 
     /*!
-    \fn  void load(const char * file)
     * \param file input file
     *
     * load the values elements from the input file
@@ -749,7 +735,6 @@ public:
         fs.close();
     }
     /*!
-    \fn  void save(const char * file)const
     * \param file input file
     *
     * save the values elements to the input file
@@ -761,7 +746,6 @@ public:
         fs.close();
     }
     /*!
-    \fn clone()
     *
     * clone the VecN
     */
@@ -770,9 +754,9 @@ public:
         return new VecN(*this);
     }
 
-    VecN<DIM+1,Type> addCoordinate(int coordinate, Type value ){
+    VecN<DIM+1,CoordinateType> addCoordinate(int coordinate, CoordinateType value ){
         POP_DbgAssert( coordinate>=0&& coordinate<=DIM);
-        VecN<DIM+1,Type> x;
+        VecN<DIM+1,CoordinateType> x;
         for(int i = 0;i<=D;i++){
             if(i<coordinate)
                 x(i)=this->_dat[i];
@@ -783,9 +767,9 @@ public:
         }
         return x;
     }
-    VecN<DIM-1,Type> removeCoordinate(int coordinate){
+    VecN<DIM-1,CoordinateType> removeCoordinate(int coordinate){
         POP_DbgAssert( coordinate>=0&& coordinate<DIM);
-        VecN<DIM-1,Type> x;
+        VecN<DIM-1,CoordinateType> x;
         for(int i = 0;i<D;i++){
             if(i<coordinate)
                 x(i)=this->_dat[i];
@@ -796,10 +780,10 @@ public:
     }
 
 #ifdef HAVE_SWIG
-    void setValue(int index,  Type value){
+    void setValue(int index,  CoordinateType value){
         _dat[index]=value;
     }
-    Type getValue(int index)const{
+    CoordinateType getValue(int index)const{
         return _dat[index];
     }
 
@@ -818,7 +802,7 @@ public:
     *
     * direct access to the vector data
     */
-    Type * data(){
+    CoordinateType * data(){
         return _dat;
     }
     /*!
@@ -827,7 +811,7 @@ public:
     *
     * direct access to the vector data
     */
-    const Type * data()const{
+    const CoordinateType * data()const{
         return _dat;
     }
 };

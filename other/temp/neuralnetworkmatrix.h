@@ -109,7 +109,6 @@ public:
     }
 
     void printNetwork(void) {
-        std::cout << "####################" << std::endl;
         std::cout << "Number of layers: " << _X.size() << std::endl;
         std::cout << "Eta: " << _eta << std::endl;
 

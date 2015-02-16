@@ -94,10 +94,10 @@ class POP_EXPORTS MatNInOut
 private:
     class impl;
     impl *_pImpl;
-    template<int DIM,typename Type>
-    static void  _save(const MatN<DIM, Type > &, const char * );
-    template<int DIM,typename Type>
-    static bool  _load(const MatN<DIM, Type > &, const char * );
+    template<int DIM,typename PixelType>
+    static void  _save(const MatN<DIM, PixelType > &, const char * );
+    template<int DIM,typename PixelType>
+    static bool  _load(const MatN<DIM, PixelType > &, const char * );
 
     static void  _save(const MatN<2, UI8 > &img, const char * filename);
     static void  _save(const MatN<2, UI16 > &img, const char * filename);
@@ -119,30 +119,30 @@ private:
 
 
 
-    template<int DIM,typename Type>
-    static void  _savePNG(const MatN<DIM, Type > &, const char * );
+    template<int DIM,typename PixelType>
+    static void  _savePNG(const MatN<DIM, PixelType > &, const char * );
 
-    template<int DIM,typename Type>
-    static bool  _loadPNG(const MatN<DIM, Type > &, const char * );
+    template<int DIM,typename PixelType>
+    static bool  _loadPNG(const MatN<DIM, PixelType > &, const char * );
     static void  _savePNG(const MatN<2, UI8 > &img, const char * filename);
     static void  _savePNG(const MatN<2, RGBUI8 > &img, const char * filename);
     static bool  _loadPNG( MatN<2, UI8 > &img, const char * filename);
     static bool  _loadPNG( MatN<2, RGBUI8 > &img, const char * filename);
 
-    template<int DIM,typename Type>
-    static bool  _loadBMP( MatN<DIM, Type > &, const char * );
-    template<int DIM,typename Type>
-    static void  _saveBMP(const MatN<DIM, Type > &, const char * );
+    template<int DIM,typename PixelType>
+    static bool  _loadBMP( MatN<DIM, PixelType > &, const char * );
+    template<int DIM,typename PixelType>
+    static void  _saveBMP(const MatN<DIM, PixelType > &, const char * );
     static bool  _loadBMP( MatN<2, UI8 > &img, const char * filename);
     static bool  _loadBMP( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, UI8 > &img, const char * filename);
     static void  _saveBMP(const MatN<2, RGBUI8 > &img, const char * filename);
 
 
-    template<int DIM,typename Type>
-    static bool  _loadJPG( MatN<DIM, Type > &, const char * );
-    template<int DIM,typename Type>
-    static void  _saveJPG(const MatN<DIM, Type > &, const char * );
+    template<int DIM,typename PixelType>
+    static bool  _loadJPG( MatN<DIM, PixelType > &, const char * );
+    template<int DIM,typename PixelType>
+    static void  _saveJPG(const MatN<DIM, PixelType > &, const char * );
     static bool  _loadJPG( MatN<2, UI8 > &img, const char * filename);
     static bool  _loadJPG( MatN<2, RGBUI8 > &img, const char * filename);
     static void  _saveJPG(const MatN<2, UI8 > &img, const char * filename);
@@ -159,8 +159,8 @@ public:
     template<I32 DIM,typename Result>
     static bool loadRaw(MatN<DIM,Result> &in,const char * file  );
 
-    template<int DIM,typename Type>
-    static bool loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
+    template<int DIM,typename PixelType>
+    static bool loadFromDirectory(MatN<DIM,PixelType> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
     template<int DIM,typename Result>
     static void saveFromDirectory(const MatN<DIM,Result> & in1cast,const char * pathdir, const char * basefilename, const char * extension);
 };
@@ -196,39 +196,39 @@ inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<3,Vec3
 template<int Dim,typename PixelType>
 inline std::pair<std::string,std::string>  header2PNG(Type2Type<pop::MatN<Dim,PixelType > >){return std::make_pair("Unknown","Unknown");}
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::loadFromDirectory(const char * pathdir,const char * basefilename,const char * extension)
 {
     MatNInOut::loadFromDirectory(*this,pathdir,basefilename,extension);
 }
-template<int Dim, typename Type>
-bool MatN<Dim,Type>::load(const char * file)
+template<int Dim, typename PixelType>
+bool MatN<Dim,PixelType>::load(const char * file)
 {
     return MatNInOut::load(*this,file);
 }
-template<int Dim, typename Type>
-bool MatN<Dim,Type>::loadRaw(const char * file,const Domain & d)
+template<int Dim, typename PixelType>
+bool MatN<Dim,PixelType>::loadRaw(const char * file,const Domain & d)
 {
     this->resize(d);
     return MatNInOut::loadRaw(*this,file);
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::saveFromDirectory(const char * pathdir,const char * basefilename,const char * extension)const 
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::saveFromDirectory(const char * pathdir,const char * basefilename,const char * extension)const
 {
     MatNInOut::saveFromDirectory(*this,pathdir,basefilename,extension);
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::save(const char * file)const 
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::save(const char * file)const
 {
     MatNInOut::save(*this,file);
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::saveRaw(const char * file)const 
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::saveRaw(const char * file)const
 {
     MatNInOut::saveRaw(*this,file);
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::saveAscii(const char * file,std::string header)const 
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::saveAscii(const char * file,std::string header)const
 {
     std::ofstream  out(file);
     if (out.fail())
@@ -378,8 +378,8 @@ void MatNInOutPgm::writeAsciiData(const MatN<D,T>&in,std::ostream &File )
 }
 
 
-template<int DIM,typename Type>
-void  MatNInOut::_save(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+void  MatNInOut::_save(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
@@ -387,8 +387,8 @@ void  MatNInOut::_save(const MatN<DIM, Type > &, const char * )
     else
         std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
-template<int DIM,typename Type>
-bool MatNInOut::_load(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+bool MatNInOut::_load(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
@@ -399,8 +399,8 @@ bool MatNInOut::_load(const MatN<DIM, Type > &, const char * )
 
 }
 
-template<int DIM,typename Type>
-void  MatNInOut::_savePNG(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+void  MatNInOut::_savePNG(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
@@ -408,8 +408,8 @@ void  MatNInOut::_savePNG(const MatN<DIM, Type > &, const char * )
     else
         std::cerr<<"In MatN::save, cannot save this matrix pixel voxel type";
 }
-template<int DIM,typename Type>
-bool  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+bool  MatNInOut::_loadPNG(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
@@ -418,8 +418,8 @@ bool  MatNInOut::_loadPNG(const MatN<DIM, Type > &, const char * )
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
     return false;
 }
-template<int DIM,typename Type>
-bool  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+bool  MatNInOut::_loadBMP( MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
@@ -428,8 +428,8 @@ bool  MatNInOut::_loadBMP( MatN<DIM, Type > &, const char * )
         std::cerr<<"In MatN::load, cannot save this matrix pixel voxel type";
     return false;
 }
-template<int DIM,typename Type>
-void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+void  MatNInOut::_saveBMP(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
@@ -441,8 +441,8 @@ void  MatNInOut::_saveBMP(const MatN<DIM, Type > &, const char * )
 
 
 
-template<int DIM,typename Type>
-bool  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+bool  MatNInOut::_loadJPG( MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::load, cannot save 3d matrix if the matrix format is not pgm";
@@ -452,8 +452,8 @@ bool  MatNInOut::_loadJPG( MatN<DIM, Type > &, const char * )
 
     return false;
 }
-template<int DIM,typename Type>
-void  MatNInOut::_saveJPG(const MatN<DIM, Type > &, const char * )
+template<int DIM,typename PixelType>
+void  MatNInOut::_saveJPG(const MatN<DIM, PixelType > &, const char * )
 {
     if(DIM==3){
         std::cerr<<"In MatN::save, cannot save 3d matrix if the matrix format is not pgm";
@@ -524,7 +524,7 @@ bool MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
             return MatNInOutPgm::readRaw(in,is);
         }
         else{
-            std::cerr<<"In MatN::loadRaw, the file should be equal or superior to sizeof(Type)*in.getDomain().multCoordinate()";
+            std::cerr<<"In MatN::loadRaw, the file should be equal or superior to sizeof(PixelType)*in.getDomain().multCoordinate()";
             return false;
         }
     }
@@ -566,8 +566,8 @@ bool MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
         return  _load(in,file);
     }
 }
-template<int DIM,typename Type>
-bool MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir, const char * basefilename, const char * extension)
+template<int DIM,typename PixelType>
+bool MatNInOut::loadFromDirectory(MatN<DIM,PixelType> & in1cast,const char * pathdir, const char * basefilename, const char * extension)
 {
     std::vector<std::string> vec =BasicUtility::getFilesInDirectory(std::string(pathdir));
     std::string ext =extension;
@@ -593,7 +593,7 @@ bool MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
         return false;
     }
 
-    MatN<2,Type> img;
+    MatN<2,PixelType> img;
     bool load0= MatNInOut::load(img,vec[0].c_str());
     if(load0==false)
         return false;
@@ -609,7 +609,7 @@ bool MatNInOut::loadFromDirectory(MatN<DIM,Type> & in1cast,const char * pathdir,
             std::cerr<<std::string("In MatN::loadFromDirectory, all matrix must have the same domain");
             return false;
         }
-        typename MatN<2,Type>::IteratorEDomain it(img.getIteratorEDomain());
+        typename MatN<2,PixelType>::IteratorEDomain it(img.getIteratorEDomain());
         while(it.next())
             in1cast.operator ()(it.x()(0),it.x()(1),i)=img(it.x()(0),it.x()(1));;
     }

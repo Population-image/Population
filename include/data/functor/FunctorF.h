@@ -400,91 +400,91 @@ struct POP_EXPORTS FunctorF
 
 
 
-    template<typename Type>
+    template<typename PixelType>
     class POP_EXPORTS FunctorAccumulatorMax
     {
         /*!
          * \class pop::FunctorF::FunctorAccumulatorMax
          * \brief max value of the list of acculuated values
          * \author Tariel Vincent
-         * \tparam Type pixel type
+         * \tparam PixelType pixel type
          *
          * \sa pop::Processing::dilation
         */
     private:
-        Type _value;
+        PixelType _value;
     public:
-        typedef Type ReturnType;
+        typedef PixelType ReturnType;
         FunctorAccumulatorMax()
-            :_value(NumericLimits<Type>::minimumRange()){}
+            :_value(NumericLimits<PixelType>::minimumRange()){}
         FunctorAccumulatorMax(const FunctorAccumulatorMax & m)
             :_value(m.getValue()){}
 
-        void operator()(Type p1)
+        void operator()(PixelType p1)
         {
             _value =  maximum(_value,p1);
         }
         void init()
         {
-            _value = NumericLimits<Type>::minimumRange();
+            _value = NumericLimits<PixelType>::minimumRange();
         }
-        Type getValue()const
+        PixelType getValue()const
         {
             return _value;
         }
     };
-    template<typename Type>
+    template<typename PixelType>
     class POP_EXPORTS FunctorAccumulatorMin
     {
         /*!
          * \class pop::FunctorF::FunctorAccumulatorMin
          * \brief min value of the list of acculuated values
          * \author Tariel Vincent
-         * \tparam Type pixel type
+         * \tparam PixelType pixel type
          *
          * \sa pop::Processing::erosion
         */
     private:
-        Type _value;
+        PixelType _value;
     public:
-        typedef Type ReturnType;
+        typedef PixelType ReturnType;
         FunctorAccumulatorMin()
-            :_value(NumericLimits<Type>::maximumRange()){}
+            :_value(NumericLimits<PixelType>::maximumRange()){}
 
-        void operator()(Type p1)
+        void operator()(PixelType p1)
         {
             _value =  minimum(_value,p1);
         }
         void init()
         {
-            _value= NumericLimits<Type>::maximumRange();
+            _value= NumericLimits<PixelType>::maximumRange();
         }
-        Type getValue()
+        PixelType getValue()
         {
             return _value;
         }
     };
 
-    template<typename Type>
+    template<typename PixelType>
     class POP_EXPORTS FunctorAccumulatorMedian
     {
         /*!
          * \class pop::FunctorF::FunctorAccumulatorMedian
          * \brief median value of the list of acculuated values
          * \author Tariel Vincent
-         * \tparam Type pixel type
+         * \tparam PixelType pixel type
          *
          * \sa pop::Processing::median
         */
     private:
-        std::vector<Type> _collector;
+        std::vector<PixelType> _collector;
         I32 _occurence;
     public:
-        typedef Type ReturnType;
+        typedef PixelType ReturnType;
         FunctorAccumulatorMedian()
             :_occurence(0)
         {}
-        void operator()(Type p)
+        void operator()(PixelType p)
         {
             if((I32)_collector.size()<=_occurence)
                 _collector.push_back(p);
@@ -496,25 +496,25 @@ struct POP_EXPORTS FunctorF
         {
             _occurence=0;
         }
-        Type getValue()
+        PixelType getValue()
         {
             std::sort(_collector.begin(),_collector.begin()+_occurence);
             return _collector[_occurence/2];
         }
     };
-    template<typename Type>
+    template<typename PixelType>
     class POP_EXPORTS FunctorAccumulatorMean
     {
         /*!
          * \class pop::FunctorF::FunctorAccumulatorMean
          * \brief mean value of the list of acculuated values
          * \author Tariel Vincent
-         * \tparam Type pixel type
+         * \tparam PixelType pixel type
          *
          * \sa pop::Processing::mean
         */
     private:
-        typedef typename FunctionTypeTraitsSubstituteF<Type,F32>::Result SuperType;
+        typedef typename FunctionTypeTraitsSubstituteF<PixelType,F32>::Result SuperType;
         SuperType _sum;
         I32 _occurence;
     public:
@@ -523,7 +523,7 @@ struct POP_EXPORTS FunctorF
             :_sum(0),_occurence(0)
         {}
 
-        void operator()(Type p)
+        void operator()(PixelType p)
         {
             _sum+=SuperType(p);
             _occurence++;
@@ -538,19 +538,19 @@ struct POP_EXPORTS FunctorF
             return _sum/_occurence;
         }
     };
-    template<typename Type>
+    template<typename PixelType>
     class POP_EXPORTS FunctorAccumulatorVariance
     {
         /*!
          * \class pop::FunctorF::FunctorAccumulatorMedian
          * \brief variance of the list of acculuated values
          * \author Tariel Vincent
-         * \tparam Type pixel type
+         * \tparam PixelType pixel type
          *
          * \sa pop::Analysis::standardDeviationValue
         */
     private:
-        typedef typename FunctionTypeTraitsSubstituteF<Type,F32>::Result SuperType;
+        typedef typename FunctionTypeTraitsSubstituteF<PixelType,F32>::Result SuperType;
         SuperType _sum;
         I32 _occurence;
         F32 _mean;
@@ -559,7 +559,7 @@ struct POP_EXPORTS FunctorF
         FunctorAccumulatorVariance(F32 mean)
             :_sum(0),_occurence(0),_mean(mean)
         {}
-        void operator()(Type p)
+        void operator()(PixelType p)
         {
             _sum+=(p-_mean)*(p-_mean);
             _occurence++;
