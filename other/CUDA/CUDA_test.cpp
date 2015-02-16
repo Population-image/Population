@@ -13,6 +13,7 @@ int main(){
 		std::cout << " And you have a CUDA device." << std::endl << std::endl;
 		//cuda_test();
 		test_neural_net();
+		//test_cublas();
 	} else {
 		std::cout << " But you don't have a CUDA device." << std::endl;
 	}
