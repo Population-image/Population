@@ -45,7 +45,7 @@ namespace pop
 {
 namespace Private{
 
-template<int DIM,typename TypePixel>
+template<int DIM,typename PixelType>
 class LaplacienSmooth
 {
 private:
@@ -54,8 +54,8 @@ private:
     F32 _sigma;
     int _radius_kernel;
 public:
-    LaplacienSmooth(const MatN<DIM,TypePixel>& f,F32 _sigma,int _radius_kernel=1);
-    TypePixel operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x);
+    LaplacienSmooth(const MatN<DIM,PixelType>& f,F32 _sigma,int _radius_kernel=1);
+    PixelType operator ()(const MatN<DIM,PixelType>& f, const typename MatN<DIM,PixelType>::E& x);
 };
 }
 /*!
@@ -122,10 +122,10 @@ public:
       * \endcode
       * \image html nonlineargaussian.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> nonLinearAnisotropicDiffusion(const MatN<DIM,TypePixel>& in,int Nstep=20,F32 K=50)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> nonLinearAnisotropicDiffusion(const MatN<DIM,PixelType>& in,int Nstep=20,F32 K=50)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<TypePixel, F32>::Result F_Float;
+        typedef typename FunctionTypeTraitsSubstituteF<PixelType, F32>::Result F_Float;
 
         MatN<DIM,F_Float> fieldtimet(in),fieldtimet_deltat(in.getDomain());
         FunctorPDE::DiffusionMalikPerona diffusion(K);
@@ -442,16 +442,16 @@ As example, this code produces
       * \image html regularization.png
     */
 
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,F32> allenCahn( MatN<DIM,TypePixel>&  labelfield, int nbrsteps)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,F32> allenCahn( MatN<DIM,PixelType>&  labelfield, int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
-        FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredMultiPhaseField<DIM,TypePixel > > laplacien;
+        FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredMultiPhaseField<DIM,PixelType > > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
         MatN<DIM,F32>   phasefield(labelfield.getDomain());
         phasefield=1;
-        typename MatN<DIM,TypePixel>::IteratorEDomain it = labelfield.getIteratorEDomain();
+        typename MatN<DIM,PixelType>::IteratorEDomain it = labelfield.getIteratorEDomain();
 
         RegionGrowingMultiPhaseField<MatN<DIM,F32> > pop(phasefield,labelfield,0.95);
         PDEAdvanced::allenCahnInMutliPhaseField(phasefield,labelfield,nbrsteps,pop.getIterator(),laplacien);
@@ -487,12 +487,12 @@ As example, this code produces
       * \endcode
       * \image html allencahn.gif
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,F32> allenCahn( MatN<DIM,TypePixel>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,F32> allenCahn( MatN<DIM,PixelType>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
     {
 
         labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
-        FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredInBulkMultiPhaseField<DIM,TypePixel> > laplacien;
+        FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredInBulkMultiPhaseField<DIM,PixelType> > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
         laplacien.partialsecond.setBulk(bulk);
         MatN<DIM,F32>   phasefield(labelfield.getDomain());
@@ -513,11 +513,11 @@ As example, this code produces
       * The classical allen-cahn equation. I will publish soon an article related to its application in image processing.
     */
 
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,F32> getField(const MatN<DIM,TypePixel> & labelfield,const MatN<DIM,F32> & scalarfield, typename MatN<DIM,TypePixel>::F label,int width=3)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,F32> getField(const MatN<DIM,PixelType> & labelfield,const MatN<DIM,F32> & scalarfield, typename MatN<DIM,PixelType>::F label,int width=3)
     {
 
-        typename MatN<DIM,TypePixel>::IteratorEDomain itg(labelfield.getIteratorEDomain()) ;
+        typename MatN<DIM,PixelType>::IteratorEDomain itg(labelfield.getIteratorEDomain()) ;
         MatN<DIM,UI8> selectfield(scalarfield.getDomain());
         while(itg.next()){
             if(labelfield(itg.x())==label)
@@ -714,8 +714,8 @@ As example, this code produces
 
 private:
 
-    template<int DIM,typename TypePixel>
-    static VecN<DIM,F32> start_VecN(const MatN<DIM,TypePixel> &  img, const std::vector<DistributionUniformReal> & d )
+    template<int DIM,typename PixelType>
+    static VecN<DIM,F32> start_VecN(const MatN<DIM,PixelType> &  img, const std::vector<DistributionUniformReal> & d )
     {
         VecN<DIM,F32> x;
         do{
@@ -724,13 +724,13 @@ private:
         }while(img(x)==0);
         return x;
     }
-    template<int DIM,typename TypePixel,typename VecN>
-    static bool next_VecN(const MatN<DIM,TypePixel> &  img,DistributionNormal& distnorm,VecN& x )
+    template<int DIM,typename PixelType,typename VecN>
+    static bool next_VecN(const MatN<DIM,PixelType> &  img,DistributionNormal& distnorm,VecN& x )
     {
         VecN xtemp = x;
         for(int i =0;i<DIM;i++)
             xtemp(i)+= distnorm.randomVariable();
-        typename MatN<DIM,TypePixel>::E xint =xtemp;
+        typename MatN<DIM,PixelType>::E xint =xtemp;
         if(img.isValid(xint)==false){
             return false;
         }
@@ -745,8 +745,8 @@ private:
 
 
 
-template<int DIM,typename TypePixel>
-Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixel>& f,F32 sigma,int radius_kernel)
+template<int DIM,typename PixelType>
+Private::LaplacienSmooth<DIM,PixelType>::LaplacienSmooth(const MatN<DIM,PixelType>& f,F32 sigma,int radius_kernel)
     :_itn(f.getIteratorENeighborhood(radius_kernel,0)),_sigma(sigma),_radius_kernel(radius_kernel){
     F32 sum=0;
     _itn.init(0);
@@ -768,10 +768,10 @@ Private::LaplacienSmooth<DIM,TypePixel>::LaplacienSmooth(const MatN<DIM,TypePixe
 
     }
 }
-template<int DIM,typename TypePixel>
-TypePixel Private::LaplacienSmooth<DIM,TypePixel>::operator ()(const MatN<DIM,TypePixel>& f, const typename MatN<DIM,TypePixel>::E& x) {
+template<int DIM,typename PixelType>
+PixelType Private::LaplacienSmooth<DIM,PixelType>::operator ()(const MatN<DIM,PixelType>& f, const typename MatN<DIM,PixelType>::E& x) {
     F32 sum=0;
-    FunctorF::FunctorMultiplicationF2<TypePixel,F32,F32> op;
+    FunctorF::FunctorMultiplicationF2<PixelType,F32,F32> op;
     _itn.init( x);
     std::vector<F32>::iterator it = _v_value.begin();
     while(_itn.next()){

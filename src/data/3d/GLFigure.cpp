@@ -580,17 +580,6 @@ void InitGL(int , int )            // We call this right after our OpenGL window
 
 
         glClearColor(0.0F,0.0F,0.0F,0.0F);
-        //        glClearRGB(0.0f, 0.0f, 0.0f, 0.0f);        // This Will Clear The Background Color To Black
-        //        glClearDepth(1.0);                // Enables Clearing Of The Depth Buffer
-        //        glDepthFunc(GL_LESS);                    // The Type Of Depth Test To Do
-        //        glEnable(GL_DEPTH_TEST);                // Enables Depth Testing
-        //        glShadeModel(GL_SMOOTH);            // Enables Smooth Color Shading
-
-        //        glMatrixMode(GL_PROJECTION);
-        //        glLoadIdentity();                // Reset The Projection Matrix
-
-        //    gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);    // Calculate The Aspect Ratio Of The Window
-
         glMatrixMode(GL_MODELVIEW);
     }
 }
@@ -880,17 +869,6 @@ int InitGL()                                        // All Setup For OpenGL Goes
             glDisable(GL_DEPTH_TEST);
         }
         glClearColor(0.0F,0.0F,0.0F,0.0F);
-        //        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);        // This Will Clear The Background Color To Black
-        //        glClearDepth(1.0);                // Enables Clearing Of The Depth Buffer
-        //        glDepthFunc(GL_LESS);                    // The Type Of Depth Test To Do
-        //        glEnable(GL_DEPTH_TEST);                // Enables Depth Testing
-        //        glShadeModel(GL_SMOOTH);            // Enables Smooth Color Shading
-
-        //        glMatrixMode(GL_PROJECTION);
-        //        glLoadIdentity();                // Reset The Projection Matrix
-
-        //    gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);    // Calculate The Aspect Ratio Of The Window
-
         glMatrixMode(GL_MODELVIEW);
     }
     return TRUE;                                        // Initialization Went OK

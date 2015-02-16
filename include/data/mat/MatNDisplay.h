@@ -207,11 +207,11 @@ public:
     virtual MatNDisplay & display(const MatN<2, RGBUI8 > &img);
 //    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
     virtual MatNDisplay & display(const MatN<2, UI8 > &img);
-    template<int DIM,typename Type>
-    MatNDisplay & display(const MatN<DIM, Type > &){return *this;}
+    template<int DIM,typename PixelType>
+    MatNDisplay & display(const MatN<DIM, PixelType > &){return *this;}
 
-    template<typename Type>
-    MatNDisplay & display(const MatN<2, Type > &img){
+    template<typename PixelType>
+    MatNDisplay & display(const MatN<2, PixelType > &img){
         this->display(   MatN<2, UI8>  ( Processing::greylevelRange(img,0,255)));
         return *this;
     }
@@ -361,14 +361,14 @@ public:
 
 
 namespace Private {
-template<int Dim, typename Type>
+template<int Dim, typename PixelType>
 struct Display
 {
     static std::vector<MatNDisplay> v_display;
 };
 
-template<int Dim, typename Type>
-std::vector<MatNDisplay> Display< Dim,  Type>::v_display;
+template<int Dim, typename PixelType>
+std::vector<MatNDisplay> Display< Dim,  PixelType>::v_display;
 template<typename PixelType>
 struct DisplayOutputPixel{inline static std::string   print( PixelType v){ return BasicUtility::Any2String(v); }};
 template<>
@@ -376,10 +376,10 @@ struct DisplayOutputPixel<UI8>{ inline static  std::string   print( UI8 v){ retu
 template<>
 struct DisplayOutputPixel<RGBUI8>{ inline static std::string   print( RGBUI8 v){ return BasicUtility::Any2String((int)v(0))+","+BasicUtility::Any2String((int)v(1))+","+BasicUtility::Any2String((int)v(2)); }};
 }
-template<int Dim, typename Type>
-void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automaticresize)const {
+template<int Dim, typename PixelType>
+void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool automaticresize)const {
 
-    MatN<Dim,Type>  img(*this);
+    MatN<Dim,PixelType>  img(*this);
     VecN<DIM,pop::F32> scale;
     scale =1;
     if(automaticresize ==true&&Dim==2){
@@ -390,21 +390,21 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
     if(Dim==2){
 
 
-        Private::Display< Dim, Type>::v_display.push_back(MatNDisplay());
+        Private::Display< Dim, PixelType>::v_display.push_back(MatNDisplay());
 
-        Private::Display< Dim, Type>::v_display.rbegin()->display(img);
-        Private::Display< Dim, Type>::v_display.rbegin()->set_title(title);
+        Private::Display< Dim, PixelType>::v_display.rbegin()->display(img);
+        Private::Display< Dim, PixelType>::v_display.rbegin()->set_title(title);
         if(stop_process==true){
-            while (!Private::Display< Dim, Type>::v_display.rbegin()->is_closed()) {
-                Private::Display< Dim, Type>::v_display.rbegin()->waitTime();
-                int iimg =1.0*Private::Display< Dim, Type>::v_display.rbegin()->mouse_y()/Private::Display< Dim, Type>::v_display.rbegin()->height()*img.getDomain()(0);
-                int jimg =1.0*Private::Display< Dim, Type>::v_display.rbegin()->mouse_x()/Private::Display< Dim, Type>::v_display.rbegin()->width()*img.getDomain()(1);
-                int i =Private::Display< Dim, Type>::v_display.rbegin()->mouse_y()*this->getDomain()(0)*1.0/img.getDomain()(0);
-                int j =Private::Display< Dim, Type>::v_display.rbegin()->mouse_x()*this->getDomain()(1)*1.0/img.getDomain()(1);
-                if (Private::Display< Dim, Type>::v_display.rbegin()->button()) {
+            while (!Private::Display< Dim, PixelType>::v_display.rbegin()->is_closed()) {
+                Private::Display< Dim, PixelType>::v_display.rbegin()->waitTime();
+                int iimg =1.0*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()/Private::Display< Dim, PixelType>::v_display.rbegin()->height()*img.getDomain()(0);
+                int jimg =1.0*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()/Private::Display< Dim, PixelType>::v_display.rbegin()->width()*img.getDomain()(1);
+                int i =Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()*this->getDomain()(0)*1.0/img.getDomain()(0);
+                int j =Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()*this->getDomain()(1)*1.0/img.getDomain()(1);
+                if (Private::Display< Dim, PixelType>::v_display.rbegin()->button()) {
                     if(img.isValid(iimg,jimg)){
-                        std::string t ="i="+ BasicUtility::Any2String(i)+", j="+BasicUtility::Any2String(j)+", f(i,j)="+Private::DisplayOutputPixel<Type>::print(img(iimg,jimg));
-                        Private::Display< Dim, Type>::v_display.rbegin()->set_title(t.c_str());
+                        std::string t ="i="+ BasicUtility::Any2String(i)+", j="+BasicUtility::Any2String(j)+", f(i,j)="+Private::DisplayOutputPixel<PixelType>::print(img(iimg,jimg));
+                        Private::Display< Dim, PixelType>::v_display.rbegin()->set_title(t.c_str());
                     }
                 }
             }
@@ -413,8 +413,8 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
         Vec2I32 d;
         d(0)=img.getDomain()(0);
         d(1)=img.getDomain()(1);
-        MatN<2, Type> plane(d);
-        typename MatN<2, Type>::IteratorEDomain it(plane.getIteratorEDomain());
+        MatN<2, PixelType> plane(d);
+        typename MatN<2, PixelType>::IteratorEDomain it(plane.getIteratorEDomain());
         VecN<DIM,int> x;
         x(2)=0;
         while(it.next()){
@@ -441,7 +441,7 @@ void MatN<Dim,Type>::display(const char * title,bool stop_process, bool automati
                     ", j="+BasicUtility::Any2String((int)(xx(1)))+
                     ", k="+BasicUtility::Any2String((int)(xx(2)));
             if(img.isValid(xx)){
-                t+=", f(i,j,k)="+Private::DisplayOutputPixel<Type>::print(img(xx));
+                t+=", f(i,j,k)="+Private::DisplayOutputPixel<PixelType>::print(img(xx));
             }
             t+=" and press  down(up)-arrow to move in the z axis";
             main_disp.set_title(t.c_str());

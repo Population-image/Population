@@ -68,13 +68,13 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lena.bmp
      * \image html Lenascale.png
     */
-    template<typename TypePixel>
-    static MatN<2,TypePixel> subResolution(const MatN<2,TypePixel> &m , int sub_resolution_factor)
+    template<typename PixelType>
+    static MatN<2,PixelType> subResolution(const MatN<2,PixelType> &m , int sub_resolution_factor)
     {
-        MatN<2,TypePixel> m_sub (m.getDomain()/sub_resolution_factor);
-        typename MatN<2,TypePixel>::iterator it_sub=m_sub.begin();
-        typename MatN<2,TypePixel>::const_iterator it=m.begin();
-        typename MatN<2,TypePixel>::const_iterator it_index_start=m.begin();
+        MatN<2,PixelType> m_sub (m.getDomain()/sub_resolution_factor);
+        typename MatN<2,PixelType>::iterator it_sub=m_sub.begin();
+        typename MatN<2,PixelType>::const_iterator it=m.begin();
+        typename MatN<2,PixelType>::const_iterator it_index_start=m.begin();
         int step_m_y=sub_resolution_factor;
         int step_m_x=(sub_resolution_factor)*m.sizeJ();
         for(unsigned int i=0;i<m_sub.sizeI();i++){
@@ -129,13 +129,13 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lena.bmp
      * \image html Lenascale.png
     */
-    template<int DIM,  typename TypePixel>
-    static MatN<DIM,TypePixel> scale(const MatN<DIM,TypePixel> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
+    template<int DIM,  typename PixelType>
+    static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {
-        typename MatN<DIM,TypePixel>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
-        MatN<DIM,TypePixel> temp(domain);
+        typename MatN<DIM,PixelType>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
+        MatN<DIM,PixelType> temp(domain);
         VecN<DIM,F32> alpha = VecN<DIM,F32>(1.f)/scale;
-        typename MatN<DIM,TypePixel>::IteratorEDomain it (temp.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it (temp.getIteratorEDomain());
         while(it.next()){
             VecN<DIM,F32> x;
             x=(VecN<DIM,F32>(it.x())-0.5)*alpha;
@@ -162,11 +162,11 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lena.png
     * \image html lenarotpi2.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> rotateMultPi_2(const MatN<DIM,TypePixel> & f,int plus_minus=1)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> rotateMultPi_2(const MatN<DIM,PixelType> & f,int plus_minus=1)
     {
-        MatN<DIM,TypePixel> g(f.getDomain()(1),f.getDomain()(0));
-        typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
+        MatN<DIM,PixelType> g(f.getDomain()(1),f.getDomain()(0));
+        typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
         if(plus_minus==1){
             while(it.next()){
                 g(g.getDomain()(0)-1-it.x()(1),it.x()(0))=f(it.x());
@@ -194,14 +194,14 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lena.png
     * \image html lenarotpi6.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> rotate(const MatN<DIM,TypePixel> & f,F32 angle)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> rotate(const MatN<DIM,PixelType> & f,F32 angle)
     {
         if(DIM==2){
             Mat2x22F32 rot22 = GeometricalTransformation::rotation2D(angle);
-            typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
+            typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
 
-            MatN<DIM,TypePixel> g(f.getDomain());
+            MatN<DIM,PixelType> g(f.getDomain());
             Vec2F32 c(f.getDomain()/2);
             it.init();
             while(it.next()){
@@ -231,12 +231,12 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lena.png
     * \image html lenamirror.png
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mirror(const MatN<DIM,TypePixel> & f,int coordinate=0){
-        MatN<DIM,TypePixel> h(f.getDomain());
-        typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> mirror(const MatN<DIM,PixelType> & f,int coordinate=0){
+        MatN<DIM,PixelType> h(f.getDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
         while(it.next()){
-            typename MatN<DIM,TypePixel>::E x=it.x();
+            typename MatN<DIM,PixelType>::E x=it.x();
             x(coordinate)=h.getDomain()(coordinate)-1-x(coordinate);
             h(x)=f(it.x());
         }
@@ -252,15 +252,15 @@ struct POP_EXPORTS GeometricalTransformation
      *
      * \sa pop::Representation::FFTDisplay
      */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> translate(const MatN<DIM,TypePixel> & f,const typename MatN<DIM,TypePixel>::E &trans,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_PERIODIC)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> translate(const MatN<DIM,PixelType> & f,const typename MatN<DIM,PixelType>::E &trans,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_PERIODIC)
     {
-        MatN<DIM,TypePixel> temp(f.getDomain());
-        typename MatN<DIM,TypePixel>::IteratorEDomain it = f.getIteratorEDomain();
+        MatN<DIM,PixelType> temp(f.getDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
         MatNBoundaryCondition condition(boundarycondtion);
         while(it.next())
         {
-            typename MatN<DIM,TypePixel>::E z = it.x()+trans;
+            typename MatN<DIM,PixelType>::E z = it.x()+trans;
             if(condition.isValid(f.getDomain(),z)){
                 condition.apply(f.getDomain(),z);
                 temp(z)=f(it.x());

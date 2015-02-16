@@ -4,8 +4,7 @@
 #include"3rdparty/VideoFFMPEG.h"
 
 namespace pop {
-bool ConvertRV32ToGrey::init =false;
-UI8 ConvertRV32ToGrey::_look_up_table[256][256][256];
+
 
 Video * Video::create(VideoImpl impl){
     if(impl==Video::VLC){

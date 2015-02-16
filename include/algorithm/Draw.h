@@ -111,8 +111,8 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenaharris.jpg
     */
-    template<int DIM, typename TypePixel>
-    static void circle(MatN<DIM,TypePixel> &img,const typename MatN<DIM,TypePixel>::E & x,int radius,typename MatN<DIM,TypePixel>::F value,int widthline=1)
+    template<int DIM, typename PixelType>
+    static void circle(MatN<DIM,PixelType> &img,const typename MatN<DIM,PixelType>::E & x,int radius,typename MatN<DIM,PixelType>::F value,int widthline=1)
     {
 
         if(DIM==2){
@@ -184,17 +184,17 @@ struct POP_EXPORTS Draw
      * \image html lenaharris2.jpg
 
     */
-    template< int DIM,typename TypePixel>
-    static void disk(MatN<DIM,TypePixel> &img,const typename MatN<DIM,TypePixel>::E & x,int radius,typename MatN<DIM,TypePixel>::F value,MatNBoundaryConditionType boundarycondition=MATN_BOUNDARY_CONDITION_PERIODIC)
+    template< int DIM,typename PixelType>
+    static void disk(MatN<DIM,PixelType> &img,const typename MatN<DIM,PixelType>::E & x,int radius,typename MatN<DIM,PixelType>::F value,MatNBoundaryConditionType boundarycondition=MATN_BOUNDARY_CONDITION_PERIODIC)
     {
         int radiuspower2=radius*radius;
-        typename MatN<DIM,TypePixel>::E xmin = x-radius;
-        typename MatN<DIM,TypePixel>::E xmax = x+radius;
-        typename MatN<DIM,TypePixel>::IteratorERectangle it = img.getIteratorERectangle(xmin,xmax);
+        typename MatN<DIM,PixelType>::E xmin = x-radius;
+        typename MatN<DIM,PixelType>::E xmax = x+radius;
+        typename MatN<DIM,PixelType>::IteratorERectangle it = img.getIteratorERectangle(xmin,xmax);
         MatNBoundaryCondition condition(boundarycondition);
         while(it.next())
         {
-            typename MatN<DIM,TypePixel>::E xx = it.x();
+            typename MatN<DIM,PixelType>::E xx = it.x();
             if((xx-x).normPower()<=radiuspower2){
                 if(condition.isValid(img.getDomain(),xx)){
                     condition.apply(img.getDomain(),xx);
@@ -221,8 +221,8 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenarec.jpg
     */
-    template<int DIM,typename TypePixel>
-    static void rectangle(MatN<DIM,TypePixel> &img,const typename  MatN<DIM,TypePixel>::E & center,const typename  MatN<DIM,TypePixel>::E & size,typename MatN<DIM,TypePixel>::F value,int widthline=1,F32 angle_radian=0 )
+    template<int DIM,typename PixelType>
+    static void rectangle(MatN<DIM,PixelType> &img,const typename  MatN<DIM,PixelType>::E & center,const typename  MatN<DIM,PixelType>::E & size,typename MatN<DIM,PixelType>::F value,int widthline=1,F32 angle_radian=0 )
     {
         pop::Mat2F32 mrot = GeometricalTransformation::rotation2D(-angle_radian);
 
@@ -261,11 +261,11 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenapoly.jpg
     */
-    template<int DIM,typename TypePixel>
-    static void polygone(MatN<DIM,TypePixel> &img,const std::vector<typename  MatN<DIM,TypePixel>::E> & pos,typename MatN<DIM,TypePixel>::F value,int widthline=1,bool bullet=false )
+    template<int DIM,typename PixelType>
+    static void polygone(MatN<DIM,PixelType> &img,const std::vector<typename  MatN<DIM,PixelType>::E> & pos,typename MatN<DIM,PixelType>::F value,int widthline=1,bool bullet=false )
     {
         for(unsigned int i =0;i<pos.size();i++){
-            typename  MatN<DIM,TypePixel>::E x1,x2;
+            typename  MatN<DIM,PixelType>::E x1,x2;
             x1 = pos[i];
             if(i<pos.size()-1)
                 x2 = pos[i+1];
@@ -295,8 +295,8 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenatext.jpg
     */
-    template<int DIM,typename TypePixel>
-    static void line(MatN<DIM,TypePixel> &img,typename MatN<DIM,TypePixel>::E x1, typename MatN<DIM,TypePixel>::E x2,typename MatN<DIM,TypePixel>::F value,int width=1)
+    template<int DIM,typename PixelType>
+    static void line(MatN<DIM,PixelType> &img,typename MatN<DIM,PixelType>::E x1, typename MatN<DIM,PixelType>::E x2,typename MatN<DIM,PixelType>::F value,int width=1)
     {
         if(width<1)
             width=1;
@@ -305,7 +305,7 @@ struct POP_EXPORTS Draw
         Point_Float d = Point_Float(x2-x1)/normValue(x2-x1);
         for(int r =0;r<=distance;r++){
             Point_Float x = Point_Float(x1)+ d*(F32)r;
-            typename MatN<DIM,TypePixel>::IteratorENeighborhood itn(img.getIteratorENeighborhood(width-1,2));
+            typename MatN<DIM,PixelType>::IteratorENeighborhood itn(img.getIteratorENeighborhood(width-1,2));
             itn.init(x);
             while(itn.next())
             {
@@ -333,8 +333,8 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenaarrow.jpg
     */
-    template<int DIM,typename TypePixel>
-    static void arrow(MatN<DIM,TypePixel> &img,typename MatN<DIM,TypePixel>::E x1,typename MatN<DIM,TypePixel>::E x2,typename MatN<DIM,TypePixel>::F value,int widthline=1,int linelength=6,F32 angleradian=0.5)
+    template<int DIM,typename PixelType>
+    static void arrow(MatN<DIM,PixelType> &img,typename MatN<DIM,PixelType>::E x1,typename MatN<DIM,PixelType>::E x2,typename MatN<DIM,PixelType>::F value,int widthline=1,int linelength=6,F32 angleradian=0.5)
     {
         line(img, x1,  x2, value, widthline);
 
@@ -377,8 +377,8 @@ struct POP_EXPORTS Draw
      * \image html lenatext.jpg
     */
 
-    template<typename TypePixel>
-    static void text( MatN<2,TypePixel> & img, std::string text,const typename MatN<2,TypePixel>::E&  pos,const typename MatN<2,TypePixel>::F & value_text,int scale_factor=1,F32 angle_radian=0){
+    template<typename PixelType>
+    static void text( MatN<2,PixelType> & img, std::string text,const typename MatN<2,PixelType>::E&  pos,const typename MatN<2,PixelType>::F & value_text,int scale_factor=1,F32 angle_radian=0){
         Vec2F32 x = pos;
         for(unsigned int i =0;i<text.size();i++){
             char letter = text[i];
@@ -583,12 +583,12 @@ struct POP_EXPORTS Draw
      * \image html lenamerge.jpg
     */
 
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mergeTwoMatrixHorizontal(const MatN<DIM,TypePixel> & img1,const MatN<DIM,TypePixel> & img2){
-        typename MatN<DIM,TypePixel>::E x = img1.getDomain();
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> mergeTwoMatrixHorizontal(const MatN<DIM,PixelType> & img1,const MatN<DIM,PixelType> & img2){
+        typename MatN<DIM,PixelType>::E x = img1.getDomain();
         x(1)+=img2.getDomain()(1);
-        MatN<DIM,TypePixel> out(x);
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(out.getIteratorEDomain());
+        MatN<DIM,PixelType> out(x);
+        typename MatN<DIM,PixelType>::IteratorEDomain it(out.getIteratorEDomain());
         while(it.next()){
             x = it.x();
             if(x(1)<img1.getDomain()(1)){
@@ -620,12 +620,12 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenamerge2.jpg
     */
-    template<int DIM,typename TypePixel>
-    static MatN<DIM,TypePixel> mergeTwoMatrixVertical(const MatN<DIM,TypePixel> & img1,const MatN<DIM,TypePixel> & img2){
-        typename MatN<DIM,TypePixel>::E x = img1.getDomain();
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> mergeTwoMatrixVertical(const MatN<DIM,PixelType> & img1,const MatN<DIM,PixelType> & img2){
+        typename MatN<DIM,PixelType>::E x = img1.getDomain();
         x(0)+=img2.getDomain()(0);
-        MatN<DIM,TypePixel> out(x);
-        typename MatN<DIM,TypePixel>::IteratorEDomain it(out.getIteratorEDomain());
+        MatN<DIM,PixelType> out(x);
+        typename MatN<DIM,PixelType>::IteratorEDomain it(out.getIteratorEDomain());
         while(it.next()){
             x = it.x();
             if(x(0)<img1.getDomain()(0)){
@@ -668,17 +668,17 @@ struct POP_EXPORTS Draw
      * \endcode
      * \image html lenaiterate.jpg
     */
-    template<int DIM, typename TypePixel1,typename TypePixel2>
-    static MatN<DIM,TypePixel1> insertMatrix(const MatN<DIM,TypePixel1> & f,const MatN<DIM,TypePixel2> & postit, typename MatN<DIM,TypePixel1>::E trans)
+    template<int DIM, typename PixelType1,typename PixelType2>
+    static MatN<DIM,PixelType1> insertMatrix(const MatN<DIM,PixelType1> & f,const MatN<DIM,PixelType2> & postit, typename MatN<DIM,PixelType1>::E trans)
     {
-        MatN<DIM,TypePixel1> h(f);
-        typename MatN<DIM,TypePixel1>::E  transs;
-        typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,TypePixel1>::E,F32>::Result temptrans(trans);
-        typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,TypePixel1>::E,F32>::Result tempgetdomain(postit.getDomain());
+        MatN<DIM,PixelType1> h(f);
+        typename MatN<DIM,PixelType1>::E  transs;
+        typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,PixelType1>::E,F32>::Result temptrans(trans);
+        typename FunctionTypeTraitsSubstituteF<typename MatN<DIM,PixelType1>::E,F32>::Result tempgetdomain(postit.getDomain());
 
-        transs=   typename MatN<DIM,TypePixel1>::E (temptrans-0.5f*tempgetdomain);
-        typename MatN<DIM,TypePixel2>::IteratorEDomain it (postit.getIteratorEDomain());
-        typename MatN<DIM,TypePixel1>::E x;
+        transs=   typename MatN<DIM,PixelType1>::E (temptrans-0.5f*tempgetdomain);
+        typename MatN<DIM,PixelType2>::IteratorEDomain it (postit.getIteratorEDomain());
+        typename MatN<DIM,PixelType1>::E x;
         while(it.next()){
 
             x =it.x()+ transs;
@@ -716,13 +716,13 @@ struct POP_EXPORTS Draw
     * \image html eutel.bmp "original image"
     * \image html euteldist.jpg "distance function used to estimate the geometrical tortuosity"
     */
-    template<int DIM,typename TypePixel>
-    static void setFace( MatN<DIM,TypePixel> & h,int coordinate,int leftorright,typename MatN<DIM,TypePixel>::F value=NumericLimits<TypePixel>::maximumRange())
+    template<int DIM,typename PixelType>
+    static void setFace( MatN<DIM,PixelType> & h,int coordinate,int leftorright,typename MatN<DIM,PixelType>::F value=NumericLimits<PixelType>::maximumRange())
     {
-        typename MatN<DIM,TypePixel>::E d = h.getDomain();
+        typename MatN<DIM,PixelType>::E d = h.getDomain();
         d(coordinate)=1;
-        typename MatN<DIM,TypePixel>::IteratorEDomain it (d);
-        typename MatN<DIM,TypePixel>::E x;
+        typename MatN<DIM,PixelType>::IteratorEDomain it (d);
+        typename MatN<DIM,PixelType>::E x;
         while(it.next()){
             x = it.x();
             if(leftorright!=0)
@@ -753,10 +753,10 @@ struct POP_EXPORTS Draw
     * image.display();
     * \endcode
     */
-    template<int DIM,typename TypePixel>
-    static void setBorder( MatN<DIM,TypePixel> & h,typename MatN<DIM,TypePixel>::F value,int borderlenght=1 )
+    template<int DIM,typename PixelType>
+    static void setBorder( MatN<DIM,PixelType> & h,typename MatN<DIM,PixelType>::F value,int borderlenght=1 )
     {
-        typename MatN<DIM,TypePixel>::IteratorEDomain it (h.getIteratorEDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it (h.getIteratorEDomain());
         while(it.next()){
             for(int i=0;i<DIM;i++)
             {
@@ -784,11 +784,11 @@ struct POP_EXPORTS Draw
     * \endcode
     * \image html lenaborderadd.jpg
     */
-    template<int DIM,typename TypePixel>
-    static void addBorder( MatN<DIM,TypePixel> & f,int widthborder, const typename MatN<DIM,TypePixel>::F& border_value=TypePixel(0),MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
+    template<int DIM,typename PixelType>
+    static void addBorder( MatN<DIM,PixelType> & f,int widthborder, const typename MatN<DIM,PixelType>::F& border_value=PixelType(0),MatNBoundaryConditionType boundary_condition=MATN_BOUNDARY_CONDITION_BOUNDED)
     {
         if(DIM==2){
-            MatN<DIM,TypePixel> out(f.getDomain()+2*widthborder,border_value);
+            MatN<DIM,PixelType> out(f.getDomain()+2*widthborder,border_value);
             if(boundary_condition==MATN_BOUNDARY_CONDITION_BOUNDED){
                 int sift_in_core =0;
                 int sift_out_core=widthborder*out.sizeJ()+widthborder;
@@ -830,11 +830,11 @@ struct POP_EXPORTS Draw
             }
             f = out;
         }else{
-            MatN<DIM,TypePixel> h(f.getDomain()+2*widthborder,border_value);
-            typename MatN<DIM,TypePixel>::IteratorEDomain it (h.getIteratorEDomain());
+            MatN<DIM,PixelType> h(f.getDomain()+2*widthborder,border_value);
+            typename MatN<DIM,PixelType>::IteratorEDomain it (h.getIteratorEDomain());
             MatNBoundaryCondition c(boundary_condition);
             while(it.next()){
-                typename MatN<DIM,TypePixel>::E x = it.x()-widthborder;
+                typename MatN<DIM,PixelType>::E x = it.x()-widthborder;
                 if(c.isValid(f.getDomain(),x)){
                     c.apply(f.getDomain(),x);
                     h(it.x())=f(x);
@@ -874,8 +874,8 @@ struct POP_EXPORTS Draw
 
 
 
-    template<int DIM,typename TypePixel>
-    static void axis(MatN<DIM,TypePixel> &img,F32 xmin,F32 xmax,F32 ymin, F32 ymax,typename MatN<DIM,TypePixel>::F value)
+    template<int DIM,typename PixelType>
+    static void axis(MatN<DIM,PixelType> &img,F32 xmin,F32 xmax,F32 ymin, F32 ymax,typename MatN<DIM,PixelType>::F value)
     {
 
         int space = 15;
@@ -938,8 +938,8 @@ struct POP_EXPORTS Draw
         Draw::text(img,BasicUtility::Any2String(10),Vec2I32(5,x-28),value,1);
         Draw::text(img,BasicUtility::Any2String(l),Vec2I32(0,x-18),value,1);
     }
-    template<int DIM,typename TypePixel>
-    static void distribution(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,typename MatN<DIM,TypePixel>::F value,MatN<DIM,TypePixel> &img)
+    template<int DIM,typename PixelType>
+    static void distribution(const Distribution & d,F32 xmin,F32 xmax,F32 ymin,F32 ymax,typename MatN<DIM,PixelType>::F value,MatN<DIM,PixelType> &img)
     {
         int sizex = img.sizeJ();
         int sizey = img.sizeI();
@@ -2127,8 +2127,8 @@ template<int DIM>Mat2F32 _caractere<DIM>::Letter9 =pop::Mat2F32(pop::Vec2I32(9,6
 //        else
 //            return N;
 //    }
-//    template<int DIM,typename TypePixel>
-//    static void number(MatN<DIM,TypePixel> &img,F32 x1,F32 y1, int value,typename MatN<DIM,TypePixel>::F value,int width=3)
+//    template<int DIM,typename PixelType>
+//    static void number(MatN<DIM,PixelType> &img,F32 x1,F32 y1, int value,typename MatN<DIM,PixelType>::F value,int width=3)
 //    {
 
 //        int valuepossitive = absolute(value);

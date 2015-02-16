@@ -129,11 +129,11 @@ public:
         *
         *
         */
-        template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E  x,int coordinate)
+        template<int DIM,typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, typename MatN<DIM,PixelType>::E  x,int coordinate)
         {
             x(coordinate)++;
-            TypePixel y;
+            PixelType y;
             if( x(coordinate)<f.getDomain()(coordinate)){
                 y= f(x);
                 x(coordinate)-=2;
@@ -151,7 +151,7 @@ public:
                 }
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -176,10 +176,10 @@ public:
         * For a scalar field, the functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$ in centered difference finite that is in 2d  equal \f$f(i+1,j)-f(i,j)\f$ for coordinate=0 and x=(i,j).\n
         * For a vectoriel field, the functor returns the partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
-        template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f,  typename MatN<DIM,TypePixel>::E  x,int coordinate)
+        template<int DIM,typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f,  typename MatN<DIM,PixelType>::E  x,int coordinate)
         {
-            TypePixel y=TypePixel(0)-f(x);
+            PixelType y=PixelType(0)-f(x);
             x(coordinate)++;
             if( x(coordinate)<f.getDomain()(coordinate)){
                 y+=f(x);
@@ -187,7 +187,7 @@ public:
                 return y;
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -213,10 +213,10 @@ public:
         * For a scalar field, the functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$ in centered difference finite that is in 2d  equal \f$f(i,j)-f(i-1,j)\f$ for coordinate=0 and x=(i,j).\n
         * For a vectoriel field, the functor returns the partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
-        template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f,  typename MatN<DIM,TypePixel>::E  x,int coordinate)
+        template<int DIM,typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f,  typename MatN<DIM,PixelType>::E  x,int coordinate)
         {
-            TypePixel y=f(x);
+            PixelType y=f(x);
             x(coordinate)--;
             if( x(coordinate)>=0){
                 y-=f(x);
@@ -224,7 +224,7 @@ public:
                 return y;
             }else{
                 x(coordinate)++;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -257,14 +257,14 @@ public:
         *
         * For a vectoriel field, the functor returns the vector partial derivative \f$(\frac{\partial f_0}{\partial x_i},\frac{\partial f_1}{\partial x_i}),\ldots\f$.
         */
-        template<int DIM,typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, typename MatN<DIM,TypePixel>::E  x,int coordinate_i,int coordinate_j )
+        template<int DIM,typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, typename MatN<DIM,PixelType>::E  x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
             }
             else{
-                TypePixel y(0);
+                PixelType y(0);
                 x(coordinate_j)++;
                 if( x(coordinate_j)<f.getDomain()(coordinate_j)){
                     y=partiatcentered(f,x,coordinate_i);
@@ -306,11 +306,11 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$ in centered difference finite that is in 2d  equal \f$(f(i+1,j)-f(i-1,j))/2\f$ for coordinate=0 and x=(i,j).
         *
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
             x(coordinate)++;
-            TypePixel y;
+            PixelType y;
             if( x(coordinate)<f.getDomain()(coordinate)&&_bulk->operator()(x)!=0){
                 y= f(x);
                 x(coordinate)-=2;
@@ -323,11 +323,11 @@ public:
                 }
                 else{
                     x(coordinate)++;
-                    return TypePixel(0);
+                    return PixelType(0);
                 }
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -358,10 +358,10 @@ public:
         * For a VecN falling outside the field domain, the partial derivative is NULL (Neumann boundary condition).
         * \sa PartialDerivateForward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
-            TypePixel y=-f(x);
+            PixelType y=-f(x);
             x(coordinate)++;
             if( x(coordinate)<f.getDomain()(coordinate) &&_bulk->operator()(x)!=0){
                 y+=f(x);
@@ -369,7 +369,7 @@ public:
                 return y;
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -400,10 +400,10 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$.
         * \sa PartialDerivateBackward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
-            TypePixel y=f(x);
+            PixelType y=f(x);
             x(coordinate)--;
             if( x(coordinate)>=0&&_bulk->operator()(x)!=0){
                 y-=f(x);
@@ -411,7 +411,7 @@ public:
                 return y;
             }else{
                 x(coordinate)++;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -451,14 +451,14 @@ public:
         *   - \f$f(i+1,j)+f(i-1,j)-2*f(i,j)\f$ for coordinate_i=coordinate_j=0
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
             }
             else{
-                TypePixel y(0);
+                PixelType y(0);
                 x(coordinate_j)++;
                 if( x(coordinate_j)<f.getDomain()(coordinate_j)&&_bulk->operator()(x)!=0){
                     y=partiatcentered(f,x,coordinate_i);
@@ -479,13 +479,13 @@ public:
     * Functor to approximate the partial derivative in centered difference finite for a scalar/vectoriel field in multi-phase field formalism.
     * \sa PartialDerivateCentered
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateCenteredMultiPhaseField
     {
     private:
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -498,13 +498,13 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$ in centered difference finite that is in 2d  equal \f$(f(i+1,j)-f(i-1,j))/2\f$ for coordinate=0 and x=(i,j).
         *
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & xx,int coordinate)
         {
-                        typename MatN<DIM,TypePixel>::E x=xx;
-            TypePixelLabel label = _label->operator()(x);
+                        typename MatN<DIM,PixelType>::E x=xx;
+            PixelTypeLabel label = _label->operator()(x);
             x(coordinate)++;
-            TypePixel y;
+            PixelType y;
             if( x(coordinate)<f.getDomain()(coordinate)){
                 if(label==_label->operator()(x))
                     y= f(x);
@@ -523,11 +523,11 @@ public:
                 }
                 else{
                     x(coordinate)++;
-                    return TypePixel(0);
+                    return PixelType(0);
                 }
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -538,14 +538,14 @@ public:
     *
     * Functor to approximate the partial derivative in forward difference finite.
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateForwardMultiPhaseField
     {
     private:
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
 
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -559,12 +559,12 @@ public:
         * For a VecN falling outside the field domain, the partial derivative is NULL (Neumann boundary condition).
         * \sa PartialDerivateForward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & xx,int coordinate)
         {
-                        typename MatN<DIM,TypePixel>::E x=xx;
-            TypePixelLabel label = _label->operator()(x);
-            TypePixel y=-f(x);
+                        typename MatN<DIM,PixelType>::E x=xx;
+            PixelTypeLabel label = _label->operator()(x);
+            PixelType y=-f(x);
             x(coordinate)++;
             if( x(coordinate)<f.getDomain()(coordinate)){
                 if(label==_label->operator()(x))
@@ -575,7 +575,7 @@ public:
                 return y;
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -587,13 +587,13 @@ public:
     * Functor to approximate the partial derivative in backward difference finite
     * For a VecN falling outside the bulk \f$\{x:bulk(x)\neq 0\} \f$, the partial derivative is NULL (Neumann boundary condition).
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateBackwardMultiPhaseField
     {
     private:
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -606,12 +606,12 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$.
         * \sa PartialDerivateBackward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & xx,int coordinate)
         {
-            typename MatN<DIM,TypePixel>::E x=xx;
-            TypePixelLabel label = _label->operator()(x);
-            TypePixel y=f(x);
+            typename MatN<DIM,PixelType>::E x=xx;
+            PixelTypeLabel label = _label->operator()(x);
+            PixelType y=f(x);
             x(coordinate)--;
             if( x(coordinate)>=0){
                 if(label==_label->operator()(x))
@@ -622,7 +622,7 @@ public:
                 return y;
             }else{
                 x(coordinate)++;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -635,22 +635,22 @@ public:
     *
     *
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateSecondCenteredMultiPhaseField
     {
     private:
 
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
             partiatforward.setLabelPhase(label);
             partiatbackward.setLabelPhase(label);
             partiatcentered.setLabelPhase(label);
         }
-        PartialDerivateForwardMultiPhaseField<DIM,TypePixelLabel > partiatforward;
-        PartialDerivateBackwardMultiPhaseField<DIM,TypePixelLabel > partiatbackward;
-        PartialDerivateCenteredMultiPhaseField<DIM,TypePixelLabel > partiatcentered;
+        PartialDerivateForwardMultiPhaseField<DIM,PixelTypeLabel > partiatforward;
+        PartialDerivateBackwardMultiPhaseField<DIM,PixelTypeLabel > partiatbackward;
+        PartialDerivateCenteredMultiPhaseField<DIM,PixelTypeLabel > partiatcentered;
         /*!
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
@@ -663,16 +663,16 @@ public:
         *   - \f$f(i+1,j)+f(i-1,j)-2*f(i,j)\f$ for coordinate_i=coordinate_j=0
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & xx,int coordinate_i,int coordinate_j )
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & xx,int coordinate_i,int coordinate_j )
         {
-            typename MatN<DIM,TypePixel>::E x=xx;
+            typename MatN<DIM,PixelType>::E x=xx;
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
             }
             else{
 
-                TypePixel y(0);
+                PixelType y(0);
                 x(coordinate_j)++;
                 if( x(coordinate_j)<f.getDomain()(coordinate_j)){
                     y=partiatcentered(f,x,coordinate_i);
@@ -693,17 +693,17 @@ public:
     * Functor to approximate the partial derivative in centered difference finite for a scalar/vectoriel field in multi-phase field formalism. For a VecN falling outside the bulk \f$\{x:bulk(x)\neq 0\} \f$, the partial derivative is NULL (Neumann boundary condition).
     * \sa PartialDerivateCentered
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateCenteredInBulkMultiPhaseField
     {
     private:
         const MatN<DIM,UI8> * _bulk;
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
         void setBulk(const MatN<DIM,UI8> & bulk){
             _bulk = & bulk;
         }
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -716,12 +716,12 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$ in centered difference finite that is in 2d  equal \f$(f(i+1,j)-f(i-1,j))/2\f$ for coordinate=0 and x=(i,j).
         *
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
-            TypePixelLabel label = _label->operator()(x);
+            PixelTypeLabel label = _label->operator()(x);
             x(coordinate)++;
-            TypePixel y;
+            PixelType y;
             if( x(coordinate)<f.getDomain()(coordinate)&&_bulk->operator()(x)!=0){
                 if(label==_label->operator()(x))
                     y= f(x);
@@ -740,11 +740,11 @@ public:
                 }
                 else{
                     x(coordinate)++;
-                    return TypePixel(0);
+                    return PixelType(0);
                 }
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -755,17 +755,17 @@ public:
     *
     * Functor to approximate the partial derivative in forward difference finite. For a VecN falling outside the bulk \f$\{x:bulk(x)\neq 0\} \f$, the partial derivative is NULL (Neumann boundary condition).
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateForwardInBulkMultiPhaseField
     {
     private:
         const MatN<DIM,UI8> * _bulk;
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
         void setBulk(const MatN<DIM,UI8> & bulk){
             _bulk = & bulk;
         }
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -779,11 +779,11 @@ public:
         * For a VecN falling outside the field domain, the partial derivative is NULL (Neumann boundary condition).
         * \sa PartialDerivateForward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
-            TypePixelLabel label = _label->operator()(x);
-            TypePixel y=-f(x);
+            PixelTypeLabel label = _label->operator()(x);
+            PixelType y=-f(x);
             x(coordinate)++;
             if( x(coordinate)<f.getDomain()(coordinate) &&_bulk->operator()(x)!=0){
                 if(label==_label->operator()(x))
@@ -794,7 +794,7 @@ public:
                 return y;
             }else{
                 x(coordinate)--;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -806,17 +806,17 @@ public:
     * Functor to approximate the partial derivative in backward difference finite
     * For a VecN falling outside the bulk \f$\{x:bulk(x)\neq 0\} \f$, the partial derivative is NULL (Neumann boundary condition).
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateBackwardInBulkMultiPhaseField
     {
     private:
         const MatN<DIM,UI8> * _bulk;
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
         void setBulk(const MatN<DIM,UI8> & bulk){
             _bulk = & bulk;
         }
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
         }
         /*!
@@ -829,11 +829,11 @@ public:
         * The functor returns the partial derivative \f$\frac{\partial f}{\partial x_i}\f$.
         * \sa PartialDerivateBackward
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate)
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate)
         {
-            TypePixelLabel label = _label->operator()(x);
-            TypePixel y=f(x);
+            PixelTypeLabel label = _label->operator()(x);
+            PixelType y=f(x);
             x(coordinate)--;
             if( x(coordinate)>=0&&_bulk->operator()(x)!=0){
                 if(label==_label->operator()(x))
@@ -844,7 +844,7 @@ public:
                 return y;
             }else{
                 x(coordinate)++;
-                return TypePixel(0);
+                return PixelType(0);
             }
 
         }
@@ -857,14 +857,14 @@ public:
     *
     *
     */
-    template<int DIM,typename TypePixelLabel>
+    template<int DIM,typename PixelTypeLabel>
     class POP_EXPORTS PartialDerivateSecondCenteredInBulkMultiPhaseField
     {
     private:
         const MatN<DIM,UI8> * _bulk;
-        const MatN<DIM,TypePixelLabel> * _label;
+        const MatN<DIM,PixelTypeLabel> * _label;
     public:
-        void setLabelPhase(const MatN<DIM,TypePixelLabel> & label){
+        void setLabelPhase(const MatN<DIM,PixelTypeLabel> & label){
             _label = & label;
             partiatforward.setLabelPhase(label);
             partiatbackward.setLabelPhase(label);
@@ -876,9 +876,9 @@ public:
             partiatbackward.setBulk(bulk);
             partiatcentered.setBulk(bulk);
         }
-        PartialDerivateForwardInBulkMultiPhaseField<DIM,TypePixelLabel> partiatforward;
-        PartialDerivateBackwardInBulkMultiPhaseField<DIM,TypePixelLabel> partiatbackward;
-        PartialDerivateCenteredInBulkMultiPhaseField<DIM,TypePixelLabel> partiatcentered;
+        PartialDerivateForwardInBulkMultiPhaseField<DIM,PixelTypeLabel> partiatforward;
+        PartialDerivateBackwardInBulkMultiPhaseField<DIM,PixelTypeLabel> partiatbackward;
+        PartialDerivateCenteredInBulkMultiPhaseField<DIM,PixelTypeLabel> partiatcentered;
         /*!
         * \brief partial derivate for scalar/vectoriel field
         * \param  f input scalar/vectoriel field
@@ -891,14 +891,14 @@ public:
         *   - \f$f(i+1,j)+f(i-1,j)-2*f(i,j)\f$ for coordinate_i=coordinate_j=0
         *   - \f$(f(i+1,j+1)-f(i-1,j+1))-(f(i+1,j-1)-f(i-1,j-1))\f$ for coordinate_i=0 and coordinate_j=1
         */
-        template<typename TypePixel>
-        inline TypePixel operator()(const MatN<DIM,TypePixel> &f, const typename MatN<DIM,TypePixel>::E & x,int coordinate_i,int coordinate_j )
+        template<typename PixelType>
+        inline PixelType operator()(const MatN<DIM,PixelType> &f, const typename MatN<DIM,PixelType>::E & x,int coordinate_i,int coordinate_j )
         {
             if(coordinate_i==coordinate_j){
                 return partiatforward(f,x,coordinate_i)-partiatbackward(f,x,coordinate_i);
             }
             else{
-                TypePixel y(0);
+                PixelType y(0);
                 x(coordinate_j)++;
                 if( x(coordinate_j)<f.getDomain()(coordinate_j)&&_bulk->operator()(x)!=0){
                     y=partiatcentered(f,x,coordinate_i);
@@ -940,10 +940,10 @@ public:
         * The functor returns the vector \f$\overrightarrow{\nabla} f\f$ that is to \f$\begin{pmatrix}\frac{\partial f}{\partial x_0}\\\frac{\partial f}{\partial x_1}\\\vdots \end{pmatrix}\f$
         * with the partial derivate given by the template paramater
         */
-        template<int DIM,typename TypePixel>
-        inline VecN<DIM, TypePixel> operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x)
+        template<int DIM,typename PixelType>
+        inline VecN<DIM, PixelType> operator()(const MatN<DIM,PixelType> & f,  const typename MatN<DIM,PixelType>::E & x)
         {
-            VecN<DIM, TypePixel> grad;
+            VecN<DIM, PixelType> grad;
             for(int i = 0;i<DIM;i++)
                 grad(i)=partial(f,x,i);
             return grad;
@@ -971,12 +971,12 @@ public:
         * with the partial derivate given by the template paramater
         *
         */
-        template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,VecN<DIM,TypePixel> > & f,  const typename MatN<DIM,TypePixel>::E & x)
+        template<int DIM,typename PixelType>
+        PixelType operator()(const MatN<DIM,VecN<DIM,PixelType> > & f,  const typename MatN<DIM,PixelType>::E & x)
         {
-            TypePixel divergence(0);
+            PixelType divergence(0);
             for(int i = 0;i<DIM;i++){
-                VecN<DIM,TypePixel> div=partial(f,x,i);
+                VecN<DIM,PixelType> div=partial(f,x,i);
                 divergence+=div(i);
             }
             return divergence;
@@ -1002,13 +1002,13 @@ public:
         * with the partial derivate given by the template paramater
         *
         */
-        template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x)
+        template<int DIM,typename PixelType>
+        PixelType operator()(const MatN<DIM,PixelType> & f,  const typename MatN<DIM,PixelType>::E & x)
         {
-            TypePixel curl;
-            TypePixel divx = partial(f,x,0);
-            TypePixel divy = partial(f,x,1);
-            TypePixel divz = partial(f,x,2);
+            PixelType curl;
+            PixelType divx = partial(f,x,0);
+            PixelType divy = partial(f,x,1);
+            PixelType divz = partial(f,x,2);
             curl(0) = divy(2)-divz(1);
             curl(1) = divz(0)-divx(2);
             curl(2) = divx(1)-divy(0);
@@ -1036,9 +1036,9 @@ public:
         * with the partial second derivate given by the template paramater
         *
         */
-        template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,TypePixel> & f,  const typename MatN<DIM,TypePixel>::E & x){
-            TypePixel laplacien(0);
+        template<int DIM,typename PixelType>
+        PixelType operator()(const MatN<DIM,PixelType> & f,  const typename MatN<DIM,PixelType>::E & x){
+            PixelType laplacien(0);
             for(int i = 0;i<DIM;i++){
                 laplacien+=partialsecond(f,x,i,i);
             }
@@ -1073,8 +1073,8 @@ public:
         * with the partial second derivate given by the template paramater
         *
         */
-        template<int DIM,typename TypePixel>
-        inline Mat2x<F32,DIM,DIM> operator()(const MatN<DIM,TypePixel> & f, const typename MatN<DIM,TypePixel>::E & x){
+        template<int DIM,typename PixelType>
+        inline Mat2x<F32,DIM,DIM> operator()(const MatN<DIM,PixelType> & f, const typename MatN<DIM,PixelType>::E & x){
             typedef Mat2x<F32,DIM,DIM> Mat2x22f;
             Mat2x22f m;
             for(int i = 0;i<DIM;i++){
@@ -1112,8 +1112,8 @@ public:
     private:
 
         F32 _kpower2;
-        template<typename TypePixel>
-        inline F32 f(TypePixel v) {
+        template<typename PixelType>
+        inline F32 f(PixelType v) {
             return 0.5f /(1 + pop::productInner(v,v)/(_kpower2));
         }
         PartialDerivateBackward derivate_backward;
@@ -1137,12 +1137,12 @@ public:
         }
 
 
-        template<int DIM,typename TypePixel>
-        TypePixel operator()(const MatN<DIM,TypePixel > &field,const  typename MatN<DIM,TypePixel>::E & x){
-            TypePixel flow=0;
+        template<int DIM,typename PixelType>
+        PixelType operator()(const MatN<DIM,PixelType > &field,const  typename MatN<DIM,PixelType>::E & x){
+            PixelType flow=0;
             for(unsigned int i=0;i<DIM;i++){
-                TypePixel diff_backward=-derivate_backward(field,x,i);
-                TypePixel diff_forward=derivate_forward(field,x,i);
+                PixelType diff_backward=-derivate_backward(field,x,i);
+                PixelType diff_forward=derivate_forward(field,x,i);
                 F32 c_backward = f(diff_backward);
                 F32 c_forward = f(diff_forward);
                 flow+=(c_backward*diff_backward+c_forward*diff_forward);
@@ -1169,8 +1169,8 @@ public:
         * Construct the functor
         *
         */
-        template<typename Type>
-        Type operator()(Type x){
+        template<typename PixelType>
+        PixelType operator()(PixelType x){
             return x*(1-x*x);
         }
         void init(){}
