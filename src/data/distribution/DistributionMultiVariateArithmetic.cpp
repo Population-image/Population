@@ -99,7 +99,7 @@ DistributionMultiVariateArithmeticMax * DistributionMultiVariateArithmeticMax::c
     return new DistributionMultiVariateArithmeticMax(*this->_fleft,*this->_fright);
 }
 F32 DistributionMultiVariateArithmeticMax::operator ()( const VecF32&  value)const {
-    return std::max(_fleft->operator ()(value),_fright->operator ()(value));
+    return (std::max)(_fleft->operator ()(value),_fright->operator ()(value));
 }
 VecF32 DistributionMultiVariateArithmeticMax::randomVariable()const{
     std::cerr<<"No random variable for addition"<<std::endl;
@@ -116,7 +116,7 @@ DistributionMultiVariateArithmeticMin * DistributionMultiVariateArithmeticMin::c
     return new DistributionMultiVariateArithmeticMin(*this->_fleft,*this->_fright);
 }
 F32 DistributionMultiVariateArithmeticMin::operator ()( const VecF32&  value)const {
-    return std::min(_fleft->operator ()(value),_fright->operator ()(value));
+    return (std::min)(_fleft->operator ()(value),_fright->operator ()(value));
 }
 VecF32 DistributionMultiVariateArithmeticMin::randomVariable()const{
     std::cerr<<"No random variable for addition"<<std::endl;

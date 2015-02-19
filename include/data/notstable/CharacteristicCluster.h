@@ -101,38 +101,38 @@ struct DistanceCharacteristic{
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicMass : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<F32>(std::max(a.getMass(),b.getMass()))/std::min(a.getMass(),b.getMass()))-1;
+        return (static_cast<F32>((std::max)(a.getMass(),b.getMass()))/(std::min)(a.getMass(),b.getMass()))-1;
     }
 };
 
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicGreyLevel : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return std::abs(a.getMean()-b.getMean())/std::min(a.getStandartDeviation(),b.getStandartDeviation());
+        return std::abs(a.getMean()-b.getMean())/(std::min)(a.getStandartDeviation(),b.getStandartDeviation());
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicHeigh : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<F32>(std::max(a.getSize()(0),b.getSize()(0))))/std::min(a.getSize()(0),b.getSize()(0))-1;
+        return (static_cast<F32>((std::max)(a.getSize()(0),b.getSize()(0))))/(std::min)(a.getSize()(0),b.getSize()(0))-1;
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicWidth : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return (static_cast<F32>(std::max(a.getSize()(1),b.getSize()(1))))/std::min(a.getSize()(1),b.getSize()(1))-1;
+        return (static_cast<F32>((std::max)(a.getSize()(1),b.getSize()(1))))/(std::min)(a.getSize()(1),b.getSize()(1))-1;
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicWidthInterval : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return static_cast<F32>(std::abs(a.getCenter()(1)-b.getCenter()(1)))/ std::min(a.getSize()(1),b.getSize()(1));
+        return static_cast<F32>(std::abs(a.getCenter()(1)-b.getCenter()(1)))/ (std::min)(a.getSize()(1),b.getSize()(1));
     }
 };
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicHeightInterval : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return static_cast<F32>(std::abs(a.getCenter()(0)-b.getCenter()(0)))/  std::min(a.getSize()(0),b.getSize()(0));
+        return static_cast<F32>(std::abs(a.getCenter()(0)-b.getCenter()(0)))/  (std::min)(a.getSize()(0),b.getSize()(0));
     }
 };
 template<typename TypeCharacteristic>

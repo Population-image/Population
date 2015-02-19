@@ -455,7 +455,7 @@ public:
         if(number_octave<1)
             number_octave = round(std::log(  (F32)img.getDomain().minCoordinate()) / std::log(2.) - 2);
 
-        F32 sig_diff = std::sqrt( std::max(sigma * sigma - sigma_init * sigma_init, 0.0001f) );
+        F32 sig_diff = std::sqrt( (std::max)(sigma * sigma - sigma_init * sigma_init, 0.0001f) );
         if(sig_diff>0.01)
             I = FunctorMatN::convolutionGaussian(I,sig_diff,std::ceil(2.5*sig_diff));
 

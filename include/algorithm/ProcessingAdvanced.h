@@ -115,7 +115,7 @@ struct ProcessingAdvanced
         typedef typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F32> >::Result FunctionVecFloat;
         typedef typename FunctionTypeTraitsSubstituteF<Function,F32>::Result FunctionFloat;
         typedef typename FunctionTypeTraitsSubstituteF<Function,UI8 >::Result FunctionBinary;
-        gradnorm= ProcessingAdvanced::gradNormGaussian(FunctionFloat(img),sigma,std::min(9.f,sigma*3),img.getIteratorEDomain(),1);
+        gradnorm= ProcessingAdvanced::gradNormGaussian(FunctionFloat(img),sigma,(std::min)(9.f,sigma*3),img.getIteratorEDomain(),1);
         FunctionVecFloat grad= ProcessingAdvanced::gradientVecGaussian(FunctionFloat(img),sigma);
 
         std::vector<F32> vtan;
@@ -1054,7 +1054,7 @@ struct ProcessingAdvanced
         while(it.next()){
             if(seed(it.x())!=0){
                 pop.growth(seed(it.x()),it.x());
-                maxi =std::max(maxi,(int)seed(it.x()));
+                maxi =(std::max)(maxi,(int)seed(it.x()));
             }
         }
         std::vector<MasterSlave> v_individu(maxi+1);

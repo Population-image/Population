@@ -120,10 +120,10 @@ private:
     template<int DIM>
     T _minimumRange(Int2Type<DIM>);
     static inline T _minimumRange(Int2Type<true>){
-        return std::numeric_limits<T>::min();
+        return (std::numeric_limits<T>::min)();
     }
     static inline T _minimumRange(Int2Type<false>){
-        return -std::numeric_limits<T>::max();
+        return -(std::numeric_limits<T>::max)();
     }
 public:
     static const bool is_specialized = true;

@@ -530,8 +530,8 @@ public:
         var_G = 1.*this->g()/Max_value;
         var_B = 1.*this->b()/Max_value;
 
-        var_min = std::min(var_R, std::min(var_G, var_B));
-        var_max = std::max(var_R, std::max(var_G, var_B));
+        var_min = (std::min)(var_R, (std::min)(var_G, var_B));
+        var_max = (std::max)(var_R, (std::max)(var_G, var_B));
         var_delta = var_max - var_min;
 
         //calcul de la luminence

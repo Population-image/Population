@@ -905,11 +905,11 @@ int DrawGLScene()                                    // Here's Where We Do All T
         }
         F32 scale=1;
         if(_max(0)-_min(0)!=0)
-            scale = std::min<F32>(scale,1./(_max(0)-_min(0)));
+            scale = (std::min)<F32>(scale,1./(_max(0)-_min(0)));
         if(_max(1)-_min(1)!=0)
-            scale = std::min<F32>(scale,1./(_max(1)-_min(1)));
+            scale = (std::min)<F32>(scale,1./(_max(1)-_min(1)));
         if(_max(2)-_min(2)!=0)
-            scale = std::min<F32>(scale,1./(_max(2)-_min(2)));
+            scale = (std::min)<F32>(scale,1./(_max(2)-_min(2)));
 
         scale *=10;
         glScalef(scale*scale_global, scale*scale_global, scale*scale_global);

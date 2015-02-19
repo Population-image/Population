@@ -402,7 +402,7 @@ bool LinearAlgebra::isDiagonal(const Matrix &m,F32 error){
     for(unsigned int i=0;i<m.sizeI();i++){
         for(unsigned int j=0;j<m.sizeJ();j++){
             if(i!=j){
-                error_diff = std::max(error_diff,std::abs(m(i,j)));
+                error_diff = (std::max)(error_diff,std::abs(m(i,j)));
             }
         }
     }
@@ -418,7 +418,7 @@ bool LinearAlgebra::isSymmetric(const Matrix &m,F32 error){
     F32 error_diff=0;
     for(unsigned int i=0;i<m.sizeI();i++){
         for(unsigned int j=i+1;j<m.sizeJ();j++){
-            error_diff = std::max(error_diff,std::abs(m(i,j)-m(j,i)));
+            error_diff = (std::max)(error_diff,std::abs(m(i,j)-m(j,i)));
         }
     }
     if(error_diff>error)
@@ -440,9 +440,9 @@ bool LinearAlgebra::isIdentity(const Matrix &m,F32 error){
     for(unsigned int i=0;i<m.sizeI();i++){
         for(unsigned int j=0;j<m.sizeJ();j++){
             if(i!=j){
-                error_diff = std::max(error_diff,std::abs(m(i,j)));
+                error_diff = (std::max)(error_diff,std::abs(m(i,j)));
             }else{
-                error_diff = std::max(error_diff,std::abs(1-m(i,j)));
+                error_diff = (std::max)(error_diff,std::abs(1-m(i,j)));
             }
         }
     }

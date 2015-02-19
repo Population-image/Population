@@ -792,21 +792,6 @@ public:
     //! \name Others
     //@{
     //------------- ------------------------
-
-
-    /*!
-    * \brief Diffusion limited aggregation
-    * \param mcorre correlation function
-    * \param domain domain of the model
-    * \param gaussianfield output gaussian field
-    * \return model
-    *
-    *   Diffusion-limited aggregation process
-    *
-    */
-    template<int DIM>
-    static MatN<DIM,UI8> gaussianThesholdedRandomField(const Mat2F32 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F32> & gaussianfield);
-
     /*!
     * \brief generate a random structure at the given volume fraction
     * \param domainmodel domain of the model
@@ -873,7 +858,6 @@ public:
 private:
     template <int DIM>
     static void divideTilling(const Vec<int> & v,Private::IntersectionRectangle<DIM> &rec,const  ModelGermGrain<DIM> & grainlist, MatN<DIM,RGBUI8> &img);
-    static DistributionRegularStep generateProbabilitySpectralDensity(const Mat2F32& correlation,F32 beta);
 
     inline static bool annealingSimutatedLaw(F32 energynext,F32 energycurrent,F32 temperature_inverse){
         if(energynext<energycurrent)
@@ -1516,7 +1500,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                 {
                     Vec<int>::iterator it;
                     for(it=v_hit.begin();it!=v_hit.end();it++)
-                        img(ximg) = std::max (img(ximg),   (grainlist.grains()[*it])->color);
+                        img(ximg) = (std::max) (img(ximg),   (grainlist.grains()[*it])->color);
                 }else if(grainlist.getModel()==DeadLeave){
                     int value_=0;
                     Vec<int>::iterator it;
@@ -1534,9 +1518,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                     img(ximg) =   (grainlist.grains()[*(v_hit.begin())])->color;
                     Vec<int>::iterator it;
                     for(it=v_hit.begin()+1;it!=v_hit.end();it++){
-                        //                        std::cout<<img(ximg)<<"t"<<transparancy<<" "<<transparancy*RGBF32(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
-                        img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
-                        //                        std::cout<<"t"<<transparancy<<" "<<transparancy*RGBF32(  (grainlist.v_list[*it])->color)<<" "<<img(ximg)<<std::endl;
+                         img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
                     }
                 }else{
                     Vec<int>::iterator it;
@@ -1552,8 +1534,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
 }
 
 template<int DIM>
-pop::MatN<DIM,pop::RGBUI8> RandomGeometry::continuousToDiscrete(const ModelGermGrain<DIM> &grain)
-{
+pop::MatN<DIM,pop::RGBUI8> RandomGeometry::continuousToDiscrete(const ModelGermGrain<DIM> &grain){
     Vec<int> v(grain.grains().size(),0);
     for(int i =0; i<(int)v.size();i++)
         v[i]=i;
@@ -1563,67 +1544,6 @@ pop::MatN<DIM,pop::RGBUI8> RandomGeometry::continuousToDiscrete(const ModelGermG
     rec.size = grain.getDomain();
     RandomGeometry::divideTilling(v,rec,  grain, img);
     return img;
-}
-template<int DIM>
-MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(const Mat2F32 &mcorre,const VecN<DIM,int> &domain,MatN<DIM,F32> & gaussianfield )
-{
-    F32 porosity = mcorre(0,1);
-    DistributionExpression f("1/(2*pi)^(1./2)*exp(-(x^2)/2)");
-    F32 beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);
-    DistributionRegularStep Pmagnitude = RandomGeometry::generateProbabilitySpectralDensity(mcorre,beta);
-
-    DistributionUniformReal d2pi(0,2*3.14159265);
-    DistributionUniformReal d_0_1(0,1);
-    DistributionMultiVariateUnitSphere dpshere(DIM);
-    int number_cosinus=1000;
-    Vec< VecN<DIM, F32> > direction(number_cosinus);
-    Vec<  F32 > module(number_cosinus);
-    Vec<  F32 > phase(number_cosinus);
-    std::cout<<"generate cosinus"<<std::endl;
-    for(int i=0;i<number_cosinus;i++){
-        F32 p = d2pi.randomVariable();
-        phase[i] = p;
-        module[i] = Pmagnitude.randomVariable()+d_0_1.randomVariable();
-        direction[i]= dpshere.randomVariable();
-    }
-
-    gaussianfield.resize(domain);
-    typename MatN<DIM,F32>::IteratorEDomain b(gaussianfield.getIteratorEDomain());
-    std::cout<<"generate field"<<std::endl;
-    while(b.next())
-    {
-        F32 sum=0;
-        VecN<DIM, F32> x = b.x();
-        for(int i=0;i<number_cosinus;i++)
-        {
-            sum +=std::cos(productInner(x,direction[i])*module[i]+phase[i]);
-        }
-        sum= sum*std::pow(2./number_cosinus,1./2.);
-        gaussianfield(b.x())=sum;
-    }
-    MatN<DIM,unsigned char> gaussianfieldthresolded(domain);
-
-    F32 betamin= beta -1;
-    F32 betamax= beta +1;
-    bool test =true;
-    do{
-        test =false;
-        gaussianfieldthresolded = Processing::threshold(gaussianfield,beta,100);
-        Mat2F32 mhisto = Analysis::histogram(gaussianfieldthresolded);
-        F32 porositymodel =mhisto(0,1);
-        F32 porosityref   = mcorre(0,1);
-        std::cout<<"porositymodel "<<porositymodel<<std::endl;
-        std::cout<<"porosityref   "<<porosityref<<std::endl;
-        if(absolute(porosityref - porositymodel)>0.0001){
-            if(porositymodel>porosityref )
-                betamax = beta;
-            else
-                betamin = beta;
-            test=true;
-            beta = betamin  + (betamax-betamin)/2;
-        }
-    }while(test==true);
-    return gaussianfieldthresolded;
 }
 template<int DIM>
 MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const Mat2F32& volume_fraction){
