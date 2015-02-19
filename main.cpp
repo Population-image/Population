@@ -134,7 +134,7 @@ int main()
     Mat2UI8 img;//2d grey-level image object
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
     img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-    F32 value;
+    int value;
     Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
     threshold.save("iexthreshold.pgm");
     Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
