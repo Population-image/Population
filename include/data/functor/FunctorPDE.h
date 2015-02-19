@@ -1147,7 +1147,7 @@ public:
                 F32 c_forward = f(diff_forward);
                 flow+=(c_backward*diff_backward+c_forward*diff_forward);
             }
-            return field(x)+flow*(0.5/DIM);
+            return field(x)+flow*(0.5f/DIM);
         }
     };
 

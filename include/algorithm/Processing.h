@@ -279,7 +279,7 @@ struct POP_EXPORTS Processing
       \endcode
     */
     template<int DIM,typename PixelType>
-    static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,PixelType>& f,F32 & thresholdvalue){
+    static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,PixelType>& f,int & thresholdvalue){
 
         Mat2F32 m = Analysis::histogram(f);
         F32 variane_between_class_max=0;

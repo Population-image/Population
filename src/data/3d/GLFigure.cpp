@@ -340,7 +340,7 @@ void FigureUnitSquare::draw()
     glColor4ub(this->_RGB.r(),this->_RGB.g(),this->_RGB.b(),this->_transparant);
     //Trapezoid
     if(direction==0){
-        glNormal3f(1*way,0,0);
+        glNormal3f(1*way,0.f,0.f);
         glVertex3f(x[0], x[1], x[2]);
         glVertex3f(x[0], x[1]+1, x[2]);
         glVertex3f(x[0], x[1]+1, x[2]+1);
