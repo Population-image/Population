@@ -6,48 +6,56 @@
 #include "data/typeF/TypeF.h"
 #include "data/neuralnetwork/NeuralNetwork.h"
 
-void test_neural_net(void);
 void test_neural_net_cpu(void);
+
+#if defined(HAVE_CUDA)
+void test_neural_net_gpu(void);
 void test_cublas(void);
-
-struct layer {
-	unsigned int _X_size; // size of _X and _d_E_X
-	unsigned int _Y_size; // size of _Y and _d_E_Y
-	unsigned int _W_width; // width of _W and _d_E_W
-	unsigned int _W_height; // height of _W and _d_E_W
-	bool _errors_initialized;
-	pop::F32* _X;
-	pop::F32* _Y;
-	pop::F32* _W;
-	pop::F32* _d_E_X;
-	pop::F32* _d_E_Y;
-	pop::F32* _d_E_W;
-};
-
-struct neural_network {
-	double _eta;
-	unsigned int _nb_layers;
-	struct layer* _layers;
-};
-
-static float sigmoid(float x){ return 1.7159f*tanh(0.66666667f*x); }
-static float derived_sigmoid(float S){ return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
-
-static __device__ float sigmoid_gpu(float x){ return 1.7159f*tanh(0.66666667f*x); }
-static __device__ float derived_sigmoid_gpu(float S){ return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
-
-struct neural_network* createNetwork(std::vector<unsigned int> v_layer, double eta);
-void propagateFront(struct neural_network* network, const pop::VecF32& in , pop::VecF32 &out);
-void propagateBackFirstDerivate(struct neural_network* network, const pop::VecF32& desired_output);
-void deleteNetwork(struct neural_network* network);
-
-struct neural_network* copyNetworkToGPU(struct neural_network* h_net);
-struct neural_network* copyNetworkFromGPU(struct neural_network* d_net);
-void deleteNetworkOnGPU(struct neural_network* network);
+#endif
 
 void printNetwork(struct neural_network* network);
 
 #if defined(HAVE_CUDA)
+static const int MAX_NB_THREADS = 1024; // GPU dependent
 #endif
+
+struct neural_network;
+
+class GPUNeuralNetwork {
+public:
+	GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta);
+	~GPUNeuralNetwork();
+
+	void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
+	void propagateBackFirstDerivate(const pop::VecF32& desired_output);
+	void displayNetwork();
+
+#if defined(HAVE_CUDA)
+	void copyNetworkToGPU();
+	void copyNetworkFromGPU();
+
+	void gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_size, unsigned int idx, pop::F32* out_computed);
+	void gpu_propagateBackFirstDerivate(pop::F32* out_set, pop::F32* out_computed, unsigned int out_set_size, unsigned int out_elt_size, unsigned int idx, int* error);
+	void gpu_displayNetwork();
+#endif
+
+private:
+	void createNetwork(std::vector<unsigned int> v_layer, double eta);
+	void deleteNetwork();
+
+	static void printNeuronsVector(pop::F32* V, unsigned int size, std::string label);
+	static void printWeightMatrix(pop::F32* M, unsigned int height, unsigned int width, std::string label);
+
+	float sigmoid(float x) { return 1.7159f*tanh(0.66666667f*x); }
+	float derived_sigmoid(float S) { return 0.666667f/1.7159f*(1.7159f*1.7159f-S*S); }
+
+	struct neural_network* h_network; // neural network on the CPU
+
+#if defined(HAVE_CUDA)
+	void deleteNetworkOnGPU();
+
+	struct neural_network* d_network; // neural network on the GPU
+#endif
+};
 
 #endif
