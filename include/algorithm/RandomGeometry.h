@@ -1500,7 +1500,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                 {
                     Vec<int>::iterator it;
                     for(it=v_hit.begin();it!=v_hit.end();it++)
-                        img(ximg) = (std::max) (img(ximg),   (grainlist.grains()[*it])->color);
+                        img(ximg) = std::max (img(ximg),   (grainlist.grains()[*it])->color);
                 }else if(grainlist.getModel()==DeadLeave){
                     int value_=0;
                     Vec<int>::iterator it;

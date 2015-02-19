@@ -902,8 +902,8 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         F32 mini=pop::NumericLimits<F32>::maximumRange();
 
         ForEachDomain2D(xx,mr){
-            maxi=(std::max)(maxi,mr(xx));
-            mini=(std::min)(mini,mr(xx));
+            maxi=std::max(maxi,mr(xx));
+            mini=std::min(mini,mr(xx));
             mrf(xx+trans)=mr(xx);
         }
         if(normalization_value==0){
@@ -935,11 +935,11 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         }
         center_gravity = center_gravity/weight_sum;
 
-        F32 max_i= (std::max)(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
-        F32 max_j= (std::max)(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
+        F32 max_i= std::max(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
+        F32 max_j= std::max(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
 
 
-        F32 homo = (std::max)(max_i/domain(0),max_j/domain(1));
+        F32 homo = std::max(max_i/domain(0),max_j/domain(1));
 
 
 
@@ -953,8 +953,8 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             pop::Vec2F32 xxx(xx);
             xxx = (xxx-Vec2F32(domain)/2.)*homo + center_gravity;
             mrf(xx)=img.interpolationBilinear(xxx);
-            maxi=(std::max)(maxi,mrf(xx));
-            mini=(std::min)(mini,mrf(xx));
+            maxi=std::max(maxi,mrf(xx));
+            mini=std::min(mini,mrf(xx));
         }
         if(normalization_value==0){
             F32 diff = (maxi-mini)/2.f;
