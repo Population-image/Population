@@ -39,12 +39,12 @@ void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax
     if(ymin == NumericLimits<F32>::minimumRange()){
         ymin = NumericLimits<F32>::maximumRange();
         for(unsigned int i=0;i<v_d.size();i++)
-            ymin = (std::min)(ymin,pop::Statistics::minValue(*v_d(i),xmin,xmax));
+            ymin = std::min(ymin,pop::Statistics::minValue(*v_d(i),xmin,xmax));
     }
     if(ymax == NumericLimits<F32>::maximumRange()){
         ymax = NumericLimits<F32>::minimumRange();
         for(unsigned int i=0;i<v_d.size();i++)
-            ymax = (std::max)(ymax,pop::Statistics::maxValue(*v_d(i),xmin,xmax));
+            ymax = std::max(ymax,pop::Statistics::maxValue(*v_d(i),xmin,xmax));
     }
 
 

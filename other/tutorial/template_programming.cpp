@@ -14,7 +14,7 @@ Mat2UI8 erosion_Level_0(Mat2UI8 m,double radius)
             for( int ki = -radius;ki<=radius;ki++){
                 for( int kj = -radius;kj<=radius;kj++){
                     if(m.isValid(i+ki,j+kj)==true){
-                        value = (std::min)(value, m(i+ki,j+kj));
+                        value = std::min(value, m(i+ki,j+kj));
                     }
                 }
             }
@@ -35,7 +35,7 @@ Mat2UI8 erosion_Level_1(Mat2UI8 m,double radius,int norm)
         //scan the neighborhood of a point
         it_local.init(it_global.x());//.init(Vec2I32)->init the neighbohood at the given 2d-vector
         while(it_local.next()){//.next()->iterate over the neighborhood
-            value = (std::min)(value, m(it_local.x()));//.x()->access a 2d-vector (Vec2I32) of the neighbohood as a pixel position
+            value = std::min(value, m(it_local.x()));//.x()->access a 2d-vector (Vec2I32) of the neighbohood as a pixel position
         }
         m_erosion(it_global.x())=value;
     }
