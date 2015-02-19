@@ -33,6 +33,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
+const int EPOCH=1;
 
 GPUNeuralNetwork::GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta) {
 	createNetwork(v_layer, eta);
@@ -98,7 +99,7 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 		l._d_E_W = NULL;
 	}
 
-#if 1
+#if 0
 	//FIXME: will be removed in the final version. Only here for tests
 	//XOR network qui fonctionne
 	{
@@ -144,7 +145,7 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 	}
 #endif
 
-#if 0
+#if 1
 	//FIXME: will be removed in the final version. Only here for tests
 	//dummy network tout à 0
 	{
@@ -167,15 +168,15 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 		l._Y[1] = 0;
 		l._Y[2] = 0;
 
-		l._W[0] = 0;
-		l._W[1] = 0;
-		l._W[2] = 0;
-		l._W[3] = 0;
-		l._W[4] = 0;
-		l._W[5] = 0;
-		l._W[6] = 0;
-		l._W[7] = 0;
-		l._W[8] = 0;
+		l._W[0] = 0.00001;
+		l._W[1] = 0.00001;
+		l._W[2] = 0.00001;
+		l._W[3] = 0.00001;
+		l._W[4] = 0.00001;
+		l._W[5] = 0.00001;
+		l._W[6] = 0.00001;
+		l._W[7] = 0.00001;
+		l._W[8] = 0.00001;
 	}
 	{
 		struct layer& l = h_network->_layers[2];
@@ -183,10 +184,10 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 
 		l._Y[0] = 0;
 
-		l._W[0] = 0;
-		l._W[1] = 0;
-		l._W[2] = 0;
-		l._W[3] = 0;
+		l._W[0] = 0.00001;
+		l._W[1] = 0.00001;
+		l._W[2] = 0.00001;
+		l._W[3] = 0.00001;
 	}
 #endif
 }
@@ -245,18 +246,17 @@ void GPUNeuralNetwork::printWeightMatrix(pop::F32* M, unsigned int height, unsig
 }
 
 void GPUNeuralNetwork::displayNetwork() {
-	std::cout << "Number of layers: " << h_network->_nb_layers << std::endl;
-	std::cout << "Eta: " << h_network->_eta << std::endl;
+	std::cout << "Number of layers: " << h_network->_nb_layers << ", eta: " << h_network->_eta << std::endl;
 
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
 
-		std::cout << "\n-- Layer " << l << ", error_initialized = " << (layer._errors_initialized ? "true" : "false") << ":" << std::endl;
+		std::cout << "\n-- Layer " << l << ", _X_size = " << layer._X_size << ", Y_size = " << layer._Y_size << ", _W_height = " << layer._W_height << ", _W_width = " << layer._W_width << std::endl;
 		printNeuronsVector(layer._X, layer._X_size, "_X");
 		printNeuronsVector(layer._Y, layer._Y_size, "_Y");
+		printWeightMatrix(layer._W, layer._W_height, layer._W_width, "_W");
 		printNeuronsVector(layer._d_E_X, layer._X_size, "_d_E_X");
 		printNeuronsVector(layer._d_E_Y, layer._Y_size, "_d_E_Y");
-		printWeightMatrix(layer._W, layer._W_height, layer._W_width, "_W");
 		printWeightMatrix(layer._d_E_W, layer._W_height, layer._W_width, "_d_E_W");
 	}
 }
@@ -487,10 +487,9 @@ __device__ void printMatrixOnGPU(pop::F32* M, unsigned int height, unsigned int 
 
 __global__ void printNetworkOnGPU(struct neural_network *network) {
 	printf("Number of layers: %d, eta: %f\n", network->_nb_layers, network->_eta);
-
 	for (unsigned int l=0; l<network->_nb_layers; l++) {
 		struct layer& layer = network->_layers[l];
-		printf("Layer %d, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
+		printf("\n--Layer %d, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
 
 		printVectorOnGPU(layer._X, layer._X_size, (char*)"_X");
 		printVectorOnGPU(layer._Y, layer._Y_size, (char*)"_Y");
@@ -574,6 +573,7 @@ void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_
 	block = (h_network->_layers[h_network->_nb_layers-1]._X_size < MAX_NB_THREADS ? h_network->_layers[h_network->_nb_layers-1]._X_size : MAX_NB_THREADS);
 	grid = h_network->_layers[h_network->_nb_layers-1]._X_size / MAX_NB_THREADS + (h_network->_layers[h_network->_nb_layers-1]._X_size%MAX_NB_THREADS ? 1 : 0);
 	gpu_propagateFront_setOutput<<<grid, block>>>(d_network, out_computed);
+	cudaDeviceSynchronize();
 }
 
 __global__ void gpu_propagateBackFirstDerivate_setXError(struct neural_network *network, pop::F32* desired_output, unsigned int in_elt_size, unsigned int idx, int l) {
@@ -624,6 +624,8 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
 void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, pop::F32* out_computed, unsigned int out_set_size, unsigned int out_elt_size, unsigned int idx, int* error) {
 	int block, grid;
 
+	return;
+
 	for (unsigned int l=h_network->_nb_layers-1; l>0; l--) {
 		// _d_E_X[l] = _X[l] - desired_output
 		if (l == h_network->_nb_layers-1){
@@ -664,6 +666,8 @@ void test_neural_net_cpu(void) {
 	v_layer.push_back(1);
 	GPUNeuralNetwork network(v_layer, 0.01);
 
+	std::cout << "\n********** CPU **********\n" << std::endl;
+
 	//create the training set
 	// (-1,-1)->-1
 	// ( 1,-1)-> 1
@@ -681,18 +685,15 @@ void test_neural_net_cpu(void) {
 	v_out(2)(0)= 1;//  1
 	v_out(3)(0)=-1;// -1
 
-	std::cout << "INITIAL NEURAL NETWORK:" << std::endl;
-	network.displayNetwork();
-
 	//use the backpropagation algorithm with first order method
 	std::vector<int> v_global_rand(v_in.size());
 	for(unsigned int i=0;i<v_global_rand.size();i++)
 		v_global_rand[i]=i;
-	std::cout<<"iter_epoch\t error_train"<<std::endl;
+	//FIXME std::cout<<"iter_epoch\t error_train"<<std::endl;
 
-	unsigned int nbr_epoch = 1000;
+	unsigned int nbr_epoch = EPOCH;
 	for(unsigned int i=0;i<nbr_epoch;i++){
-		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
+		//FIXME std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
 		int error=0;
 		for(unsigned int j=0;j<v_global_rand.size();j++){
 			pop::VecF32 vout;
@@ -715,9 +716,6 @@ void test_neural_net_cpu(void) {
 		std::cout<<vout<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
 	}
 	std::cout<<std::endl;
-
-	std::cout << "FINAL NEURAL NETWORK:" << std::endl;
-	network.displayNetwork();
 
 	//MNIST neural net
 #if 0
@@ -792,8 +790,7 @@ void test_neural_net_gpu(void) {
 	v_layer.push_back(1);
 	GPUNeuralNetwork network(v_layer, 0.01);
 
-	std::cout << "INITIAL NEURAL NETWORK:" << std::endl;
-	network.gpu_displayNetwork();
+	std::cout << "\n********** GPU **********\n" << std::endl;
 
 	//create the training set
 	pop::Vec<pop::VecF32> v_in(4,pop::VecF32(2));//4 vector of two scalar values
@@ -819,7 +816,6 @@ void test_neural_net_gpu(void) {
 	std::vector<int> v_global_rand(v_in.size());
 	for(unsigned int i=0;i<v_global_rand.size();i++)
 		v_global_rand[i]=i;
-	std::cout<<"iter_epoch\t error_train"<<std::endl;
 
 	pop::F32* d_in_set;
 	cudaMalloc(&d_in_set, v_in.size()*v_in(0).size() * sizeof(v_in(0)(0)));
@@ -848,9 +844,10 @@ void test_neural_net_gpu(void) {
 	int* d_error;
 	cudaMalloc(&d_error, sizeof(error));
 
-	unsigned int nbr_epoch = 1000;
+	unsigned int nbr_epoch = EPOCH;
+	//FIXME std::cout<<"iter_epoch\t error_train"<<std::endl;
 	for(unsigned int i=0;i<nbr_epoch;i++){
-		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
+		//FIXME std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
 
 		error = 0;
 		cudaMemcpy(d_error, &error, sizeof(error), cudaMemcpyHostToDevice);
@@ -863,12 +860,12 @@ void test_neural_net_gpu(void) {
 
 		cudaMemcpy(&error, d_error, sizeof(error), cudaMemcpyDeviceToHost);
 		//FIXME std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<std::endl;
-
-		cudaFree(d_error);
-		cudaFree(d_out);
-		cudaFree(d_in_set);
-		cudaFree(d_out_set);
 	}
+
+	cudaFree(d_error);
+	cudaFree(d_out);
+	cudaFree(d_in_set);
+	cudaFree(d_out_set);
 
 	network.copyNetworkFromGPU();
 
