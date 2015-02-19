@@ -1,3 +1,4 @@
+
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
 /*
@@ -124,7 +125,7 @@ int main()
     MatN<2,F32> m_corr(100,2);
     for(unsigned int i=0;i<m_corr.sizeI();i++){
         //m_corr(i,0)=i;
-        m_corr(i,1)=Corson_model(i);
+//        m_corr(i,1)=Corson_model(i);
 
     }
     std::cout<<m_corr<<std::endl;

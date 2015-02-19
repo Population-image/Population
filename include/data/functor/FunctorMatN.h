@@ -591,25 +591,25 @@ struct POP_EXPORTS FunctorMatN
     static Function1 smoothDeriche(const Function1 & f, F32 alpha=1)
     {
         F32 e_a = std::exp(- alpha);
-        F32 e_2a = std::exp(- 2.0 * alpha);
-        F32 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
+        F32 e_2a = std::exp(- 2.f * alpha);
+        F32 k = (1.f - e_a) * (1.f - e_a) / (1.f + (2 * alpha * e_a) - e_2a);
 
         F32 a0_c= k;
-        F32 a1_c=  k * e_a * (alpha - 1.0);
+        F32 a1_c=  k * e_a * (alpha - 1.f);
         F32 a2_c=  0;
         F32 a0_ac= 0;
-        F32 a1_ac=  k * e_a * (alpha + 1.0);
+        F32 a1_ac=  k * e_a * (alpha + 1.f);
         F32 a2_ac=  - k * e_2a;
 
         F32 b1= 2 * e_a;
         F32 b2 = - e_2a;
 
 
-        F32 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
+        F32 a0_c_border0 = ((a0_c + a1_c) / (1.f - b1 - b2));
         F32 a0_c_border1 = a0_c ;
         F32 a1_c_border1 = a1_c ;
 
-        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
+        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.f - b1 - b2));
         F32 a0_ac_border1 = 0 ;
         F32 a1_ac_border1 = a1_ac + a2_ac ;
 
@@ -657,25 +657,25 @@ struct POP_EXPORTS FunctorMatN
             return gradientDeriche(ffloat, direction,alpha);
         }
         F32 e_a = std::exp(- alpha);
-        F32 e_2a = std::exp(- 2.0 * alpha);
-        F32 k = (1.0 - e_a) * (1.0 - e_a) / (1.0 + (2 * alpha * e_a) - e_2a);
+        F32 e_2a = std::exp(- 2.f * alpha);
+        F32 k = (1.f - e_a) * (1.f - e_a) / (1.f + (2 * alpha * e_a) - e_2a);
 
         F32 a0_c= k;
-        F32 a1_c=  k * e_a * (alpha - 1.0);
+        F32 a1_c=  k * e_a * (alpha - 1.f);
         F32 a2_c=  0;
         F32 a0_ac= 0;
-        F32 a1_ac=  k * e_a * (alpha + 1.0);
+        F32 a1_ac=  k * e_a * (alpha + 1.f);
         F32 a2_ac=  - k * e_2a;
 
         F32 b1= 2 * e_a;
         F32 b2 = - e_2a;
 
 
-        F32 a0_c_border0 = ((a0_c + a1_c) / (1.0 - b1 - b2));
+        F32 a0_c_border0 = ((a0_c + a1_c) / (1.f - b1 - b2));
         F32 a0_c_border1 = a0_c ;
         F32 a1_c_border1 = a1_c ;
 
-        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.0 - b1 - b2));
+        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.f - b1 - b2));
         F32 a0_ac_border1 = 0 ;
         F32 a1_ac_border1 = a1_ac + a2_ac ;
 
@@ -683,7 +683,7 @@ struct POP_EXPORTS FunctorMatN
         F32 b1_border1 = b1 + b2 ;
 
 
-        F32 kp = - (1.0 - e_a) * (1.0 - e_a) / e_a;
+        F32 kp = - (1.f - e_a) * (1.f - e_a) / e_a;
         F32 a0_c_d= 0;
         F32 a1_c_d=  kp * e_a;
         F32 a2_c_d=  0;
@@ -691,11 +691,11 @@ struct POP_EXPORTS FunctorMatN
         F32 a1_ac_d= - kp * e_a;
         F32 a2_ac_d= 0;
 
-        F32 a0_c_border0_d = ((a0_c_d + a1_c_d) / (1.0 - b1 - b2));
+        F32 a0_c_border0_d = ((a0_c_d + a1_c_d) / (1.f - b1 - b2));
         F32 a0_c_border1_d = a0_c_d ;
         F32 a1_c_border1_d = a1_c_d ;
 
-        F32 a0_ac_border0_d = ((a1_ac_d + a2_ac_d) / (1.0 - b1 - b2));
+        F32 a0_ac_border0_d = ((a1_ac_d + a2_ac_d) / (1.f - b1 - b2));
         F32 a0_ac_border1_d = 0 ;
         F32 a1_ac_border1_d = a1_ac_d + a2_ac_d ;
 

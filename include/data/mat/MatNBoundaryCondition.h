@@ -319,7 +319,7 @@ private:
     template<typename FloatType>
     static  VecN<PowerGP<2,3>::value,std::pair<FloatType,Vec3I32 > > _getWeightPosition(const Vec3I32 x_domain,const VecN<3,FloatType> &x_point,MatNBoundaryCondition boundary ,Int2Type<3>)
     {
-        VecN<PowerGP<2,3>::value,std::pair<FloatType,Vec3I32 > > v_out(std::make_pair(0,Vec3I32(0,0)));
+        VecN<PowerGP<2,3>::value,std::pair<FloatType,Vec3I32 > > v_out(std::make_pair(0.f,Vec3I32(0,0)));
         VecN<3,FloatType> x;
         x(0)=x_point(0);
         x(1)=x_point(1);
@@ -327,9 +327,9 @@ private:
         bool all_hit=true;
         FloatType sum=0;
         Vec3I32 x1;
-        x1(0)=std::floor(x(0));
-        x1(1)=std::floor(x(1));
-        x1(2)=std::floor(x(2));
+        x1(0)=(I32)std::floor(x(0));
+        x1(1)=(I32)std::floor(x(1));
+        x1(2)=(I32)std::floor(x(2));
         if(boundary.isValid(x_domain,x1)){
             boundary.apply(x_domain,x1);
             FloatType norm = (1-(x(0)-x1(0)))*(1-(x(1)-x1(1)))*(1-(x(2)-x1(2)));

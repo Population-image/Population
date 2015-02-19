@@ -286,22 +286,22 @@ std::string BasicUtility::getPathSeparator() {
     return "???";
 #endif
 }
-UI8 maximum(UI8 v1,UI8 v2){return std::max(v1,v2);}
-UI16 maximum(UI16 v1,UI16 v2){return std::max(v1,v2);}
-UI32 maximum(UI32 v1,UI32 v2){return std::max(v1,v2);}
-I8 maximum(I8 v1,I8 v2){return std::max(v1,v2);}
-I16 maximum(I16 v1,I16 v2){return std::max(v1,v2);}
-I32 maximum(I32 v1,I32 v2){return std::max(v1,v2);}
-F32 maximum(F32 v1,F32 v2){return std::max(v1,v2);}
-F64 maximum(F64 v1,F64 v2){return std::max(v1,v2);}
-UI8 minimum(UI8 v1,UI8 v2){return std::min(v1,v2);}
-UI16 minimum(UI16 v1,UI16 v2){return std::min(v1,v2);}
-UI32 minimum(UI32 v1,UI32 v2){return std::min(v1,v2);}
-I8 minimum(I8 v1,I8 v2){return std::min(v1,v2);}
-I16 minimum(I16 v1,I16 v2){return std::min(v1,v2);}
-I32 minimum(I32 v1,I32 v2){return std::min(v1,v2);}
-F32 minimum(F32 v1,F32 v2){return std::min(v1,v2);}
-F64 minimum(F64 v1,F64 v2){return std::min(v1,v2);}
+UI8 maximum(UI8 v1,UI8 v2){return (std::max)(v1,v2);}
+UI16 maximum(UI16 v1,UI16 v2){return (std::max)(v1,v2);}
+UI32 maximum(UI32 v1,UI32 v2){return (std::max)(v1,v2);}
+I8 maximum(I8 v1,I8 v2){return (std::max)(v1,v2);}
+I16 maximum(I16 v1,I16 v2){return (std::max)(v1,v2);}
+I32 maximum(I32 v1,I32 v2){return (std::max)(v1,v2);}
+F32 maximum(F32 v1,F32 v2){return (std::max)(v1,v2);}
+F64 maximum(F64 v1,F64 v2){return (std::max)(v1,v2);}
+UI8 minimum(UI8 v1,UI8 v2){return (std::min)(v1,v2);}
+UI16 minimum(UI16 v1,UI16 v2){return (std::min)(v1,v2);}
+UI32 minimum(UI32 v1,UI32 v2){return (std::min)(v1,v2);}
+I8 minimum(I8 v1,I8 v2){return (std::min)(v1,v2);}
+I16 minimum(I16 v1,I16 v2){return (std::min)(v1,v2);}
+I32 minimum(I32 v1,I32 v2){return (std::min)(v1,v2);}
+F32 minimum(F32 v1,F32 v2){return (std::min)(v1,v2);}
+F64 minimum(F64 v1,F64 v2){return (std::min)(v1,v2);}
 
 
 F32 absolute(UI8 v1){return (F32)v1;}

@@ -340,23 +340,23 @@ void FigureUnitSquare::draw()
     glColor4ub(this->_RGB.r(),this->_RGB.g(),this->_RGB.b(),this->_transparant);
     //Trapezoid
     if(direction==0){
-        glNormal3f(1*way,0.f,0.f);
-        glVertex3f(x[0], x[1], x[2]);
-        glVertex3f(x[0], x[1]+1, x[2]);
-        glVertex3f(x[0], x[1]+1, x[2]+1);
-        glVertex3f(x[0], x[1], x[2]+1);
+        glNormal3f(1.f*way,0.f,0.f);
+        glVertex3f((GLfloat)x[0], (GLfloat)x[1], (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0], (GLfloat)x[1]+1, (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0], (GLfloat)x[1]+1, (GLfloat)x[2]+1);
+        glVertex3f((GLfloat)x[0], (GLfloat)x[1], (GLfloat)x[2]+1);
     }else if(direction==1){
-        glNormal3f(0,1*way,0);
-        glVertex3f(x[0] , x[1], x[2]);
-        glVertex3f(x[0]+1,x[1], x[2]);
-        glVertex3f(x[0]+1,x[1], x[2]+1);
-        glVertex3f(x[0] , x[1], x[2]+1);
+        glNormal3f((GLfloat)0,(GLfloat)1*way,(GLfloat)0);
+        glVertex3f((GLfloat)x[0] , (GLfloat)x[1], (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0]+1,(GLfloat)x[1], (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0]+1,(GLfloat)x[1], (GLfloat)x[2]+1);
+        glVertex3f((GLfloat)x[0] , (GLfloat)x[1], (GLfloat)x[2]+1);
     }else{
-        glNormal3f(0,0,1*way);
-        glVertex3f(x[0] , x[1], x[2]);
-        glVertex3f(x[0]+1,x[1], x[2]);
-        glVertex3f(x[0]+1,x[1]+1, x[2]);
-        glVertex3f(x[0] , x[1]+1, x[2]);
+        glNormal3f((GLfloat)0,(GLfloat)0,(GLfloat)1*way);
+        glVertex3f((GLfloat)x[0] , (GLfloat)x[1], (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0]+1,(GLfloat)x[1], (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0]+1,(GLfloat)x[1]+1, (GLfloat)x[2]);
+        glVertex3f((GLfloat)x[0] , (GLfloat)x[1]+1, (GLfloat)x[2]);
     }
     glEnd();
 #endif
@@ -407,7 +407,7 @@ void FigureCone::draw()
     glColor4ub(this->_RGB.r(),this->_RGB.g(),this->_RGB.b(),this->_transparant);
     glVertex3f(x(0)+dir(0)*h,x(1)+dir(1)*h,x(2)+dir(2)*h);
     Mat2x33F32 m= GeometricalTransformation::rotationFromVectorToVector(Vec3F32(0,0,1),dir);
-    for(F32 angle=0.0f;angle<=(2*PI);angle+=(PI/10.0))
+    for(F32 angle=0.0f;angle<=(2*PI);angle+=(PI/10.f))
     {
         Vec3F32 xrot(r*std::sin(angle),r*std::cos(angle),0);
         xrot= m*xrot;
@@ -905,11 +905,11 @@ int DrawGLScene()                                    // Here's Where We Do All T
         }
         F32 scale=1;
         if(_max(0)-_min(0)!=0)
-            scale = std::min<F32>(scale,1./(_max(0)-_min(0)));
+            scale = std::min<F32>(scale,1.f/(_max(0)-_min(0)));
         if(_max(1)-_min(1)!=0)
-            scale = std::min<F32>(scale,1./(_max(1)-_min(1)));
+            scale = std::min<F32>(scale,1.f/(_max(1)-_min(1)));
         if(_max(2)-_min(2)!=0)
-            scale = std::min<F32>(scale,1./(_max(2)-_min(2)));
+            scale = std::min<F32>(scale,1.f/(_max(2)-_min(2)));
 
         scale *=10;
         glScalef(scale*scale_global, scale*scale_global, scale*scale_global);
@@ -1276,10 +1276,10 @@ void drawwindow(void *    )            // Window Show State
                 zRot-=5;
             }
             else if(keys[VK_ADD]){
-                scale_global*=1.1;
+                scale_global*=1.1f;
             }
             else if(keys[VK_SUBTRACT]){
-                scale_global*=0.9;
+                scale_global*=0.9f;
             }
             else if(keys['S']){
                 op->_shot=true;
