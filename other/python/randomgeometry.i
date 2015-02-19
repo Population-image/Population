@@ -52,8 +52,6 @@ typedef pop::RandomGeometry RandomGeometry;
 %template(continuousToDiscrete) pop::RandomGeometry::continuousToDiscrete<2>;
 %template(continuousToDiscrete) pop::RandomGeometry::continuousToDiscrete<3>;
 
-%template(gaussianThesholdedRandomField) pop::RandomGeometry::gaussianThesholdedRandomField<2>;
-%template(gaussianThesholdedRandomField) pop::RandomGeometry::gaussianThesholdedRandomField<3>;
 
 %template(randomStructure) pop::RandomGeometry::randomStructure<2>;
 %template(randomStructure) pop::RandomGeometry::randomStructure<3>;
