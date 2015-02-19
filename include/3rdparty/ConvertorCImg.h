@@ -94,16 +94,17 @@ struct convertCImg<2,Result>
 
         FunctorF::FunctorAccumulatorMin<Result > funcmini;
         it.init();
-        typename TypeTraitsTypeScalar<Result>::Result min = normValue(forEachFunctorAccumulator(img,funcmini,it));
+		typedef typename TypeTraitsTypeScalar<Result>::Result TypeResult;
+        TypeResult min = (TypeResult)normValue(forEachFunctorAccumulator(img,funcmini,it));
         FunctorF::FunctorAccumulatorMax<Result > funcmaxi;
         it.init();
-        typename TypeTraitsTypeScalar<Result>::Result max = normValue(forEachFunctorAccumulator(img,funcmaxi,it));
+        TypeResult max = (TypeResult)normValue(forEachFunctorAccumulator(img,funcmaxi,it));
         for(int i =0;i<img.getDomain()[0];i++)
             for(int j =0;j<img.getDomain()[1];j++){
                 if(typeid(Result)==typeid(UI8))
-                    temp.operator ()(i,j)= normValue(img.operator ()(i,j));
+                    temp.operator ()(i,j)= (TypeResult)normValue(img.operator ()(i,j));
                 else
-                    temp.operator ()(i,j)= normValue( (img.operator ()(i,j)-min)*255./(max-min));
+                    temp.operator ()(i,j)= (TypeResult)normValue( (img.operator ()(i,j)-min)*255./(max-min));
             }
         return temp;
     }
@@ -113,9 +114,9 @@ struct convertCImg<2,Result>
         for(int i =0;i<temp.getDomain()[0];i++)
             for(int j =0;j<temp.getDomain()[1];j++){
                 if(img.spectrum ()==3){
-                    temp.operator ()(i,j) =  0.299*img.operator ()(i,j,0,0) + 0.587*img.operator ()(i,j,0,1) + 0.114*img.operator ()(i,j,0,2)+0.000001;
+                    temp.operator ()(i,j) = (Result)( 0.299f*img.operator ()(i,j,0,0) + 0.587f*img.operator ()(i,j,0,1) + 0.114f*img.operator ()(i,j,0,2)+0.0001f);
                 }else if(img.spectrum ()==1){
-                    temp.operator ()(i,j) = img.operator ()(i,j);
+                    temp.operator ()(i,j) = (Result) img.operator ()(i,j);
                 }
             }
         return temp;

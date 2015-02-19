@@ -402,7 +402,7 @@ bool LinearAlgebra::isDiagonal(const Matrix &m,F32 error){
     for(unsigned int i=0;i<m.sizeI();i++){
         for(unsigned int j=0;j<m.sizeJ();j++){
             if(i!=j){
-                error_diff = std::max(error_diff,std::abs(m(i,j)));
+                error_diff = (std::max)(error_diff,std::abs(m(i,j)));
             }
         }
     }

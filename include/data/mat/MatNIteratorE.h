@@ -554,7 +554,7 @@ private:
 
         for(unsigned int i=0;i<Function::DIM;i++){
             if((x1(i)-x2(i))!=0){
-                return std::abs( (_grad(x1)(i)+_grad(x2)(i))*0.5);
+                return std::abs( (_grad(x1)(i)+_grad(x2)(i))*0.5f);
             }
         }
         return 0;
@@ -568,7 +568,7 @@ public:
         _tab.clear();
         _label++;
         std::queue<std::pair<typename Function::E,std::pair<F32,typename Function::E >  >  > _queue;
-        _queue.push(std::make_pair(x_init, std::make_pair(0,x_init)));
+        _queue.push(std::make_pair(x_init, std::make_pair(0.f,x_init)));
         while(_queue.empty()==false){
             typename Function::E & x_origin= _queue.front().first;
             F32  value              = _queue.front().second.first;
@@ -595,7 +595,7 @@ public:
     bool next()
     {
         _index++;
-        if(_index<_tab.size()){
+        if(_index<(int)_tab.size()){
             return true;
         }
         else{

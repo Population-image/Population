@@ -1381,12 +1381,12 @@ void NNNeuronMaxPool::addConnection( NNNeuron* neuron){
 }
 
 void NNNeuronMaxPool::propagateFront(){
-    this->_Yn=-std::numeric_limits<F32>::max();
+    this->_Yn=-(std::numeric_limits<F32>::max)();
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
 
         NNConnection& c = (_connections[i_connection]);
-        this->_Yn = std::max(_Yn,c._neuron->_Xn);
+        this->_Yn = (std::max)(_Yn,c._neuron->_Xn);
     }
     this->_Xn = this->_Yn;
 }
@@ -1394,7 +1394,7 @@ void NNNeuronMaxPool::propagateFront(){
 void NNNeuronMaxPool::propagateBackFirstDerivate(){
 
     _dErr_dYn = _dErr_dXn;
-    F32 max_value = -std::numeric_limits<F32>::max();
+    F32 max_value = -(std::numeric_limits<F32>::max)();
     unsigned int i_index_max=0;
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {

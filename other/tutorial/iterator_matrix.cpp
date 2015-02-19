@@ -3,8 +3,8 @@ using namespace pop;//Population namespace
 
 template<typename PixelType>
 void fill1(MatN<2,PixelType> & m, PixelType value){
-    for(int i =0;i<m.sizeI();i++)
-        for(int j =0;j<m.sizeJ();j++)
+    for(unsigned int i =0;i<m.sizeI();i++)
+        for(unsigned int j =0;j<m.sizeJ();j++)
             m(i,j)=value;
 }
 template<typename PixelType>
@@ -21,7 +21,7 @@ void fill3(MatN<DIM,PixelType> & m, PixelType value){
     }
 }
 template<int DIM,typename PixelType>
-MatN<DIM,PixelType> erosion1(const MatN<DIM,PixelType> & m, double radius, int norm){
+MatN<DIM,PixelType> erosion1(const MatN<DIM,PixelType> & m, F32 radius, int norm){
     MatN<DIM,PixelType> m_ero(m.getDomain());
     typename MatN<DIM,PixelType>::IteratorEDomain it_global = m.getIteratorEDomain();//in C++11, you can write: auto it_global =  m.getIteratorEDomain();
     typename MatN<DIM,PixelType>::IteratorENeighborhood it_local = m.getIteratorENeighborhood(radius,norm);//in C++11, you can write: auto it_local =  m.getIteratorENeighborhood(radius,norm);
@@ -65,5 +65,5 @@ int main()
     std::cout<<m3d<<std::endl;
     m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
     erosion1(m,5,2).display("erosion1",false);
-    erosion2(m,m.getIteratorERectangle(Vec2F32(m.getDomain())*0.25,Vec2F32(m.getDomain())*0.75),m.getIteratorENeighborhood(5,2)).display("erosion2");
+    erosion2(m,m.getIteratorERectangle(Vec2F32(m.getDomain())*0.25f,Vec2F32(m.getDomain())*0.75f),m.getIteratorENeighborhood(5,2)).display("erosion2");
 }

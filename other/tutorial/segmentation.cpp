@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     DistributionRegularStep d(m);
     //DistributionDisplay::display(d,d.getXmin(),d.getXmax());
     //Manual threshold segmentation
-    F32 threshold;
+    int threshold;
     Mat3UI8 grain= Processing::thresholdOtsuMethod(imgfilter,threshold);
     //or automatic threshold segmentation
     //		double value;

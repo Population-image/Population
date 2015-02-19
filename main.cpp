@@ -1,6 +1,7 @@
+
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
-
+/*
 DistributionRegularStep generateProbabilitySpectralDensity(const Mat2F32& correlation)
 {
     std::string str_cummulative_gausssian = "1/((2*pi)^(0.5))*exp(-(x^2)*0.5)";
@@ -108,11 +109,11 @@ DistributionRegularStep generateProbabilitySpectralDensity(const Mat2F32& correl
         std::cout<<i<<" "<<m_corr(i,1)<<" "<<correlation(i,1) <<std::endl;
     }
 }
-
+*/
 int main()
 {
-    F32 f=0.4;
-    F32 c=0.1;
+    F32 f=0.4f;
+    F32 c=0.1f;
     F32 n=1;
     std::string f_str=pop::BasicUtility::Any2String(f);
     std::string c_str=pop::BasicUtility::Any2String(c);
@@ -123,12 +124,12 @@ int main()
     DistributionExpression Corson_model(exp);
     MatN<2,F32> m_corr(100,2);
     for(unsigned int i=0;i<m_corr.sizeI();i++){
-        m_corr(i,0)=i;
-        m_corr(i,1)=Corson_model(i);
+        //m_corr(i,0)=i;
+//        m_corr(i,1)=Corson_model(i);
 
     }
     std::cout<<m_corr<<std::endl;
-    generateProbabilitySpectralDensity(m_corr);
+    //generateProbabilitySpectralDensity(m_corr);
     return 1;
 
     Mat2UI8 img;//2d grey-level image object

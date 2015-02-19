@@ -1668,7 +1668,7 @@ struct ProcessingAdvanced
             region(it.x())=seed(it.x());
         }
         /* initialize random seed: */
-        srand ( time(NULL) );
+        srand ((unsigned int) time(NULL) );
         pop.setLevel(0);
         int index =0;
         int display_step=1;

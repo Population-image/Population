@@ -131,7 +131,7 @@ public:
     static T minimumRange() throw()
     { return _minimumRange(Int2Type<std::numeric_limits<T>::is_integer>() );}
     static T maximumRange() throw()
-    { return std::numeric_limits<T>::max(); }
+    { return (std::numeric_limits<T>::max)(); }
     static const int digits10 = std::numeric_limits<T>::digits10;
     static const bool is_integer = std::numeric_limits<T>::is_integer;
 };

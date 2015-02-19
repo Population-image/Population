@@ -518,7 +518,7 @@ bool MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
     }
     else{
         is.seekg (0, is.end);
-        unsigned int length = is.tellg();
+        unsigned int length = (unsigned int)is.tellg();
         is.seekg (0, is.beg);
         if(length>=sizeof(Result)*in.getDomain().multCoordinate()) {
             return MatNInOutPgm::readRaw(in,is);
