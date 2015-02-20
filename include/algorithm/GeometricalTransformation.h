@@ -296,12 +296,12 @@ struct POP_EXPORTS GeometricalTransformation
                 dist(i)(it.x())=d.randomVariable();
         }
         for(unsigned int i=0;i<DIM;i++)
-            dist(i) = ProcessingAdvanced::smoothGaussian(dist(i),sigma,sigma*2.5f,dist(i).getIteratorEDomain());
+            dist(i) = ProcessingAdvanced::smoothGaussian(dist(i),sigma,(int)(sigma*2.5f),dist(i).getIteratorEDomain());
         it.init();
         F32 dist_sum=0;
         int number=0;
         while(it.next()){
-            double distance=0;
+            F32 distance=0;
             for(unsigned int i=0;i<DIM;i++)
                 distance+=dist(i)(it.x())*dist(i)(it.x());
             dist_sum+=distance;

@@ -105,7 +105,7 @@ DistributionArithmeticMax * DistributionArithmeticMax::clone()const {
     return new DistributionArithmeticMax(*this->_fleft,*this->_fright);
 }
 F32 DistributionArithmeticMax::operator ()( F32  value)const {
-    return std::max(_fleft->operator ()(value),_fright->operator ()(value));
+    return (std::max)(_fleft->operator ()(value),_fright->operator ()(value));
 }
 F32 DistributionArithmeticMax::randomVariable()const{
     std::cerr<<"No random variable for addition"<<std::endl;
@@ -119,7 +119,7 @@ DistributionArithmeticMin * DistributionArithmeticMin::clone()const {
     return new DistributionArithmeticMin(*this->_fleft,*this->_fright);
 }
 F32 DistributionArithmeticMin::operator ()( F32  value)const {
-    return std::min(_fleft->operator ()(value),_fright->operator ()(value));
+    return (std::min)(_fleft->operator ()(value),_fright->operator ()(value));
 }
 F32 DistributionArithmeticMin::randomVariable()const{
     std::cerr<<"No random variable for addition"<<std::endl;

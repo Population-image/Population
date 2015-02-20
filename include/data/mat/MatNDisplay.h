@@ -383,7 +383,7 @@ void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool aut
     VecN<DIM,pop::F32> scale;
     scale =1;
     if(automaticresize ==true&&Dim==2){
-        scale = scale*(600./img.getDomain()(0));
+        scale = scale*(600.f/img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale);
     }
 
@@ -397,10 +397,10 @@ void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool aut
         if(stop_process==true){
             while (!Private::Display< Dim, PixelType>::v_display.rbegin()->is_closed()) {
                 Private::Display< Dim, PixelType>::v_display.rbegin()->waitTime();
-                int iimg =1.0*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()/Private::Display< Dim, PixelType>::v_display.rbegin()->height()*img.getDomain()(0);
-                int jimg =1.0*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()/Private::Display< Dim, PixelType>::v_display.rbegin()->width()*img.getDomain()(1);
-                int i =Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()*this->getDomain()(0)*1.0/img.getDomain()(0);
-                int j =Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()*this->getDomain()(1)*1.0/img.getDomain()(1);
+                int iimg =(int)1.*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()/Private::Display< Dim, PixelType>::v_display.rbegin()->height()*img.getDomain()(0);
+                int jimg =(int)1.*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()/Private::Display< Dim, PixelType>::v_display.rbegin()->width()*img.getDomain()(1);
+                int i =(int)(Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()*this->getDomain()(0)*1.0/img.getDomain()(0));
+                int j =(int)(Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()*this->getDomain()(1)*1.0/img.getDomain()(1));
                 if (Private::Display< Dim, PixelType>::v_display.rbegin()->button()) {
                     if(img.isValid(iimg,jimg)){
                         std::string t ="i="+ BasicUtility::Any2String(i)+", j="+BasicUtility::Any2String(j)+", f(i,j)="+Private::DisplayOutputPixel<PixelType>::print(img(iimg,jimg));

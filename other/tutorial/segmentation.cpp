@@ -12,7 +12,6 @@ int main(int argc, char *argv[]){
     Mat2F32 m = Analysis::histogram(img);
     DistributionRegularStep d(m);
     //DistributionDisplay::display(d,d.getXmin(),d.getXmax());
-
     int threshold;
     Mat3UI8 grain= Processing::thresholdOtsuMethod(imgfilter,threshold);
     //        grain.display();

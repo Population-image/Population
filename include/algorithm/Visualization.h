@@ -110,7 +110,7 @@ struct POP_EXPORTS Visualization
                 I32 r = 0;
                 I32 g = 0;
                 I32 b = 0;
-                int i=normValue(f(it.x()));
+                int i=(int)normValue(f(it.x()));
                 if(i==1)v=RGBUI8(255,0,0);
                 else if (i==2)v=RGBUI8(0,255,0);
                 else if (i==3)v=RGBUI8(0,0,255);
@@ -283,7 +283,7 @@ struct POP_EXPORTS Visualization
     {
         MatN<DIM,PixelType1>  labelb(label.getDomain());
         typename MatN<DIM,PixelType1>::IteratorEDomain it (label.getIteratorEDomain());
-        typename MatN<DIM,PixelType1>::IteratorENeighborhood itn(label.getIteratorENeighborhood(width,norm));
+        typename MatN<DIM,PixelType1>::IteratorENeighborhood itn(label.getIteratorENeighborhood((F32)width,norm));
         while(it.next()){
             typename MatN<DIM,PixelType1>::F l = label(it.x());
             itn.init(it.x());
@@ -310,17 +310,17 @@ struct POP_EXPORTS Visualization
         if(min<0){
             std::cerr<<"In Vizualization::labelForegroundBoundary,the label matrix must be possitive";
         }
-        std::vector<RGB<F32> > v(max+1);
+        std::vector<RGB<UI8> > v(max+1);
 
         srand ( 1 );
 
         for(I32 i=0;i<(I32)v.size();i++)
         {
-            if(i==1)v[i]=RGB<F32>(255,0,0);
-            else if(i==2)v[i]=RGB<F32>(0,255,0);
-            else if(i==3)v[i]=RGB<F32>(0,0,255);
+            if(i==1)v[i]=RGB<UI8>(255,0,0);
+            else if(i==2)v[i]=RGB<UI8>(0,255,0);
+            else if(i==3)v[i]=RGB<UI8>(0,0,255);
             else
-                v[i]=RGB<F32>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
+                v[i]=RGB<UI8>(rand()%256,rand()%256,rand()%256);//255*dist.randomVariable(),255*dist.randomVariable(),255*dist.randomVariable());
 
         }
         MatN<DIM,RGBUI8> foreground(label.getDomain());
@@ -331,7 +331,7 @@ struct POP_EXPORTS Visualization
         {
             if(labelb(it.x())==0)
             {
-                RGB<F32> value(img(it.x()));
+                RGB<UI8> value(img(it.x()));
                 foreground(it.x())=value;
             }
             else
@@ -483,9 +483,9 @@ struct POP_EXPORTS Visualization
     static void lineCube(Scene3d& scene,const MatN<3,PixelType> & img,F32 width=2,RGBUI8 RGB=RGBUI8(255,0,0))
     {
 
-        int d0 = img.getDomain()(0);
-        int d1 = img.getDomain()(1);
-        int d2 = img.getDomain()(2);
+        F32 d0 = (F32)img.getDomain()(0);
+        F32 d1 = (F32)img.getDomain()(1);
+        F32 d2 = (F32)img.getDomain()(2);
 
         VecN<3,F32> x1,x2;
         x1(0)=0;x1(1)=0;x1(2)=0;
@@ -1015,7 +1015,7 @@ struct POP_EXPORTS Visualization
 
         VecN<3,F32> x;
         VecN<3,F32> y;
-        x(direction)=slice;
+        x(direction)=(F32)slice;
         while(it.next())
         {
             FigurePolygon * poly = new FigurePolygon();
@@ -1026,9 +1026,9 @@ struct POP_EXPORTS Visualization
             for(int i=0;i<3;i++)
             {
                 if(i<direction)
-                    x(i)=it.x()(i);
+                    x(i)=(F32)it.x()(i);
                 else if(i>direction)
-                    x(i)=it.x()(i-1);
+                    x(i)=(F32)it.x()(i-1);
             }
             y =x;
             poly->vpos.push_back(x+trans);

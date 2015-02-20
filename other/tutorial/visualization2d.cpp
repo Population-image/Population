@@ -29,11 +29,11 @@ void visualizealgorithm(){
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
     int value;
     Mat2UI8 thre = Processing::thresholdOtsuMethod(img,value);
-    Mat2RGBUI8 foreground = Visualization::labelForeground (thre,img,0.7);
+    Mat2RGBUI8 foreground = Visualization::labelForeground (thre,img,0.7f);
     foreground.display();
 
     //# display each label with a random colour
-    DistributionPoisson d(0.001);
+    DistributionPoisson d(0.001f);
     Mat2UI32 field(512,512);//#realisation of a discrete poisson field
     Mat2UI32::IteratorEDomain it = field.getIteratorEDomain();
     int label = 1;

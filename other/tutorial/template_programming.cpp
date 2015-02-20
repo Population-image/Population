@@ -3,7 +3,7 @@ using namespace pop;//Population namespace
 
 
 //erosion of 2d matrix with UI8 as pixel type and the structural emlement is a square
-Mat2UI8 erosion_Level_0(Mat2UI8 m,double radius)
+Mat2UI8 erosion_Level_0(Mat2UI8 m,int radius)
 {
     Mat2UI8 m_erosion(m.getDomain());
     //scan the domain of the matrix
@@ -14,7 +14,7 @@ Mat2UI8 erosion_Level_0(Mat2UI8 m,double radius)
             for( int ki = -radius;ki<=radius;ki++){
                 for( int kj = -radius;kj<=radius;kj++){
                     if(m.isValid(i+ki,j+kj)==true){
-                        value = std::min(value, m(i+ki,j+kj));
+                        value = (std::min)(value, m(i+ki,j+kj));
                     }
                 }
             }
@@ -24,7 +24,7 @@ Mat2UI8 erosion_Level_0(Mat2UI8 m,double radius)
     return m_erosion;
 }
 //erosion of 2d matrix with UI8 as pixel type and the structural element is a ball
-Mat2UI8 erosion_Level_1(Mat2UI8 m,double radius,int norm)
+Mat2UI8 erosion_Level_1(Mat2UI8 m,F32 radius,int norm)
 {
     Mat2UI8 m_erosion(m.getDomain());
     Mat2UI8::IteratorEDomain it_global = m.getIteratorEDomain();
@@ -35,7 +35,7 @@ Mat2UI8 erosion_Level_1(Mat2UI8 m,double radius,int norm)
         //scan the neighborhood of a point
         it_local.init(it_global.x());//.init(Vec2I32)->init the neighbohood at the given 2d-vector
         while(it_local.next()){//.next()->iterate over the neighborhood
-            value = std::min(value, m(it_local.x()));//.x()->access a 2d-vector (Vec2I32) of the neighbohood as a pixel position
+            value = (std::min)(value, m(it_local.x()));//.x()->access a 2d-vector (Vec2I32) of the neighbohood as a pixel position
         }
         m_erosion(it_global.x())=value;
     }
@@ -43,7 +43,7 @@ Mat2UI8 erosion_Level_1(Mat2UI8 m,double radius,int norm)
 }
 //erosion of a Nd matrix with any pixel type and the structural element is a ball
 template<int Dim, typename PixelType>
-MatN<Dim,PixelType> erosion_Level_2(MatN<Dim,PixelType> m,double radius,int norm)
+MatN<Dim,PixelType> erosion_Level_2(MatN<Dim,PixelType> m,F32 radius,int norm)
 {
     MatN<Dim,PixelType> m_erosion(m.getDomain());
     typename MatN<Dim,PixelType>::IteratorEDomain it_global = m.getIteratorEDomain();
@@ -122,7 +122,7 @@ int main(){
     m_erosion = erosion_Level_2(m,3,2);
     m_erosion.display("Level 2",false);
     pop::Mat2UI8::IteratorERectangle it_global = m.getIteratorERectangle(m.getDomain()/4,m.getDomain()*3/4);
-    pop::Mat2UI8::IteratorENeighborhoodAmoebas it_local = m.getIteratorENeighborhoodAmoebas(15,0.05);
+    pop::Mat2UI8::IteratorENeighborhoodAmoebas it_local = m.getIteratorENeighborhoodAmoebas(15,0.05f);
     m_erosion = erosion_Level_3(m,it_global,it_local);
     m_erosion.display("Level 3",false);
 

@@ -45,7 +45,7 @@ char* Cryptography::xor_decryptFile(const std::string filename, size_t *len, con
 		const size_t key_len) {
 	std::ifstream infile(filename.c_str(), std::ios::binary);
 	infile.seekg(0, infile.end);
-    *len = infile.tellg();
+    *len = (size_t)infile.tellg();
 
     char* c = new char[*len];
 	infile.seekg(0, std::ios::beg);
@@ -83,7 +83,7 @@ void Cryptography::cryptOrDecryptFileXORKey(std::string inputfile,
 		std::string outputfile, pop::UI32 key) {
 	std::ifstream infile(inputfile.c_str(), std::ios::binary);
 	infile.seekg(0, infile.end);
-	long size = infile.tellg();
+	long size = (long)infile.tellg();
 
 	char * c = new char[size];
 	infile.seekg(0, std::ios::beg);
