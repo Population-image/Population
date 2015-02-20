@@ -891,7 +891,7 @@ struct POP_EXPORTS Analysis
         Mat2UI8 img;//2d grey-level image object
         img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));
         img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-        F32 value;
+        int value;
         Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
         threshold = Processing::greylevelRemoveEmptyValue(threshold);//scale the binary level from [0-255] to [0-1]
         Mat2F32 m_corr_simulated = Analysis::correlation(threshold,200);

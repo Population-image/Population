@@ -12,12 +12,8 @@ int main(int argc, char *argv[]){
     Mat2F32 m = Analysis::histogram(img);
     DistributionRegularStep d(m);
     //DistributionDisplay::display(d,d.getXmin(),d.getXmax());
-    //Manual threshold segmentation
     int threshold;
     Mat3UI8 grain= Processing::thresholdOtsuMethod(imgfilter,threshold);
-    //or automatic threshold segmentation
-    //		double value;
-    //		Mat3UI8 grain= Processing::thresholdOtsuMethod(imgfilter,value);
     //        grain.display();
     Mat3RGBUI8 color= Visualization::labelForegroundBoundary(grain,imgfilter);
     color.display();

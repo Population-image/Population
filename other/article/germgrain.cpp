@@ -145,7 +145,7 @@ int main()
 //    Mat2UI8 img;//2d grey-level image object
 //    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
 //    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-//    F32 value;
+//    int value;
 //    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
 //    threshold.display("initial",false);
 //    threshold = Processing::greylevelRemoveEmptyValue(threshold);

@@ -210,7 +210,7 @@ void processingTest()
 
 
     test.start("thresholdOtsuMethod");
-    F32 value;
+    int value;
     out = pop::Processing::thresholdOtsuMethod(in,value);
     test.end(out);
 
