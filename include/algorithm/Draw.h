@@ -575,7 +575,7 @@ struct POP_EXPORTS Draw
      * \code
      * Mat2RGBUI8 lena;
      * lena.load("../image/Lena.bmp");;
-     * F32 value;
+     * int value;
      * Mat2RGBUI8 threshold = Processing::thresholdOtsuMethod(lena,value);
      * threshold = Draw::mergeTwoMatrixHorizontal(lena,threshold);
      * threshold.display();
@@ -613,7 +613,7 @@ struct POP_EXPORTS Draw
      * \code
      * Mat2RGBUI8 lena;
      * lena.load("../image/Lena.bmp");;
-     * F32 value;
+     * int value;
      * Mat2RGBUI8 threshold = Processing::thresholdOtsuMethod(lena,value);
      * threshold = Draw::mergeTwoMatrixVertical(lena,threshold);
      * threshold.display();
@@ -705,7 +705,7 @@ struct POP_EXPORTS Draw
     * \code
         Mat2UI8 eutel;
         eutel.load("../doc/image2/eutel.bmp");
-        F32 value;
+        int value;
         eutel = Processing::thresholdOtsuMethod(eutel,value);
         eutel.display();
         Mat2UI8 face(eutel.getDomain());

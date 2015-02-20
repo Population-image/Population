@@ -273,7 +273,8 @@ struct POP_EXPORTS Processing
         Mat2UI8 img;//2d grey-level matrix object
         img.load("../image/iex.png");//replace this path by those on your computer
         img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-        Mat2UI8 threshold = Processing::thresholdOtsuMethod(img);//threshold segmentation
+        int thresholdvalue;
+        Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,thresholdvalue);//threshold segmentation
         Mat2RGBUI8 RGB = Visualization::labelForeground(threshold,img);//Visual validation
         RGB.display();
       \endcode
