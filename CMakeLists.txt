@@ -31,7 +31,7 @@ POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
-POP_OPTION(BUILD_EXPORT      "export library" ON )
+POP_OPTION(BUILD_EXPORT      "export library" OFF )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )

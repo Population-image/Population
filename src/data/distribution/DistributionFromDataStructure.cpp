@@ -46,7 +46,7 @@ F32 DistributionRegularStep::getStep()const{
 
 F32  DistributionRegularStep::fMinusOneForMonotonicallyIncreasing(F32 y)const{
     std::vector<F32>::const_iterator low=std::lower_bound (this->_table.begin(), this->_table.end(), y);
-    return this->_spacing*     int(low- this->_table.begin())+this->_xmin ;
+    return this->_spacing*     int(low- this->_table.begin()-1)+this->_xmin ;
 }
 
 void DistributionRegularStep::smoothGaussian(F32 sigma){

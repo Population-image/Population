@@ -151,7 +151,7 @@ struct POP_EXPORTS Representation
                 for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
                     lign(xx(fixed_coordinate))=F(xx);
                 }
-                lign2 = Representation::FFTOneDimension(lign,direction);
+                lign2 = Representation::FFT(lign,direction);
                 for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
                     F(xx)=lign2(xx(fixed_coordinate));
                 }
@@ -162,9 +162,9 @@ struct POP_EXPORTS Representation
         typename MatN<DIM,ComplexF32>::IteratorEDomain b(F.getDomain());
         if(direction!=1)
         {
+            int mult = F.getDomain().multCoordinate();
             while(b.next())
             {
-                int mult = F.getDomain().multCoordinate();
                 (F)(b.x())*= mult;
             }
         }
@@ -312,32 +312,31 @@ struct POP_EXPORTS Representation
         return out;
     }
     //@}
-private:
-    template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType>   FFTOneDimension(const MatN<DIM,PixelType> & in,int direction ){
-        if(in.getDomain()(0)>1){
+    static inline MatN<1,ComplexF32>  FFT(const MatN<1,ComplexF32> & in ,int direction=1){
+        if(isPowerOfTwo(in.size())==false){
+            std::cerr<<"Is no power of 2"<<std::endl;
+        }
 
-            typename MatN<DIM,PixelType>::E x;
-            x =in.getDomain();
-            x(0)/=2;
-            MatN<DIM,PixelType>  fodd (x);
-            MatN<DIM,PixelType> feven (x);
+        if(in.size()>1){
 
-            for(int i =0; i< fodd.getDomain()(0);i++){
+            MatN<1,ComplexF32> fodd (in.size()/2);
+            MatN<1,ComplexF32> feven (in.size()/2);
+
+            for(int i =0; i< fodd.size();i++){
                 (fodd)(i)= (in)(2*i);
                 (feven)(i)= (in)(2*i+1);
             }
-            MatN<DIM,PixelType>  Fodd = Representation::FFTOneDimension(fodd,direction);
-            MatN<DIM,PixelType>  Feven = Representation::FFTOneDimension(feven,direction);
-            MatN<DIM,PixelType> out (in.getDomain());
-            int half = in.getDomain()(0)/2;
+            MatN<1,ComplexF32>  Fodd = Representation::FFT(fodd,direction);
+            MatN<1,ComplexF32>  Feven = Representation::FFT(feven,direction);
+            MatN<1,ComplexF32> out (in.getDomain());
+            int half = in.size()/2;
 
             ComplexF32  w1,w;
-            w1.real() = std::cos(2*PI/in.getDomain()(0) );
+            w1.real() = std::cos(2*PI/in.size() );
             if(direction==1)
-                w1.img() = -std::sin(2*PI/in.getDomain()(0) );
+                w1.img() = -std::sin(2*PI/in.size() );
             else
-                w1.img() = std::sin(2*PI/in.getDomain()(0) );
+                w1.img() = std::sin(2*PI/in.size() );
             w.real()=1;
             w.img()=0;
 
@@ -351,12 +350,7 @@ private:
         }
         else
         {
-            typename MatN<DIM,PixelType>::E x;
-            x(0)=1;
-            MatN<DIM,PixelType> out (x);
-            x(0)=0;
-            (out) (x) = (in) (x);
-            return out;
+            return in;
         }
     }
 

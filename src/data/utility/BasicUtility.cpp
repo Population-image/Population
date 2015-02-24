@@ -242,7 +242,7 @@ int BasicUtility::editDistance(std::string s1,std::string s2){
         return static_cast<int>(s2.size());
     if(s2.size()==0)
         return static_cast<int>(s1.size());
-	pop::Mat2UI16 m(static_cast<int>(s1.size()),static_cast<int>(s2.size()));
+    pop::Mat2UI16 m(static_cast<int>(s1.size()+1),static_cast<int>(s2.size()+1));
     for(unsigned int i =0;i<m.sizeI();i++){
         m(i,0)=i;
     }
