@@ -12,7 +12,8 @@ int main(){
 	if (popcuda::isCudaAvailable()) {
 		std::cout << " And you have a CUDA device." << std::endl << std::endl;
 		//cuda_test();
-		test_neural_net();
+		test_neural_net_cpu();
+		test_neural_net_gpu();
 		//test_cublas();
 	} else {
 		std::cout << " But you don't have a CUDA device." << std::endl;
