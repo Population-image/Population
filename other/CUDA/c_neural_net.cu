@@ -33,7 +33,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
-const int EPOCH=1;
+const int EPOCH=500;
 
 GPUNeuralNetwork::GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta) {
 	createNetwork(v_layer, eta);
@@ -98,98 +98,6 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 		}
 		l._d_E_W = NULL;
 	}
-
-#if 0
-	//FIXME: will be removed in the final version. Only here for tests
-	//XOR network qui fonctionne
-	{
-		struct layer& l = h_network->_layers[0];
-		l._X[0] = 1;
-		l._X[1] = 1;
-		l._X[2] = 1;
-
-		l._Y[0] = 0;
-		l._Y[1] = 0;
-	}
-	{
-		struct layer& l = h_network->_layers[1];
-		l._X[0] = -1.20591;
-		l._X[1] = 1.68757;
-		l._X[2] = -1.15248;
-		l._X[3] = 1;
-
-		l._Y[0] = -1.309180;
-		l._Y[1] = 3.59145;
-		l._Y[2] = -1.22061;
-
-		l._W[0] = -0.836141;
-		l._W[1] = -1.23238;
-		l._W[2] = .75938;
-		l._W[3] = 1.4026;
-		l._W[4] = 1.09406;
-		l._W[5] = 1.09479;
-		l._W[6] = -.624209;
-		l._W[7] = .542668;
-		l._W[8] = -1.13907;
-	}
-	{
-		struct layer& l = h_network->_layers[2];
-		l._X[0] = -.997085;
-
-		l._Y[0] = -.99615;
-
-		l._W[0] = 1.2475;
-		l._W[1] = 1.23825;
-		l._W[2] = .886464;
-		l._W[3] = -.559775;
-	}
-#endif
-
-#if 1
-	//FIXME: will be removed in the final version. Only here for tests
-	//dummy network tout à 0
-	{
-		struct layer& l = h_network->_layers[0];
-		l._X[0] = 1;
-		l._X[1] = 1;
-		l._X[2] = 1;
-
-		l._Y[0] = 0;
-		l._Y[1] = 0;
-	}
-	{
-		struct layer& l = h_network->_layers[1];
-		l._X[0] = 1;
-		l._X[1] = 1;
-		l._X[2] = 1;
-		l._X[3] = 1;
-
-		l._Y[0] = 0;
-		l._Y[1] = 0;
-		l._Y[2] = 0;
-
-		l._W[0] = 0.00001;
-		l._W[1] = 0.00001;
-		l._W[2] = 0.00001;
-		l._W[3] = 0.00001;
-		l._W[4] = 0.00001;
-		l._W[5] = 0.00001;
-		l._W[6] = 0.00001;
-		l._W[7] = 0.00001;
-		l._W[8] = 0.00001;
-	}
-	{
-		struct layer& l = h_network->_layers[2];
-		l._X[0] = 1;
-
-		l._Y[0] = 0;
-
-		l._W[0] = 0.00001;
-		l._W[1] = 0.00001;
-		l._W[2] = 0.00001;
-		l._W[3] = 0.00001;
-	}
-#endif
 }
 
 void GPUNeuralNetwork::deleteNetwork() {
@@ -261,6 +169,14 @@ void GPUNeuralNetwork::displayNetwork() {
 	}
 }
 
+void GPUNeuralNetwork::setEta(const double eta) {
+	h_network->_eta = eta;
+}
+
+double GPUNeuralNetwork::getEta() const {
+	return h_network->_eta;
+}
+
 void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) {
 	std::copy(in.begin(),in.end(), h_network->_layers[0]._X);
 
@@ -326,8 +242,9 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
 		for(unsigned int j=0; j<layer._W_width; j++){
 			for (unsigned int i=0; i<layer._W_height; i++) {
-				layer._d_E_W[i*layer._W_height+j] = layer._d_E_Y[i] * prev_layer._X[j];
-				layer._W[i*layer._W_height+j] = layer._W[i*layer._W_height+j] - h_network->_eta*layer._d_E_W[i*layer._W_height+j];
+				int idx = i*layer._W_width+j;
+				layer._d_E_W[idx] = layer._d_E_Y[i] * prev_layer._X[j];
+				layer._W[idx] = layer._W[idx] - h_network->_eta*layer._d_E_W[idx];
 			}
 		}
 
@@ -335,7 +252,7 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 		for(unsigned int j=0; j<prev_layer._X_size; j++){
 			prev_layer._d_E_X[j] = 0;
 			for (unsigned int i=0; i<layer._W_height; i++) {
-				prev_layer._d_E_X[j] += layer._W[i*layer._W_height+j] * layer._d_E_Y[i];
+				prev_layer._d_E_X[j] += layer._W[i*layer._W_width+j] * layer._d_E_Y[i];
 			}
 		}
 	}
@@ -597,8 +514,12 @@ __global__ void gpu_propagateBackFirstDerivate_setWeight(struct neural_network *
 	if (tid < layer._W_height*layer._W_width) {
 		int i = tid / layer._W_width;
 		int j = tid % layer._W_width;
-		layer._d_E_W[i*layer._W_height+j] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
-		layer._W[i*layer._W_height+j] = layer._W[i*layer._W_height+j] - network->_eta*layer._d_E_W[i*layer._W_height+j];
+
+		//int idx = i*layer._W_width+j;
+		//printf("l=%d, i=%d, j=%d, tid=%d, idx=%d\n", l, i, j, tid, idx);
+
+		layer._d_E_W[tid] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
+		layer._W[tid] = layer._W[tid] - network->_eta*layer._d_E_W[tid];
 	}
 }
 
@@ -610,7 +531,7 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
 		pop::F32 s = 0.0f;
 
 		for (unsigned int i=0; i<layer._W_height; i++) {
-			s += layer._W[i*layer._W_height+tid] * layer._d_E_Y[i];
+			s += layer._W[i*layer._W_width+tid] * layer._d_E_Y[i];
 		}
 		prev_layer._d_E_X[tid] = s;
 	}
@@ -623,8 +544,6 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
  */
 void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, pop::F32* out_computed, unsigned int out_set_size, unsigned int out_elt_size, unsigned int idx, int* error) {
 	int block, grid;
-
-	return;
 
 	for (unsigned int l=h_network->_nb_layers-1; l>0; l--) {
 		// _d_E_X[l] = _X[l] - desired_output
@@ -689,11 +608,11 @@ void test_neural_net_cpu(void) {
 	std::vector<int> v_global_rand(v_in.size());
 	for(unsigned int i=0;i<v_global_rand.size();i++)
 		v_global_rand[i]=i;
-	//FIXME std::cout<<"iter_epoch\t error_train"<<std::endl;
+	std::cout<<"iter_epoch\t error_train"<<std::endl;
 
 	unsigned int nbr_epoch = EPOCH;
 	for(unsigned int i=0;i<nbr_epoch;i++){
-		//FIXME std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
+		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
 		int error=0;
 		for(unsigned int j=0;j<v_global_rand.size();j++){
 			pop::VecF32 vout;
@@ -706,7 +625,7 @@ void test_neural_net_cpu(void) {
 				error++;
 		}
 
-		//std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<std::endl;
+		//FIXME std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<std::endl;
 	}
 
 	//test the training
@@ -716,70 +635,6 @@ void test_neural_net_cpu(void) {
 		std::cout<<vout<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
 	}
 	std::cout<<std::endl;
-
-	//MNIST neural net
-#if 0
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
-
-	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
-	std::cout << "size trainings: " << number_training(0).size() << std::endl;
-
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(size_in);
-	v_layer.push_back(1000);
-	v_layer.push_back(1000);
-	v_layer.push_back(number_training.size());
-	network = createNetwork(v_layer, 0.001);
-
-	pop::Vec<pop::VecF32> vtraining_in;
-	pop::Vec<pop::VecF32> vtraining_out;
-
-	double ratio = 1;
-	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne,ratio);
-
-	pop::Vec<pop::VecF32> vtest_in;
-	pop::Vec<pop::VecF32> vtest_out;
-	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne,1);
-
-	number_training.clear();
-	number_test.clear();
-
-	std::vector<int> v_global_rand(vtraining_in.size());
-	for(unsigned int i=0;i<v_global_rand.size();i++)
-		v_global_rand[i]=i;
-
-	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
-
-	for(unsigned int i=0;i<100;i++){
-		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,pop::Distribution::irand());
-		int error_training=0,error_test=0;
-
-		for(unsigned int j=0;j<v_global_rand.size();j++){
-			pop::VecF32 vout;
-			propagateFront(network, vtraining_in(v_global_rand[j]),vout);
-			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-			propagateBackFirstDerivate(network, vtraining_out(v_global_rand[j]));
-			int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
-			if(label1!=label2){
-				error_training++;
-			}
-		}
-		for(unsigned int j=0;j<vtest_in.size();j++){
-			pop::VecF32 vout;
-			propagateFront(network, vtest_in(j),vout);
-			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-			int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
-			if(label1!=label2){
-				error_test++;
-			}
-		}
-		network->_eta *=0.9;
-		std::cout<<i<<"\t"<<error_training*1./v_global_rand.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network->_eta <<std::endl;
-	}
-
-	deleteNetwork(network);
-#endif
 }
 
 #if defined(HAVE_CUDA)
@@ -845,9 +700,9 @@ void test_neural_net_gpu(void) {
 	cudaMalloc(&d_error, sizeof(error));
 
 	unsigned int nbr_epoch = EPOCH;
-	//FIXME std::cout<<"iter_epoch\t error_train"<<std::endl;
+	std::cout<<"iter_epoch\t error_train"<<std::endl;
 	for(unsigned int i=0;i<nbr_epoch;i++){
-		//FIXME std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
+		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() , pop::Distribution::irand());
 
 		error = 0;
 		cudaMemcpy(d_error, &error, sizeof(error), cudaMemcpyHostToDevice);
@@ -876,6 +731,73 @@ void test_neural_net_gpu(void) {
 		std::cout<<vout<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
 	}
 	std::cout<<std::endl;
+}
+
+void test_neural_net_gpu_mnist(void) {
+	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
+	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
+
+	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
+	std::cout << "size trainings: " << number_training(0).size() << std::endl;
+
+	std::vector<unsigned int> v_layer;
+	v_layer.push_back(size_in);
+	v_layer.push_back(1000);
+	v_layer.push_back(1000);
+	v_layer.push_back(number_training.size());
+	GPUNeuralNetwork network(v_layer, 0.001);
+
+	pop::Vec<pop::VecF32> vtraining_in;
+	pop::Vec<pop::VecF32> vtraining_out;
+
+	double ratio = 1;
+	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
+
+	pop::Vec<pop::VecF32> vtest_in;
+	pop::Vec<pop::VecF32> vtest_out;
+	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtest_in,vtest_out,number_test,number_training(0)(0).getDomain(),pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
+
+	number_training.clear();
+	number_test.clear();
+
+
+	size_t total_size_training = (vtraining_in.size()*vtraining_in(0).size() + vtraining_out.size()*vtraining_out(0).size()) * sizeof(vtraining_in(0)(0));
+	size_t total_size_test = (vtest_in.size()*vtest_in(0).size() + vtest_out.size()*vtest_out(0).size()) * sizeof(vtest_in(0)(0));
+	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
+
+	std::vector<int> v_global_rand(vtraining_in.size());
+	for(unsigned int i=0;i<v_global_rand.size();i++)
+		v_global_rand[i]=i;
+
+	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+
+	for(unsigned int i=0;i<100;i++){
+		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,pop::Distribution::irand());
+		int error_training=0,error_test=0;
+
+		for(unsigned int j=0;j<v_global_rand.size();j++){
+			pop::VecF32 vout;
+			network.propagateFront(vtraining_in(v_global_rand[j]),vout);
+			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+			network.propagateBackFirstDerivate(vtraining_out(v_global_rand[j]));
+			int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
+			if(label1!=label2){
+				error_training++;
+			}
+		}
+		for(unsigned int j=0;j<vtest_in.size();j++){
+			pop::VecF32 vout;
+			network.propagateFront(vtest_in(j),vout);
+			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+			int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
+			if(label1!=label2){
+				error_test++;
+			}
+		}
+
+		network.setEta(network.getEta()*0.9);
+		std::cout<<i<<"\t"<<error_training*1./v_global_rand.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network.getEta()<<std::endl;
+	}
 }
 
 void test_cublas(void) {
