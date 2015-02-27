@@ -493,7 +493,7 @@ struct POP_EXPORTS Processing
         MatN<DIM,UI8>  ff(f);
         Mat2F32 mm =Analysis::histogram(ff);
         Mat2F32 mmm(mm);
-        mmm.deleteCol(0);
+        mmm= mmm.deleteCol(0);
         mmm = Processing::dynamicNoRegionGrowing(mmm,dynamic);
         mm.setCol(1,mmm.getCol(0));
         DistributionRegularStep step(mm);
@@ -2162,7 +2162,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * F32 surface_expectation = moment_order_2*3.14159265;
      * Vec2F32 domain(512);//2d field domain
      * F32 N=-std::log(porosity)/std::log(2.718)/surface_expectation;
-     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson VecNd process
+     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson Pointd process
      * RandomGeometry::sphere(grain,dnormal);
      * Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
      * lattice.display();
@@ -2335,7 +2335,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       * \return tesselation
       *
       *  the output is the voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ (work only for 1-norm and \f$\infty-norm\f$)\n
-       * In this code, we generate a voronoi tesselation from a Poisson VecN process
+       * In this code, we generate a voronoi tesselation from a Poisson Point process
       * \code
         Mat2UI32 field(512,512);
 
@@ -2381,7 +2381,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
       * \return tesselation
       *
       *  Voronoi tesselation based on the seeds \f$ region_i(x) = \{y :  d(y ,s_i) \leq d(y , s_j), j\neq i\}\f$ calculated with the euclidean norm\n
-      * In this code, we generate a voronoi tesselation from a Poisson VecN process
+      * In this code, we generate a voronoi tesselation from a Poisson Point process
       * \code
         Mat2UI32 field(512,512);
 

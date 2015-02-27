@@ -260,7 +260,7 @@ class POP_EXPORTS ModelGermGrain
         DistributionUniformReal duniform_radius(3,25);
         DistributionMultiVariate dd (DistributionMultiVariate(duniform_radius,duniform_radius),duniform_radius);
         Vec3F32 domain(100,100,100);
-        ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.00005);//generate the 2d Poisson VecN process
+        ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.00005);//generate the 2d Poisson Point process
         DistributionMultiVariate angle(DistributionMultiVariate(Distribution(0,3.14159265,"UNIFORMREAL"),Distribution(0,3.14159265,"UNIFORMREAL")),Distribution(0,3.14159265,"UNIFORMREAL") );
 
         RandomGeometry::ellipsoid(grain,dd,angle);

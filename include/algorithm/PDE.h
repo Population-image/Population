@@ -425,7 +425,7 @@ As example, this code produces
       * This algorithm can be used for the regularisation:
       * \code
       * Vec3F32 domain(256);//2d field domain
-      * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
+      * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson Point process
       * DistributionNormal dnormal(30,20);
       * RandomGeometry::sphere(grain,dnormal);
       * Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
@@ -468,7 +468,7 @@ As example, this code produces
       * This algorithm can be used for the grain partition regularisation:
       * \code
     Vec2F32 domain(512);//2d field domain
-    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson VecN process
+    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson Point process
     DistributionNormal dnormal(30,5);
     RandomGeometry::sphere(grain,dnormal);
     Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
@@ -568,7 +568,7 @@ As example, this code produces
     F32 surface_expectation = 4./3.*moment_order_3*3.14159265;
     Vec3F32 domain(300);//2d field domain
     F32 lambda=-std::log(porosity)/std::log(2.718)/surface_expectation;
-    ModelGermGrain3 grains = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
+    ModelGermGrain3 grains = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
     RandomGeometry::sphere(grains,d1);
     Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grains);
     Mat3UI8 img_VecN_grey;

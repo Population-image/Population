@@ -101,7 +101,7 @@ in the Software.
      * std::cout<<"porespace fraction:"<<mhisto(1,1)<<std::endl;
      * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
-     * mchord.deleteCol(1);
+     * mchord = mchord.deleteCol(1);
      * DistributionRegularStep dchord_solid(mchord);
      * std::cout<<"Charateristic length of solid space "<<Statistics::moment(dchord_solid,1,0,300,1)<<std::endl;//  \sum_{i=0}^{300} i*d(i)=27.2
      * \endcode
@@ -293,7 +293,7 @@ struct POP_EXPORTS Analysis
      * std::cout<<"porespace fraction:"<<mhisto(1,1)<<std::endl;
      * Mat2F32 mchord = Analysis::chord(porespace);
      * mchord.saveAscii("spinodal_chord.m");
-     * mchord.deleteCol(1);
+     * mchord = mchord.deleteCol(1);
      * DistributionRegularStep dchord_solid(mchord);
      * std::cout<<"Charateristic length of solid space "<<Statistics::moment(dchord_solid,1,0,300,1)<<std::endl;//  \sum_{i=0}^{300} i*d(i)=27.2
      * \endcode
@@ -431,7 +431,7 @@ struct POP_EXPORTS Analysis
      * F32 surface_expectation = moment_order_2*3.14159265;
      * Vec2F32 domain(2048);//2d field domain
      * F32 N=-std::log(porosity)/std::log(2.718)/surface_expectation;
-     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson VecNd process
+     * ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,N);//generate the 2d Poisson Pointd process
      * RandomGeometry::sphere(grain,dnormal);
      * Mat2RGBUI8 lattice = RandomGeometry::continuousToDiscrete(grain);
 
@@ -1556,7 +1556,7 @@ struct POP_EXPORTS Analysis
         img = img.opposite();
         MatN<DIM,UI8>  granulo;
         MatN<DIM,F32> m = Analysis::granulometryMatheron(img,0,granulo);
-        m.deleteCol(1);
+        m = m.deleteCol(1);
         DistributionRegularStep d(m);
         F32 mean = Statistics::moment(d,1,d.getXmin(),d.getXmax(),1);
         typename MatN<DIM,UI8>::IteratorEDomain it(dist.getIteratorEDomain());

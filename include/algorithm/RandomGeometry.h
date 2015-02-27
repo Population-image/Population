@@ -792,6 +792,56 @@ public:
     //! \name Others
     //@{
     //------------- ------------------------
+
+    /*!
+    * \brief Thesholded gaussian field
+    * \param mcorre correlation function
+    * \param size size of the model
+    * \param gaussianfield gaussian field
+    * \return thesholded gaussian field
+    *
+    *
+    *  \code
+    F32 f=0.4f;
+    F32 c=0.03f;
+    F32 n=1;
+    std::string f_str=pop::BasicUtility::Any2String(f);
+    std::string c_str=pop::BasicUtility::Any2String(c);
+    std::string n_str=pop::BasicUtility::Any2String(n);
+    std::string exp = f_str+"*"+f_str+"+"+f_str+"*(1-"+f_str+")*exp(-"+c_str+"*x^"+n_str+")";
+    std::cout<<exp<<std::endl;
+
+    DistributionExpression Corson_model(exp);
+    MatN<2,F32> m_correlation_corson_model(256,2);
+    for(unsigned int i=0;i<m_correlation_corson_model.sizeI();i++){
+        m_correlation_corson_model(i,0)=i;
+        m_correlation_corson_model(i,1)=Corson_model(i);
+    }
+
+
+    Mat3F32 m_gaussian_field;
+    Mat3UI8 m_U_bin =RandomGeometry::gaussianThesholdedRandomField(m_correlation_corson_model,400,m_gaussian_field);
+
+
+    m_U_bin = Processing::greylevelRemoveEmptyValue(m_U_bin);
+    Mat2F32 m_corr_gaussian = Analysis::correlation(m_U_bin,100);
+
+    for(unsigned int i= 0; i<std::min(m_correlation_corson_model.sizeI(),m_corr_gaussian.sizeI());i++){
+        std::cout<<i<<" "<<m_correlation_corson_model(i,1)<<" "<<m_corr_gaussian(i,2) <<std::endl;
+    }
+
+    Scene3d scene;
+    Mat3F32 phasefield = PDE::allenCahn(m_U_bin,10);
+    phasefield = PDE::getField(m_U_bin,phasefield,1,6);
+    Visualization::marchingCubeLevelSet(scene,phasefield);
+    Visualization::lineCube(scene,m_U_bin);
+    scene.display();
+    * \endcode
+    *
+    */
+    template<int DIM>
+    static MatN<DIM,UI8> gaussianThesholdedRandomField( Mat2F32 mcorre, int size,MatN<DIM,F32> & gaussianfield);
+
     /*!
     * \brief generate a random structure at the given volume fraction
     * \param domainmodel domain of the model
@@ -1698,7 +1748,116 @@ void RandomGeometry::matrixBinary( ModelGermGrain<DIM> &  grain,const  MatN<DIM,
         delete g;
     }
 }
+template<int DIM>
+MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(Mat2F32 correlation,int size_gaussian,MatN<DIM,F32>&gaussian_field ){
+    std::string str_cummulative_gausssian = "1/((2*pi)^(0.5))*exp(-(x^2)*0.5)";
+    DistributionExpression f_beta(str_cummulative_gausssian);
+    F32 beta= Statistics::maxRangeIntegral(f_beta,1-correlation(0,1),-4,4,0.001);
 
+    correlation = Representation::truncateMulitple2(correlation);
+    MatN<1,F32> autocorrelation;
+    autocorrelation.resize(VecN<1,int>(correlation.sizeI()));
+    for(unsigned int i= 0; i<autocorrelation.size();i++){
+        if(i<correlation.size())
+            autocorrelation(i)=correlation(i,1)-correlation(0,1)*correlation(0,1);
+        else
+            autocorrelation(i)=0;
+    }
+    std::string s = BasicUtility::Any2String(beta);
+    std::string  equation= "1/(2*pi*(1-x^2)^0.5)*exp(-("+s+")^2/(1+x))";
+    DistributionExpression f(equation.c_str());
+    DistributionRegularStep fintegral = Statistics::integral(f,0,1.2,0.001f);
+    MatN<1,F32> rho;
+    rho.resize(VecN<1,int>(autocorrelation.size()));
+    for(unsigned int i= 0; i<rho.size()/2;i++) {
+        if(autocorrelation(i)>0){
+            double value=std::min(0.999f,autocorrelation(i));
+            rho(i)=Statistics::FminusOneOfYMonotonicallyIncreasingFunction(fintegral,value,0,1.2,0.001f);
+        }else{
+            rho(i)=0;
+        }
+        if(rho(i)<0)
+            rho(i)=0;
+        if(i>0)
+            rho(rho.size()-i)=rho(i);
+    }
+    MatN<1,ComplexF32> rhocomplex;
+    Convertor::fromRealImaginary(rho,rhocomplex);
+    MatN<1,ComplexF32> fft = Representation::FFT(rhocomplex,1);
+    for(unsigned int i=0;i<fft.size();i++){
+        if(fft(i).real()>0)
+            fft(i).real()=sqrt(fft(i).real());
+        else
+            fft(i).real()=-sqrt(-fft(i).real());
+    }
+    MatN<1,ComplexF32> weigh= Representation::FFT(fft,0);
+    double sum2=0;
+    int size=200;
+    for(unsigned int i=0;i<weigh.size();i++){
+        if(weigh(i).real()/weigh(0).real()>0.01)
+            sum2+=weigh(i).real();
+        else
+            size=std::min(size,(int)i);
+    }
+    for( int i=weigh.size();i>=0;i--){
+        if(weigh(i).real()/weigh(0).real()>0.01)
+            weigh(i).real()/=sum2;
+        else
+            weigh(i).real()=0;
+    }
+    int radius_kernel=size;
+
+
+    Vec<F32> kernel(2*radius_kernel+1);
+    kernel(radius_kernel)=weigh(0).real();
+    for(unsigned int i=1;i<=radius_kernel;i++){
+        kernel(radius_kernel-i)=weigh(i).real();
+        kernel(radius_kernel+i)=weigh(i).real();
+    }
+    F32 sum = std::accumulate(kernel.begin(),kernel.end(),F32(0));
+    kernel = kernel*(1./sum);
+
+    VecN<DIM,int> domain;
+    domain=size_gaussian;
+    MatN<DIM,F32> m_U(domain);
+    DistributionNormal d_normal(0,1);
+    for(unsigned int i=1;i<m_U.size();i++){
+        m_U(i)=d_normal.randomVariable();
+    }
+
+    for(unsigned int d=0;d<DIM;d++){
+        std::cout<<"convolution "<<d<<std::endl;
+        m_U   = Processing::convolutionSeperable(m_U,kernel,d,MatNBoundaryConditionPeriodic());
+    }
+
+    F32 mean_value = Analysis::meanValue(m_U);
+    F32 standart_deviation = Analysis::standardDeviationValue(m_U);
+    m_U = (m_U-mean_value)*(1/standart_deviation);
+    MatN<DIM,UI8> m_U_bin(m_U.getDomain());
+
+    //to have the exact volume fraction
+    double betamin= beta -1;
+    double betamax= beta +1;
+    bool test =true;
+    do{
+        test =false;
+        m_U_bin = Processing::threshold(m_U,beta,100);
+        pop::Mat2F32 mhisto = Analysis::histogram(m_U_bin);
+        double porositymodel =mhisto(0,1);
+        double porosityref   = 1-correlation(0,1);
+        if(absolute(porosityref - porositymodel)>0.0001){
+            if(porositymodel>porosityref )
+                betamax = beta;
+            else
+                betamin = beta;
+            test=true;
+            beta = betamin  + (betamax-betamin)/2;
+        }
+    }while(test==true);
+    gaussian_field = m_U;
+    m_U_bin = Processing::threshold(m_U,beta);
+    return m_U_bin;
+}
 
 }
 #endif // RANDOMGEOMETRY_H

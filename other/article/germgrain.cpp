@@ -9,7 +9,7 @@ void figure1_PoissonPointProcess()
         Vec2F32 domain(512,512);//2d field domain
         double lambda= 0.001;// parameter of the Poisson Point process
         ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
-        DistributionDirac d (1);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+        DistributionDirac d (1);//because the Poisson Point process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
         RandomGeometry::sphere(grain,d);
         Mat2UI8 img = RandomGeometry::continuousToDiscrete(grain);
         img = img.opposite();
@@ -35,7 +35,7 @@ void figure2_MaternFilter()
 {
     {
         Vec2F32 domain(512,512);//2d field domain
-        double lambda= 0.1;// parameter of the Poisson VecN process
+        double lambda= 0.1;// parameter of the Poisson Point process
         ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
         RandomGeometry::hardCoreFilter(grain,20);
         DistributionDirac d(10);
@@ -47,7 +47,7 @@ void figure2_MaternFilter()
     }
     {
         Vec3F32 domain(256,256,256);//2d field domain
-        double lambda= 0.01;// parameter of the Poisson VecN process
+        double lambda= 0.01;// parameter of the Poisson Point process
         ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 3d Poisson Point process
         RandomGeometry::hardCoreFilter(grain,40);
         DistributionDirac d(20);
@@ -63,7 +63,7 @@ void figure2_MaternFilter()
 }
 void figure3_MinOverlap(){
     Vec2F32 domain(512,512);//2d field domain
-    double lambda= 0.01;// parameter of the Poisson VecN process
+    double lambda= 0.01;// parameter of the Poisson Point process
     ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
     RandomGeometry::minOverlapFilter(grain,10);
     DistributionDirac d(5);
@@ -123,9 +123,71 @@ void figure5_EulerAngle(){
 
 }
 
+void testAnnealing(){
+    Mat2UI8 img;//2d grey-level image object
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/SLB_AU130000.pgm"));//replace this path by those on your computer
+    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
+    int value;
+    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
+    threshold.display("initial",false);
+    threshold = Processing::greylevelRemoveEmptyValue(threshold);
 
+    Mat2F32 volume_fraction = Analysis::histogram(threshold);
+    //2D case
+    {
+//        Vec2I32 v(512,512);
+//        Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
+//        RandomGeometry::annealingSimutated(random,threshold,5,256,0.01);
+//        Visualization::labelToRandomRGB(random).display();
+    }
+    //3D case (expensive process)
+    {
+        Vec3I32 v(256,256,256);
+        Mat3UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
+        RandomGeometry::annealingSimutated(random,threshold,5);
+        random.save("annealing.pgm");
+        Scene3d scene;
+        Mat3F32 phasefield = PDE::allenCahn(random,10);
+        phasefield = PDE::getField(random,phasefield,1,6);
+        Visualization::marchingCubeLevelSet(scene,phasefield);
+        Visualization::lineCube(scene,phasefield);
+        scene.display();
+    }
+}
+
+void testGaussianField(){
+    Mat2UI8 img;//2d grey-level image object
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/CTG.pgm"));//replace this path by those on your computer
+    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
+    int value;
+    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
+    threshold.display("initial",false);
+    threshold = Processing::greylevelRemoveEmptyValue(threshold);
+    Mat2F32 m_field_field_correlation_experimental =Analysis::correlation(threshold,200);
+    m_field_field_correlation_experimental = m_field_field_correlation_experimental.deleteCol(1);//remove the pore-pore correlation function in the first column
+    m_field_field_correlation_experimental.saveAscii("CTG_field_field_correlation_experimental.m");
+    Mat3F32 m_gaussian_field;
+    Mat3UI8 m_U_bin =RandomGeometry::gaussianThesholdedRandomField(m_field_field_correlation_experimental,128,m_gaussian_field);
+    m_U_bin = Processing::greylevelRemoveEmptyValue(m_U_bin);
+    Mat2F32 m_field_field_correlation_model = Analysis::correlation(m_U_bin,200);
+    m_field_field_correlation_model = m_field_field_correlation_model.deleteCol(1);//remove the pore-pore correlation function in the first column
+    m_field_field_correlation_model.saveAscii("CTG_field_field_correlation_model.m");
+    //test the correlation match
+    for(unsigned int i= 0; i<10;i++){
+        std::cout<<i<<" "<<m_field_field_correlation_experimental(i,1)<<" "<<m_field_field_correlation_model(i,1) <<std::endl;
+    }
+
+    Scene3d scene;
+    Mat3F32 phasefield = PDE::allenCahn(m_U_bin,5);
+    phasefield = PDE::getField(m_U_bin,phasefield,1,6);
+    Visualization::marchingCubeLevelSet(scene,phasefield);
+    Visualization::lineCube(scene,m_U_bin);
+    scene.display();
+}
 int main()
 {
+//    testAnnealing();
+    testGaussianField();
     //    figure1_PoissonPointProcess();
 //        figure2_MaternFilter();
     //figure3_MinOverlap();
@@ -141,26 +203,13 @@ int main()
 }
 
 
-//void testAnnealing(){
-//    Mat2UI8 img;//2d grey-level image object
-//    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
-//    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-//    int value;
-//    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
-//    threshold.display("initial",false);
-//    threshold = Processing::greylevelRemoveEmptyValue(threshold);
-//    Vec2I32 v(512,512);
-//    Mat2F32 volume_fraction = Analysis::histogram(threshold);
-//    Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-//    RandomGeometry::annealingSimutated(random,threshold,8,256,0.01);
-//    Visualization::labelToRandomRGB(random).display();
-//}
+
 //void testUniformPoissonPointProcess2D(){
 //    Vec2F32 domain(512,512);//2d field domain
-//    double lambda= 0.001;// parameter of the Poisson VecN process
+//    double lambda= 0.001;// parameter of the Poisson Point process
 
-//    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
-//    DistributionDirac d (1);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+//    ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
+//    DistributionDirac d (1);//because the Poisson Point process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
 //    RandomGeometry::sphere(grain,d);
 //    Mat2RGBUI8 img = RandomGeometry::continuousToDiscrete(grain);
 //    img.display();
@@ -169,10 +218,10 @@ int main()
 
 //void testUniformPoissonPointProcess3D(){
 //    Vec3F32 domain(200,200,200);//2d field domain
-//    double lambda= 0.0001;// parameter of the Poisson VecN process
+//    double lambda= 0.0001;// parameter of the Poisson Point process
 
-//    ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson VecN process
-//    DistributionDirac d (1);//because the Poisson VecN process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
+//    ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson Point process
+//    DistributionDirac d (1);//because the Poisson Point process has a surface equal to 0, we associate each point with mono-disperse sphere to display the result
 //    RandomGeometry::sphere(grain,d);
 //    Mat3RGBUI8 img = RandomGeometry::continuousToDiscrete(grain);
 //    Scene3d scene;
