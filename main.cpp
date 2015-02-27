@@ -45,23 +45,23 @@ Mat2UI8 gaussianField(const Mat2F32& correlation)
     MatN<1,ComplexF32> rhocomplex;
     Convertor::fromRealImaginary(rho,rhocomplex);
     MatN<1,ComplexF32> fft = Representation::FFT(rhocomplex,1);
-//    for(unsigned int i=0;i<fft.size();i++){
-//        std::complex<F32> c(fft(i).real(),fft(i).img());
-//        fft(i).real()=std::real(c);
-//        fft(i).img()=std::imag(c);
-//    }
-    MatN<1,ComplexF32> weigh_see = Representation::FFT(rhocomplex,0);
+    for(unsigned int i=0;i<fft.size();i++){
+        std::complex<F32> c(fft(i).real(),fft(i).img());
+        fft(i).real()=std::real(c);
+        fft(i).img()=std::imag(c);
+    }
+    MatN<1,ComplexF32> weigh_see = Representation::FFT(fft,0);
     weigh_see *=weigh_see.size();
     MatN<1,ComplexF32> fft_reversee = Representation::FFT(weigh_see,1);
     F32 initial =fft_reversee(0).real()/fft(0).real();
     for(unsigned int i=0;i<fft.size();i++){
         std::cout<<fft_reversee(i).real()/fft(i).real()/initial<<std::endl;
     }
-//    F32 initial =fft_reversee(0).real()*fft_reversee(0).real()/fft(0).real();
-//    for(unsigned int i=0;i<fft.size();i++){
-//        std::cout<<fft_reversee(i).real()*fft_reversee(i).real()/fft(i).real()/initial<<std::endl;
-//    }
-    exit(0);
+    //    F32 initial =fft_reversee(0).real()*fft_reversee(0).real()/fft(0).real();
+    //    for(unsigned int i=0;i<fft.size();i++){
+    //        std::cout<<fft_reversee(i).real()*fft_reversee(i).real()/fft(i).real()/initial<<std::endl;
+    //    }
+
 
 
     MatN<1,F32> w;
@@ -141,6 +141,14 @@ Mat2UI8 gaussianField(const Mat2F32& correlation)
 
 int main()
 {
+    //    {
+    //        MatN<1,ComplexF32> m_direct(4);
+    //        m_direct(0)=ComplexF32(1,0);m_direct(1)=ComplexF32(0.5f,0);
+    //        MatN<1,ComplexF32> m_fft = Representation::FFT(m_direct,1);
+    //        m_direct = Representation::FFT(m_fft,-1);
+    //        std::cout<<m_direct<<std::endl;
+    //        return 1;
+    //    }
     //    {
     //    Mat2UI8 img;//2d grey-level image object
     //    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));//load the image
