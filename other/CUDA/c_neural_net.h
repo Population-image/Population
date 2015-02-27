@@ -10,6 +10,7 @@ void test_neural_net_cpu(void);
 
 #if defined(HAVE_CUDA)
 void test_neural_net_gpu(void);
+void test_neural_net_gpu_mnist(void);
 void test_cublas(void);
 #endif
 
@@ -29,6 +30,9 @@ public:
 	void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
 	void propagateBackFirstDerivate(const pop::VecF32& desired_output);
 	void displayNetwork();
+
+	void setEta(const double eta);
+	double getEta() const;
 
 #if defined(HAVE_CUDA)
 	void copyNetworkToGPU();

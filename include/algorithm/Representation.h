@@ -322,7 +322,7 @@ struct POP_EXPORTS Representation
             MatN<1,ComplexF32> fodd (in.size()/2);
             MatN<1,ComplexF32> feven (in.size()/2);
 
-            for(int i =0; i< fodd.size();i++){
+            for(size_t i =0; i< fodd.size();i++){
                 (fodd)(i)= (in)(2*i);
                 (feven)(i)= (in)(2*i+1);
             }
