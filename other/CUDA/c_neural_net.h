@@ -7,6 +7,7 @@
 #include "data/neuralnetwork/NeuralNetwork.h"
 
 void test_neural_net_cpu(void);
+void test_neural_net_cpu_mnist(void);
 
 #if defined(HAVE_CUDA)
 void test_neural_net_gpu(void);
@@ -37,9 +38,11 @@ public:
 #if defined(HAVE_CUDA)
 	void copyNetworkToGPU();
 	void copyNetworkFromGPU();
+	static pop::F32* gpu_copyDataToGPU(pop::Vec<pop::VecF32> h_data);
 
 	void gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_size, unsigned int idx, pop::F32* out_computed);
-	void gpu_propagateBackFirstDerivate(pop::F32* out_set, pop::F32* out_computed, unsigned int out_set_size, unsigned int out_elt_size, unsigned int idx, int* error);
+	void gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigned int out_elt_size, unsigned int idx);
+	void gpu_computeError(pop::F32* out_set, pop::F32* out_computed, unsigned int out_elt_size, unsigned int idx, int* error);
 	void gpu_displayNetwork();
 #endif
 
