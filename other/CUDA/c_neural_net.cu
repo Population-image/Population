@@ -34,7 +34,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
-const int EPOCH=500;
+const int EPOCH=13;
 
 static std::string getCurrentTime() {
 	time_t rawtime;
@@ -302,7 +302,7 @@ void GPUNeuralNetwork::copyNetworkToGPU() {
 		struct layer& layer = h_network->_layers[i];
 		size += (layer._X_size + layer._Y_size) * 2 * sizeof(layer._X[0]);
 		if (i!=0) {
-			size += (layer._W_height + layer._W_width) * 2 * sizeof(layer._W[0]);
+			size += (layer._W_height * layer._W_width) * 2 * sizeof(layer._W[0]);
 		}
 	}
 	cudaMalloc(&d_network, size);
@@ -694,18 +694,18 @@ void test_neural_net_cpu_mnist(void) {
 	/*
 	 * CPU version on my computer: 1h10 for 1 epoch
 	 * 	iter_epoch	 error_train	 error_test	 learning rate
-	 *	0	0.218433	0.0729	0.0009	Wed Feb 25 19:18:25 2015
-	 *	1	0.146433	0.0894	0.00081	Wed Feb 25 20:25:30 2015
+	 *	0	0.218433	0.0729	0.0009		Wed Feb 25 19:18:25 2015
+	 *	1	0.146433	0.0894	0.00081		Wed Feb 25 20:25:30 2015
 	 *	2	0.130867	0.0536	0.000729	Wed Feb 25 21:32:56 2015
-	 *	3	0.10725	0.0537	0.0006561	Wed Feb 25 22:39:58 2015
+	 *	3	0.10725		0.0537	0.0006561	Wed Feb 25 22:39:58 2015
 	 *	4	0.0838667	0.1162	0.00059049	Wed Feb 25 23:47:36 2015
 	 *	5	0.0662667	0.0319	0.000531441	Thu Feb 26 00:54:49 2015
 	 *	6	0.0524833	0.0327	0.000478297	Thu Feb 26 02:02:20 2015
 	 *	7	0.0406833	0.0266	0.000430467	Thu Feb 26 03:09:42 2015
 	 *	8	0.0327833	0.0291	0.00038742	Thu Feb 26 04:17:24 2015
-	 *	9	0.0276	0.0281	0.000348678	Thu Feb 26 05:24:49 2015
+	 *	9	0.0276		0.0281	0.000348678	Thu Feb 26 05:24:49 2015
 	 *	10	0.0230333	0.0259	0.000313811	Thu Feb 26 06:31:56 2015
-	 *	11	0.0213	0.0249	0.00028243	Thu Feb 26 07:39:25 2015
+	 *	11	0.0213		0.0249	0.00028243	Thu Feb 26 07:39:25 2015
 	 *	12	0.0189333	0.0242	0.000254187	Thu Feb 26 08:46:27 2015
 	 */
 	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
@@ -744,7 +744,7 @@ void test_neural_net_cpu_mnist(void) {
 
 	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
 
-	for(unsigned int i=0;i<100;i++){
+	for(unsigned int i=0;i<EPOCH;i++){
 		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,pop::Distribution::irand());
 		int error_training=0,error_test=0;
 
@@ -852,6 +852,25 @@ void test_neural_net_gpu(void) {
 	std::cout<<std::endl;
 }
 
+/*
+ * GPU version on my computer: 1m39 for 1 epoch! Improvement of 42x !
+ * 	iter_epoch	 error_train	 error_test	 learning rate
+ *	0	0.217417	0.1365	0.0009		Tue Mar  3 16:39:12 2015
+ * 	1	0.137467	0.1274	0.00081		Tue Mar  3 16:40:54 2015
+ *	2	0.129067	0.0404	0.000729	Tue Mar  3 16:42:32 2015
+ *	3	0.10425		0.0409	0.0006561	Tue Mar  3 16:44:15 2015
+ *	4	0.0823667	0.0307	0.00059049	Tue Mar  3 16:45:54 2015
+ *	5	0.0647167	0.0303	0.000531441	Tue Mar  3 16:47:32 2015
+ *	6	0.0509667	0.1179	0.000478297	Tue Mar  3 16:49:09 2015
+ *	7	0.0398833	0.5643	0.000430467	Tue Mar  3 16:50:47 2015
+ *	8	0.03105		0.0263	0.00038742	Tue Mar  3 16:52:24 2015
+ *	9	0.0268333	0.0256	0.000348678	Tue Mar  3 16:54:03 2015
+ *	10	0.02335		0.0245	0.000313811	Tue Mar  3 16:55:40 2015
+ *	11	0.0212167	0.0248	0.00028243	Tue Mar  3 16:57:21 2015
+ *	12	0.0191167	0.0246	0.000254187	Tue Mar  3 16:59:00 2015
+ * testing this neural network on the cpu gives the same results:
+ * 					0.0246	0.000254187	Tue Mar  3 16:59:19 2015
+ */
 void test_neural_net_gpu_mnist(void) {
 	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
 	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
@@ -868,7 +887,6 @@ void test_neural_net_gpu_mnist(void) {
 
 	pop::Vec<pop::VecF32> vtraining_in;
 	pop::Vec<pop::VecF32> vtraining_out;
-
 	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,number_training(0)(0).getDomain(),pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
 
 	pop::Vec<pop::VecF32> vtest_in;
@@ -908,7 +926,7 @@ void test_neural_net_gpu_mnist(void) {
 
 	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
 
-	for(unsigned int i=0;i<100;i++){
+	for(unsigned int i=0;i<EPOCH;i++){
 		std::random_shuffle (v_global_rand.begin(), v_global_rand.end(), pop::Distribution::irand());
 
 		error_training = error_test = 0;
@@ -941,6 +959,21 @@ void test_neural_net_gpu_mnist(void) {
 	cudaFree(d_vtraining_out);
 	cudaFree(d_vtest_in);
 	cudaFree(d_vtest_out);
+
+	//FINAL TEST WITH THE CPU
+	network.copyNetworkFromGPU();
+	error_test = 0;
+	for(unsigned int j=0;j<vtest_in.size();j++){
+		pop::VecF32 vout;
+		network.propagateFront(vtest_in(j),vout);
+		int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+		int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
+		if(label1!=label2){
+			error_test++;
+		}
+	}
+
+	std::cout<<"FINAL-CPU\t"<<error_training*1./v_global_rand.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network.getEta()<<"\t"<<getCurrentTime()<<std::endl;
 }
 
 void test_cublas(void) {
