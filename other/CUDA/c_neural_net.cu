@@ -34,7 +34,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
-const int EPOCH=13;
+const int EPOCH=1;
 
 static std::string getCurrentTime() {
 	time_t rawtime;
@@ -485,7 +485,6 @@ void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_
 	block = (h_network->_layers[0]._X_size < MAX_NB_THREADS ? h_network->_layers[0]._X_size : MAX_NB_THREADS);
 	grid = h_network->_layers[0]._X_size / MAX_NB_THREADS + (h_network->_layers[0]._X_size%MAX_NB_THREADS ? 1 : 0);
 	gpu_propagateFront_setInput<<<grid, block>>>(d_network, in_set, in_elt_size, idx);
-	cudaDeviceSynchronize();
 
 	cublasStatus_t	stat;
 	cublasHandle_t handle;
@@ -513,7 +512,6 @@ void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_
 		block = (h_network->_layers[l+1]._X_size < MAX_NB_THREADS ? h_network->_layers[l+1]._X_size : MAX_NB_THREADS);
 		grid = h_network->_layers[l+1]._X_size / MAX_NB_THREADS + (h_network->_layers[l+1]._X_size%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateFront_computeSigmoid<<<grid, block>>>(d_network, l+1);
-		cudaDeviceSynchronize();
 	}
 
 	cublasDestroy(handle);
@@ -521,7 +519,6 @@ void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_
 	block = (h_network->_layers[h_network->_nb_layers-1]._X_size < MAX_NB_THREADS ? h_network->_layers[h_network->_nb_layers-1]._X_size : MAX_NB_THREADS);
 	grid = h_network->_layers[h_network->_nb_layers-1]._X_size / MAX_NB_THREADS + (h_network->_layers[h_network->_nb_layers-1]._X_size%MAX_NB_THREADS ? 1 : 0);
 	gpu_propagateFront_setOutput<<<grid, block>>>(d_network, out_computed);
-	cudaDeviceSynchronize();
 }
 
 __global__ void gpu_propagateBackFirstDerivate_setXError(struct neural_network *network, pop::F32* desired_output, unsigned int in_elt_size, unsigned int idx, int l) {
@@ -546,11 +543,24 @@ __global__ void gpu_propagateBackFirstDerivate_setWeight(struct neural_network *
 		int i = tid / layer._W_width;
 		int j = tid % layer._W_width;
 
-		//int idx = i*layer._W_width+j;
-		//printf("l=%d, i=%d, j=%d, tid=%d, idx=%d\n", l, i, j, tid, idx);
+		// optim 1: we don't care about _d_E_W, as it is only used in this function. Gain: ~7s/epoch
+		//layer._d_E_W[tid] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
+		layer._W[tid] = layer._W[tid] - network->_eta * layer._d_E_Y[i] * network->_layers[l-1]._X[j];
+	}
+}
 
-		layer._d_E_W[tid] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
-		layer._W[tid] = layer._W[tid] - network->_eta*layer._d_E_W[tid];
+__global__ void gpu_propagateBackFirstDerivate_setWeight_v2(struct neural_network *network, int l, int Y_max) {
+	int tid = blockDim.x*blockIdx.x + threadIdx.x;
+	struct layer& layer = network->_layers[l];
+
+	extern __shared__ pop::F32 shared_d_E_Y[];
+	shared_d_E_Y[tid] = layer._d_E_Y[tid];
+	__syncthreads();
+
+	if (tid < layer._X_size) {
+		for (int i=0; i<Y_max; i++) {
+			layer._W[tid*layer._W_width+i] = layer._W[tid*layer._W_width+i] - network->_eta * shared_d_E_Y[i] * network->_layers[l-1]._X[tid];
+		}
 	}
 }
 
@@ -582,14 +592,12 @@ void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigne
 			block = (h_network->_layers[l]._X_size < MAX_NB_THREADS ? h_network->_layers[l]._X_size : MAX_NB_THREADS);
 			grid = h_network->_layers[l]._X_size / MAX_NB_THREADS + (h_network->_layers[l]._X_size%MAX_NB_THREADS ? 1 : 0);
 			gpu_propagateBackFirstDerivate_setXError<<<grid, block>>>(d_network, out_set, out_elt_size, idx, l);
-			cudaDeviceSynchronize();
 		}
 
 		// _d_E_Y[l] = _d_E_X[l] * derived_sigmoid(_X[l])
 		block = (h_network->_layers[l]._Y_size < MAX_NB_THREADS ? h_network->_layers[l]._Y_size : MAX_NB_THREADS);
 		grid = h_network->_layers[l]._Y_size / MAX_NB_THREADS + (h_network->_layers[l]._Y_size%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setYError<<<grid, block>>>(d_network, l);
-		cudaDeviceSynchronize();
 
 		// _d_E_W[l-1] = _d_E_Y[l] * _X[l-1]
 		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
@@ -597,14 +605,19 @@ void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigne
 		block = (nb_weights < MAX_NB_THREADS ? nb_weights : MAX_NB_THREADS);
 		grid = nb_weights / MAX_NB_THREADS + (nb_weights%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setWeight<<<grid, block>>>(d_network, l);
-		cudaDeviceSynchronize();
+
+#if 0
+		// quite slow: 5m30 per epoch...
+		int Y_max = h_network->_layers[l]._Y_size;
+		block = (Y_max < MAX_NB_THREADS ? Y_max : MAX_NB_THREADS);
+		grid = Y_max / MAX_NB_THREADS + (Y_max%MAX_NB_THREADS ? 1 : 0);
+		gpu_propagateBackFirstDerivate_setWeight_v2<<<grid, block, Y_max * sizeof(pop::F32)>>>(d_network, l, Y_max);
+#endif
 
 		// _d_E_X[l-1][j] = sum_{i=0}^{_W[l-1].sizeI()}{_W[l](i, j) * _d_E_Y[l](i)}, j=0 to _X[l].size()
-		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
 		block = (h_network->_layers[l-1]._X_size < MAX_NB_THREADS ? h_network->_layers[l-1]._X_size : MAX_NB_THREADS);
 		grid = h_network->_layers[l-1]._X_size / MAX_NB_THREADS + (h_network->_layers[l-1]._X_size%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setPreviousXError<<<grid, block>>>(d_network, l);
-		cudaDeviceSynchronize();
 	}
 }
 
