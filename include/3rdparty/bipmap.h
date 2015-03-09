@@ -623,8 +623,6 @@ public:
      * It creates a corresponding color table (palette) which have to be destroyed by the user after usage.
      *
      * Supported Bit depths are: 4, 8
-     *
-     * Todo: Optimize, use optimized palette, do ditehring (see my dithering class), support padding for 4 bit bitmaps
      */
 
     bool GetBitsWithPalette(void* Buffer, unsigned int &Size, unsigned int BitCount, BGRA* &Palette, unsigned int &PaletteSize, bool OptimalPalette = false, bool IncludePadding = true) {
