@@ -125,7 +125,7 @@ void figure5_EulerAngle(){
 
 void testAnnealing(){
     Mat2UI8 img;//2d grey-level image object
-    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/SLB_AU130000.pgm"));//replace this path by those on your computer
+    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/CTG.pgm"));//replace this path by those on your computer
     img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
     int value;
     Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
@@ -135,16 +135,16 @@ void testAnnealing(){
     Mat2F32 volume_fraction = Analysis::histogram(threshold);
     //2D case
     {
-//        Vec2I32 v(512,512);
+//        Vec2I32 v(128,128);
 //        Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-//        RandomGeometry::annealingSimutated(random,threshold,5,256,0.01);
+//        RandomGeometry::annealingSimutated(random,threshold,5,100,0.01);
 //        Visualization::labelToRandomRGB(random).display();
     }
     //3D case (expensive process)
     {
         Vec3I32 v(256,256,256);
         Mat3UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-        RandomGeometry::annealingSimutated(random,threshold,5);
+        RandomGeometry::annealingSimutated(random,threshold,10);
         random.save("annealing.pgm");
         Scene3d scene;
         Mat3F32 phasefield = PDE::allenCahn(random,10);
@@ -186,8 +186,10 @@ void testGaussianField(){
 }
 int main()
 {
-//    testAnnealing();
-    testGaussianField();
+
+
+    testAnnealing();
+//    testGaussianField();
     //    figure1_PoissonPointProcess();
 //        figure2_MaternFilter();
     //figure3_MinOverlap();

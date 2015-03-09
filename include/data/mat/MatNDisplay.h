@@ -207,6 +207,13 @@ public:
     virtual MatNDisplay & display(const MatN<2, RGBUI8 > &img);
 //    virtual MatNDisplay & display(const MatN<2, RGBAUI8 > &img);
     virtual MatNDisplay & display(const MatN<2, UI8 > &img);
+    template<typename PixelType>
+    MatNDisplay & display(const MatN<3, PixelType > &m){
+        MatN<2, PixelType > m_2d(m.sizeI(),m.sizeJ());
+        std::copy(m.begin(),m.begin()+m.sizeI()*m.sizeJ(),m_2d.begin());
+        this->display(m_2d);
+        return *this;
+    }
     template<int DIM,typename PixelType>
     MatNDisplay & display(const MatN<DIM, PixelType > &){return *this;}
 

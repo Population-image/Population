@@ -880,7 +880,7 @@ public:
     */
 
     template<int DIM1,int DIM2>
-    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F32 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,F32 temperature_inverse=1);
+    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F32 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,F32 temperature_inverse=0.01);
 
 
     /*!
@@ -1568,7 +1568,7 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                     img(ximg) =   (grainlist.grains()[*(v_hit.begin())])->color;
                     Vec<int>::iterator it;
                     for(it=v_hit.begin()+1;it!=v_hit.end();it++){
-                         img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
+                        img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
                     }
                 }else{
                     Vec<int>::iterator it;
@@ -1625,7 +1625,7 @@ MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const
 template<int DIM1,int DIM2>
 void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference,F32 nbr_permutation_by_pixel, int lengthcorrelation,F32 temperature_inverse){
     if(temperature_inverse==-1)
-        temperature_inverse=model.getDomain().multCoordinate();
+        temperature_inverse=0.01f;
     if(lengthcorrelation==-1){
         lengthcorrelation = 10000;
         for(int i=0;i<DIM1;i++){
@@ -1635,7 +1635,8 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
             lengthcorrelation = minimum(lengthcorrelation,img_reference.getDomain()(i)/2);
         }
     }
-    std::cout<<"correlation lenght "<<lengthcorrelation<<std::endl;
+    std::cout<<"Correlation lenght "<<lengthcorrelation<<std::endl;
+    std::cout<<"Inverse temperature "<<temperature_inverse<<std::endl;
     MatN<DIM2,UI8> ref= Processing::greylevelRemoveEmptyValue(img_reference);
     model= Processing::greylevelRemoveEmptyValue(model);
     Mat2F32 m = Analysis::histogram(ref);
