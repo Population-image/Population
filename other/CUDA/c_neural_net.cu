@@ -14,6 +14,9 @@
 #include "Population.h"
 #include "microtime.h"
 
+// slower when using cublas
+//#define SET_W_ERROR_CUBLAS
+
 struct layer {
 	unsigned int _X_size; // size of _X and _d_E_X
 	unsigned int _Y_size; // size of _Y and _d_E_Y
@@ -34,7 +37,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
-const int EPOCH=1;
+const int EPOCH=5;
 
 static std::string getCurrentTime() {
 	time_t rawtime;
@@ -543,24 +546,10 @@ __global__ void gpu_propagateBackFirstDerivate_setWeight(struct neural_network *
 		int i = tid / layer._W_width;
 		int j = tid % layer._W_width;
 
-		// optim 1: we don't care about _d_E_W, as it is only used in this function. Gain: ~7s/epoch
-		//layer._d_E_W[tid] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
+		layer._d_E_W[tid] = layer._d_E_Y[i] * network->_layers[l-1]._X[j];
+#ifdef SET_W_ERROR_CUBLAS
 		layer._W[tid] = layer._W[tid] - network->_eta * layer._d_E_Y[i] * network->_layers[l-1]._X[j];
-	}
-}
-
-__global__ void gpu_propagateBackFirstDerivate_setWeight_v2(struct neural_network *network, int l, int Y_max) {
-	int tid = blockDim.x*blockIdx.x + threadIdx.x;
-	struct layer& layer = network->_layers[l];
-
-	extern __shared__ pop::F32 shared_d_E_Y[];
-	shared_d_E_Y[tid] = layer._d_E_Y[tid];
-	__syncthreads();
-
-	if (tid < layer._X_size) {
-		for (int i=0; i<Y_max; i++) {
-			layer._W[tid*layer._W_width+i] = layer._W[tid*layer._W_width+i] - network->_eta * shared_d_E_Y[i] * network->_layers[l-1]._X[tid];
-		}
+#endif
 	}
 }
 
@@ -586,39 +575,68 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
 void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigned int out_elt_size, unsigned int idx) {
 	int block, grid;
 
+#ifdef SET_W_ERROR_CUBLAS
+	cublasStatus_t	stat;
+	cublasHandle_t handle;
+	cublasCreate(&handle);
+	float alpha = 1.0f;
+	float beta = -h_network->_eta;
+#endif
+
+	// start points to the start of the layer nb_layers-1
+	pop::F32* start = (pop::F32*)((char*)d_network + sizeof(*d_network) + h_network->_nb_layers * sizeof(h_network->_layers[0]));
+	for (unsigned int l=0; l<h_network->_nb_layers-1; l++) {
+		struct layer& layer = h_network->_layers[l];
+		start += (layer._X_size + layer._Y_size + layer._W_height*layer._W_width)*2;
+	}
+
 	for (unsigned int l=h_network->_nb_layers-1; l>0; l--) {
+		struct layer& layer = h_network->_layers[l];
+		struct layer& prev_layer = h_network->_layers[l-1];
+
 		// _d_E_X[l] = _X[l] - desired_output
 		if (l == h_network->_nb_layers-1){
-			block = (h_network->_layers[l]._X_size < MAX_NB_THREADS ? h_network->_layers[l]._X_size : MAX_NB_THREADS);
-			grid = h_network->_layers[l]._X_size / MAX_NB_THREADS + (h_network->_layers[l]._X_size%MAX_NB_THREADS ? 1 : 0);
+			block = (layer._X_size < MAX_NB_THREADS ? layer._X_size : MAX_NB_THREADS);
+			grid = layer._X_size / MAX_NB_THREADS + (layer._X_size%MAX_NB_THREADS ? 1 : 0);
 			gpu_propagateBackFirstDerivate_setXError<<<grid, block>>>(d_network, out_set, out_elt_size, idx, l);
 		}
 
 		// _d_E_Y[l] = _d_E_X[l] * derived_sigmoid(_X[l])
-		block = (h_network->_layers[l]._Y_size < MAX_NB_THREADS ? h_network->_layers[l]._Y_size : MAX_NB_THREADS);
-		grid = h_network->_layers[l]._Y_size / MAX_NB_THREADS + (h_network->_layers[l]._Y_size%MAX_NB_THREADS ? 1 : 0);
+		block = (layer._Y_size < MAX_NB_THREADS ? layer._Y_size : MAX_NB_THREADS);
+		grid = layer._Y_size / MAX_NB_THREADS + (layer._Y_size%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setYError<<<grid, block>>>(d_network, l);
 
 		// _d_E_W[l-1] = _d_E_Y[l] * _X[l-1]
-		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
-		unsigned int nb_weights = h_network->_layers[l]._W_height * h_network->_layers[l]._W_width;
+		unsigned int nb_weights = layer._W_height * layer._W_width;
 		block = (nb_weights < MAX_NB_THREADS ? nb_weights : MAX_NB_THREADS);
 		grid = nb_weights / MAX_NB_THREADS + (nb_weights%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setWeight<<<grid, block>>>(d_network, l);
 
-#if 0
-		// quite slow: 5m30 per epoch...
-		int Y_max = h_network->_layers[l]._Y_size;
-		block = (Y_max < MAX_NB_THREADS ? Y_max : MAX_NB_THREADS);
-		grid = Y_max / MAX_NB_THREADS + (Y_max%MAX_NB_THREADS ? 1 : 0);
-		gpu_propagateBackFirstDerivate_setWeight_v2<<<grid, block, Y_max * sizeof(pop::F32)>>>(d_network, l, Y_max);
+		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
+#ifdef SET_W_ERROR_CUBLAS
+		pop::F32* d_W = start + layer._X_size + layer._Y_size;
+		pop::F32* d_dW = d_W + layer._W_height*layer._W_width + layer._X_size + layer._Y_size;
+		stat = cublasSgeam(handle, CUBLAS_OP_N, CUBLAS_OP_N, layer._W_width, layer._W_height, &alpha, d_W, layer._W_width, &beta, d_dW, layer._W_width, d_W, layer._W_width);
+		if (stat != CUBLAS_STATUS_SUCCESS) {
+			std::cout << "Cublas error in _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1] for layer l = " << l << ", cublas status: " << cublasGetErrorString(stat) << std::endl;
+		}
+
+		if (l>1) {
+			start -= (prev_layer._X_size + prev_layer._Y_size + prev_layer._W_height*prev_layer._W_width)*2;
+		}
+#else
+		// this is done in the previous kernel (gpu_propagateBackFirstDerivate_setWeight)
 #endif
 
 		// _d_E_X[l-1][j] = sum_{i=0}^{_W[l-1].sizeI()}{_W[l](i, j) * _d_E_Y[l](i)}, j=0 to _X[l].size()
-		block = (h_network->_layers[l-1]._X_size < MAX_NB_THREADS ? h_network->_layers[l-1]._X_size : MAX_NB_THREADS);
-		grid = h_network->_layers[l-1]._X_size / MAX_NB_THREADS + (h_network->_layers[l-1]._X_size%MAX_NB_THREADS ? 1 : 0);
+		block = (prev_layer._X_size < MAX_NB_THREADS ? prev_layer._X_size : MAX_NB_THREADS);
+		grid = prev_layer._X_size / MAX_NB_THREADS + (prev_layer._X_size%MAX_NB_THREADS ? 1 : 0);
 		gpu_propagateBackFirstDerivate_setPreviousXError<<<grid, block>>>(d_network, l);
 	}
+
+#ifdef SET_W_ERROR_CUBLAS
+	cublasDestroy(handle);
+#endif
 }
 
 //This version is very simple. We can leverage the parallelism of the GPU and do something better
@@ -973,6 +991,8 @@ void test_neural_net_gpu_mnist(void) {
 	cudaFree(d_vtest_in);
 	cudaFree(d_vtest_out);
 
+	return;
+
 	//FINAL TEST WITH THE CPU
 	network.copyNetworkFromGPU();
 	error_test = 0;
@@ -990,6 +1010,92 @@ void test_neural_net_gpu_mnist(void) {
 }
 
 void test_cublas(void) {
+	cublasStatus_t	stat;
+	cublasHandle_t handle;
+
+	const int width = 3;
+	const int height = 2;
+
+	float* W = new float[width*height];
+	W[0] = .5; W[1] = .8; W[2] = 2;
+	W[3] = 1.5; W[4] = 1; W[5] = 0;
+
+	float* dW = new float[width*height];
+	dW[0] = 1; dW[1] = 2; dW[2] = 3;
+	dW[3] = 4; dW[4] = 5; dW[5] = 6;
+
+	const float eta = 0.9;
+
+	std::cout << "***** BEFORE:" << std::endl;
+	std::cout << "W = [" << std::endl;
+	for (int i=0; i<height; i++) {
+		for (int j=0; j<width; j++) {
+			std::cout << " " << W[i*width+j];
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "]" << std::endl;
+
+	std::cout << "dW = [" << std::endl;
+	for (int i=0; i<height; i++) {
+		for (int j=0; j<width; j++) {
+			std::cout << " " << dW[i*width+j];
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "]" << std::endl;
+
+	//*************************************************
+
+	float* d_W;
+	cudaMalloc(&d_W, width*height*sizeof(*d_W));
+	cudaMemcpy(d_W, W, width*height*sizeof(*d_W), cudaMemcpyHostToDevice);
+
+	float* d_dW;
+	cudaMalloc(&d_dW, width*height*sizeof(*d_dW));
+	cudaMemcpy(d_dW, dW, width*height*sizeof(*d_dW), cudaMemcpyHostToDevice);
+
+	cublasCreate(&handle);
+
+	float alpha = 1.0f;
+	float beta = -eta;
+	//  C = α op(A) + β op(B) -> W = 1 op(W) + -eta op(dW)
+	stat = cublasSgeam(handle, CUBLAS_OP_N, CUBLAS_OP_N, width, height, &alpha, d_W, width, &beta, d_dW, width, d_W, width);
+	std::cout << "cublas status: " << cublasGetErrorString(stat) << std::endl;
+
+	cudaMemcpy(W, d_W, width*height*sizeof(*d_W), cudaMemcpyDeviceToHost);
+	cudaMemcpy(dW, d_dW, width*height*sizeof(*d_dW), cudaMemcpyDeviceToHost);
+
+	cublasDestroy(handle);
+	cudaFree(d_dW);
+	cudaFree(d_W);
+
+	//*************************************************
+
+	std::cout << "***** AFTER:" << std::endl;
+	std::cout << "W = [" << std::endl;
+	for (int i=0; i<height; i++) {
+		for (int j=0; j<width; j++) {
+			std::cout << " " << W[i*width+j];
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "]" << std::endl;
+
+	std::cout << "dW = [" << std::endl;
+	for (int i=0; i<height; i++) {
+		for (int j=0; j<width; j++) {
+			std::cout << " " << dW[i*width+j];
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "]" << std::endl;
+
+	delete[] dW;
+	delete[] W;
+
+
+#if 0
 	cublasStatus_t	stat;
 	cublasHandle_t handle;
 
@@ -1058,5 +1164,6 @@ void test_cublas(void) {
 	delete[] Y;
 	delete[] X;
 	delete[] W;
+#endif
 }
 #endif
