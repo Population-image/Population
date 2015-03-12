@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include "PopulationConfig.h"
+#include "3rdparty/pugixml.hpp"
 namespace pop
 {
 
@@ -13,9 +14,6 @@ public:
     XMLNode();
     XMLNode(const XMLNode & node);
     XMLNode& operator ()(const XMLNode & node);
-    virtual ~XMLNode();
-    class impl;
-    impl *_pImpl;
     void setName(std::string name);
     void setValue(std::string value);
     XMLNode addChild(std::string name);
@@ -53,6 +51,7 @@ public:
     void setAttribute(std::string name,std::string  value);
     void addAttribute(std::string name,std::string  value);
     bool rmAttribute(std::string name);
+    pugi::xml_node _node;
 };
 
 
@@ -60,8 +59,6 @@ class POP_EXPORTS XMLDocument
 {
 public:
   XMLDocument();
-  virtual ~XMLDocument();
-
   void load(std::string file);
   void loadFromByteArray(const char *file);
 //  void load(std::istream & is);
@@ -69,9 +66,9 @@ public:
 //  void save(std::ostream file)const ;
   XMLNode getChild(std::string name);
   XMLNode addChild(std::string name);
+
 private:
-  class impl;
-  impl *_pImpl;
+    pugi::xml_document _doc;
 };
 
 }
