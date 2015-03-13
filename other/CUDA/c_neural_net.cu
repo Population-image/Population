@@ -189,11 +189,18 @@ void GPUNeuralNetwork::displayNetwork() {
 
 // save the cpu version of the neural network to the file filename
 void GPUNeuralNetwork::save(std::string filename) {
-	//TODO
-	//we need to save:
-	// -the number of layers and their size
-	// -the weights
-
+	std::ofstream out(filename.c_str());
+	out << h_network->_nb_layers << ", " << h_network->_eta << std::endl;
+	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
+		struct layer& layer = h_network->_layers[l];
+		out << l << ", " << layer._X_size << ", " << layer._Y_size << ", " << layer._W_height << ", " << layer._W_width << std::endl;
+		for (unsigned int i=0; i<layer._W_height; i++) {
+			for (unsigned int j=0; j<layer._W_width; j++) {
+				out << layer._W[i*layer._W_width + j] << ", ";
+			}
+			out << std::endl;
+		}
+	}
 }
 
 // load the cpu version of the neural network from the file filename.
@@ -1057,6 +1064,9 @@ static void test_neural_net_gpu(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<po
 		cudaMemcpy(&error_test, d_error_test, sizeof(error_test), cudaMemcpyDeviceToHost);
 
 		std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network->getEta()<<"\t"<<getCurrentTime()<<std::endl;
+
+		network->copyNetworkFromGPU();
+		network->save("nnet_" + getCurrentTime() + ".log");
 	}
 
 	cudaFree(d_error_training);
