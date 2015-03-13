@@ -59,7 +59,7 @@ bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
 }
 bool OCRNeuralNetwork::setDictionnaryByteArray(const char * byte_array){
 
-        _n.loadByteArray(byte_array);
+   _n.loadByteArray(byte_array);
     return true;
 
 }

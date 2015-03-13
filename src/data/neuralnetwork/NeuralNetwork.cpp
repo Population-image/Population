@@ -643,6 +643,7 @@ void NeuralNetworkFeedForward::loadByteArray(const char *  file)
     XMLDocument doc;
     doc.loadFromByteArray(file);
     load(doc);
+
 }
 
 void NeuralNetworkFeedForward::load(XMLDocument &doc)
