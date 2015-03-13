@@ -1,6 +1,8 @@
 #ifndef C_NEURAL_NET_H
 #define C_NEURAL_NET_H
 
+#include <vector>
+
 #include "popconfig.h"
 
 #include "data/typeF/TypeF.h"
@@ -12,6 +14,7 @@ void test_neural_net_cpu_mnist(void);
 #if defined(HAVE_CUDA)
 void test_neural_net_gpu(void);
 void test_neural_net_gpu_mnist(void);
+void test_neural_net_gpu_augmented_database(void);
 void test_cublas(void);
 #endif
 
@@ -32,13 +35,16 @@ public:
 	void propagateBackFirstDerivate(const pop::VecF32& desired_output);
 	void displayNetwork();
 
+	void save(std::string filename);
+	void load(std::string filename);
+
 	void setEta(const double eta);
 	double getEta() const;
 
 #if defined(HAVE_CUDA)
 	void copyNetworkToGPU();
 	void copyNetworkFromGPU();
-	static pop::F32* gpu_copyDataToGPU(pop::Vec<pop::VecF32> h_data);
+	static pop::F32* gpu_copyDataToGPU(pop::Vec<pop::VecF32> h_data, const unsigned int min, unsigned int n, std::vector<int> shuffle = std::vector<int>());
 
 	void gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_size, unsigned int idx, pop::F32* out_computed);
 	void gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigned int out_elt_size, unsigned int idx);
