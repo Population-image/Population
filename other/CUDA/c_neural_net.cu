@@ -19,6 +19,9 @@
 // slower when using cublas
 //#define SET_W_ERROR_CUBLAS
 
+// if defined, then loadDatabase() will process a batch of images instead of 1 image at a time. May improve disk access
+#define BATCH_LOADING
+
 struct layer {
 	unsigned int _X_size; // size of _X and _d_E_X
 	unsigned int _Y_size; // size of _Y and _d_E_Y
@@ -39,7 +42,7 @@ struct neural_network {
 	struct layer* _layers;
 };
 
-const int EPOCH=10;
+const int EPOCH = 60;
 const int MAX_PER_FOLDER = 3000; // for training with the database, max number of images per folder we consider
 const int NETWORK_FOR_DATABASE_TRAINING = 1; // neural network to be used when training with the database, see [ciresan10deep] p.5.
 const float GPU_MEMORY_PRESSURE = .95; // we use at most GPU_MEMORY_PRESSURE percent of the total gpu memory for the datasets
@@ -51,6 +54,13 @@ static std::string getCurrentTime() {
 	std::string s = asctime(timeinfo);
 	s.erase(s.length()-1);
 	return s;
+}
+
+GPUNeuralNetwork::GPUNeuralNetwork() {
+	h_network = NULL;
+#if defined(HAVE_CUDA)
+	d_network = NULL;
+#endif
 }
 
 GPUNeuralNetwork::GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta) {
@@ -119,6 +129,10 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 }
 
 void GPUNeuralNetwork::deleteNetwork() {
+	if (h_network == NULL) {
+		return;
+	}
+
 	for (unsigned int i=0; i<h_network->_nb_layers; i++) {
 		struct layer& l = h_network->_layers[i];
 
@@ -189,29 +203,73 @@ void GPUNeuralNetwork::displayNetwork() {
 
 // save the cpu version of the neural network to the file filename
 void GPUNeuralNetwork::save(std::string filename) {
-	std::ofstream out(filename.c_str());
-	out << h_network->_nb_layers << ", " << h_network->_eta << std::endl;
+	std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary);
+	out.write((char*)&h_network->_nb_layers,sizeof(h_network->_nb_layers));
+	out.write((char*)&h_network->_eta,sizeof(h_network->_eta));
+
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
-		out << l << ", " << layer._X_size << ", " << layer._Y_size << ", " << layer._W_height << ", " << layer._W_width << std::endl;
-		for (unsigned int i=0; i<layer._W_height; i++) {
-			for (unsigned int j=0; j<layer._W_width; j++) {
-				out << layer._W[i*layer._W_width + j] << ", ";
-			}
-			out << std::endl;
+		out.write((char*)&l,sizeof(l));
+		out.write((char*)&layer._X_size,sizeof(layer._X_size));
+		out.write((char*)&layer._Y_size,sizeof(layer._Y_size));
+		out.write((char*)&layer._W_height,sizeof(layer._W_height));
+		out.write((char*)&layer._W_width,sizeof(layer._W_width));
+		for (unsigned int i=0; i<layer._W_height*layer._W_width; i++) {
+			out.write((char*)&layer._W[i],sizeof(layer._W[i]));
 		}
 	}
+
+	out.flush();
+	out.close();
 }
 
 // load the cpu version of the neural network from the file filename.
 // If you use the GPU, then you need to copy it to the GPU by calling copyNetworkToGPU()
 void GPUNeuralNetwork::load(std::string filename) {
-	//we have saved:
-	// -the number of layers and their size
-	// -the weights
-	// with the number of layers and their size we construct a std::vector and we call createNetwork
-	// with the weights we modify the values of the weights
-	//TODO
+	std::vector<unsigned int> layers;
+	std::vector<pop::VecF32> weights;
+
+	std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
+	if (!in.is_open()) {
+		std::cerr << "GPUNeuralNetwork::load(): unable to open file " << filename << std::endl;
+		exit(-1);
+	}
+
+	unsigned int nb_layers;
+	double eta;
+	in.read((char*)&nb_layers, sizeof(nb_layers));
+	in.read((char*)&eta, sizeof(eta));
+
+	for (unsigned int l=0; l<nb_layers; l++) {
+        unsigned int ll, X_size, Y_size, W_height, W_width;
+    	in.read((char*)&ll, sizeof(ll));
+    	in.read((char*)&X_size, sizeof(X_size));
+    	in.read((char*)&Y_size, sizeof(Y_size));
+    	in.read((char*)&W_height, sizeof(W_height));
+    	in.read((char*)&W_width, sizeof(W_width));
+    	if (ll != l) {
+    		std::cerr << "GPUNeuralNetwork::load(): wrong layer: " << ll << " instead of " << l << std::endl;
+    		exit(-1);
+    	}
+    	layers.push_back(Y_size);
+
+    	pop::VecF32	v_w;
+		for (unsigned int i=0; i<W_height*W_width; i++) {
+			pop::F32 w;
+			in.read((char*)&w, sizeof(w));
+			v_w.push_back(w);
+		}
+    	weights.push_back(v_w);
+	}
+	in.close();
+
+    createNetwork(layers, eta);
+
+    for (int l=1; l<nb_layers; l++) {
+    	for (int i=0; i<weights[l].size(); i++) {
+    		h_network->_layers[l]._W[i] = weights[l](i);
+    	}
+    }
 }
 
 void GPUNeuralNetwork::setEta(const double eta) {
@@ -307,8 +365,6 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 		}
 	}
 }
-
-#define BATCH_LOADING
 
 static void loadDatabase(std::string directory, const int max_per_folder, pop::Vec<pop::VecF32> &v_neuron_in, pop::Vec<pop::VecF32> &v_neuron_out) {
 	pop::Vec2I32 domain(29,29);
@@ -493,7 +549,9 @@ void GPUNeuralNetwork::copyNetworkFromGPU() {
 }
 
 void GPUNeuralNetwork::deleteNetworkOnGPU() {
-	cudaFree(d_network);
+	if (d_network != NULL) {
+		cudaFree(d_network);
+	}
 }
 
 // copy n elements from position min in h_data to the gpu
@@ -764,6 +822,181 @@ __global__ void gpu_computeError_v1(pop::F32* desired_output, pop::F32* computed
 void GPUNeuralNetwork::gpu_computeError(pop::F32* out_set, pop::F32* out_computed, unsigned int out_elt_size, unsigned int idx, int* error) {
 	gpu_computeError_v1<<<1, 1>>>(out_set, out_computed, out_elt_size, idx, error);
 }
+
+void GPUNeuralNetwork::gpu_learn(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtraining_out, pop::Vec<pop::VecF32>& vtest_in, pop::Vec<pop::VecF32>& vtest_out, bool final_cpu_test) {
+	size_t total_size_training = (vtraining_in.size()*vtraining_in(0).size() + vtraining_out.size()*vtraining_out(0).size()) * sizeof(vtraining_in(0)(0));
+	size_t total_size_test = (vtest_in.size()*vtest_in(0).size() + vtest_out.size()*vtest_out(0).size()) * sizeof(vtest_in(0)(0));
+	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
+
+	size_t free, total;
+	cudaMemGetInfo(&free, &total);
+	const size_t available = GPU_MEMORY_PRESSURE*free;
+
+	pop::F32* d_out;
+	cudaMalloc(&d_out, vtest_out(0).size() * sizeof(vtest_out(0)(0)));
+
+	int error_training, error_test;
+	int *d_error_training, *d_error_test;
+	cudaMalloc(&d_error_training, sizeof(error_training));
+	cudaMalloc(&d_error_test, sizeof(error_test));
+
+	std::vector<int> v_global_rand(vtraining_in.size());
+	for(unsigned int i=0;i<v_global_rand.size();i++)
+		v_global_rand[i]=i;
+
+	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+
+	for(unsigned int i=0;i<EPOCH;i++){
+		int start, stop, step;
+		error_training = error_test = 0;
+		cudaMemcpy(d_error_training, &error_training, sizeof(error_training), cudaMemcpyHostToDevice);
+		cudaMemcpy(d_error_test, &error_test, sizeof(error_test), cudaMemcpyHostToDevice);
+		std::random_shuffle(v_global_rand.begin(), v_global_rand.end(), pop::Distribution::irand());
+
+		//*********************** TRAINING ***********************
+		start = 0;
+		stop = vtraining_in.size();
+		step = available / (vtraining_in(0).size()*sizeof(vtraining_in(0)(0)) + vtraining_out(0).size()*sizeof(vtraining_out(0)(0)));
+		while (start < stop) {
+			const int nb_elts = min(step, stop-start);
+			//std::cout << "training: start=" << start << ", stop=" << stop << ", step=" << step << ", nb_elts=" << nb_elts << std::endl;
+			pop::F32* d_vtraining_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_in, start, nb_elts, v_global_rand);
+			pop::F32* d_vtraining_out = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_out, start, nb_elts, v_global_rand);
+
+			for(unsigned int j=0;j<nb_elts;j++) {
+				gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
+				gpu_propagateBackFirstDerivate(d_vtraining_out, vtraining_out(0).size(), j);
+				gpu_computeError(d_vtraining_out, d_out, vtraining_out(0).size(), j, d_error_training);
+			}
+
+			cudaFree(d_vtraining_in);
+			cudaFree(d_vtraining_out);
+			start += step;
+		}
+
+		//*********************** TEST ***********************
+		start = 0;
+		stop = vtest_in.size();
+		step = available / (vtest_in(0).size()*sizeof(vtest_in(0)(0)) + vtest_out(0).size()*sizeof(vtest_out(0)(0)));
+		while (start < stop) {
+			//std::cout << "test: start=" << start << ", stop=" << stop << ", step=" << step << std::endl;
+			const int nb_elts = min(start+step, stop);
+			pop::F32* d_vtest_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_in, start, nb_elts);
+			pop::F32* d_vtest_out = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_out, start, nb_elts);
+
+			for(unsigned int j=0;j<nb_elts;j++){
+				gpu_propagateFront(d_vtest_in, vtest_in(0).size(), j, d_out);
+				gpu_computeError(d_vtest_out, d_out, vtest_out(0).size(), j, d_error_test);
+			}
+
+			cudaFree(d_vtest_in);
+			cudaFree(d_vtest_out);
+			start += step;
+		}
+
+		setEta(getEta()*0.9);
+
+		cudaMemcpy(&error_training, d_error_training, sizeof(error_training), cudaMemcpyDeviceToHost);
+		cudaMemcpy(&error_test, d_error_test, sizeof(error_test), cudaMemcpyDeviceToHost);
+
+		std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<getEta()<<"\t"<<getCurrentTime()<<std::endl;
+
+		//If you want to save the network:
+		//copyNetworkFromGPU();
+		//save("nnet_" + getCurrentTime() + ".bin");
+	}
+
+	cudaFree(d_error_training);
+	cudaFree(d_error_test);
+	cudaFree(d_out);
+
+	copyNetworkFromGPU();
+
+	if (final_cpu_test) {
+		//FINAL TEST WITH THE CPU
+		error_test = 0;
+		for(unsigned int j=0;j<vtest_in.size();j++){
+			pop::VecF32 vout;
+			propagateFront(vtest_in(j),vout);
+			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+			int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
+			if(label1!=label2){
+				error_test++;
+			}
+		}
+
+		std::cout<<"FINAL-CPU\t"<< " - " << "\t"<<error_test*1./vtest_in.size() <<"\t"<<getEta()<<"\t"<<getCurrentTime()<<std::endl;
+	}
+}
+
+void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtest_in) {
+	size_t total_size_training = vtraining_in.size() * vtraining_in(0).size() * sizeof(vtraining_in(0)(0));
+	size_t total_size_test = vtest_in.size() * vtest_in(0).size() * sizeof(vtest_in(0)(0));
+	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
+
+	size_t free, total;
+	cudaMemGetInfo(&free, &total);
+	const size_t available = GPU_MEMORY_PRESSURE*free;
+
+	pop::F32* d_out;
+	cudaMalloc(&d_out, h_network->_layers[h_network->_nb_layers-1]._X_size);
+
+	int error_training, error_test;
+	int *d_error_training, *d_error_test;
+	cudaMalloc(&d_error_training, sizeof(error_training));
+	cudaMalloc(&d_error_test, sizeof(error_test));
+
+	std::vector<int> v_global_rand(vtraining_in.size());
+	for(unsigned int i=0;i<v_global_rand.size();i++)
+		v_global_rand[i]=i;
+
+	std::cout << "epoch\ttotal_samples\ttotal_duration(ns)\tduration_per_sample(ns)" << std::endl;
+
+	for(unsigned int i=0;i<EPOCH;i++){
+		struct timespec time_start, time_end;
+		int start, stop, step;
+
+		clock_gettime(CLOCK_REALTIME, &time_start);
+
+		//*********************** TRAINING ***********************
+		start = 0;
+		stop = vtraining_in.size();
+		step = available / (vtraining_in(0).size()*sizeof(vtraining_in(0)(0)));
+		while (start < stop) {
+			const int nb_elts = min(step, stop-start);
+			pop::F32* d_vtraining_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_in, start, nb_elts);
+
+			for(unsigned int j=0;j<nb_elts;j++) {
+				gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
+			}
+
+			cudaFree(d_vtraining_in);
+			start += step;
+		}
+
+		//*********************** TEST ***********************
+		start = 0;
+		stop = vtest_in.size();
+		step = available / (vtest_in(0).size()*sizeof(vtest_in(0)(0)));
+		while (start < stop) {
+			const int nb_elts = min(start+step, stop);
+			pop::F32* d_vtest_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_in, start, nb_elts);
+
+			for(unsigned int j=0;j<nb_elts;j++){
+				gpu_propagateFront(d_vtest_in, vtest_in(0).size(), j, d_out);
+			}
+
+			cudaFree(d_vtest_in);
+			start += step;
+		}
+
+		clock_gettime(CLOCK_REALTIME, &time_end);
+		unsigned long duration = (time_end.tv_sec-time_start.tv_sec)*1000000000 + (time_end.tv_nsec-time_start.tv_nsec);
+		std::cout << i << "\t" << vtraining_in.size()+vtest_in.size() << duration << "\t" << duration/(vtraining_in.size()+vtest_in.size()) << std::endl;
+	}
+
+	cudaFree(d_out);
+}
 #endif
 
 void test_neural_net_cpu(void) {
@@ -987,110 +1220,6 @@ void test_neural_net_gpu(void) {
 	std::cout<<std::endl;
 }
 
-static void test_neural_net_gpu(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtraining_out, pop::Vec<pop::VecF32>& vtest_in, pop::Vec<pop::VecF32>& vtest_out, GPUNeuralNetwork* network, bool final_cpu_test) {
-	size_t total_size_training = (vtraining_in.size()*vtraining_in(0).size() + vtraining_out.size()*vtraining_out(0).size()) * sizeof(vtraining_in(0)(0));
-	size_t total_size_test = (vtest_in.size()*vtest_in(0).size() + vtest_out.size()*vtest_out(0).size()) * sizeof(vtest_in(0)(0));
-	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
-
-	size_t free, total;
-	cudaMemGetInfo(&free, &total);
-	const size_t available = GPU_MEMORY_PRESSURE*free;
-
-	pop::F32* d_out;
-	cudaMalloc(&d_out, vtest_out(0).size() * sizeof(vtest_out(0)(0)));
-
-	int error_training, error_test;
-	int *d_error_training, *d_error_test;
-	cudaMalloc(&d_error_training, sizeof(error_training));
-	cudaMalloc(&d_error_test, sizeof(error_test));
-
-	std::vector<int> v_global_rand(vtraining_in.size());
-	for(unsigned int i=0;i<v_global_rand.size();i++)
-		v_global_rand[i]=i;
-
-	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
-
-	for(unsigned int i=0;i<EPOCH;i++){
-		int start, stop, step;
-		error_training = error_test = 0;
-		cudaMemcpy(d_error_training, &error_training, sizeof(error_training), cudaMemcpyHostToDevice);
-		cudaMemcpy(d_error_test, &error_test, sizeof(error_test), cudaMemcpyHostToDevice);
-		std::random_shuffle(v_global_rand.begin(), v_global_rand.end(), pop::Distribution::irand());
-
-		//*********************** TRAINING ***********************
-		start = 0;
-		stop = vtraining_in.size();
-		step = available / (vtraining_in(0).size()*sizeof(vtraining_in(0)(0)) + vtraining_out(0).size()*sizeof(vtraining_out(0)(0)));
-		while (start < stop) {
-			const int nb_elts = min(step, stop-start);
-			//std::cout << "training: start=" << start << ", stop=" << stop << ", step=" << step << ", nb_elts=" << nb_elts << std::endl;
-			pop::F32* d_vtraining_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_in, start, nb_elts, v_global_rand);
-			pop::F32* d_vtraining_out = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_out, start, nb_elts, v_global_rand);
-
-			for(unsigned int j=0;j<nb_elts;j++) {
-				network->gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
-				network->gpu_propagateBackFirstDerivate(d_vtraining_out, vtraining_out(0).size(), j);
-				network->gpu_computeError(d_vtraining_out, d_out, vtraining_out(0).size(), j, d_error_training);
-			}
-
-			cudaFree(d_vtraining_in);
-			cudaFree(d_vtraining_out);
-			start += step;
-		}
-
-		//*********************** TEST ***********************
-		start = 0;
-		stop = vtest_in.size();
-		step = available / (vtest_in(0).size()*sizeof(vtest_in(0)(0)) + vtest_out(0).size()*sizeof(vtest_out(0)(0)));
-		while (start < stop) {
-			//std::cout << "test: start=" << start << ", stop=" << stop << ", step=" << step << std::endl;
-			const int nb_elts = min(start+step, stop);
-			pop::F32* d_vtest_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_in, start, nb_elts);
-			pop::F32* d_vtest_out = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_out, start, nb_elts);
-
-			for(unsigned int j=0;j<nb_elts;j++){
-				network->gpu_propagateFront(d_vtest_in, vtest_in(0).size(), j, d_out);
-				network->gpu_computeError(d_vtest_out, d_out, vtest_out(0).size(), j, d_error_test);
-			}
-
-			cudaFree(d_vtest_in);
-			cudaFree(d_vtest_out);
-			start += step;
-		}
-
-		network->setEta(network->getEta()*0.9);
-
-		cudaMemcpy(&error_training, d_error_training, sizeof(error_training), cudaMemcpyDeviceToHost);
-		cudaMemcpy(&error_test, d_error_test, sizeof(error_test), cudaMemcpyDeviceToHost);
-
-		std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1./vtest_in.size() <<"\t"<<network->getEta()<<"\t"<<getCurrentTime()<<std::endl;
-
-		network->copyNetworkFromGPU();
-		network->save("nnet_" + getCurrentTime() + ".log");
-	}
-
-	cudaFree(d_error_training);
-	cudaFree(d_error_test);
-	cudaFree(d_out);
-
-	network->copyNetworkFromGPU();
-
-	if (final_cpu_test) {
-		//FINAL TEST WITH THE CPU
-		error_test = 0;
-		for(unsigned int j=0;j<vtest_in.size();j++){
-			pop::VecF32 vout;
-			network->propagateFront(vtest_in(j),vout);
-			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
-			int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
-			if(label1!=label2){
-				error_test++;
-			}
-		}
-
-		std::cout<<"FINAL-CPU\t"<< " - " << "\t"<<error_test*1./vtest_in.size() <<"\t"<<network->getEta()<<"\t"<<getCurrentTime()<<std::endl;
-	}
-}
 
 /*
  * GPU version on my computer: 1m39 for 1 epoch! Improvement of 42x !
@@ -1136,7 +1265,7 @@ void test_neural_net_gpu_mnist(void) {
 	number_training.clear();
 	number_test.clear();
 
-	test_neural_net_gpu(vtraining_in, vtraining_out, vtest_in, vtest_out, &network, false);
+	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, false);
 }
 
 void test_neural_net_gpu_augmented_database() {
@@ -1158,32 +1287,20 @@ void test_neural_net_gpu_augmented_database() {
 	std::vector<unsigned int> v_layer;
 	v_layer.push_back(size_in);
 	switch (NETWORK_FOR_DATABASE_TRAINING) {
-	case 1:
-		v_layer.push_back(1000);
-		v_layer.push_back(500);
-		break;
-	case 2:
-		v_layer.push_back(1500);
-		v_layer.push_back(1000);
-		v_layer.push_back(500);
-		break;
-	case 3:
-		v_layer.push_back(2000);
-		v_layer.push_back(1500);
-		v_layer.push_back(1000);
-		v_layer.push_back(500);
-		break;
-	case 4:
-		v_layer.push_back(2500);
-		v_layer.push_back(2000);
-		v_layer.push_back(1500);
-		v_layer.push_back(1000);
-		v_layer.push_back(500);
-		break;
 	case 5:
 		for (int i=0; i<9; i++) {
 			v_layer.push_back(1000);
 		}
+		break;
+	case 4:
+		v_layer.push_back(2500);
+	case 3:
+		v_layer.push_back(2000);
+	case 2:
+		v_layer.push_back(1500);
+	case 1:
+		v_layer.push_back(1000);
+		v_layer.push_back(500);
 		break;
 	default:
 		std::cerr << "Database training: unknown network " << NETWORK_FOR_DATABASE_TRAINING << std::endl;
@@ -1193,7 +1310,30 @@ void test_neural_net_gpu_augmented_database() {
 	GPUNeuralNetwork network(v_layer, 0.001);
 	std::cout << "Network created at " << getCurrentTime() << std::endl;
 
-	test_neural_net_gpu(vtraining_in, vtraining_out, vtest_in, vtest_out, &network, true);
+	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, true);
+}
+
+void bench_propagate_front_gpu_augmented_database(void) {
+	std::cout << "Starting to load training database at " << getCurrentTime() << std::endl;
+	pop::Vec<pop::VecF32> vtraining_in;
+	pop::Vec<pop::VecF32> vtraining_out;
+	loadDatabase("/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base_augmented", MAX_PER_FOLDER, vtraining_in, vtraining_out);
+	vtraining_out.clear();
+	std::cout << "Training database loaded at " << getCurrentTime() << std::endl;
+
+	std::cout << "Starting to load test database at " << getCurrentTime() << std::endl;
+	pop::Vec<pop::VecF32> vtest_in;
+	pop::Vec<pop::VecF32> vtest_out;
+	loadDatabase("/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base", MAX_PER_FOLDER, vtest_in, vtest_out);
+	vtest_out.clear();
+	std::cout << "Test database loaded at " << getCurrentTime() << std::endl;
+
+	GPUNeuralNetwork network;
+	network.load("/home/pl/Documents/alphanumericvision/deep_big_simple_neural_net/gpu/1/network.bin");
+	network.copyNetworkToGPU();
+	std::cout << "Network created at " << getCurrentTime() << std::endl;
+
+	network.gpu_propagate(vtraining_in, vtest_in);
 }
 
 void test_cublas(void) {
