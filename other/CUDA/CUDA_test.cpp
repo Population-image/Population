@@ -16,7 +16,8 @@ int main(){
 		//test_neural_net_gpu();
 		//test_neural_net_cpu_mnist();
 		//test_neural_net_gpu_mnist();
-		test_neural_net_gpu_augmented_database();
+		//test_neural_net_gpu_augmented_database();
+		bench_propagate_front_gpu_augmented_database();
 		//test_cublas();
 	} else {
 		std::cout << " But you don't have a CUDA device." << std::endl;

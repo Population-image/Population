@@ -15,6 +15,7 @@ void test_neural_net_cpu_mnist(void);
 void test_neural_net_gpu(void);
 void test_neural_net_gpu_mnist(void);
 void test_neural_net_gpu_augmented_database(void);
+void bench_propagate_front_gpu_augmented_database(void);
 void test_cublas(void);
 #endif
 
@@ -28,6 +29,7 @@ struct neural_network;
 
 class GPUNeuralNetwork {
 public:
+	GPUNeuralNetwork();
 	GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta);
 	~GPUNeuralNetwork();
 
@@ -50,6 +52,9 @@ public:
 	void gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigned int out_elt_size, unsigned int idx);
 	void gpu_computeError(pop::F32* out_set, pop::F32* out_computed, unsigned int out_elt_size, unsigned int idx, int* error);
 	void gpu_displayNetwork();
+
+	void gpu_learn(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtraining_out, pop::Vec<pop::VecF32>& vtest_in, pop::Vec<pop::VecF32>& vtest_out, bool final_cpu_test);
+	void gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtest_in);
 #endif
 
 private:
