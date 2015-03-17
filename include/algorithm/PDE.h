@@ -35,12 +35,12 @@ in the Software.
 #define PDE_H
 
 #include"data/typeF/TypeF.h"
-#include"algorithm/Processing.h"
+
 #include"data/functor/FunctorPDE.h"
 #include"data/population/PopulationPDE.h"
 #include"algorithm/PDEAdvanced.h"
 #include"algorithm/Statistics.h"
-
+#include"algorithm/ProcessingAdvanced.h"
 namespace pop
 {
 namespace Private{
@@ -424,20 +424,15 @@ As example, this code produces
       * \image html spinodaldecomposition.gif
       * This algorithm can be used for the regularisation:
       * \code
-      * Vec3F32 domain(256);//2d field domain
-      * ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.01);//generate the 2d Poisson Point process
-      * DistributionNormal dnormal(30,20);
-      * RandomGeometry::sphere(grain,dnormal);
-      * Mat3RGBUI8 img_VecN = RandomGeometry::continuousToDiscrete(grain);
-      * Mat3UI8 img_VecN_grey;
-      * img_VecN_grey = img_VecN;
-      * img_VecN_grey = pop::Processing::greylevelRemoveEmptyValue(img_VecN_grey);
-      * Mat3F32 phasefield = PDE::allenCahn(img_VecN_grey,40);
-      * phasefield = PDE::getField(img_VecN_grey,phasefield,1,6);
-      * Scene3d scene;
-      * pop::Visualization::marchingCubeLevelSet(scene,phasefield);
-      * pop::Visualization::lineCube(scene,phasefield);
-      * scene.display();
+    Vec3F32 domain(100);//2d field domain
+    ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,0.0001);//generate the 2d Poisson Point process
+    DistributionNormal dnormal(10,5);
+    RandomGeometry::sphere(grain,dnormal);
+    Mat3UI8 random_structure = RandomGeometry::continuousToDiscrete(grain);
+    Scene3d scene;
+    pop::Visualization::marchingCubeSmooth(scene,random_structure,random_structure);
+    pop::Visualization::lineCube(scene,random_structure);
+    scene.display();
       * \endcode
       * \image html regularization.png
     */
@@ -445,13 +440,13 @@ As example, this code produces
     template<int DIM,typename PixelType>
     static MatN<DIM,F32> allenCahn( MatN<DIM,PixelType>&  labelfield, int nbrsteps)
     {
-
-        labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
+        typename MatN<DIM,PixelType>::IteratorEDomain it = labelfield.getIteratorEDomain();
+        labelfield = pop::ProcessingAdvanced::greylevelRemoveEmptyValue(labelfield,it);
         FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredMultiPhaseField<DIM,PixelType > > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
         MatN<DIM,F32>   phasefield(labelfield.getDomain());
         phasefield=1;
-        typename MatN<DIM,PixelType>::IteratorEDomain it = labelfield.getIteratorEDomain();
+        it.init();
 
         RegionGrowingMultiPhaseField<MatN<DIM,F32> > pop(phasefield,labelfield,0.95);
         PDEAdvanced::allenCahnInMutliPhaseField(phasefield,labelfield,nbrsteps,pop.getIterator(),laplacien);
@@ -491,7 +486,7 @@ As example, this code produces
     static MatN<DIM,F32> allenCahn( MatN<DIM,PixelType>&  labelfield,const MatN<DIM,UI8> & bulk,int nbrsteps)
     {
 
-        labelfield = pop::Processing::greylevelRemoveEmptyValue(labelfield);
+        labelfield = pop::ProcessingAdvanced::greylevelRemoveEmptyValue(labelfield,labelfield.getIteratorEDomain());
         FunctorPDE::Laplacien<FunctorPDE::PartialDerivateSecondCenteredInBulkMultiPhaseField<DIM,PixelType> > laplacien;
         laplacien.partialsecond.setLabelPhase(labelfield);
         laplacien.partialsecond.setBulk(bulk);
@@ -524,7 +519,7 @@ As example, this code produces
                 selectfield(itg.x())=1;
         }
         MatN<DIM,UI8> dilateselectfield(scalarfield.getDomain());
-        dilateselectfield = pop::Processing::dilationRegionGrowing(selectfield,width,1);
+        dilateselectfield = pop::ProcessingAdvanced::dilationRegionGrowing(selectfield,width,1);
         itg.init();
         MatN<DIM,F32> scalarfield_phase(scalarfield.getDomain()) ;
         itg.init();
@@ -666,7 +661,7 @@ As example, this code produces
         PDEAdvanced::allenCahnInSinglePhaseField(phasefield,nbriteration,it,laplacien,3);
         MatN<DIM,VecN<DIM,F32> > gradnormalized(phasefield.getDomain());
         FunctorPDE::Gradient<FunctorPDE::PartialDerivateCentered > func_grad;
-        MatN<DIM,UI8>  phasedilation = pop::Processing::dilationRegionGrowing(phase2,10);
+        MatN<DIM,UI8>  phasedilation = pop::ProcessingAdvanced::dilationRegionGrowing(phase2,10,1);
         it.init();
         while(it.next()){
 

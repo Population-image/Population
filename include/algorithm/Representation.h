@@ -280,6 +280,40 @@ struct POP_EXPORTS Representation
         }
         return filter;
     }
+    /*!
+     * \param f input matrix
+     * \return output matrix with a float as pixel/voxel type
+     *
+     *  calculated the 2-VecNd correlation function in any direction by FFT  P = FFT^(-1)(FFT(f)FFT(f)^*)
+    */
+
+    template<int DIM,typename PixelType>
+    static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,PixelType> & f){
+
+        MatN<DIM,PixelType> bint;
+        bint = pop::Representation::truncateMulitple2(f);
+        MatN<DIM,F32> binfloat(bint);
+        typename MatN<DIM,PixelType>::IteratorEDomain it (binfloat.getIteratorEDomain());
+        binfloat = pop::ProcessingAdvanced::greylevelRange(binfloat,it,0,1);
+
+
+        MatN<DIM,ComplexF32>  bin_complex(bint.getDomain());
+        Convertor::fromRealImaginary(binfloat,bin_complex);
+        MatN<DIM,ComplexF32>  fft = pop::Representation::FFT(bin_complex,1);
+
+        it.init();
+        while(it.next()){
+            ComplexF32 c = fft(it.x());
+            ComplexF32 c1 = fft(it.x());
+            fft(it.x()).real() = (c*c1.conjugate()).real();
+            fft(it.x()).img() =0;
+        }
+        fft  = pop::Representation::FFT(fft,0);
+        MatN<DIM,F32>  fout(bint.getDomain());
+        Convertor::toRealImaginary(fft,fout);
+        return  fout;
+
+    }
     //@}
 
     //-------------------------------------

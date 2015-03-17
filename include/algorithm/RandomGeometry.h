@@ -45,6 +45,9 @@ in the Software.
 #include"algorithm/Processing.h"
 #include"data/mat/MatNDisplay.h"
 #include"data/utility/BSPTree.h"
+#include"algorithm/Representation.h"
+#include"algorithm/Visualization.h"
+
 namespace pop
 {
 /*!
@@ -422,12 +425,8 @@ public:
 
         Mat2F32 m=  Analysis::histogram(img_germ_grey);
         std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
-
-        img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
-        Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,10);
-        phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
         Scene3d scene;
-        pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+        pop::Visualization::marchingCubeSmooth(scene,img_germ_grey);
         pop::Visualization::lineCube(scene,img_germ);
         scene.display();
     * \endcode
@@ -468,11 +467,8 @@ public:
         Mat2F32 m=  Analysis::histogram(img_germ_grey);
         std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
-        img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
-        Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,10);
-        phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
         Scene3d scene;
-        pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+        pop::Visualization::marchingCubeSmooth(scene,img_germ_grey);
         pop::Visualization::lineCube(scene,img_germ);
         scene.display();
     * \endcode
@@ -514,11 +510,8 @@ public:
     Mat2F32 m=  Analysis::histogram(img_germ_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
-    img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
-    Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,5);
-    phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
     Scene3d scene;
-    pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+    pop::Visualization::marchingCubeSmooth(scene,img_germ_grey);
     pop::Visualization::lineCube(scene,img_germ);
     scene.display();
     * \endcode
@@ -561,11 +554,8 @@ public:
     Mat2F32 m=  Analysis::histogram(img_germ_grey);
     std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
-    img_germ_grey = pop::Processing::greylevelRemoveEmptyValue(img_germ_grey);
-    Mat3F32 phasefield = PDE::allenCahn(img_germ_grey,5);
-    phasefield = PDE::getField(img_germ_grey,phasefield,1,3);
     Scene3d scene;
-    pop::Visualization::marchingCubeLevelSet(scene,phasefield);
+    pop::Visualization::marchingCubeSmooth(scene,img_germ_grey);
     pop::Visualization::lineCube(scene,img_germ);
     scene.display();
     * \endcode
@@ -831,9 +821,7 @@ public:
     }
 
     Scene3d scene;
-    Mat3F32 phasefield = PDE::allenCahn(m_U_bin,10);
-    phasefield = PDE::getField(m_U_bin,phasefield,1,6);
-    Visualization::marchingCubeLevelSet(scene,phasefield);
+    pop::Visualization::marchingCubeSmooth(scene,m_U_bin);
     Visualization::lineCube(scene,m_U_bin);
     scene.display();
     * \endcode
@@ -880,7 +868,7 @@ public:
     */
 
     template<int DIM1,int DIM2>
-    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F32 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,F32 temperature_inverse=0.01);
+    static void annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference, F32 nbr_permutation_by_pixel=8,int lengthcorrelation=-1,F32 temperature_inverse=1);
 
 
     /*!
@@ -916,6 +904,9 @@ private:
         {
             F32 v1 = rand()*1.f/RAND_MAX;
             F32 v2 = std::exp((energycurrent-energynext)*temperature_inverse);
+//            F32 v3 = std::exp((energycurrent-energynext)*2*temperature_inverse);
+//            std::cout<<v2<<std::endl;
+//            std::cout<<v3<<std::endl;
             if(v1<v2)
                 return true;
             else
@@ -941,6 +932,68 @@ private:
                 {
                     y[i]=k;
                     lenght = absolute(y[i]-x[i]);
+                    if(boundary==true){
+                        MatNBoundaryConditionPeriodic::apply(img.getDomain(),y);
+                        etat2 = img(y);
+                        autocorrhit[etat1][etat2][lenght]++;
+                    }else{
+                        if(MatNBoundaryConditionBounded::isValid(img.getDomain(),y)){
+                            MatNBoundaryConditionBounded::apply(img.getDomain(),y);
+                            etat2 = img(y);
+                            autocorrhit[etat1][etat2][lenght]++;
+                        }
+                    }
+                }
+            }
+
+        }
+        return autocorrhit;
+    }
+    template<int DIM>
+    static Vec< Vec<Vec<int> > >  autoCorrelationDiago( const MatN<DIM,UI8> & img , int taille, int nbr_phase,bool boundary =true)
+    {
+        Vec< Vec<Vec<int> > > autocorrhit( nbr_phase,Vec< Vec<int> >(nbr_phase,  Vec<int>(taille+1)));
+        typename MatN<DIM,UI8>::E x,y;
+        int etat1,etat2;
+        typename MatN<DIM,UI8>::IteratorEDomain b(img.getIteratorEDomain());
+        while(b.next())
+        {
+            x = b.x();
+            etat1 = img(x);
+            int DIR;
+            if(DIM==2)
+                DIR=2;
+            else
+                DIR=6;
+            for(int i=0;i<DIR;i++)
+            {
+                typename MatN<DIM,UI8>::E diag;
+                if(DIM==2){
+                    if(i==0){
+                        diag(0)=1;
+                        diag(1)=1;
+                    }else{
+                        diag(0)=-1;
+                        diag(1)=1;
+                    }
+                }else{
+                    if(i==0){
+                        diag(0)= 1;diag(1)= 1;diag(2)=0;
+                    }else if(i==1){
+                        diag(0)=-1;diag(1)= 1;diag(2)= 0;
+                    }else if(i==2){
+                        diag(0)= 1;diag(1)= 0;diag(2)= 1;
+                    }else if(i==3){
+                        diag(0)=-1;diag(1)= 0;diag(2)= 1;
+                    }else if(i==4){
+                        diag(0)= 0;diag(1)= 1;diag(2)= 1;
+                    }else if(i==5){
+                        diag(0)= 0;diag(1)=-1;diag(2)= 1;
+                    }
+                }
+                for(int lenght=0;lenght<=taille;lenght++)
+                {
+                    y=x+lenght*diag;
                     if(boundary==true){
                         MatNBoundaryConditionPeriodic::apply(img.getDomain(),y);
                         etat2 = img(y);
@@ -1073,10 +1126,68 @@ private:
                 v_cor[etat2][new_state][lenght]++;
             }
         }
-
-
     }
+    template<int DIM>
+    static void   switch_state_pixel_diago(Vec<Vec< Vec<int> > >& v_cor, const MatN<DIM,UI8>& img , int taille,const typename MatN<DIM,UI8>::E & x  , int new_state)
+    {
 
+        int lenght=0;
+        typename MatN<DIM,UI8>::E y;
+        int old_state = (int)img(x);
+        int DIR;
+        if(DIM==2)
+            DIR=2;
+        else
+            DIR=6;
+        for(int i=0;i<DIR;i++)
+        {
+            y=x;
+            v_cor[old_state][old_state][0]--;
+            v_cor[new_state][new_state][0]++;
+            typename MatN<DIM,UI8>::E diag;
+            if(DIM==2){
+                if(i==0){
+                    diag(0)=1;
+                    diag(1)=1;
+                }else{
+                    diag(0)=-1;
+                    diag(1)=1;
+                }
+            }else{
+                if(i==0){
+                    diag(0)= 1;diag(1)= 1;diag(2)=0;
+                }else if(i==1){
+                    diag(0)=-1;diag(1)= 1;diag(2)= 0;
+                }else if(i==2){
+                    diag(0)= 1;diag(1)= 0;diag(2)= 1;
+                }else if(i==3){
+                    diag(0)=-1;diag(1)= 0;diag(2)= 1;
+                }else if(i==4){
+                    diag(0)= 0;diag(1)= 1;diag(2)= 1;
+                }else if(i==5){
+                    diag(0)= 0;diag(1)=-1;diag(2)= 1;
+                }
+            }
+            for(int k = 1;k<=taille;k++)
+            {
+                y=x+k*diag;
+                lenght = absolute(k);
+                MatNBoundaryConditionPeriodic::apply(img.getDomain(),y);
+                int etat2 = img(y);
+                v_cor[old_state][etat2][lenght]--;
+                v_cor[new_state][etat2][lenght]++;
+            }
+            for(int k = -taille;k<0;k++)
+            {
+                y=x+k*diag;
+                lenght = absolute(k);
+                MatNBoundaryConditionPeriodic::apply(img.getDomain(),y);
+                int etat2 = img(y);
+                v_cor[etat2][old_state][lenght]--;
+                v_cor[etat2][new_state][lenght]++;
+            }
+        }
+    }
     static F32 energy(Vec< Vec<int> >& v1,Vec< Vec<int> >& v2,Vec<int> &nbr_pixel_by_phase1,Vec<int> &nbr_pixel_by_phase2)
     {
         F32 sum=0;
@@ -1276,9 +1387,10 @@ void  RandomGeometry::addition(const ModelGermGrain<DIM> &  grain1,ModelGermGrai
 template<int DIM>
 ModelGermGrain<DIM>  RandomGeometry::poissonPointProcess(VecN<DIM,F32> domain,F32 lambda)
 {
-    std::cout<<"Poisson Point process"<<std::endl;
+
     DistributionPoisson d(lambda*domain.multCoordinate());
     int nbr_VecNs = d.randomVariable();
+    std::cout<<"Poisson Point process number of germs "<< nbr_VecNs<<std::endl;
     ModelGermGrain<DIM> grain;
     grain.setDomain(domain);
     DistributionUniformReal rx(0,1);
@@ -1624,8 +1736,8 @@ MatN<DIM,UI8> RandomGeometry::randomStructure(const VecN<DIM,I32>& domain, const
 
 template<int DIM1,int DIM2>
 void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,UI8> & img_reference,F32 nbr_permutation_by_pixel, int lengthcorrelation,F32 temperature_inverse){
-    if(temperature_inverse==-1)
-        temperature_inverse=0.01f;
+    if(temperature_inverse==1.f&&DIM1==3)
+        temperature_inverse=100.f;
     if(lengthcorrelation==-1){
         lengthcorrelation = 10000;
         for(int i=0;i<DIM1;i++){
@@ -1635,6 +1747,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
             lengthcorrelation = minimum(lengthcorrelation,img_reference.getDomain()(i)/2);
         }
     }
+    F32 init_temp= temperature_inverse;
     std::cout<<"Correlation lenght "<<lengthcorrelation<<std::endl;
     std::cout<<"Inverse temperature "<<temperature_inverse<<std::endl;
     MatN<DIM2,UI8> ref= Processing::greylevelRemoveEmptyValue(img_reference);
@@ -1642,8 +1755,14 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
     Mat2F32 m = Analysis::histogram(ref);
     int nbrphase=m.sizeI();
 
+
+
+
     Vec<Vec< Vec<int> > > vref = RandomGeometry::autoCorrelation(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodel = RandomGeometry::autoCorrelation(model,lengthcorrelation,nbrphase);
+
+    Vec<Vec< Vec<int> > > vref_diag = RandomGeometry::autoCorrelationDiago(ref,lengthcorrelation,nbrphase);
+    Vec<Vec< Vec<int> > > vmodel_diag = RandomGeometry::autoCorrelationDiago(model,lengthcorrelation,nbrphase);
 
     Vec<Vec< Vec<int> > > vrefcross = RandomGeometry::autoCorrelationCross(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodelcross = RandomGeometry::autoCorrelationCross(model,lengthcorrelation,nbrphase);
@@ -1687,22 +1806,30 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
                 }
             }
         }while(boundary==false);
+
         RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p1,state2);
+        RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p1,state2);
         RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state2);
         model(p1)=state2;
+
         RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p2,state1);
+        RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p2,state1);
         RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state1);
         model(p2)=state1;
-        F32 energytemp = RandomGeometry::energy(vref,vmodel);
-        energytemp += RandomGeometry::energy(vrefcross,vmodelcross);
-        temperature_inverse++;
-        if(annealingSimutatedLaw(energytemp, energy_current,temperature_inverse)==false){
-            //            if(energytemp> energy_current){
+        F32 energytemp=0;
+        energytemp+= RandomGeometry::energy(vref,vmodel);
+        energytemp+= RandomGeometry::energy(vrefcross,vmodelcross);
+        energytemp+= RandomGeometry::energy(vref_diag,vmodel_diag);
+        temperature_inverse+=init_temp;
+       if(annealingSimutatedLaw(energytemp, energy_current,temperature_inverse)==false){
+       // if(energytemp>= energy_current){
 
             RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p1,state1);
+            RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p1,state1);
             RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state1);
             model(p1)=state1;
             RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p2,state2);
+            RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p2,state2);
             RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state2);
             model(p2)=state2;
         }else{
@@ -1710,7 +1837,7 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
         }
 
         if(count%(model.getDomain().multCoordinate()/10)==0){
-            std::cout<<"annealingSimutated E="<<energytemp<<" and nbr permutation per pixel(voxel)="<<count*1.0/model.getDomain().multCoordinate()<<std::endl;
+            std::cout<<"annealingSimutated E="<<energy_current<<" and nbr permutation per pixel(voxel)="<<count*1.0/model.getDomain().multCoordinate()<<std::endl;
             d.display(Visualization::labelToRandomRGB(model));
         }
         count++;

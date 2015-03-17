@@ -124,20 +124,18 @@ void figure5_EulerAngle(){
 }
 
 void testAnnealing(){
-    Mat2UI8 img;//2d grey-level image object
-    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/CTG.pgm"));//replace this path by those on your computer
-    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
-    int value;
-    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
-    threshold.display("initial",false);
+    Mat2UI8 threshold;//2d grey-level image object
+    threshold.load("/home/vincent/Desktop/meb_A_675_7j_visu.bmp");//replace this path by those on your computer
+    threshold = GeometricalTransformation::subResolution(threshold,4);
     threshold = Processing::greylevelRemoveEmptyValue(threshold);
-
+    Visualization::labelToRandomRGB(threshold).display();
     Mat2F32 volume_fraction = Analysis::histogram(threshold);
     //2D case
     {
-//        Vec2I32 v(128,128);
+
+//        Vec2I32 v(256,256);
 //        Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-//        RandomGeometry::annealingSimutated(random,threshold,5,100,0.01);
+//        RandomGeometry::annealingSimutated(random,threshold);
 //        Visualization::labelToRandomRGB(random).display();
     }
     //3D case (expensive process)
@@ -145,11 +143,13 @@ void testAnnealing(){
         Vec3I32 v(256,256,256);
         Mat3UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
         RandomGeometry::annealingSimutated(random,threshold,10);
+        Mat2F32 m_field_field_annealing_model = Analysis::correlation(random,200);
+        m_field_field_annealing_model = m_field_field_annealing_model.deleteCol(1);//remove the pore-pore correlation function in the first column
+        m_field_field_annealing_model.saveAscii("CTG_field_field_annealing_model.m");
+
         random.save("annealing.pgm");
         Scene3d scene;
-        Mat3F32 phasefield = PDE::allenCahn(random,10);
-        phasefield = PDE::getField(random,phasefield,1,6);
-        Visualization::marchingCubeLevelSet(scene,phasefield);
+        Visualization::marchingCubeSmooth(scene,random);
         Visualization::lineCube(scene,phasefield);
         scene.display();
     }
@@ -178,15 +178,31 @@ void testGaussianField(){
     }
 
     Scene3d scene;
-    Mat3F32 phasefield = PDE::allenCahn(m_U_bin,5);
-    phasefield = PDE::getField(m_U_bin,phasefield,1,6);
-    Visualization::marchingCubeLevelSet(scene,phasefield);
+
+    Visualization::marchingCubeSmooth(scene,m_U_bin);
     Visualization::lineCube(scene,m_U_bin);
     scene.display();
 }
 int main()
 {
 
+//    Mat2UI8 m(8,8);
+//    m=0;
+//    m(4,4)=1;m(5,5)=1;
+//    Mat2F32 volume_fraction = Analysis::histogram(m);
+//    Vec2I32 v(8,8);
+//    Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
+//    RandomGeometry::annealingSimutated(random,m);
+
+//    Mat3UI8 init;
+//   Mat3UI8 random ;
+//   init.load("/home/vincent/Desktop/WorkSegmentation/lavoux/lavoux.pgm");
+//    random.load("/home/vincent/Desktop/WorkSegmentation/lavoux/segmentation.pgm");
+
+//    Visualization::labelForegroundBoundary(random,init).display();
+//    Mat2F32 m_field_field_annealing_model = Analysis::correlation(random,200);
+//    m_field_field_annealing_model = m_field_field_annealing_model.deleteCol(1);//remove the pore-pore correlation function in the first column
+//    m_field_field_annealing_model.saveAscii("CTG_field_field_annealing_model.m");
 
     testAnnealing();
 //    testGaussianField();

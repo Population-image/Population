@@ -44,7 +44,6 @@ in the Software.
 #include"algorithm/ForEachFunctor.h"
 #include"data/mat/MatN.h"
 #include"algorithm/ProcessingAdvanced.h"
-#include"algorithm/Representation.h"
 #include"data/notstable/graph/Graph.h"
 #include"algorithm/Statistics.h"
 #include"algorithm/AnalysisAdvanced.h"
@@ -111,22 +110,6 @@ in the Software.
      * mcorre.saveAscii("spinodal_corre.m");
      * \endcode
      * \image html spinodal_corr.png "No long-range oscillion=No periodic structure and REV oke as in REVPorosity"
-     * \code
-     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
-     * Mat3F32 corre= Analysis::correlationDirectionByFFT(porespace);
-     * corre = GeometricalTransformation::translate(corre,corre.getDomain()/2);//centered
-     * corre = corre(corre.getDomain()/2-Vec3I32(20,20,20),corre.getDomain()/2+Vec3I32(20,20,20));//take only the core (the correlation length is near 20)
-     * Mat3UI8 dcorre;
-     * dcorre= pop::Processing::greylevelRange(corre,1,255);//0 is black color so start at 1
-     * Mat3RGBUI8 dcorregrad=Visualization::labelToRGBGradation(dcorre);//color gradation
-     * Scene3d scene;
-     * Visualization::plane(scene,dcorregrad,dcorre.getDomain()(0)/2,0);
-     * Visualization::plane(scene,dcorregrad,dcorre.getDomain()(1)/2,1);
-     * Visualization::plane(scene,dcorregrad,dcorre.getDomain()(2)/2,2);
-     * Visualization::lineCube(scene,dcorregrad);
-     * scene.display();//if you close the opengl windows, that stop the program in linux. So comment this line in linux to execute the rest of the code
-     * \endcode
-     * \image html spinodal_corr3d.png "We observe an isotropic 2-point correlation function->structure is istropic"
      * \code
      * Mat3UI8 fdistance;
      * Mat2F32 mldistance= Analysis::ldistance(porespace,2,fdistance);//euclidean distance only in Population library ;-)
@@ -1025,40 +1008,7 @@ struct POP_EXPORTS Analysis
         }
         return m;
     }
-    /*!
-     * \param f input matrix
-     * \return output matrix with a float as pixel/voxel type
-     *
-     *  calculated the 2-VecNd correlation function in any direction by FFT  P = FFT^(-1)(FFT(f)FFT(f)^*)
-    */
 
-    template<int DIM,typename PixelType>
-    static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,PixelType> & f){
-
-        MatN<DIM,PixelType> bint;
-        bint = pop::Representation::truncateMulitple2(f);
-        MatN<DIM,F32> binfloat(bint);
-        typename MatN<DIM,PixelType>::IteratorEDomain it (binfloat.getIteratorEDomain());
-        binfloat = pop::ProcessingAdvanced::greylevelRange(binfloat,it,0,1);
-
-
-        MatN<DIM,ComplexF32>  bin_complex(bint.getDomain());
-        Convertor::fromRealImaginary(binfloat,bin_complex);
-        MatN<DIM,ComplexF32>  fft = pop::Representation::FFT(bin_complex,1);
-
-        it.init();
-        while(it.next()){
-            ComplexF32 c = fft(it.x());
-            ComplexF32 c1 = fft(it.x());
-            fft(it.x()).real() = (c*c1.conjugate()).real();
-            fft(it.x()).img() =0;
-        }
-        fft  = pop::Representation::FFT(fft,0);
-        MatN<DIM,F32>  fout(bint.getDomain());
-        Convertor::toRealImaginary(fft,fout);
-        return  fout;
-
-    }
     /*!
      * \param f input matrix
      * \param nbrchord  number of sampling

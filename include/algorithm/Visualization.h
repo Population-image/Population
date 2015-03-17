@@ -42,6 +42,7 @@ in the Software.
 
 #include"data/notstable/graph/Graph.h"
 #include"algorithm/Draw.h"
+#include"PDE.h"
 namespace pop
 {
 
@@ -735,7 +736,6 @@ struct POP_EXPORTS Visualization
 
 
         std::vector<_vertex> vertices = _runMarchingCubes2(phasefied,0);
-        //        MatN<3,RGBUI8 >::IteratorENeighborhood itn (maRGB.getIteratorENeighborhood(1,0));
         while(vertices.empty()==false)
         {
             _vertex vert = vertices.back();
@@ -744,18 +744,8 @@ struct POP_EXPORTS Visualization
             triangle->normal(0)=vert.normal_x;triangle->normal(1)=vert.normal_y;triangle->normal(2)=vert.normal_z;
             triangle->x(0)=vert.x-2;triangle->x(1)=vert.y-2;triangle->x(2)=vert.z-2;
 
-            //            if(maRGB.getDomain()(0)==0){
             RGBUI8 c(200,200,200);
             triangle->setRGB(c);
-            //            }else
-            //            {
-            //                itn.init(triangle->x);
-            //                RGBUI8 c;
-            //                while(itn.next()){
-            //                    c = max(c,maRGBUI8(itn.x()));
-            //                }
-            //                triangle->setRGB(c);
-            //            }
             scene._v_figure.push_back(triangle);
         }
     }
@@ -780,7 +770,6 @@ struct POP_EXPORTS Visualization
      * Mat3UI32 water = pop::Processing::watershed(minima,dist,grain,1);
      * Mat3F32 phasefield = PDE::allenCahn(grain,5);
      * phasefield = PDE::getField(grain,phasefield,1,6);
-
      * Scene3d scene;
      * Visualization::marchingCubeLevelSet(scene,phasefield,Visualization::labelToRandomRGB(water));
      * Visualization::lineCube(scene,phasefield);
@@ -816,7 +805,36 @@ struct POP_EXPORTS Visualization
             }
             scene._v_figure.push_back(triangle);
         }
+    }
 
+    template<typename LabelType>
+    static inline void marchingCubeSmooth(Scene3d& scene, MatN<3,LabelType>  m_label,int smooth_factor=5, MatN<3,RGBUI8>  m_color= MatN<3,RGBUI8>())
+    {
+        typename MatN<3,LabelType>::IteratorEDomain it = m_label.getIteratorEDomain();
+        m_label = ProcessingAdvanced::greylevelRemoveEmptyValue(m_label,it);
+        it.init();
+        int value =AnalysisAdvanced::maxValue(m_label,it);
+        if(m_color.empty()==true){
+            m_color.resize(m_label.getDomain());
+            if(value==1){
+                it.init();
+                while(it.next()){
+                    if(m_label(it.x())!=0){
+                        m_color(it.x())= RGBUI8(255,255,255);
+                    }else{
+                        m_color(it.x())= RGBUI8(0,0,0);
+                    }
+                }
+            }
+            else{
+                m_color=Visualization::labelToRandomRGB(m_label);
+            }
+        }
+        Mat3F32 phasefield = PDE::allenCahn(m_label,smooth_factor);
+        for(unsigned int i=1;i<=value;i++){
+            Mat3F32 phasefield_i = PDE::getField(m_label,phasefield,i);
+            Visualization::marchingCubeLevelSet(scene,phasefield_i,m_color);
+        }
     }
 
 

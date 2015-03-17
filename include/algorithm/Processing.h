@@ -37,6 +37,7 @@ in the Software.
 #include"algorithm/GeometricalTransformation.h"
 #include"algorithm/ProcessingAdvanced.h"
 #include"algorithm/Analysis.h"
+#include"algorithm/Draw.h"
 #include"data/mat/MatNIteratorE.h"
 namespace pop
 {
