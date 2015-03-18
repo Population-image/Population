@@ -389,9 +389,10 @@ struct POP_EXPORTS Representation
     }
 
     template<typename T>
-    static bool isPowerOfTwo (T v)
+    static bool isPowerOfTwo (T x)
     {
-        return ((v & -v)) == v;
+        bool powerOfTwo = !(x == 0) && !(x & (x - 1));
+        return powerOfTwo;
     }
 };
 }
