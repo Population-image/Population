@@ -236,35 +236,35 @@ void GPUNeuralNetwork::load(std::string filename) {
 	in.read((char*)&eta, sizeof(eta));
 
 	for (unsigned int l=0; l<nb_layers; l++) {
-        unsigned int ll, X_size, Y_size, W_height, W_width;
-    	in.read((char*)&ll, sizeof(ll));
-    	in.read((char*)&X_size, sizeof(X_size));
-    	in.read((char*)&Y_size, sizeof(Y_size));
-    	in.read((char*)&W_height, sizeof(W_height));
-    	in.read((char*)&W_width, sizeof(W_width));
-    	if (ll != l) {
-    		std::cerr << "GPUNeuralNetwork::load(): wrong layer: " << ll << " instead of " << l << std::endl;
-    		exit(-1);
-    	}
-    	layers.push_back(Y_size);
+		unsigned int ll, X_size, Y_size, W_height, W_width;
+		in.read((char*)&ll, sizeof(ll));
+		in.read((char*)&X_size, sizeof(X_size));
+		in.read((char*)&Y_size, sizeof(Y_size));
+		in.read((char*)&W_height, sizeof(W_height));
+		in.read((char*)&W_width, sizeof(W_width));
+		if (ll != l) {
+			std::cerr << "GPUNeuralNetwork::load(): wrong layer: " << ll << " instead of " << l << std::endl;
+			exit(-1);
+		}
+		layers.push_back(Y_size);
 
-    	pop::VecF32	v_w;
+		pop::VecF32	v_w;
 		for (unsigned int i=0; i<W_height*W_width; i++) {
 			pop::F32 w;
 			in.read((char*)&w, sizeof(w));
 			v_w.push_back(w);
 		}
-    	weights.push_back(v_w);
+		weights.push_back(v_w);
 	}
 	in.close();
 
-    createNetwork(layers, eta);
+	createNetwork(layers, eta);
 
-    for (int l=1; l<nb_layers; l++) {
-    	for (int i=0; i<weights[l].size(); i++) {
-    		h_network->_layers[l]._W[i] = weights[l](i);
-    	}
-    }
+	for (int l=1; l<nb_layers; l++) {
+		for (int i=0; i<weights[l].size(); i++) {
+			h_network->_layers[l]._W[i] = weights[l](i);
+		}
+	}
 }
 
 void GPUNeuralNetwork::setEta(const double eta) {
@@ -1276,163 +1276,5 @@ void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder
 	std::cout << "Network created at " << getCurrentTime() << std::endl;
 
 	network.gpu_propagate(vtraining_in, vtest_in, nb_epoch);
-}
-
-void test_cublas(void) {
-	cublasStatus_t	stat;
-	cublasHandle_t handle;
-
-	const int width = 3;
-	const int height = 2;
-
-	float* W = new float[width*height];
-	W[0] = .5; W[1] = .8; W[2] = 2;
-	W[3] = 1.5; W[4] = 1; W[5] = 0;
-
-	float* dW = new float[width*height];
-	dW[0] = 1; dW[1] = 2; dW[2] = 3;
-	dW[3] = 4; dW[4] = 5; dW[5] = 6;
-
-	const float eta = 0.9;
-
-	std::cout << "***** BEFORE:" << std::endl;
-	std::cout << "W = [" << std::endl;
-	for (int i=0; i<height; i++) {
-		for (int j=0; j<width; j++) {
-			std::cout << " " << W[i*width+j];
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "]" << std::endl;
-
-	std::cout << "dW = [" << std::endl;
-	for (int i=0; i<height; i++) {
-		for (int j=0; j<width; j++) {
-			std::cout << " " << dW[i*width+j];
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "]" << std::endl;
-
-	//*************************************************
-
-	float* d_W;
-	cudaMalloc(&d_W, width*height*sizeof(*d_W));
-	cudaMemcpy(d_W, W, width*height*sizeof(*d_W), cudaMemcpyHostToDevice);
-
-	float* d_dW;
-	cudaMalloc(&d_dW, width*height*sizeof(*d_dW));
-	cudaMemcpy(d_dW, dW, width*height*sizeof(*d_dW), cudaMemcpyHostToDevice);
-
-	cublasCreate(&handle);
-
-	float alpha = 1.0f;
-	float beta = -eta;
-	//  C = α op(A) + β op(B) -> W = 1 op(W) + -eta op(dW)
-	stat = cublasSgeam(handle, CUBLAS_OP_N, CUBLAS_OP_N, width, height, &alpha, d_W, width, &beta, d_dW, width, d_W, width);
-	std::cout << "cublas status: " << popcuda::cublasGetErrorString(stat) << std::endl;
-
-	cudaMemcpy(W, d_W, width*height*sizeof(*d_W), cudaMemcpyDeviceToHost);
-	cudaMemcpy(dW, d_dW, width*height*sizeof(*d_dW), cudaMemcpyDeviceToHost);
-
-	cublasDestroy(handle);
-	cudaFree(d_dW);
-	cudaFree(d_W);
-
-	//*************************************************
-
-	std::cout << "***** AFTER:" << std::endl;
-	std::cout << "W = [" << std::endl;
-	for (int i=0; i<height; i++) {
-		for (int j=0; j<width; j++) {
-			std::cout << " " << W[i*width+j];
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "]" << std::endl;
-
-	std::cout << "dW = [" << std::endl;
-	for (int i=0; i<height; i++) {
-		for (int j=0; j<width; j++) {
-			std::cout << " " << dW[i*width+j];
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "]" << std::endl;
-
-	delete[] dW;
-	delete[] W;
-
-
-#if 0
-	cublasStatus_t	stat;
-	cublasHandle_t handle;
-
-	const int width = 3;
-	const int height = 2;
-	float* W = new float[width*height];
-	for (int i=0; i<width*height; i++) {
-		W[i] = i;
-	}
-
-	std::cout << "W = [";
-	for (int i=0; i<width*height; i++) {
-		std::cout << " " << W[i];
-	}
-	std::cout << " ]" << std::endl;
-
-	float* X = new float[width];
-	X[0] = 2;
-	for (int i=1; i<width; i++) {
-		X[i] = 1;
-	}
-
-	std::cout << "X = [";
-	for (int i=0; i<width; i++) {
-		std::cout << " " << X[i];
-	}
-	std::cout << " ]" << std::endl;
-
-	float* Y = new float[height];
-	for (int i=1; i<height; i++) {
-		Y[i] = 0;
-	}
-
-	float* d_W;
-	cudaMalloc(&d_W, width*height*sizeof(*d_W));
-	cudaMemcpy(d_W, W, width*height*sizeof(*d_W), cudaMemcpyHostToDevice);
-
-	float* d_X;
-	cudaMalloc(&d_X, width*sizeof(*d_X));
-	cudaMemcpy(d_X, X, width*sizeof(*d_X), cudaMemcpyHostToDevice);
-
-	float* d_Y;
-	cudaMalloc(&d_Y, height*sizeof(*d_Y));
-
-	cublasCreate(&handle);
-
-	float alpha = 1.0f;
-	float beta = 0.0f;
-	//  Y = α op(W) X + β Y
-	stat = cublasSgemv_v2(handle, CUBLAS_OP_T, width, height, &alpha, d_W, width, d_X, 1, &beta, d_Y, 1);	// Y = [ 3 15 ]
-	std::cout << "cublas status: " << popcuda::cublasGetErrorString(stat) << std::endl;
-
-	cudaMemcpy(Y, d_Y, height*sizeof(*d_Y), cudaMemcpyDeviceToHost);
-
-	std::cout << "Y = [";
-	for (int i=0; i<height; i++) {
-		std::cout << " " << Y[i];
-	}
-	std::cout << " ]" << std::endl;
-
-	cublasDestroy(handle);
-	cudaFree(d_W);
-	cudaFree(d_X);
-	cudaFree(d_Y);
-
-	delete[] Y;
-	delete[] X;
-	delete[] W;
-#endif
 }
 #endif
