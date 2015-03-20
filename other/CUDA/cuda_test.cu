@@ -713,6 +713,21 @@ __global__ void kernel_convolution_gpu_shared(T* d_in, const unsigned int in_hei
 
 template<typename T>
 pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> kernel, const unsigned int r, const unsigned int step) {
+	cudaEvent_t cuda_start_time, cuda_stop_time;
+	cudaError_t error;
+	float msecTotal;
+
+	error = cudaEventCreate(&cuda_start_time);
+	if (error != cudaSuccess)
+	{
+		std::cerr << "Failed to create start event (error code " << cudaGetErrorString(error) << ")!" << std::endl;
+	}
+	error = cudaEventCreate(&cuda_stop_time);
+	if (error != cudaSuccess)
+	{
+		std::cerr << "Failed to create stop event (error code " << cudaGetErrorString(error) << ")!" << std::endl;
+	}
+
 	const unsigned d = 2*r;
 	pop::MatN<2, T> out((in.sizeI()-d)/step, (in.sizeJ()-d)/step);
 
@@ -740,7 +755,13 @@ pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> 
 		grid.x = out.sizeI() / BLOCK_SIZE + (out.sizeI()%BLOCK_SIZE ? 1 : 0);
 		grid.y = out.sizeJ() / BLOCK_SIZE + (out.sizeJ()%BLOCK_SIZE ? 1 : 0);
 	}
-	std::cout << "grid = (" << grid.x << ", " << grid.y << "), block = (" << block.x << ", " << block.y << ")" << std::endl;
+	//std::cout << "grid = (" << grid.x << ", " << grid.y << "), block = (" << block.x << ", " << block.y << ")" << std::endl;
+
+	error = cudaEventRecord(cuda_start_time, NULL);
+	if (error != cudaSuccess)
+	{
+		std::cerr << "Failed to record start event (error code " << cudaGetErrorString(error) << ")!" << std::endl;
+	}
 
 	unsigned int memsize = kernel.sizeI()*kernel.sizeJ()*sizeof(*d_kernel);
 #ifdef SHARED_IN
@@ -753,6 +774,22 @@ pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> 
 		kernel_convolution_gpu_shared<<<grid, block, memsize>>>(d_in, in.sizeI(), in.sizeJ(), d_kernel, d_out, d, step, out.sizeI(), out.sizeJ(), memsize);
 	}
 
+	error = cudaEventRecord(cuda_stop_time, NULL);
+	if (error != cudaSuccess)
+	{
+		std::cerr << "Failed to record stop event (error code " << cudaGetErrorString(error) << ")!" << std::endl;
+	}
+
+	error = cudaEventSynchronize(cuda_stop_time);
+	if (error != cudaSuccess)
+	{
+		std::cerr << "Failed to synchronize on the stop event (error code " << cudaGetErrorString(error) << ")!" << std::endl;
+	}
+
+	msecTotal = 0.0f;
+	cudaEventElapsedTime(&msecTotal, cuda_start_time, cuda_stop_time);
+	std::cout << "GPU convolution: " << msecTotal << "ms" << std::endl;
+
 	cudaMemcpy(out.data(), d_out, out.sizeI() * out.sizeJ() * sizeof(*d_out), cudaMemcpyDeviceToHost);
 
 	cudaFree(d_out);
@@ -763,11 +800,50 @@ pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> 
 }
 
 void test_convolution(void) {
-#if 1
 	uint64_t start_time, stop_time, diff_time;
-
 	init_clock_mhz();
 
+#if 1
+	pop::Mat2F32 m(30, 30);
+	for (int i=0; i<30; i++) {
+		for (int j=0; j<30; j++) {
+			m(i, j) = i*30+j;
+		}
+	}
+
+	pop::Mat2F32 kernel_identity(3, 3);
+	for (int i=0; i<3; i++) {
+		for (int j=0; j<3; j++) {
+			kernel_identity(i, j) = (i==1 && j==1);
+		}
+	}
+
+	const unsigned int nb_iter = 1;
+
+	pop::Mat2F32 out_cpu;
+	rdtsc(start_time);
+	for (int i=0; i<nb_iter; i++)
+		out_cpu = convolution_cpu(m, kernel_identity, 1, 1);
+	rdtsc(stop_time);
+	diff_time = diffTime(stop_time, start_time)/nb_iter;
+	std::cout << "\t--> CPU convolution: " << diff_time << "usec <--\n" << std::endl;
+
+	pop::Mat2F32 out_gpu;
+	rdtsc(start_time);
+	for (int i=0; i<nb_iter; i++)
+		out_gpu = convolution_gpu(m, kernel_identity, 1, 1);
+	rdtsc(stop_time);
+	diff_time = diffTime(stop_time, start_time)/nb_iter;
+	std::cout << "\t--> GPU convolution: " << diff_time << "usec <--\n" << std::endl;
+
+	if (out_cpu != out_gpu) {
+		std::cerr << "Erreur de calcul !" << std::endl;
+	} else {
+		std::cout << "Calcul correct !" << std::endl;
+	}
+#endif
+
+#if 0
 	pop::Mat2UI8 m;
 	//m.load("/home/pl/workspace/Population/image/Vd-Orig.png");
 	m.load("/home/pl/workspace/Population/image/NYC.jpg");
