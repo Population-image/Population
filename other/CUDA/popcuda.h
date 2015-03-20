@@ -39,6 +39,7 @@ bool isCudaAvailable();
 const char* cublasGetErrorString(cublasStatus_t status);
 
 unsigned int getMaxNumberThreadsPerBlock();
+unsigned int getMaxSharedMemPerBlock();
 #endif
 
 }

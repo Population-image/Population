@@ -654,6 +654,8 @@ __global__ void kernel_convolution_gpu(T* d_in, const unsigned int in_height, co
 	d_out[i*out_width+j] = sum;
 }
 
+#undef SHARED_IN
+
 template<typename T>
 __global__ void kernel_convolution_gpu_shared(T* d_in, const unsigned int in_height, const unsigned int in_width, T* d_kernel, T* d_out, const unsigned int d, const unsigned int step, const unsigned int out_height, const unsigned int out_width, unsigned int memsize) {
 	unsigned int i = blockIdx.x*blockDim.y + threadIdx.x;
@@ -663,25 +665,47 @@ __global__ void kernel_convolution_gpu_shared(T* d_in, const unsigned int in_hei
 		return;
 	}
 
-	extern __shared__ T shared_in[];
+	extern __shared__ T h[];
 
-	unsigned int i_start = 0;//XXX
-	unsigned int j_start = 0;//XXX
-	unsigned int i_end = 0;//XXX
-	unsigned int j_end = 0;//XXX
-
-
+	// the kernel is small, so it is faster enough to run this single-threaded copy
 	if (threadIdx.x == 0 && threadIdx.y == 0) {
-
+		for (unsigned int k=0; k<(d+1)*(d+1); k++) {
+			h[k] = d_kernel[k];
+		}
 	}
 
-	__syncthreads();
+#ifdef SHARED_IN
+	T* shared_in = h + (d+1)*(d+1);
+	unsigned int i_min = blockIdx.x*blockDim.y*step;
+	unsigned int i_max = (blockIdx.x+1)*blockDim.y*step;
+	unsigned int j_min = blockIdx.y*blockDim.x*step;
+	unsigned int j_max = (blockIdx.y+1)*blockDim.x*step;
 
+	//nb elements on x : i_max+d - i_min
+	// per thread: (i_max+d - i_min)/blockDim.x
+	// thread 0: from i_min to i_min+blockDim.x
+	// thread 1: from i_min+blockDim.x to i_min+2*blockDim.x
+	// ...
+	// thread t: from i_min*step+t*blockDim.x to i_min*step+(t+1)*blockDim.x
+	for (unsigned int k=i_min+threadIdx.x*blockDim.x; k<i_min+(threadIdx.x+1)*blockDim.x && k<i_max+d; k++) {
+		for (unsigned int l=j_min+threadIdx.y*blockDim.y; l<j_max+(threadIdx.y+1)*blockDim.y && l<j_max+d; l++) {
+			shared_in[(k-i_min)*(blockDim.x+d)+l-j_min] = d_in[k*in_width+l];
+		}
+	}
+#endif
+
+	__syncthreads();
 
 	float sum = 0.0;
 	for (unsigned int n=0; n<=d; n++) {
 		for (unsigned int m=0; m<=d; m++) {
-			sum += d_in[(n+i*step)*in_width+(m+j*step)] * d_kernel[n*(d+1)+m];
+			//sum += d_in[(n+i*step)*in_width+(m+j*step)] * d_kernel[n*(d+1)+m];
+			//sum += d_in[(n+i*step)*in_width+(m+j*step)] * h[n*(d+1)+m];
+#ifdef SHARED_IN
+			sum += shared_in[(n+i*step-i_min)*(blockDim.x+d)+(m+j*step-j_min)] * h[n*(d+1)+m];
+#else
+			sum += d_in[(n+i*step)*in_width+(m+j*step)] * h[n*(d+1)+m];
+#endif
 		}
 	}
 	d_out[i*out_width+j] = sum;
@@ -716,12 +740,13 @@ pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> 
 		grid.x = out.sizeI() / BLOCK_SIZE + (out.sizeI()%BLOCK_SIZE ? 1 : 0);
 		grid.y = out.sizeJ() / BLOCK_SIZE + (out.sizeJ()%BLOCK_SIZE ? 1 : 0);
 	}
-	//std::cout << "grid = (" << grid.x << ", " << grid.y << "), block = (" << block.x << ", " << block.y << ")" << std::endl;
+	std::cout << "grid = (" << grid.x << ", " << grid.y << "), block = (" << block.x << ", " << block.y << ")" << std::endl;
 
-	std::cout << "max " << 49152/sizeof(T) << " elements" << std::endl;
-
-	unsigned int memsize = (BLOCK_SIZE+d)*(BLOCK_SIZE+d)*sizeof(*d_out);
-	if (memsize > 49152) { //XXX GPU dependant. We need a method to get this value
+	unsigned int memsize = kernel.sizeI()*kernel.sizeJ()*sizeof(*d_kernel);
+#ifdef SHARED_IN
+	memsize += (BLOCK_SIZE+d)*(BLOCK_SIZE+d)*sizeof(*d_out);
+#endif
+	if (memsize > popcuda::getMaxSharedMemPerBlock()) {
 		std::cout << "Kernel too big for the shared memory version. Using the global memory version" << std::endl;
 		kernel_convolution_gpu<<<grid, block>>>(d_in, in.sizeI(), in.sizeJ(), d_kernel, d_out, d, step, out.sizeI(), out.sizeJ());
 	} else {
@@ -738,6 +763,7 @@ pop::MatN<2, T> convolution_gpu(const pop::MatN<2, T> in, const pop::MatN<2, T> 
 }
 
 void test_convolution(void) {
+#if 1
 	uint64_t start_time, stop_time, diff_time;
 
 	init_clock_mhz();
@@ -782,10 +808,11 @@ void test_convolution(void) {
 
 	out_cpu.save("/home/pl/workspace/Population/image/NYC-cpu.jpg");
 	out_gpu.save("/home/pl/workspace/Population/image/NYC-gpu.jpg");
+#endif
 
-#if 0
 	bool cpu = false;
 
+#if 0
 	std::cout << "Test convolution on " << (cpu ? "CPU" : "GPU") << std::endl;
 	std::cout << std::endl;
 
@@ -809,9 +836,9 @@ void test_convolution(void) {
 
 	pop::Mat2F32 out = cpu ? convolution_cpu(in, kernel, 1, 1) : convolution_gpu(in, kernel, 1, 1);
 	std::cout << "out = " << out << std::endl; // -> 24
+#endif
 
-	//---------------------------------------------------------------
-
+#if 0
 	pop::Mat2UI8 m;
 	m.load("/home/pl/workspace/Population/image/Vd-Orig.png");
 
@@ -828,8 +855,6 @@ void test_convolution(void) {
 
 	n = cpu ? convolution_cpu(m, kernel_identity, 1, 2) : convolution_gpu(m, kernel_identity, 1, 2);
 	n.save("/home/pl/workspace/Population/image/Vd-modified-sub.png");
-
-	//---------------------------------------------------------------
 #endif
 }
 

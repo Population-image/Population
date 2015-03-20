@@ -39,4 +39,13 @@ unsigned int popcuda::getMaxNumberThreadsPerBlock() {
     cudaGetDeviceProperties(&deviceProp, dev);
     return deviceProp.maxThreadsPerBlock;
 }
+
+unsigned int popcuda::getMaxSharedMemPerBlock() {
+	int dev = 0;
+    cudaSetDevice(dev);
+    cudaDeviceProp deviceProp;
+    cudaGetDeviceProperties(&deviceProp, dev);
+    return deviceProp.sharedMemPerBlock;
+}
+
 #endif
