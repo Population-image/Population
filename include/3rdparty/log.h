@@ -6,6 +6,7 @@
 #include <string>
 #include <typeinfo>
 #include <stdio.h>
+#include <ctime>
 
 //! redefinition de l'appel du nom de fonction car depend du type de compilateur
 #if defined (__FUNCSIG__)
@@ -196,51 +197,14 @@ class FILELOG_DECLSPEC FILELog : public Log<Output2FILE> {};
    FILE_LOG_GLUE(CHOOSER(N_ARGS(__VA_ARGS__)), \
                (__VA_ARGS__))
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
-#include <windows.h>
-
-inline std::string NowTime()
-{
-    const int MAX_LEN = 200;
-    char buffer[MAX_LEN];
-    if (GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0,
-            "HH':'mm':'ss", buffer, MAX_LEN) == 0)
-        return "Error in NowTime()";
-
-    char result[100] = {0};
-    static DWORD first = GetTickCount();
-    sprintf(result, "%s.%03ld", buffer, (long)(GetTickCount() - first) % 1000);
-    return result;
+inline std::string NowTime() {
+    time_t rawtime;
+    time(&rawtime);
+    struct tm * timeinfo = localtime(&rawtime);
+    std::string s = asctime(timeinfo);
+    s.erase(s.length()-1);
+    return s;
 }
-
-#else
-
-#include <sys/time.h>
-
-inline std::string NowTime()
-{
-    char buffer[11];
-    time_t t;
-    time(&t);
-    tm r ;
-    r.tm_sec = 0;
-        r.tm_min = 0;
-        r.tm_hour = 0;
-        r.tm_mon = 0;
-        r.tm_year = 0;
-        r.tm_wday = 0;
-        r.tm_yday = 0;
-        r.tm_isdst = 0;
-    strftime(buffer, sizeof(buffer), "%X", localtime_r(&t, &r));
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    char result[100] = {0};
-    sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000);
-    return result;
-}
-
-
-#endif //WIN32
 
 #endif //__LOG_H__
