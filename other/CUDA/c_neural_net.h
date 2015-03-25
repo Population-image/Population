@@ -8,21 +8,16 @@
 #include "data/typeF/TypeF.h"
 #include "data/neuralnetwork/NeuralNetwork.h"
 
-void test_neural_net_cpu(void);
-void test_neural_net_cpu_mnist(void);
+void test_neural_net_cpu(const int nb_epoch);
+void test_neural_net_cpu_mnist(const int nb_epoch);
+
+void loadDatabase(std::string directory, const int max_per_folder, pop::Vec<pop::VecF32> &v_neuron_in, pop::Vec<pop::VecF32> &v_neuron_out);
 
 #if defined(HAVE_CUDA)
-void test_neural_net_gpu(void);
-void test_neural_net_gpu_mnist(void);
-void test_neural_net_gpu_augmented_database(void);
-void bench_propagate_front_gpu_augmented_database(void);
-void test_cublas(void);
-#endif
-
-void printNetwork(struct neural_network* network);
-
-#if defined(HAVE_CUDA)
-static const int MAX_NB_THREADS = 1024; // GPU dependent
+void test_neural_net_gpu(const int nb_epoch);
+void test_neural_net_gpu_mnist(const int nb_epoch);
+void test_neural_net_gpu_augmented_database(const int max_files_per_folder, const int network_for_training, std::string database_training, std::string database_test, const int nb_epoch);
+void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder, std::string network_path, std::string database_training, std::string database_test, const int nb_epoch);
 #endif
 
 struct neural_network;
@@ -53,8 +48,8 @@ public:
 	void gpu_computeError(pop::F32* out_set, pop::F32* out_computed, unsigned int out_elt_size, unsigned int idx, int* error);
 	void gpu_displayNetwork();
 
-	void gpu_learn(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtraining_out, pop::Vec<pop::VecF32>& vtest_in, pop::Vec<pop::VecF32>& vtest_out, bool final_cpu_test);
-	void gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtest_in);
+	void gpu_learn(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtraining_out, pop::Vec<pop::VecF32>& vtest_in, pop::Vec<pop::VecF32>& vtest_out, bool final_cpu_test, const int nb_epoch);
+	void gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<pop::VecF32>& vtest_in, const int nb_epoch);
 #endif
 
 private:
