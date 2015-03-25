@@ -6,6 +6,6 @@
 using namespace pop;
 
 int main(){
-    //neuralnetwortest();
+    neuralnetwortest2();
     return 1;
 }

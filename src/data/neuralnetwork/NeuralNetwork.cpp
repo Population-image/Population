@@ -459,7 +459,6 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
 
         unsigned int height = (height_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
         unsigned int width  = (width_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
-
         NNLayerMatrixConvolutionalPlusSubScaling * layer = new NNLayerMatrixConvolutionalPlusSubScaling(nbr_map,height,width);
         layer->_size_convolutution = kernelsize;
         layer->_sub_scaling = sub_scale_sampling;

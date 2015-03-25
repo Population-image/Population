@@ -5,6 +5,559 @@
 using namespace pop;//Population namespace
 
 
+enum TypeLayer{
+    LAYER_INPUT,
+    LAYER_INPUT_MATRIX,
+    LAYER_FULLY_CONNECTED,
+    LAYER_CONVOLUTIONNAL
+};
+struct Layer
+{
+    F32 sigmoid(F32 x){ return 1.7159*tanh(0.66666667*x);}
+    F32 derived_sigmoid(F32 S){ return 0.666667f/1.7159f*(1.7159f+(S))*(1.7159f-(S));}  // derivative of the sigmoid as a function of the sigmoid's output
+
+    Vec<F32> _X;
+    Vec<F32> _Y;
+    Vec<F32> _W;
+
+    int _nbr_map;
+    int _sizei_map;
+    int _sizej_map;
+
+
+    int _nbr_kernel;
+    int _sizei_kernel;
+    int _sizej_kernel;
+    int _sub_resolution_factor;
+
+    Vec<F32> _d_E_X;
+    Vec<F32> _d_E_Y;
+    Vec<F32> _d_E_W;
+    TypeLayer _type;
+
+    void fullyConnected(const Layer & layer_previous){
+        const F32 * ptr_X_init= layer_previous._X.data();
+        const F32 * ptr_X_end = layer_previous._X.data()+layer_previous._X.size();
+        const F32 * ptr_X_incr;
+
+        const F32 * ptr_W_incr = this->_W.data();
+
+        F32 * ptr_Y_init= this->_Y.data();
+        F32 * ptr_Y_end = this->_Y.data()+this->_Y.size();
+        F32 * ptr_Y_incr;
+
+        for(ptr_Y_incr=ptr_Y_init;ptr_Y_incr!=ptr_Y_end;ptr_Y_incr++){
+            F32 sum =0;
+            ptr_X_incr = ptr_X_init;
+            for(ptr_X_incr=ptr_X_init;ptr_X_incr!=ptr_X_end;ptr_X_incr++,ptr_W_incr++){
+                sum+=(*ptr_X_incr)*(*ptr_W_incr);
+            }
+            *ptr_Y_incr=sum;
+        }
+    }
+
+
+    void convolutional_single_point(F32* Y,int index_i,int index_j,int index_map, const Layer & layer_previous){
+        int rayon_kernel=(_sizei_kernel-1)*0.5;
+        int index_i_previous = index_i*_sub_resolution_factor+ rayon_kernel;
+        int index_j_previous = index_j*_sub_resolution_factor+ rayon_kernel;
+
+        const F32 * ptr_X_previous_start = layer_previous._X.data() +   index_j_previous + index_i_previous*layer_previous._sizej_map;//start point on the previous layer
+        int X_sift    = rayon_kernel*(1+layer_previous._sizej_map);//start on the corner
+
+
+        int map_size    = layer_previous._sizei_map*layer_previous._sizej_map;
+
+        const F32 * ptr_W_incr = this->_W.data()+(_sizei_kernel*_sizej_kernel+1)*layer_previous._nbr_map*index_map ;//start weight
+
+        for(unsigned int index_map_previous =0;index_map_previous<layer_previous._nbr_map;index_map_previous++){
+            const F32 * ptr_X_previous = ptr_X_previous_start + map_size*index_map_previous-X_sift;
+            for(unsigned int index_i_W =0;index_i_W<this->_sizei_kernel;index_i_W++){
+                for(unsigned int index_j_W =0;index_j_W<this->_sizej_kernel;index_j_W++,ptr_X_previous++,ptr_W_incr++){
+                    *Y+=*ptr_X_previous * *ptr_W_incr;
+                }
+                ptr_X_previous+=(layer_previous._sizej_map-this->_sizej_kernel);
+            }
+            *Y+=*ptr_W_incr;//biais weight;
+            ptr_W_incr++;
+        }
+    }
+
+    void convolutional(const Layer & layer_previous){
+        F32 * ptr_Y_incr=this->_Y.data();
+        //iter on the output point for each map
+        //start for each map
+        for(unsigned int index_map =0;index_map<this->_nbr_map;index_map++){
+            for(unsigned int index_i =0;index_i<this->_sizei_map;index_i++){
+                for(unsigned int index_j =0;index_j<this->_sizej_map;index_j++,ptr_Y_incr++){
+                    *ptr_Y_incr=0;
+                    convolutional_single_point(ptr_Y_incr,index_i,index_j,index_map,layer_previous);
+                }
+            }
+
+        }
+    }
+    void error_W_Convolutional_single_point(const F32* d_E_Y,int index_i,int index_j,int index_map, const Layer & layer_previous){
+
+        int index_i_previous = index_i*_sub_resolution_factor+ (_sizei_kernel-1)*0.5;
+        int index_j_previous = index_j*_sub_resolution_factor+ (_sizej_kernel-1)*0.5;
+
+        const F32 * ptr_X_previous_start = layer_previous._X.data() +   index_j_previous + index_i_previous*layer_previous._sizej_map;//start point on the previous layer
+        int X_sift    = (_sizei_kernel-1)*0.5*(1+layer_previous._sizej_map);//start on the corner
+
+
+        int map_size    = layer_previous._sizei_map*layer_previous._sizej_map;
+
+        F32 * ptr_d_E_W_incr = this->_d_E_W.data()+(_sizei_kernel*_sizej_kernel+1)*layer_previous._nbr_map*index_map ;//start weight
+
+        for(unsigned int index_map_previous =0;index_map_previous<layer_previous._nbr_map;index_map_previous++){
+            const F32 * ptr_X_previous = ptr_X_previous_start + map_size*index_map_previous-X_sift;
+
+            for(unsigned int index_i_W =0;index_i_W<this->_sizei_kernel;index_i_W++){
+                for(unsigned int index_j_W =0;index_j_W<this->_sizej_kernel;index_j_W++,ptr_X_previous++,ptr_d_E_W_incr++){
+                    //difference line with convolutional_single_point
+                    *ptr_d_E_W_incr += *d_E_Y *   *ptr_X_previous ;
+                }
+                ptr_X_previous+=(layer_previous._sizej_map-this->_sizej_kernel);
+            }
+            //difference line with convolutional_single_point
+            *ptr_d_E_W_incr += *d_E_Y  ;
+            ptr_d_E_W_incr++;
+
+        }
+    }
+
+    void error_X_Convolutional_single_point(const F32* d_E_Y,int index_i,int index_j,int index_map,  Layer & layer_previous){
+
+        int index_i_previous = index_i*_sub_resolution_factor+ (_sizei_kernel-1)*0.5;
+        int index_j_previous = index_j*_sub_resolution_factor+ (_sizej_kernel-1)*0.5;
+
+        F32 * ptr_d_E_X_previous_start = layer_previous._d_E_X.data() +   index_j_previous + index_i_previous*layer_previous._sizej_map;//start point on the previous layer
+        int X_sift    = (_sizei_kernel-1)*0.5*(1+layer_previous._sizej_map);//start on the corner
+
+
+        int map_size    = layer_previous._sizei_map*layer_previous._sizej_map;
+
+        const F32 * ptr_W_incr = this->_W.data()+(_sizei_kernel*_sizej_kernel+1)*layer_previous._nbr_map*index_map ;//start weight
+
+        for(unsigned int index_map_previous =0;index_map_previous<layer_previous._nbr_map;index_map_previous++){
+            F32 * ptr_d_E_X_previous = ptr_d_E_X_previous_start + map_size*index_map_previous-X_sift;
+
+            for(unsigned int index_i_W =0;index_i_W<this->_sizei_kernel;index_i_W++){
+                for(unsigned int index_j_W =0;index_j_W<this->_sizej_kernel;index_j_W++,ptr_d_E_X_previous++,ptr_W_incr++){
+                    //difference line with convolutional_single_point
+                    *ptr_d_E_X_previous += *d_E_Y *  * ptr_W_incr   ;
+                }
+                ptr_d_E_X_previous+=(layer_previous._sizej_map-this->_sizej_kernel);
+            }
+            //difference line with convolutional_single_point
+            ptr_W_incr++;
+
+        }
+    }
+
+
+    void error_W_Convolutional(const Layer & layer_previous){
+
+        //difference line with convolutional
+        for(unsigned int i=0;i<this->_d_E_W.size();i++){
+            this->_d_E_W[i]=0;
+        }
+        //difference line with convolutional
+        F32 * ptr_d_E_Y_incr=this->_d_E_Y.data();
+        //iter on the output point for each map
+        //start for each map
+        for(unsigned int index_map =0;index_map<this->_nbr_map;index_map++){
+            for(unsigned int index_i =0;index_i<this->_sizei_map;index_i++){
+                for(unsigned int index_j =0;index_j<this->_sizej_map;index_j++,ptr_d_E_Y_incr++){
+                    //difference line with convolutional
+                    error_W_Convolutional_single_point(ptr_d_E_Y_incr,index_i,index_j,index_map,layer_previous);
+                }
+            }
+        }
+    }
+    void error_X_Convolutional(Layer & layer_previous){
+
+        //difference line with convolutional
+        for(unsigned int i=0;i<layer_previous._d_E_X.size();i++){
+            layer_previous._d_E_X[i]=0;
+        }
+        //difference line with convolutional
+        F32 * ptr_d_E_Y_incr=this->_d_E_Y.data();
+        //iter on the output point for each map
+        //start for each map
+        for(unsigned int index_map =0;index_map<this->_nbr_map;index_map++){
+            for(unsigned int index_i =0;index_i<this->_sizei_map;index_i++){
+                for(unsigned int index_j =0;index_j<this->_sizej_map;index_j++,ptr_d_E_Y_incr++){
+                    //difference line with convolutional
+                    error_X_Convolutional_single_point(ptr_d_E_Y_incr,index_i,index_j,index_map,layer_previous);
+                }
+            }
+        }
+    }
+
+    void f(){
+        const F32 * ptr_Y_init= this->_Y.data();
+        const F32 * ptr_Y_end = this->_Y.data()+this->_Y.size();
+        const F32 * ptr_Y_incr;
+        F32 * ptr_X_incr      = this->_X.data();
+        for(ptr_Y_incr=ptr_Y_init;ptr_Y_incr!=ptr_Y_end;ptr_Y_incr++,ptr_X_incr++){
+            *ptr_X_incr = sigmoid(*ptr_Y_incr);
+        }
+    }
+
+    void error_f(){
+        F32 * ptr_d_E_Y_init= this->_d_E_Y.data();
+        F32 * ptr_d_E_Y_end = this->_d_E_Y.data()+this->_d_E_Y.size();
+        F32 * ptr_d_E_Y_incr;
+        const F32 * ptr_d_E_X_incr      = this->_d_E_X.data();
+        const F32 * ptr_X_incr      = this->_X.data();
+        for(ptr_d_E_Y_incr=ptr_d_E_Y_init;ptr_d_E_Y_incr!=ptr_d_E_Y_end;ptr_d_E_Y_incr++,ptr_d_E_X_incr++,ptr_X_incr++){
+            *ptr_d_E_Y_incr = *ptr_d_E_X_incr* derived_sigmoid(*ptr_X_incr);
+        }
+    }
+    void error_W_Fully_Connected(const Layer & layer_previous){
+        const F32 * ptr_X_init= layer_previous._X.data();
+        const F32 * ptr_X_end = layer_previous._X.data()+layer_previous._X.size();
+        const F32 * ptr_X_incr;
+
+        F32 * ptr_W_incr = this->_W.data();
+        F32 * ptr_d_E_W_incr = this->_d_E_W.data();
+
+        const F32 * ptr_d_E_Y_init= this->_d_E_Y.data();
+        const F32 * ptr_d_E_Y_end = this->_d_E_Y.data()+this->_d_E_Y.size();
+        const F32 * ptr_d_E_Y_incr;
+
+        for(ptr_d_E_Y_incr=ptr_d_E_Y_init;ptr_d_E_Y_incr!=ptr_d_E_Y_end;ptr_d_E_Y_incr++){
+            ptr_X_incr = ptr_X_init;
+            for(ptr_X_incr=ptr_X_init;ptr_X_incr!=ptr_X_end;ptr_X_incr++,ptr_W_incr++,ptr_d_E_W_incr++){
+                *ptr_d_E_W_incr  = (*ptr_d_E_Y_incr)*(*ptr_X_incr);
+            }
+        }
+    }
+
+
+
+    void error_X_Fully_Connected( Layer & layer_previous){
+        F32 * ptr_d_E_X_init= layer_previous._d_E_X.data();
+        F32 * ptr_d_E_X_end = layer_previous._d_E_X.data()+layer_previous._d_E_X.size()-1;//the last one is the biais
+        F32 * ptr_d_E_X_incr;
+
+        const F32 * ptr_W_incr = this->_W.data();
+        const F32 * ptr_W_incr_j = this->_W.data();
+        int size_j = this->_sizej_kernel;
+
+        const F32 * ptr_d_E_Y_init= this->_d_E_Y.data();
+        const F32 * ptr_d_E_Y_end = this->_d_E_Y.data()+this->_d_E_Y.size();
+        const F32 * ptr_d_E_Y_incr;
+
+        for(ptr_d_E_X_incr=ptr_d_E_X_init;ptr_d_E_X_incr!=ptr_d_E_X_end;ptr_d_E_X_incr++,ptr_W_incr_j++){
+            *ptr_d_E_X_incr=0;
+            ptr_W_incr=ptr_W_incr_j;
+            for(ptr_d_E_Y_incr=ptr_d_E_Y_init;ptr_d_E_Y_incr!=ptr_d_E_Y_end;ptr_d_E_Y_incr++,ptr_W_incr+=size_j){
+                *ptr_d_E_X_incr+=(*ptr_d_E_Y_incr)*(*ptr_W_incr);
+            }
+        }
+    }
+
+};
+
+
+class NeuralNetworkFullyConnected2
+{
+public:
+    Vec<Layer> _v_layer;
+    F32 _eta;
+
+    void setEta(F32 eta){
+        for(unsigned int i = 0;i<_v_layer.size();i++){
+            _eta=eta;
+        }
+    }
+    void addInputNeuron(int size_neuron){
+        Layer layer;
+        layer._type = LAYER_INPUT;
+        layer._X.resize(size_neuron+1,1);//add the neuron with constant value 1
+        layer._d_E_X.resize(size_neuron+1);//add the neuron with constant value 1
+        _v_layer.push_back(layer);
+    }
+
+    void addInputNeuronMatrix(Vec2I32 size, int nbr_map=1){
+        int size_neuron = size.multCoordinate()*nbr_map;
+        Layer layer;
+        layer._type = LAYER_INPUT_MATRIX;
+        layer._X.resize(size_neuron+1,1);//add the neuron with constant value 1
+        layer._d_E_X.resize(size_neuron+1);//add the neuron with constant value 1
+        layer._nbr_map =nbr_map;
+        layer._sizei_map = size(0);
+        layer._sizej_map = size(1);
+        _v_layer.push_back(layer);
+    }
+
+    void addConvolutionnal(int radius_kernel=1, int nbr_map=1, int sub_resolution_factor=2){
+        Layer layer;
+
+        int sizei_map_previous = this->_v_layer.rbegin()->_sizei_map;
+        int sizej_map_previous = this->_v_layer.rbegin()->_sizej_map;
+
+        layer._sizei_map =std::floor (  (sizei_map_previous-1-2*radius_kernel)/(1.*sub_resolution_factor))+1;
+        layer._sizej_map =std::floor (  (sizej_map_previous-1-2*radius_kernel)/(1.*sub_resolution_factor))+1;
+        layer._sub_resolution_factor = sub_resolution_factor;
+        std::cout<<layer._sizei_map <<std::endl;
+        std::cout<<layer._sizej_map<<std::endl;
+        layer._nbr_map   = nbr_map;
+
+        int size_neuron = layer._sizei_map*layer._sizej_map*layer._nbr_map;
+
+        layer._type = LAYER_CONVOLUTIONNAL;
+        layer._X.resize(size_neuron+1,1);//add the neuron with constant value 1
+        layer._d_E_X.resize(size_neuron+1);//add the neuron with constant value 1
+
+        layer._Y.resize(size_neuron);
+        layer._d_E_Y.resize(size_neuron);
+
+
+        layer._nbr_kernel    =nbr_map*this->_v_layer.rbegin()->_nbr_map;
+        layer._sizei_kernel = radius_kernel*2+1;
+        layer._sizej_kernel = radius_kernel*2+1;
+
+        int nbr_weigh = layer._nbr_kernel*(layer._sizei_kernel*layer._sizej_kernel+1);//kernel size :  weight= layer._radius_kernel*2, heigh= layer._radius_kernel*2, and one biais
+
+        layer._W.resize(nbr_weigh);
+        layer._d_E_W.resize(nbr_weigh);
+        int erase=0;
+        DistributionNormal n(0,1./std::sqrt(layer._sizei_kernel*layer._sizej_kernel));
+        for(unsigned int i = 0;i<layer._W.size();i++){
+            layer._W[i]=n.randomVariable();
+            //layer._W[i]=erase;
+            //erase++;
+        }
+        _v_layer.push_back(layer);
+    }
+
+
+    void addFullyConnected(int size_neuron){
+        Layer layer;
+        layer._type = LAYER_FULLY_CONNECTED;
+        layer._X.resize(size_neuron+1,1);//add the neuron with constant value 1
+        layer._d_E_X.resize(size_neuron+1);//add the neuron with constant value 1
+        layer._Y.resize(size_neuron);
+        layer._d_E_Y.resize(size_neuron);
+
+        layer._nbr_map=0;
+        layer._nbr_kernel=1;
+        layer._sizej_kernel = _v_layer(_v_layer.size()-1)._X.size();
+        layer._sizei_kernel = size_neuron;
+        layer._W.resize(layer._sizei_kernel*layer._sizej_kernel);
+        layer._d_E_W.resize(layer._sizei_kernel*layer._sizej_kernel);
+        DistributionNormal n(0,1./std::sqrt(layer._sizej_kernel));
+        for(unsigned int i = 0;i<layer._W.size();i++){
+            layer._W[i]=n.randomVariable();
+        }
+        _v_layer.push_back(layer);
+    }
+
+    void propagateFront(int index_layer){
+        Layer & layer_previous= _v_layer[index_layer-1];
+        Layer & layer         = _v_layer[index_layer];
+        if(layer._type==LAYER_FULLY_CONNECTED){
+            layer.fullyConnected(layer_previous);
+        }else if(layer._type==LAYER_CONVOLUTIONNAL){
+            layer.convolutional(layer_previous);
+        }
+        layer.f();
+    }
+    void propagateFront(const pop::Vec<Mat2F32> & v_map , pop::VecF32 &out){
+        for(unsigned int index_map=0;index_map<v_map.size();index_map++){
+            int sift_map = index_map*v_map(0).size();
+            std::copy(v_map(index_map).begin(),v_map(index_map).end(),_v_layer(0)._X.begin()+sift_map);
+        }
+        for(unsigned int layer_index=1;layer_index<_v_layer.size();layer_index++){
+            propagateFront(layer_index);
+            std::cout<<_v_layer(layer_index)._X<<std::endl;
+        }
+        std::copy(_v_layer.rbegin()->_X.begin(),_v_layer.rbegin()->_X.begin()+out.size(),out.begin());
+    }
+
+
+    void propagateFront(const pop::VecF32& in , pop::VecF32 &out){
+        std::copy(in.begin(),in.end(),_v_layer(0)._X.begin());
+        for(unsigned int layer_index=1;layer_index<_v_layer.size();layer_index++){
+            propagateFront(layer_index);
+        }
+        std::copy(_v_layer.rbegin()->_X.begin(),_v_layer.rbegin()->_X.begin()+out.size(),out.begin());
+    }
+    void propagateBackFirstDerivate(int index_layer){
+        Layer & layer_previous= _v_layer[index_layer-1];
+        Layer & layer         = _v_layer[index_layer];
+        layer.error_f();
+        if(layer._type==LAYER_FULLY_CONNECTED){
+            layer.error_X_Fully_Connected(layer_previous);
+            layer.error_W_Fully_Connected(layer_previous);
+
+        }else if(layer._type==LAYER_CONVOLUTIONNAL){
+            layer.error_X_Convolutional(layer_previous);
+            layer.error_W_Convolutional(layer_previous);
+
+        }
+    }
+
+    void propagateBackFirstDerivate(const pop::VecF32& desired_output){
+
+
+        //first output layer
+        Layer & layer_out = _v_layer[_v_layer.size()-1];
+        for(unsigned int j=0;j<desired_output.size();j++){
+            layer_out._d_E_X(j) = ( layer_out._X(j)-desired_output[j]);
+        }
+
+        for( int index_layer=_v_layer.size()-1;index_layer>0;index_layer--){
+            propagateBackFirstDerivate(index_layer);
+        }
+
+    }
+    void learningFirstDerivate(){
+        for( int index_layer=1;index_layer<_v_layer.size();index_layer++){
+            for(unsigned int indew_weight =0;indew_weight<_v_layer(index_layer)._W.size();indew_weight++)
+                _v_layer(index_layer)._W(indew_weight) = _v_layer(index_layer)._W(indew_weight) - _eta*_v_layer(index_layer)._d_E_W(indew_weight);
+        }
+    }
+};
+
+
+void neuralnetwortest2(){
+    int size_input_matrix = 7;
+    int nbr_map=1;
+    NeuralNetworkFeedForward neural;
+    neural.addInputLayerMatrix(size_input_matrix,size_input_matrix);
+    neural.addLayerConvolutionalPlusSubScaling(nbr_map,3,2);
+    neural.addLayerConvolutionalPlusSubScaling(nbr_map,3,2);
+    neural.addLayerFullyConnected(1);
+    neural.setLearningRate(0.01);
+
+    NeuralNetworkFullyConnected2 test;
+    test.addInputNeuronMatrix(Vec3I32(size_input_matrix,size_input_matrix),1);
+    test.addConvolutionnal(1,nbr_map,2);
+    test.addConvolutionnal(1,nbr_map,2);
+    test.addFullyConnected(1);
+    test.setEta(0.01);
+
+    for(unsigned int i=1;i<=3;i++){
+        NNLayer* layer_neural = neural.layers()(i);
+        std::cout<<layer_neural->_weights.size()<<std::endl;
+        std::cout<<test._v_layer(i)._W.size()<<std::endl;
+        for(unsigned int index_weight=0;index_weight<layer_neural->_weights.size();index_weight++){
+            if(index_weight==0){
+                test._v_layer(i)._W(layer_neural->_weights.size()-1)=layer_neural->_weights(index_weight)->_Wn;
+            }else{
+                test._v_layer(i)._W(index_weight-1)=layer_neural->_weights(index_weight)->_Wn;
+            }
+
+        }
+
+    }
+
+    Mat2F32 m1(size_input_matrix,size_input_matrix);
+
+    DistributionNormal d(0,1);
+    for(unsigned int i=0;i<m1.size();i++){
+        m1(i)=d.randomVariable();
+    }
+    //std::cout<<m1<<std::endl;
+    Mat2F32 m2(size_input_matrix,size_input_matrix);
+    for(unsigned int i=0;i<m2.size();i++){
+        m2(i)=d.randomVariable();
+    }
+
+    Vec<Mat2F32> v_m(1);
+    v_m(0) = m1;
+    Vec<F32> v_in(size_input_matrix*size_input_matrix);
+    for(unsigned int index_map=0;index_map<v_m.size();index_map++){
+        int sift_map = index_map*v_m(0).size();
+        std::copy(v_m(index_map).begin(),v_m(index_map).end(),v_in.begin()+sift_map);
+    }
+    //    v_m(1) = m2;
+    while(1==1){
+
+
+        VecF32 v_out(1);
+        test.propagateFront(v_in,v_out);
+        VecF32 v_out_temp=v_out;
+        neural.propagateFront(v_in,v_out);
+        std::cout<<"propagate front "<<v_out_temp(0)<<std::endl;
+        std::cout<<"propagate front "<<v_out(0)<<std::endl;
+
+
+
+
+
+        //exit(0);
+        v_out(0)=-1;
+        test.propagateBackFirstDerivate(v_out);
+        test.learningFirstDerivate();
+        v_out(0)=-1;
+        neural.propagateBackFirstDerivate(v_out);
+        neural.learningFirstDerivate();
+        test.propagateFront(v_in,v_out);
+        v_out_temp=v_out;
+        neural.propagateFront(v_in,v_out);
+        std::cout<<"propagate front "<<v_out_temp(0)<<std::endl;
+        std::cout<<"propagate front "<<v_out(0)<<std::endl;
+
+
+//        std::cout<<"error"<<std::endl;
+//        for( int layer=2;layer>=0;layer--){
+//            std::cout<<"layer "<<layer<<std::endl;
+//            //            for(unsigned int i=0;i<neural.layers()(layer)->_neurons.size();i++)
+//            //                std::cout<<(neural.layers()(layer)->_neurons(i)->_dErr_dXn)<<" ";
+//            //            std::cout<<std::endl;
+//            //            std::cout<<test._v_layer(layer)._d_E_X<<std::endl;
+
+//            for(unsigned int i=0;i<neural.layers()(layer)->_weights.size();i++)
+//                std::cout<<(neural.layers()(layer)->_weights(i)->_dE_dWn)<<" ";
+//            std::cout<<std::endl;
+//            std::cout<<test._v_layer(layer)._d_E_W<<std::endl;
+
+//        }
+//        exit(0);
+
+        //        for(unsigned int i=0;i<neural.layers()(1)->_neurons.size();i++)
+        //            std::cout<<(neural.layers()(1)->_neurons(i)->_dErr_dXn)<<" ";
+        //        std::cout<<std::endl;
+        //        std::cout<<test._v_layer(1)._d_E_X<<std::endl;
+        //        exit(0);
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class NeuralNetworkFullyConnected
 {
 public:
@@ -18,7 +571,7 @@ public:
         for(unsigned int i=0;i<v_layer.size();i++){
             int size_layer =v_layer[i];
             if(i!=v_layer.size()-1)
-//               _X.push_back(VecF32(size_layer,1));//no add the neuro
+                //               _X.push_back(VecF32(size_layer,1));//no add the neuro
                 _X.push_back(VecF32(size_layer+1,1));//add the neuron with constant value 1
             else
                 _X.push_back(VecF32(size_layer,1));//except for the last one
@@ -154,6 +707,81 @@ public:
 
 
 void neuralnetwortest(){
+    {
+        NeuralNetworkFullyConnected2 test;
+        test.addInputNeuronMatrix(Vec3I32(4,4),2);
+        test.addConvolutionnal(3,2,1);
+        test.addFullyConnected(1);
+
+        Vec<int> v_in(4*4);
+
+    }
+    {
+        F32 eta = 0.1;
+        int size =3;
+        NeuralNetworkFullyConnected test;
+        test._eta =eta;
+        Vec<int> v_layer(size);
+        //    v(0)=2;v(1)=1;
+        v_layer(0)=2;v_layer(1)=3;v_layer(2)=1;
+        test.createNetwork(v_layer);
+
+        NeuralNetworkFullyConnected2 test2;
+        test2.addInputNeuron(2);
+        test2.addFullyConnected(3);
+        test2.addFullyConnected(1);
+        test2.setEta(eta);
+
+        for(unsigned int i=1;i<size;i++){
+            for(unsigned int j=0;j<test2._v_layer(i)._W.size();j++){
+                test2._v_layer(i)._W(j) = test._W(i-1)(j);
+            }
+        }
+
+
+
+        Vec<VecF32> v(4,VecF32(2));
+        v(0)(0)=-1;v(0)(1)=-1;
+        v(1)(0)= 1;v(1)(1)=-1;
+        v(2)(0)=-1;v(2)(1)= 1;
+        v(3)(0)= 1;v(3)(1)= 1;
+
+        Vec<VecF32> vout(4,VecF32(1));
+        vout(0)(0)=-1;
+        vout(1)(0)= 1;
+        vout(2)(0)= 1;
+        vout(3)(0)=-1;
+
+        Vec<int> v_global_rand(4);
+        for(unsigned int i=0;i<v_global_rand.size();i++)
+            v_global_rand[i]=i;
+
+
+        while(1==1){
+            std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+            for(unsigned int K=0;K<v_global_rand.size();K++)
+            {
+                int i = v_global_rand[K];
+                VecF32 out;
+                std::cout<<i<<std::endl;
+                test.propagateFront(v(i),out);
+                std::cout<<out<<std::endl;
+                test2.propagateFront(v(i),out);
+                std::cout<<out<<std::endl;
+
+
+                test.propagateBackFirstDerivate(vout(i));
+                test2.propagateBackFirstDerivate(vout(i));
+                test.propagateFront(v(i),out);
+                std::cout<<out<<std::endl;
+                test2.propagateFront(v(i),out);
+                std::cout<<out<<std::endl;
+
+
+            }
+        }
+        return;
+    }
     //        {
     //            NeuralNetworkFeedForward n2;
     //            n2.addInputLayer(2);
@@ -162,66 +790,25 @@ void neuralnetwortest(){
 
     //            NeuralNetworkFullConnection3 neural;
 
-    //            std::vector<unsigned int>  v_int;
-    //            v_int.push_back(2);//
-    //            v_int.push_back(3);
-    //            v_int.push_back(1);
-    //            neural.createNetwork(v_int);
 
-    //            Vec<VecF32> v(4,VecF32(2));
-    //            v(0)(0)=-1;v(0)(1)=-1;
-    //            v(1)(0)= 1;v(1)(1)=-1;
-    //            v(2)(0)=-1;v(2)(1)= 1;
-    //            v(3)(0)= 1;v(3)(1)= 1;
-
-    //            Vec<VecF32> vout(4,VecF32(1));
-    //            vout(0)(0)=-1;
-    //            vout(1)(0)= 1;
-    //            vout(2)(0)= 1;
-    //            vout(3)(0)=-1;
     //            neural._eta=0.001;
 
 
-    //            std::vector<int> v_global_rand(4);
-    //            for(unsigned int i=0;i<v_global_rand.size();i++)
-    //                v_global_rand[i]=i;
-
-    //            while(1==1){
-    //                std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
-    //                for(unsigned int K=0;K<v_global_rand.size();K++)
-    //                {
-    //                    int i = v_global_rand[K];
-    //                    VecF32 out;
-    //                    std::cout<<i<<std::endl;
-    //                    neural.propagateFront(v(i),out);
-    //                    //std::cout<<out<<std::endl;
-
-    //                    neural.propagateBackFirstDerivate(v(i),vout(i));
-    //                    neural.propagateFront(v(i),out);
-    //                    std::cout<<out<<std::endl;
 
 
-    //                    n2.propagateFront(v(i),out);
-    //                    n2.propagateBackFirstDerivate(vout(i));
-    //                    n2.learningFirstDerivate();
-    //                    n2.propagateFront(v(i),out);
-    //                    std::cout<<out<<std::endl;
-    //                }
-    //            }
-    //            return;
-    //        }
+
     NeuralNetworkFullyConnected network;
 
 
     Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST( "/home/vincent/Desktop/train-images.idx3-ubyte","/home/vincent/Desktop/train-labels.idx1-ubyte");
     Vec<Vec<Mat2UI8> > number_test =  TrainingNeuralNetwork::loadMNIST("/home/vincent/Desktop/t10k-images.idx3-ubyte","/home/vincent/Desktop/t10k-labels.idx1-ubyte");
 
-//    number_training.resize(10);
-//    number_test.resize(10);
-//    for(unsigned int i=0;i<number_training.size();i++){
-//        number_training(i).resize(1000);
-//        number_test(i).resize(50);
-//    }
+    //    number_training.resize(10);
+    //    number_test.resize(10);
+    //    for(unsigned int i=0;i<number_training.size();i++){
+    //        number_training(i).resize(1000);
+    //        number_test(i).resize(50);
+    //    }
 
 
 

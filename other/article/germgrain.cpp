@@ -150,7 +150,7 @@ void testAnnealing(){
         random.save("annealing.pgm");
         Scene3d scene;
         Visualization::marchingCubeSmooth(scene,random);
-        Visualization::lineCube(scene,phasefield);
+        Visualization::lineCube(scene,random);
         scene.display();
     }
 }
@@ -185,7 +185,12 @@ void testGaussianField(){
 }
 int main()
 {
+    {
+        Mat3UI8 random;
+        random.load("annealing_save.pgm");
+        Visualization::labelToRandomRGB(random).display();
 
+    }
 //    Mat2UI8 m(8,8);
 //    m=0;
 //    m(4,4)=1;m(5,5)=1;

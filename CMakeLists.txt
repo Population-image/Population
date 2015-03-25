@@ -9,7 +9,7 @@ set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
@@ -31,7 +31,7 @@ POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" ON )
-POP_OPTION(BUILD_EXPORT      "export library" OFF )
+POP_OPTION(BUILD_EXPORT      "export library" ON )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
