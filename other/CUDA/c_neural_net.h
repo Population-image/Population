@@ -20,12 +20,29 @@ void test_neural_net_gpu_augmented_database(const int max_files_per_folder, cons
 void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder, std::string network_path, std::string database_training, std::string database_test, const int nb_epoch);
 #endif
 
+enum TypeLayer {
+    LAYER_INPUT,
+    LAYER_INPUT_MATRIX,
+    LAYER_FULLY_CONNECTED,
+    LAYER_CONVOLUTIONNAL
+};
+
+// used to create a neural network
+struct layer_representation {
+	TypeLayer type;
+	int nb_neurons;    			// for fully connected and input
+	pop::Vec2I32 size; 			// for input matrix
+	int nbr_map;				// for input matrix and convolutional
+	int radius_kernel;			// for convolutional
+	int sub_resolution_factor;	// for convolutional
+};
+
 struct neural_network;
 
 class GPUNeuralNetwork {
 public:
 	GPUNeuralNetwork();
-	GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta);
+	GPUNeuralNetwork(std::vector<struct layer_representation> v_layer, double eta);
 	~GPUNeuralNetwork();
 
 	void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
@@ -53,7 +70,7 @@ public:
 #endif
 
 private:
-	void createNetwork(std::vector<unsigned int> v_layer, double eta);
+	void createNetwork(std::vector<struct layer_representation> v_layer, double eta);
 	void deleteNetwork();
 
 	static void printNeuronsVector(pop::F32* V, unsigned int size, std::string label);

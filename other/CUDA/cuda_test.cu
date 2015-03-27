@@ -803,7 +803,7 @@ void test_convolution(void) {
 	uint64_t start_time, stop_time, diff_time;
 	init_clock_mhz();
 
-#if 1
+#if 0
 	pop::Mat2F32 m(30, 30);
 	for (int i=0; i<30; i++) {
 		for (int j=0; j<30; j++) {
@@ -844,8 +844,50 @@ void test_convolution(void) {
 #endif
 
 #if 0
+	pop::Mat2UI8 m8int;
+	m8int.load("/home/pl/workspace/Population/image/Vd-Orig.png");
+	pop::Mat2F32 m(m8int);
+
+	pop::Mat2F32 kernel(3, 3);
+	for (int i=0; i<3; i++) {
+		for (int j=0; j<3; j++) {
+			kernel(i, j) = (i==1 && j==1 ? 8 : -1);
+		}
+	}
+
+	rdtsc(start_time);
+	pop::Mat2F32 out_cpu = convolution_cpu(m, kernel, 1, 1);
+	rdtsc(stop_time);
+	diff_time = diffTime(stop_time, start_time)/1000.0;
+	std::cout << "\t--> CPU convolution: " << diff_time << "ms <--\n" << std::endl;
+
+	rdtsc(start_time);
+	pop::Mat2F32 out_gpu = convolution_gpu(m, kernel, 1, 1);
+	rdtsc(stop_time);
+	diff_time = diffTime(stop_time, start_time)/1000.0;
+	std::cout << "\t--> GPU convolution: " << diff_time << "ms <--\n" << std::endl;
+
+	if (out_cpu != out_gpu) {
+		std::cerr << "Erreur de calcul !" << std::endl;
+		/*
+		for (int i=0; i<out_cpu.sizeI(); i++) {
+			for (int j=0; j<out_cpu.sizeJ(); j++) {
+				if (out_cpu(i, j) != out_gpu(i, j)) {
+					std::cerr << "(" << i << ", " << j << "): " << static_cast<int>(out_cpu(i, j)) << " != " << static_cast<int>(out_gpu(i, j)) << std::endl;
+				}
+			}
+		}
+		*/
+	} else {
+		std::cout << "Calcul correct !" << std::endl;
+	}
+
+	pop::Mat2UI8 outui8(out_gpu);
+	outui8.save("/home/pl/workspace/Population/image/Vd-convolution.jpg");
+#endif
+
+#if 1
 	pop::Mat2UI8 m;
-	//m.load("/home/pl/workspace/Population/image/Vd-Orig.png");
 	m.load("/home/pl/workspace/Population/image/NYC.jpg");
 
 	pop::Mat2UI8 kernel_identity(3, 3);
@@ -869,7 +911,6 @@ void test_convolution(void) {
 
 	if (out_cpu != out_gpu) {
 		std::cerr << "Erreur de calcul !" << std::endl;
-		/*
 		for (int i=0; i<out_cpu.sizeI(); i++) {
 			for (int j=0; j<out_cpu.sizeJ(); j++) {
 				if (out_cpu(i, j) != out_gpu(i, j)) {
@@ -877,7 +918,6 @@ void test_convolution(void) {
 				}
 			}
 		}
-		*/
 	} else {
 		std::cout << "Calcul correct !" << std::endl;
 	}

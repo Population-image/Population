@@ -22,6 +22,8 @@
 #define BATCH_LOADING
 
 struct layer {
+	TypeLayer _type;
+
 	unsigned int _X_size; // size of _X and _d_E_X
 	unsigned int _Y_size; // size of _Y and _d_E_Y
 	unsigned int _W_width; // width of _W and _d_E_W
@@ -32,6 +34,15 @@ struct layer {
 	pop::F32* _d_E_X;
 	pop::F32* _d_E_Y;
 	pop::F32* _d_E_W;
+
+	// convolution and input matrix only
+	unsigned int _nbr_map;
+	unsigned int _sizei_map;
+	unsigned int _sizej_map;
+	unsigned int _nbr_kernel;
+	unsigned int _sizei_kernel;
+	unsigned int _sizej_kernel;
+	unsigned int _sub_resolution_factor;
 };
 
 struct neural_network {
@@ -41,6 +52,21 @@ struct neural_network {
 };
 
 const float GPU_MEMORY_PRESSURE = .95; // we use at most GPU_MEMORY_PRESSURE percent of the total gpu memory for the datasets
+
+static std::string typeLayer2String(TypeLayer t) {
+	switch (t) {
+	case LAYER_INPUT:
+		return "input";
+	case LAYER_INPUT_MATRIX:
+		return "input matrix";
+	case LAYER_FULLY_CONNECTED:
+		return "fully connected";
+	case LAYER_CONVOLUTIONNAL:
+		return "convolutional";
+	default:
+		return "unknown type";
+	}
+}
 
 static std::string getCurrentTime() {
 	time_t rawtime;
@@ -58,7 +84,7 @@ GPUNeuralNetwork::GPUNeuralNetwork() {
 #endif
 }
 
-GPUNeuralNetwork::GPUNeuralNetwork(std::vector<unsigned int> v_layer, double eta) {
+GPUNeuralNetwork::GPUNeuralNetwork(std::vector<struct layer_representation> v_layer, double eta) {
 	createNetwork(v_layer, eta);
 #if defined(HAVE_CUDA)
 	copyNetworkToGPU();
@@ -72,8 +98,7 @@ GPUNeuralNetwork::~GPUNeuralNetwork() {
 #endif
 }
 
-
-void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double eta) {
+void GPUNeuralNetwork::createNetwork(std::vector<struct layer_representation> v_layer, double eta) {
 	h_network = new struct neural_network;
 
 	h_network->_nb_layers = v_layer.size();
@@ -81,8 +106,29 @@ void GPUNeuralNetwork::createNetwork(std::vector<unsigned int> v_layer, double e
 	h_network->_eta = eta;
 
 	for(unsigned int i=0;i<v_layer.size();i++){
-		int size_layer = v_layer[i];
 		struct layer& l = h_network->_layers[i];
+
+		//TODO: create layers
+		switch (v_layer[i].type) {
+		case LAYER_INPUT:
+			//TODO
+			break;
+		case LAYER_INPUT_MATRIX:
+			//TODO
+			break;
+		case LAYER_FULLY_CONNECTED:
+			//TODO
+			break;
+		case LAYER_CONVOLUTIONNAL:
+			//TODO
+			break;
+		default:
+			std::cerr << "Layer type unknown: " << v_layer[i].type << std::endl;
+			break;
+		}
+
+		l._type = v_layer[i].type;
+		int size_layer = v_layer[i].nb_neurons; //XXX
 
 		if(i != v_layer.size()-1) {
 			// add a bias neuron with constant value 1
@@ -186,13 +232,20 @@ void GPUNeuralNetwork::displayNetwork() {
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
 
-		std::cout << "\n-- Layer " << l << ", _X_size = " << layer._X_size << ", Y_size = " << layer._Y_size << ", _W_height = " << layer._W_height << ", _W_width = " << layer._W_width << std::endl;
+		std::cout << "\n-- Layer " << l << ", type = " << typeLayer2String(layer._type) << ", _X_size = " << layer._X_size << ", Y_size = " << layer._Y_size << ", _W_height = " << layer._W_height << ", _W_width = " << layer._W_width << std::endl;
+		if (layer._type == LAYER_CONVOLUTIONNAL || layer._type == LAYER_INPUT_MATRIX) {
+			std::cout << "\tnbr_map = " << layer._nbr_map << ", sizei_map = " << layer._sizei_map << ", sizej_map = " << layer._sizej_map << std::endl;
+			std::cout << "\t_sub_resolution_factor = " << layer._sub_resolution_factor << ", nbr_map = " << layer._nbr_kernel << ", sizei_kernel = " << layer._sizei_kernel << ", sizej_kernel = " << layer._sizej_kernel << std::endl;
+		}
+
+		/*
 		printNeuronsVector(layer._X, layer._X_size, "_X");
 		printNeuronsVector(layer._Y, layer._Y_size, "_Y");
 		printWeightMatrix(layer._W, layer._W_height, layer._W_width, "_W");
 		printNeuronsVector(layer._d_E_X, layer._X_size, "_d_E_X");
 		printNeuronsVector(layer._d_E_Y, layer._Y_size, "_d_E_Y");
 		printWeightMatrix(layer._d_E_W, layer._W_height, layer._W_width, "_d_E_W");
+		*/
 	}
 }
 
@@ -205,6 +258,14 @@ void GPUNeuralNetwork::save(std::string filename) {
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
 		out.write((char*)&l,sizeof(l));
+		out.write((char*)&layer._type,sizeof(layer._type));
+		out.write((char*)&layer._nbr_map,sizeof(layer._nbr_map));
+		out.write((char*)&layer._sizei_map,sizeof(layer._sizei_map));
+		out.write((char*)&layer._sizej_map,sizeof(layer._sizej_map));
+		out.write((char*)&layer._nbr_kernel,sizeof(layer._nbr_kernel));
+		out.write((char*)&layer._sizei_kernel,sizeof(layer._sizei_kernel));
+		out.write((char*)&layer._sizej_kernel,sizeof(layer._sizej_kernel));
+		out.write((char*)&layer._sub_resolution_factor,sizeof(layer._sub_resolution_factor));
 		out.write((char*)&layer._X_size,sizeof(layer._X_size));
 		out.write((char*)&layer._Y_size,sizeof(layer._Y_size));
 		out.write((char*)&layer._W_height,sizeof(layer._W_height));
@@ -221,7 +282,8 @@ void GPUNeuralNetwork::save(std::string filename) {
 // load the cpu version of the neural network from the file filename.
 // If you use the GPU, then you need to copy it to the GPU by calling copyNetworkToGPU()
 void GPUNeuralNetwork::load(std::string filename) {
-	std::vector<unsigned int> layers;
+	std::vector<struct layer_representation> layers;
+	struct layer_representation lr;
 	std::vector<pop::VecF32> weights;
 
 	std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
@@ -236,8 +298,18 @@ void GPUNeuralNetwork::load(std::string filename) {
 	in.read((char*)&eta, sizeof(eta));
 
 	for (unsigned int l=0; l<nb_layers; l++) {
+		TypeLayer type;
 		unsigned int ll, X_size, Y_size, W_height, W_width;
+		unsigned int nbr_map, sizei_map, sizej_map, nbr_kernel, sizei_kernel, sizej_kernel, sub_resolution_factor;
 		in.read((char*)&ll, sizeof(ll));
+		in.read((char*)&type, sizeof(type));
+		in.read((char*)&nbr_map, sizeof(nbr_map));
+		in.read((char*)&sizei_map, sizeof(sizei_map));
+		in.read((char*)&sizej_map, sizeof(sizej_map));
+		in.read((char*)&nbr_kernel, sizeof(nbr_kernel));
+		in.read((char*)&sizei_kernel, sizeof(sizei_kernel));
+		in.read((char*)&sizej_kernel, sizeof(sizej_kernel));
+		in.read((char*)&sub_resolution_factor, sizeof(sub_resolution_factor));
 		in.read((char*)&X_size, sizeof(X_size));
 		in.read((char*)&Y_size, sizeof(Y_size));
 		in.read((char*)&W_height, sizeof(W_height));
@@ -246,7 +318,23 @@ void GPUNeuralNetwork::load(std::string filename) {
 			std::cerr << "GPUNeuralNetwork::load(): wrong layer: " << ll << " instead of " << l << std::endl;
 			exit(-1);
 		}
-		layers.push_back(Y_size);
+
+		/*
+			TypeLayer type;
+			int nb_neurons;    			// for fully connected and input
+			pop::Vec2I32 size; 			// for input matrix
+			int nbr_map;				// for input matrix and convolutional
+			int radius_kernel;			// for convolutional
+			int sub_resolution_factor;	// for convolutional
+				*/
+
+		lr.type = type;
+		lr.nb_neurons = Y_size;
+		lr.nbr_map = nbr_map;
+		lr.radius_kernel = radius_kernel;
+		lr.sub_resolution_factor = sub_resolution_factor;
+		//TODO: what do we do with the Vec2I32 size???
+		layers.push_back(lr);
 
 		pop::VecF32	v_w;
 		for (unsigned int i=0; i<W_height*W_width; i++) {
@@ -281,6 +369,8 @@ double GPUNeuralNetwork::getEta() const {
 }
 
 void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) {
+	//TODO
+
 	std::copy(in.begin(),in.end(), h_network->_layers[0]._X);
 
 	for (unsigned int l=0; l<h_network->_nb_layers-1; l++) {
@@ -309,6 +399,8 @@ void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) 
 }
 
 void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_output) {
+	//TODO
+
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
 		if (layer._d_E_X == NULL) {
@@ -577,11 +669,30 @@ __device__ void printMatrixOnGPU(pop::F32* M, unsigned int height, unsigned int 
 	printf("]\n");
 }
 
+__device__ char* gpu_typeLayer2String(TypeLayer t) {
+	switch (t) {
+	case LAYER_INPUT:
+		return (char*)"input";
+	case LAYER_INPUT_MATRIX:
+		return (char*)"input matrix";
+	case LAYER_FULLY_CONNECTED:
+		return (char*)"fully connected";
+	case LAYER_CONVOLUTIONNAL:
+		return (char*)"convolutional";
+	default:
+		return (char*)"unknown type";
+	}
+}
+
 __global__ void printNetworkOnGPU(struct neural_network *network) {
 	printf("Number of layers: %d, eta: %f\n", network->_nb_layers, network->_eta);
 	for (unsigned int l=0; l<network->_nb_layers; l++) {
 		struct layer& layer = network->_layers[l];
-		printf("\n--Layer %d, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
+		printf("\n--Layer %d, type = %s, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, gpu_typeLayer2String(layer._type), layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
+		if (layer._type == LAYER_CONVOLUTIONNAL || layer._type == LAYER_INPUT_MATRIX) {
+			printf("\tnbr_map = %d, sizei_map = %d, sizej_map = %d\n", layer._nbr_map, layer._sizei_map, layer._sizej_map);
+			printf("\tt_sub_resolution_factor = %d, nbr_map = %d, sizei_map = %d, sizej_map = %d\n", layer._sub_resolution_factor, layer._nbr_kernel, layer._sizei_kernel, layer._sizej_kernel);
+		}
 
 		printVectorOnGPU(layer._X, layer._X_size, (char*)"_X");
 		printVectorOnGPU(layer._Y, layer._Y_size, (char*)"_Y");
@@ -624,6 +735,8 @@ __global__ void gpu_propagateFront_setOutput(struct neural_network *network, pop
  * out_computed: the output element, of size equal to the number of neurons in the last layer
  */
 void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_size, unsigned int idx, pop::F32* out_computed) {
+	//TODO
+
 	int block, grid;
 	unsigned int max_nb_threads = popcuda::getMaxNumberThreadsPerBlock();
 
@@ -715,6 +828,8 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
  * out_computed: the output element computed previously (using propagateFrontGPU), of size out_elt_size
  */
 void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigned int out_elt_size, unsigned int idx) {
+	//TODO
+
 	int block, grid;
 	unsigned int max_nb_threads = popcuda::getMaxNumberThreadsPerBlock();
 
@@ -981,10 +1096,15 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 #endif
 
 void test_neural_net_cpu(const int nb_epoch) {
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(2);
-	v_layer.push_back(3);
-	v_layer.push_back(1);
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = 2;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 3;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1;
+	v_layer.push_back(lr);
 	GPUNeuralNetwork network(v_layer, 0.01);
 
 	std::cout << "\n********** CPU **********\n" << std::endl;
@@ -1045,11 +1165,17 @@ void test_neural_net_cpu_mnist(const int nb_epoch) {
 	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
 	std::cout << "size trainings: " << number_training(0).size() << std::endl;
 
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(size_in);
-	v_layer.push_back(1000);
-	v_layer.push_back(1000);
-	v_layer.push_back(number_training.size());
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = size_in;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1000;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1000;
+	v_layer.push_back(lr);
+	lr.nb_neurons = number_training.size();
+	v_layer.push_back(lr);
 	GPUNeuralNetwork network(v_layer, 0.001);
 
 	pop::Vec<pop::VecF32> vtraining_in;
@@ -1106,10 +1232,15 @@ void test_neural_net_cpu_mnist(const int nb_epoch) {
 
 #if defined(HAVE_CUDA)
 void test_neural_net_gpu(const int nb_epoch) {
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(2);
-	v_layer.push_back(3);
-	v_layer.push_back(1);
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = 2;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 3;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1;
+	v_layer.push_back(lr);
 	GPUNeuralNetwork network(v_layer, 0.01);
 
 	std::cout << "\n********** GPU **********\n" << std::endl;
@@ -1189,11 +1320,17 @@ void test_neural_net_gpu_mnist(const int nb_epoch) {
 	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
 	std::cout << "size trainings: " << number_training(0).size() << std::endl;
 
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(size_in);
-	v_layer.push_back(1000);
-	v_layer.push_back(1000);
-	v_layer.push_back(number_training.size());
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = size_in;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1000;
+	v_layer.push_back(lr);
+	lr.nb_neurons = 1000;
+	v_layer.push_back(lr);
+	lr.nb_neurons = number_training.size();
+	v_layer.push_back(lr);
 	GPUNeuralNetwork network(v_layer, 0.001);
 
 	pop::Vec<pop::VecF32> vtraining_in;
@@ -1226,29 +1363,40 @@ void test_neural_net_gpu_augmented_database(const int max_files_per_folder, cons
 	int size_in = vtraining_in(0).size();
 	int size_out = vtraining_out(0).size();
 
-	std::vector<unsigned int> v_layer;
-	v_layer.push_back(size_in);
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_FULLY_CONNECTED;
+
+	lr.nb_neurons = size_in;
+	v_layer.push_back(lr);
 	switch (network_for_training) {
 	case 5:
 		for (int i=0; i<9; i++) {
-			v_layer.push_back(1000);
+			lr.nb_neurons = 1000;
+			v_layer.push_back(lr);
 		}
 		break;
 	case 4:
-		v_layer.push_back(2500);
+		lr.nb_neurons = 2500;
+		v_layer.push_back(lr);
 	case 3:
-		v_layer.push_back(2000);
+		lr.nb_neurons = 2000;
+		v_layer.push_back(lr);
 	case 2:
-		v_layer.push_back(1500);
+		lr.nb_neurons = 1500;
+		v_layer.push_back(lr);
 	case 1:
-		v_layer.push_back(1000);
-		v_layer.push_back(500);
+		lr.nb_neurons = 1000;
+		v_layer.push_back(lr);
+		lr.nb_neurons = 500;
+		v_layer.push_back(lr);
 		break;
 	default:
 		std::cerr << "Database training: unknown network " << network_for_training << std::endl;
 		return;
 	}
-	v_layer.push_back(size_out);
+	lr.nb_neurons = size_out;
+	v_layer.push_back(lr);
 	GPUNeuralNetwork network(v_layer, 0.001);
 	std::cout << "Network created at " << getCurrentTime() << std::endl;
 
@@ -1256,6 +1404,99 @@ void test_neural_net_gpu_augmented_database(const int max_files_per_folder, cons
 }
 
 void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder, std::string network_path, std::string database_training, std::string database_test, const int nb_epoch) {
+
+	{
+		//we need to load the networks in the new format
+		//TODO
+		GPUNeuralNetwork network;
+		network.load("/home/pl/Documents/alphanumericvision/deep_big_simple_neural_net/gpu/1/network_new.bin");
+		network.displayNetwork();
+		//XXX
+		return;
+
+		/*
+		 * We should load the following networks (from 2 to 5):
+
+		 Number of layers: 5, eta: 1.79701e-06
+
+	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
+
+	-- Layer 1, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 842
+
+	-- Layer 2, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
+
+	-- Layer 3, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
+
+	-- Layer 4, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
+
+
+	=================================
+
+	Number of layers: 6, eta: 1.79701e-06
+
+	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
+
+	-- Layer 1, type = fully connected, _X_size = 2001, Y_size = 2000, _W_height = 2000, _W_width = 842
+
+	-- Layer 2, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 2001
+
+	-- Layer 3, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
+
+	-- Layer 4, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
+
+	-- Layer 5, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
+
+
+	===================================
+
+	Number of layers: 7, eta: 1.79701e-06
+
+	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
+
+	-- Layer 1, type = fully connected, _X_size = 2501, Y_size = 2500, _W_height = 2500, _W_width = 842
+
+	-- Layer 2, type = fully connected, _X_size = 2001, Y_size = 2000, _W_height = 2000, _W_width = 2501
+
+	-- Layer 3, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 2001
+
+	-- Layer 4, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
+
+	-- Layer 5, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
+
+	-- Layer 6, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
+
+	===================================
+
+	Number of layers: 11, eta: 1.79701e-06
+
+	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
+
+	-- Layer 1, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 842
+
+	-- Layer 2, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 3, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 4, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 5, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 6, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 7, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 8, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 9, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
+
+	-- Layer 10, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 1001
+		 */
+
+
+
+	}
+
+
 	std::cout << "Starting to load training database at " << getCurrentTime() << std::endl;
 	pop::Vec<pop::VecF32> vtraining_in;
 	pop::Vec<pop::VecF32> vtraining_out;
