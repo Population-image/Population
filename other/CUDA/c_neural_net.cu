@@ -108,64 +108,155 @@ void GPUNeuralNetwork::createNetwork(std::vector<struct layer_representation> v_
 	for(unsigned int i=0;i<v_layer.size();i++){
 		struct layer& l = h_network->_layers[i];
 
-		//TODO: create layers
-		switch (v_layer[i].type) {
-		case LAYER_INPUT:
-			//TODO
-			break;
-		case LAYER_INPUT_MATRIX:
-			//TODO
-			break;
-		case LAYER_FULLY_CONNECTED:
-			//TODO
-			break;
-		case LAYER_CONVOLUTIONNAL:
-			//TODO
-			break;
-		default:
-			std::cerr << "Layer type unknown: " << v_layer[i].type << std::endl;
-			break;
-		}
-
 		l._type = v_layer[i].type;
-		int size_layer = v_layer[i].nb_neurons; //XXX
 
-		if(i != v_layer.size()-1) {
-			// add a bias neuron with constant value 1
+		switch (l._type) {
+		case LAYER_INPUT:
+		{
+			l._sub_resolution_factor = 0;
+
+			l._nbr_map = 0;
+			l._sizei_map = 0;
+			l._sizej_map = 0;
+
+			l._nbr_kernel = 0;
+			l._sizei_kernel = 0;
+			l._sizej_kernel = 0;
+
+			int size_layer = v_layer[i].nb_neurons;
 			l._X_size = size_layer+1;
-		} else {
-			// except for the last layer
-			l._X_size = size_layer;
-		}
-		l._X = new pop::F32[l._X_size];
-		for (unsigned int j=0; j<l._X_size; j++) {
-			l._X[j] = 1;
-		}
-		l._d_E_X = NULL;
+			l._X = new pop::F32[l._X_size];
+			for (unsigned int j=0; j<l._X_size; j++) {
+				l._X[j] = 1;
+			}
+			l._d_E_X = NULL;
 
-		l._Y_size = size_layer;
-		l._Y = new pop::F32[l._Y_size];
-		for (unsigned int j=0; j<l._Y_size; j++) {
-			l._Y[j] = 0;
-		}
-		l._d_E_Y = NULL;
+			l._Y_size = 0;
+			l._Y = NULL;
+			l._d_E_Y = NULL;
 
-		if (i != 0) {
+			l._W_height = 0;
+			l._W_width = 0;
+			l._W = NULL;
+			l._d_E_W = NULL;
+
+			break;
+		}
+		case LAYER_INPUT_MATRIX:
+		{
+			l._sub_resolution_factor = 0;
+
+			l._nbr_map = v_layer[i].nbr_map;
+			l._sizei_map = v_layer[i].sizei_map;
+			l._sizej_map = v_layer[i].sizej_map;
+
+			l._nbr_kernel = 0;
+			l._sizei_kernel = 0;
+			l._sizej_kernel = 0;
+
+			int size_layer = l._sizei_map * l._sizej_map * l._nbr_map;
+			l._X_size = size_layer+1;
+			l._X = new pop::F32[l._X_size];
+			for (unsigned int j=0; j<l._X_size; j++) {
+				l._X[j] = 1;
+			}
+			l._d_E_X = NULL;
+
+			l._Y_size = 0;
+			l._Y = NULL;
+			l._d_E_Y = NULL;
+
+			l._W_height = 0;
+			l._W_width = 0;
+			l._W = NULL;
+			l._d_E_W = NULL;
+
+			break;
+		}
+		case LAYER_FULLY_CONNECTED:
+		{
+			int size_layer = v_layer[i].nb_neurons;
 			unsigned int size_layer_previous = h_network->_layers[i-1]._X_size;
-			pop::DistributionNormal n(0,1./std::sqrt(size_layer_previous));
+			l._sub_resolution_factor = 0;
 
+			l._nbr_map = 0;
+			l._sizei_map = 0;
+			l._sizej_map = 0;
+
+			l._nbr_kernel = 1;
+			l._sizei_kernel = size_layer;
+			l._sizej_kernel = size_layer_previous;
+
+			l._X_size = size_layer+1;
+			l._X = new pop::F32[l._X_size];
+			for (unsigned int j=0; j<l._X_size; j++) {
+				l._X[j] = 1;
+			}
+			l._d_E_X = NULL;
+
+			l._Y_size = size_layer;
+			l._Y = new pop::F32[l._Y_size];
+			for (unsigned int j=0; j<l._Y_size; j++) {
+				l._Y[j] = 0;
+			}
+			l._d_E_Y = NULL;
+
+			pop::DistributionNormal n(0,1./std::sqrt(size_layer_previous));
 			l._W_height = size_layer;
 			l._W_width = size_layer_previous;
 			l._W = new pop::F32[l._W_height * l._W_width];
 			for (unsigned int j=0; j<l._W_height * l._W_width; j++) {
 				l._W[j] = n.randomVariable();
 			}
-		} else {
-			l._W_height = 0;
-			l._W_width = 0;
-			l._W = NULL;
+			l._d_E_W = NULL;
+
+			break;
 		}
-		l._d_E_W = NULL;
+		case LAYER_CONVOLUTIONNAL:
+		{
+			unsigned int sizei_map_previous = h_network->_layers[i-1]._sizei_map;
+			unsigned int sizej_map_previous = h_network->_layers[i-1]._sizej_map;
+			l._sub_resolution_factor = v_layer[i].sub_resolution_factor;
+
+			l._nbr_map = v_layer[i].nbr_map;
+			l._sizei_map = std::floor( (sizei_map_previous-1-2*v_layer[i].radius_kernel)/(1.*l._sub_resolution_factor) ) + 1;
+			l._sizej_map = std::floor( (sizej_map_previous-1-2*v_layer[i].radius_kernel)/(1.*l._sub_resolution_factor) ) + 1;
+
+			l._nbr_kernel = l._nbr_map * h_network->_layers[i-1]._nbr_map;
+			l._sizei_kernel = v_layer[i].radius_kernel*2 + 1;
+			l._sizej_kernel = v_layer[i].radius_kernel*2 + 1;
+
+			int size_layer = l._sizei_map * l._sizej_map * l._nbr_map;
+			l._X_size = size_layer+1;
+			l._X = new pop::F32[l._X_size];
+			for (unsigned int j=0; j<l._X_size; j++) {
+				l._X[j] = 1;
+			}
+			l._d_E_X = NULL;
+
+			l._Y_size = size_layer;
+			l._Y = new pop::F32[l._Y_size];
+			for (unsigned int j=0; j<l._Y_size; j++) {
+				l._Y[j] = 0;
+			}
+			l._d_E_Y = NULL;
+
+			unsigned int nbr_weigh = l._nbr_kernel * (l._sizei_kernel*l._sizej_kernel+1); // there is one additional bias per kernel
+			l._W_height = 1;
+			l._W_width = nbr_weigh;
+			pop::DistributionNormal n(0,1./std::sqrt(l._sizei_kernel*l._sizej_kernel));
+			l._W = new pop::F32[l._W_height * l._W_width];
+			for (unsigned int j=0; j<l._W_height * l._W_width; j++) {
+				l._W[j] = n.randomVariable();
+			}
+			l._d_E_W = NULL;
+
+			break;
+		}
+		default:
+			std::cerr << "Layer type unknown: " << v_layer[i].type << std::endl;
+			break;
+		}
 	}
 }
 
@@ -245,7 +336,7 @@ void GPUNeuralNetwork::displayNetwork() {
 		printNeuronsVector(layer._d_E_X, layer._X_size, "_d_E_X");
 		printNeuronsVector(layer._d_E_Y, layer._Y_size, "_d_E_Y");
 		printWeightMatrix(layer._d_E_W, layer._W_height, layer._W_width, "_d_E_W");
-		*/
+		 */
 	}
 }
 
@@ -319,21 +410,13 @@ void GPUNeuralNetwork::load(std::string filename) {
 			exit(-1);
 		}
 
-		/*
-			TypeLayer type;
-			int nb_neurons;    			// for fully connected and input
-			pop::Vec2I32 size; 			// for input matrix
-			int nbr_map;				// for input matrix and convolutional
-			int radius_kernel;			// for convolutional
-			int sub_resolution_factor;	// for convolutional
-				*/
-
 		lr.type = type;
 		lr.nb_neurons = Y_size;
 		lr.nbr_map = nbr_map;
-		lr.radius_kernel = radius_kernel;
+		lr.radius_kernel = (sizei_kernel-1)/2;
 		lr.sub_resolution_factor = sub_resolution_factor;
-		//TODO: what do we do with the Vec2I32 size???
+		lr.sizei_map = sizei_map;
+		lr.sizej_map = sizej_map;
 		layers.push_back(lr);
 
 		pop::VecF32	v_w;
@@ -369,20 +452,53 @@ double GPUNeuralNetwork::getEta() const {
 }
 
 void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) {
-	//TODO
-
 	std::copy(in.begin(),in.end(), h_network->_layers[0]._X);
 
 	for (unsigned int l=0; l<h_network->_nb_layers-1; l++) {
 		struct layer& prev_layer = h_network->_layers[l];
 		struct layer& layer = h_network->_layers[l+1];
 
-		// _Y[l+1] = _W[l+1] * _X[l]
-		for (unsigned int i=0; i<layer._Y_size; i++) {
-			layer._Y[i] = 0;
-			for (unsigned int j=0; j<prev_layer._X_size; j++) {
-				layer._Y[i] += layer._W[i*prev_layer._X_size+j] * prev_layer._X[j];
+		if (layer._type == LAYER_FULLY_CONNECTED) {
+			// _Y[l+1] = _W[l+1] * _X[l]
+			for (unsigned int i=0; i<layer._Y_size; i++) {
+				layer._Y[i] = 0;
+				for (unsigned int j=0; j<prev_layer._X_size; j++) {
+					layer._Y[i] += layer._W[i*prev_layer._X_size+j] * prev_layer._X[j];
+				}
 			}
+		} else if (layer._type == LAYER_CONVOLUTIONNAL) {
+			const unsigned int rayon_kernel = (layer._sizei_kernel-1)/2;
+			const int X_shift = rayon_kernel * (1+prev_layer._sizej_map);
+			const int map_size = prev_layer._sizei_map * prev_layer._sizej_map;
+			pop::F32* ptr_Y_incr = layer._Y;
+
+			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
+				for (unsigned int index_i = 0; index_i < layer._sizei_map; index_i++) {
+					for (unsigned int index_j = 0; index_j < layer._sizej_map; index_j++, ptr_Y_incr++) {
+						*ptr_Y_incr=0;
+
+						const int index_i_previous = index_i * layer._sub_resolution_factor + rayon_kernel;
+						const int index_j_previous = index_j * layer._sub_resolution_factor + rayon_kernel;
+						const pop::F32* ptr_X_previous_start = prev_layer._X + index_j_previous + index_i_previous*prev_layer._sizej_map;
+						const pop::F32* ptr_W_incr = layer._W + (layer._sizei_kernel*layer._sizej_kernel+1) * prev_layer._nbr_map * index_map;
+
+						for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
+							const pop::F32* ptr_X_previous = ptr_X_previous_start + map_size * index_map_previous - X_shift;
+							for (unsigned int index_i_W = 0; index_i_W < layer._sizei_kernel; index_i_W++) {
+								for (unsigned int index_j_W = 0; index_j_W < layer._sizej_kernel; index_j_W++, ptr_X_previous++, ptr_W_incr++) {
+									*ptr_Y_incr += *ptr_X_previous * *ptr_W_incr;
+								}
+								ptr_X_previous += prev_layer._sizej_map - layer._sizej_kernel;
+							}
+							*ptr_Y_incr += *ptr_W_incr; //bias weight;
+							ptr_W_incr++;
+						}
+					}
+				}
+
+			}
+		} else {
+			std::cerr << "Propagate front: invalid layer " << layer._type << std::endl;
 		}
 
 		// _X[l+1] = sigmoid(_Y[l+1])
@@ -399,8 +515,6 @@ void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) 
 }
 
 void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_output) {
-	//TODO
-
 	for (unsigned int l=0; l<h_network->_nb_layers; l++) {
 		struct layer& layer = h_network->_layers[l];
 		if (layer._d_E_X == NULL) {
@@ -417,38 +531,88 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 		}
 	}
 
+	// _d_E_X[last_layer] = _X[last_layer] - desired_output
+	struct layer& last_layer = h_network->_layers[h_network->_nb_layers-1];
+	for (unsigned int j=0; j<last_layer._X_size; j++) {
+		last_layer._d_E_X[j] = last_layer._X[j] - desired_output[j];
+	}
+
 	for (unsigned int l=h_network->_nb_layers-1; l>0; l--) {
 		struct layer& layer = h_network->_layers[l];
 		struct layer& prev_layer = h_network->_layers[l-1];
-
-		// _d_E_X[l] = _X[l] - desired_output
-		if (l == h_network->_nb_layers-1){
-			for (unsigned int j=0; j<layer._X_size; j++) {
-				layer._d_E_X[j] = layer._X[j] - desired_output[j];
-			}
-		}
 
 		// _d_E_Y[l] = _d_E_X[l] * derived_sigmoid(_X[l])
 		for (unsigned int j=0; j<layer._Y_size; j++) {
 			layer._d_E_Y[j] = layer._d_E_X[j] * derived_sigmoid(layer._X[j]);
 		}
 
-		// _d_E_W[l-1] = _d_E_Y[l] * _X[l-1]
-		// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
-		for(unsigned int j=0; j<layer._W_width; j++){
-			for (unsigned int i=0; i<layer._W_height; i++) {
-				int idx = i*layer._W_width+j;
-				layer._d_E_W[idx] = layer._d_E_Y[i] * prev_layer._X[j];
-				layer._W[idx] = layer._W[idx] - h_network->_eta*layer._d_E_W[idx];
+		if (layer._type == LAYER_FULLY_CONNECTED) {
+			// _d_E_W[l-1] = _d_E_Y[l] * _X[l-1]
+			// _W[l-1] = _W[l-1] - _eta * _d_E_W[l-1]
+			for(unsigned int j=0; j<layer._W_width; j++){
+				for (unsigned int i=0; i<layer._W_height; i++) {
+					int idx = i*layer._W_width+j;
+					layer._d_E_W[idx] = layer._d_E_Y[i] * prev_layer._X[j];
+					layer._W[idx] = layer._W[idx] - h_network->_eta*layer._d_E_W[idx];
+				}
 			}
-		}
 
-		// _d_E_X[l-1][j] = sum_{i=0}^{_W[l-1].sizeI()}{_W[l](i, j) * _d_E_Y[l](i)}, j=0 to _X[l].size()
-		for(unsigned int j=0; j<prev_layer._X_size; j++){
-			prev_layer._d_E_X[j] = 0;
-			for (unsigned int i=0; i<layer._W_height; i++) {
-				prev_layer._d_E_X[j] += layer._W[i*layer._W_width+j] * layer._d_E_Y[i];
+			// _d_E_X[l-1][j] = sum_{i=0}^{_W[l-1].sizeI()}{_W[l](i, j) * _d_E_Y[l](i)}, j=0 to _X[l].size()
+			for(unsigned int j=0; j<prev_layer._X_size; j++){
+				prev_layer._d_E_X[j] = 0;
+				for (unsigned int i=0; i<layer._W_height; i++) {
+					prev_layer._d_E_X[j] += layer._W[i*layer._W_width+j] * layer._d_E_Y[i];
+				}
 			}
+		} else if (layer._type == LAYER_CONVOLUTIONNAL) {
+			const unsigned int X_shift = (layer._sizei_kernel-1)/2 * (1+prev_layer._sizej_map);
+			const unsigned int map_size = prev_layer._sizei_map*prev_layer._sizej_map;
+
+			memset(layer._d_E_Y, 0, layer._Y_size*sizeof(*layer._d_E_Y));
+			memset(layer._d_E_W, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
+			pop::F32* ptr_d_E_Y_incr = layer._d_E_Y;
+
+			for (unsigned int index_map=0; index_map<layer._nbr_map; index_map++) {
+				for (unsigned int index_i=0; index_i<layer._sizei_map; index_i++) {
+					for (unsigned int index_j=0; index_j<layer._sizej_map; index_j++, ptr_d_E_Y_incr++) {
+						const unsigned int index_i_previous = index_i*layer._sub_resolution_factor + (layer._sizei_kernel-1)/2;
+						const unsigned int index_j_previous = index_j*layer._sub_resolution_factor + (layer._sizej_kernel-1)/2;
+
+						// error on X
+						pop::F32* ptr_d_E_X_previous_start = prev_layer._d_E_X + index_j_previous + index_i_previous*prev_layer._sizej_map;
+						const pop::F32* ptr_W_incr = layer._W + (layer._sizei_kernel*layer._sizej_kernel+1)*prev_layer._nbr_map*index_map;
+
+						for (unsigned int index_map_previous=0; index_map_previous<prev_layer._nbr_map; index_map_previous++) {
+							pop::F32* ptr_d_E_X_previous = ptr_d_E_X_previous_start + map_size*index_map_previous-X_shift;
+							for (unsigned int index_i_W=0; index_i_W<layer._sizei_kernel; index_i_W++) {
+								for (unsigned int index_j_W=0; index_j_W<layer._sizej_kernel; index_j_W++, ptr_d_E_X_previous++, ptr_W_incr++) {
+									*ptr_d_E_X_previous += *ptr_d_E_Y_incr * *ptr_W_incr;
+								}
+								ptr_d_E_X_previous += prev_layer._sizej_map-layer._sizej_kernel;
+							}
+							ptr_W_incr++;
+						}
+
+						// error on W
+						const pop::F32* ptr_X_previous_start = prev_layer._X + index_j_previous + index_i_previous*prev_layer._sizej_map;
+						pop::F32* ptr_d_E_W_incr = layer._d_E_W + (layer._sizei_kernel*layer._sizej_kernel+1)*prev_layer._nbr_map*index_map;
+
+						for (unsigned int index_map_previous=0; index_map_previous<prev_layer._nbr_map; index_map_previous++) {
+							const pop::F32* ptr_X_previous = ptr_X_previous_start + map_size*index_map_previous-X_shift;
+							for (unsigned int index_i_W=0; index_i_W<layer._sizei_kernel; index_i_W++) {
+								for (unsigned int index_j_W=0; index_j_W<layer._sizej_kernel; index_j_W++, ptr_X_previous++, ptr_d_E_W_incr++) {
+									*ptr_d_E_W_incr += *ptr_d_E_Y_incr * *ptr_X_previous ;
+								}
+								ptr_X_previous += prev_layer._sizej_map-layer._sizej_kernel;
+							}
+							*ptr_d_E_W_incr += *ptr_d_E_Y_incr;
+							ptr_d_E_W_incr++;
+						}
+					}
+				}
+			}
+		} else {
+			std::cerr << "Propagate back: invalid layer " << layer._type << std::endl;
 		}
 	}
 }
@@ -1098,9 +1262,10 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 void test_neural_net_cpu(const int nb_epoch) {
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
-	lr.type = LAYER_FULLY_CONNECTED;
+	lr.type = LAYER_INPUT;
 	lr.nb_neurons = 2;
 	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
 	lr.nb_neurons = 3;
 	v_layer.push_back(lr);
 	lr.nb_neurons = 1;
@@ -1167,9 +1332,10 @@ void test_neural_net_cpu_mnist(const int nb_epoch) {
 
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
-	lr.type = LAYER_FULLY_CONNECTED;
+	lr.type = LAYER_INPUT;
 	lr.nb_neurons = size_in;
 	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
 	lr.nb_neurons = 1000;
 	v_layer.push_back(lr);
 	lr.nb_neurons = 1000;
@@ -1234,9 +1400,10 @@ void test_neural_net_cpu_mnist(const int nb_epoch) {
 void test_neural_net_gpu(const int nb_epoch) {
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
-	lr.type = LAYER_FULLY_CONNECTED;
+	lr.type = LAYER_INPUT;
 	lr.nb_neurons = 2;
 	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
 	lr.nb_neurons = 3;
 	v_layer.push_back(lr);
 	lr.nb_neurons = 1;
@@ -1322,9 +1489,10 @@ void test_neural_net_gpu_mnist(const int nb_epoch) {
 
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
-	lr.type = LAYER_FULLY_CONNECTED;
+	lr.type = LAYER_INPUT;
 	lr.nb_neurons = size_in;
 	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
 	lr.nb_neurons = 1000;
 	v_layer.push_back(lr);
 	lr.nb_neurons = 1000;
@@ -1409,91 +1577,10 @@ void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder
 		//we need to load the networks in the new format
 		//TODO
 		GPUNeuralNetwork network;
-		network.load("/home/pl/Documents/alphanumericvision/deep_big_simple_neural_net/gpu/1/network_new.bin");
+		network.load("/home/pl/Documents/alphanumericvision/deep_big_simple_neural_net/gpu/5/network_new.bin");
 		network.displayNetwork();
 		//XXX
 		return;
-
-		/*
-		 * We should load the following networks (from 2 to 5):
-
-		 Number of layers: 5, eta: 1.79701e-06
-
-	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
-
-	-- Layer 1, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 842
-
-	-- Layer 2, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
-
-	-- Layer 3, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
-
-	-- Layer 4, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
-
-
-	=================================
-
-	Number of layers: 6, eta: 1.79701e-06
-
-	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
-
-	-- Layer 1, type = fully connected, _X_size = 2001, Y_size = 2000, _W_height = 2000, _W_width = 842
-
-	-- Layer 2, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 2001
-
-	-- Layer 3, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
-
-	-- Layer 4, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
-
-	-- Layer 5, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
-
-
-	===================================
-
-	Number of layers: 7, eta: 1.79701e-06
-
-	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
-
-	-- Layer 1, type = fully connected, _X_size = 2501, Y_size = 2500, _W_height = 2500, _W_width = 842
-
-	-- Layer 2, type = fully connected, _X_size = 2001, Y_size = 2000, _W_height = 2000, _W_width = 2501
-
-	-- Layer 3, type = fully connected, _X_size = 1501, Y_size = 1500, _W_height = 1500, _W_width = 2001
-
-	-- Layer 4, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1501
-
-	-- Layer 5, type = fully connected, _X_size = 501, Y_size = 500, _W_height = 500, _W_width = 1001
-
-	-- Layer 6, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 501
-
-	===================================
-
-	Number of layers: 11, eta: 1.79701e-06
-
-	-- Layer 0, type = fully connected, _X_size = 842, Y_size = 841, _W_height = 0, _W_width = 0
-
-	-- Layer 1, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 842
-
-	-- Layer 2, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 3, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 4, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 5, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 6, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 7, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 8, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 9, type = fully connected, _X_size = 1001, Y_size = 1000, _W_height = 1000, _W_width = 1001
-
-	-- Layer 10, type = fully connected, _X_size = 33, Y_size = 33, _W_height = 33, _W_width = 1001
-		 */
-
-
-
 	}
 
 

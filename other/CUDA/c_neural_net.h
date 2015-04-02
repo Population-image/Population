@@ -31,7 +31,8 @@ enum TypeLayer {
 struct layer_representation {
 	TypeLayer type;
 	int nb_neurons;    			// for fully connected and input
-	pop::Vec2I32 size; 			// for input matrix
+	pop::I32 sizei_map;			// for input matrix
+	pop::I32 sizej_map;			// for input matrix
 	int nbr_map;				// for input matrix and convolutional
 	int radius_kernel;			// for convolutional
 	int sub_resolution_factor;	// for convolutional
