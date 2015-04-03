@@ -4,27 +4,14 @@
 #include <vector>
 
 #include "popconfig.h"
-
 #include "data/typeF/TypeF.h"
 #include "data/neuralnetwork/NeuralNetwork.h"
-
-void test_neural_net_cpu(const int nb_epoch);
-void test_neural_net_cpu_mnist(const int nb_epoch);
-
-void loadDatabase(std::string directory, const int max_per_folder, pop::Vec<pop::VecF32> &v_neuron_in, pop::Vec<pop::VecF32> &v_neuron_out);
-
-#if defined(HAVE_CUDA)
-void test_neural_net_gpu(const int nb_epoch);
-void test_neural_net_gpu_mnist(const int nb_epoch);
-void test_neural_net_gpu_augmented_database(const int max_files_per_folder, const int network_for_training, std::string database_training, std::string database_test, const int nb_epoch);
-void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder, std::string network_path, std::string database_training, std::string database_test, const int nb_epoch);
-#endif
 
 enum TypeLayer {
     LAYER_INPUT,
     LAYER_INPUT_MATRIX,
     LAYER_FULLY_CONNECTED,
-    LAYER_CONVOLUTIONNAL
+    LAYER_CONVOLUTIONAL
 };
 
 // used to create a neural network
@@ -88,5 +75,17 @@ private:
 	struct neural_network* d_network; // neural network on the GPU
 #endif
 };
+
+void test_neural_net_cpu(const int nb_epoch);
+void test_neural_net_cpu_mnist(const int nb_epoch);
+void test_neural_net_conv_cpu(const int nb_epoch);
+void test_neural_net_conv_cpu_mnist(const int nb_epoch);
+
+#if defined(HAVE_CUDA)
+void test_neural_net_gpu(const int nb_epoch);
+void test_neural_net_gpu_mnist(const int nb_epoch);
+void test_neural_net_gpu_augmented_database(const int max_files_per_folder, const int network_for_training, std::string database_training, std::string database_test, const int nb_epoch);
+void bench_propagate_front_gpu_augmented_database(const int max_files_per_folder, std::string network_path, std::string database_training, std::string database_test, const int nb_epoch);
+#endif
 
 #endif
