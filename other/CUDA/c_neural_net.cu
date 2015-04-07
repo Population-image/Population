@@ -566,7 +566,7 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 			const unsigned int X_shift = (layer._sizei_kernel-1)/2 * (1+prev_layer._sizej_map);
 			const unsigned int map_size = prev_layer._sizei_map*prev_layer._sizej_map;
 
-			memset(layer._d_E_X, 0, layer._Y_size*sizeof(*layer._d_E_X));
+			memset(layer._d_E_X, 0, layer._X_size*sizeof(*layer._d_E_X));
 			memset(layer._d_E_W, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
 			pop::F32* ptr_d_E_Y_incr = layer._d_E_Y;
 
@@ -890,6 +890,37 @@ __global__ void gpu_propagateFront_convolution(struct neural_network *network, i
 	struct layer& prev_layer = network->_layers[l-1];
 	int tid = blockDim.x*blockIdx.x + threadIdx.x;
 
+	//XXX
+#if 0
+	if (tid == 0) {
+		pop::F32* ptr_Y_incr = layer._Y;
+		for (int index_i=0; index_i<layer._sizei_map; index_i++) {
+			for (int index_j=0; index_j<layer._sizej_map; index_j++,ptr_Y_incr++) {
+				const unsigned int rayon_kernel = (layer._sizei_kernel-1)/2;
+				const int X_shift = rayon_kernel * (1+prev_layer._sizej_map);
+				const int map_size = prev_layer._sizei_map * prev_layer._sizej_map;
+				const int index_i_previous = index_i * layer._sub_resolution_factor + rayon_kernel;
+				const int index_j_previous = index_j * layer._sub_resolution_factor + rayon_kernel;
+
+				const pop::F32* ptr_X_previous_start = prev_layer._X + index_j_previous + index_i_previous*prev_layer._sizej_map;
+				const pop::F32* ptr_W_incr = layer._W + (layer._sizei_kernel*layer._sizej_kernel+1) * prev_layer._nbr_map * index_map;
+
+				pop::F32 v = 0;
+				for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++, ptr_W_incr++) {
+					const pop::F32* ptr_X_previous = ptr_X_previous_start + map_size * index_map_previous - X_shift;
+					for (unsigned int index_i_W = 0; index_i_W < layer._sizei_kernel; index_i_W++) {
+						for (unsigned int index_j_W = 0; index_j_W < layer._sizej_kernel; index_j_W++, ptr_X_previous++, ptr_W_incr++) {
+							v += *ptr_X_previous * *ptr_W_incr;
+						}
+						ptr_X_previous += prev_layer._sizej_map - layer._sizej_kernel;
+					}
+					v += *ptr_W_incr; //bias weight;
+				}
+				*ptr_Y_incr = v;
+			}
+		}
+	}
+#else
 	if (tid < layer._sizei_map * layer._sizej_map) {
 		const unsigned int index_i = tid / layer._sizej_map;
 		const unsigned int index_j = tid % layer._sizej_map;
@@ -916,6 +947,7 @@ __global__ void gpu_propagateFront_convolution(struct neural_network *network, i
 		}
 		layer._Y[tid] = v;
 	}
+#endif
 }
 
 /*
@@ -1131,7 +1163,7 @@ void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigne
 			grid = prev_layer._X_size / max_nb_threads + (prev_layer._X_size%max_nb_threads ? 1 : 0);
 			gpu_propagateBackFirstDerivate_setPreviousXError<<<grid, block>>>(d_network, l);
 		} else if (layer._type == LAYER_CONVOLUTIONAL) {
-			cudaMemset(start + layer._X_size+layer._Y_size+layer._W_height*layer._W_width, 0, layer._Y_size*sizeof(*layer._d_E_X));
+			cudaMemset(start + layer._X_size+layer._Y_size+layer._W_height*layer._W_width, 0, layer._X_size*sizeof(*layer._d_E_X));
 			cudaMemset(start + 2*(layer._X_size+layer._Y_size)+layer._W_height*layer._W_width, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
 
 			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
@@ -1221,7 +1253,7 @@ void GPUNeuralNetwork::gpu_learn(pop::Vec<pop::VecF32>& vtraining_in, pop::Vec<p
 
 			for(unsigned int j=0;j<nb_elts;j++) {
 				gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
-				gpu_propagateBackFirstDerivate(d_vtraining_out, vtraining_out(0).size(), j);
+				//XXX gpu_propagateBackFirstDerivate(d_vtraining_out, vtraining_out(0).size(), j);
 				gpu_computeError(d_vtraining_out, d_out, vtraining_out(0).size(), j, d_error_training);
 			}
 
@@ -1549,8 +1581,10 @@ void test_neural_net_conv_cpu_mnist(const int nb_epoch) {
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
 	lr.type = LAYER_INPUT_MATRIX;
-	lr.sizei_map = 29;
-	lr.sizej_map = 29;
+	//lr.sizei_map = 29;
+	//lr.sizej_map = 29;
+	lr.sizei_map = number_training(0)(0).getDomain()(0);
+	lr.sizej_map = number_training(0)(0).getDomain()(1);
 	lr.nbr_map = 1;
 	v_layer.push_back(lr);
 	lr.type = LAYER_CONVOLUTIONAL;
@@ -1738,7 +1772,7 @@ void test_neural_net_gpu_mnist(const int nb_epoch) {
 	number_training.clear();
 	number_test.clear();
 
-	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, false, nb_epoch);
+	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, true, nb_epoch);
 }
 
 void test_neural_net_gpu_augmented_database(const int max_files_per_folder, const int network_for_training, std::string database_training, std::string database_test, const int nb_epoch) {
@@ -1915,8 +1949,10 @@ void test_neural_net_conv_gpu_mnist(const int nb_epoch) {
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
 	lr.type = LAYER_INPUT_MATRIX;
-	lr.sizei_map = 29;
-	lr.sizej_map = 29;
+	//lr.sizei_map = 29;
+	//lr.sizej_map = 29;
+	lr.sizei_map = number_training(0)(0).getDomain()(0);
+	lr.sizej_map = number_training(0)(0).getDomain()(1);
 	lr.nbr_map = 1;
 	v_layer.push_back(lr);
 	lr.type = LAYER_CONVOLUTIONAL;
@@ -1948,6 +1984,6 @@ void test_neural_net_conv_gpu_mnist(const int nb_epoch) {
 	number_training.clear();
 	number_test.clear();
 
-	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, false, nb_epoch);
+	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, true, nb_epoch);
 }
 #endif
