@@ -16,10 +16,15 @@
 #include "data/utility/BasicUtility.h"
 
 // slower when using cublas
-//#define SET_W_ERROR_CUBLAS
+#define SET_W_ERROR_CUBLAS
+#undef SET_W_ERROR_CUBLAS
 
 // if defined, then loadDatabase() will process a batch of images instead of 1 image at a time. May improve disk access
 #define BATCH_LOADING
+
+// Vincent's algo for convolution
+#define VT_CONV_ALGO
+#undef VT_CONV_ALGO
 
 struct layer {
 	TypeLayer _type;
@@ -325,7 +330,7 @@ void GPUNeuralNetwork::displayNetwork() {
 		std::cout << "\n-- Layer " << l << ", type = " << typeLayer2String(layer._type) << ", _X_size = " << layer._X_size << ", Y_size = " << layer._Y_size << ", _W_height = " << layer._W_height << ", _W_width = " << layer._W_width << std::endl;
 		if (layer._type == LAYER_CONVOLUTIONAL || layer._type == LAYER_INPUT_MATRIX) {
 			std::cout << "\tnbr_map = " << layer._nbr_map << ", sizei_map = " << layer._sizei_map << ", sizej_map = " << layer._sizej_map << std::endl;
-			std::cout << "\t_sub_resolution_factor = " << layer._sub_resolution_factor << ", nbr_map = " << layer._nbr_kernel << ", sizei_kernel = " << layer._sizei_kernel << ", sizej_kernel = " << layer._sizej_kernel << std::endl;
+			std::cout << "\t_sub_resolution_factor = " << layer._sub_resolution_factor << ", nbr_kernel = " << layer._nbr_kernel << ", sizei_kernel = " << layer._sizei_kernel << ", sizej_kernel = " << layer._sizej_kernel << std::endl;
 		}
 
 		/*
@@ -466,38 +471,63 @@ void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) 
 				}
 			}
 		} else if (layer._type == LAYER_CONVOLUTIONAL) {
+#ifndef VT_CONV_ALGO
+			memset(layer._Y, 0, layer._Y_size);
+
+			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
+				for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
+					// convolution between:
+					//	previous map index_map_previous
+					//	kernel index_kernel + index_map_previous*prev_layer._nbr_map
+					//	map index_kernel
+					unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
+					pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+					pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
+					pop::F32* start_map = layer._Y + index_map * layer._sizei_map * layer._sizej_map;
+
+					for (unsigned int i=0; i<layer._sizei_map; i++) {
+						for (unsigned int j=0; j<layer._sizej_map; j++) {
+							for (unsigned int n=0; n<layer._sizei_kernel; n++) {
+								for (unsigned int m=0; m<layer._sizej_kernel; m++) {
+									start_map[i*layer._sizej_map+j] += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
+								}
+							}
+							start_map[i*layer._sizej_map+j] += start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
+						}
+					}
+				}
+			}
+#else
 			const unsigned int rayon_kernel = (layer._sizei_kernel-1)/2;
+			const unsigned int map_size = prev_layer._sizei_map*prev_layer._sizej_map;
 			const int X_shift = rayon_kernel * (1+prev_layer._sizej_map);
-			const int map_size = prev_layer._sizei_map * prev_layer._sizej_map;
-			pop::F32* ptr_Y_incr = layer._Y;
 
 			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
 				for (unsigned int index_i = 0; index_i < layer._sizei_map; index_i++) {
-					for (unsigned int index_j = 0; index_j < layer._sizej_map; index_j++, ptr_Y_incr++) {
-						//XXX pop::F32 v = 0;
-						*ptr_Y_incr=0;
-
+					for (unsigned int index_j = 0; index_j < layer._sizej_map; index_j++) {
 						const int index_i_previous = index_i * layer._sub_resolution_factor + rayon_kernel;
 						const int index_j_previous = index_j * layer._sub_resolution_factor + rayon_kernel;
 						const pop::F32* ptr_X_previous_start = prev_layer._X + index_j_previous + index_i_previous*prev_layer._sizej_map;
 						const pop::F32* ptr_W_incr = layer._W + (layer._sizei_kernel*layer._sizej_kernel+1) * prev_layer._nbr_map * index_map;
+						pop::F32 v = 0;
 
 						for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
 							const pop::F32* ptr_X_previous = ptr_X_previous_start + map_size * index_map_previous - X_shift;
 							for (unsigned int index_i_W = 0; index_i_W < layer._sizei_kernel; index_i_W++) {
 								for (unsigned int index_j_W = 0; index_j_W < layer._sizej_kernel; index_j_W++, ptr_X_previous++, ptr_W_incr++) {
-									*ptr_Y_incr += *ptr_X_previous * *ptr_W_incr;
+									v += *ptr_X_previous * *ptr_W_incr;
 								}
 								ptr_X_previous += prev_layer._sizej_map - layer._sizej_kernel;
 							}
-							*ptr_Y_incr += *ptr_W_incr; //bias weight;
+							v += *ptr_W_incr; //bias weight;
 							ptr_W_incr++;
 						}
 
-						//XXX layer._Y[index_map * layer._sizei_map * layer._sizej_map + index_i * layer._sizej_map + index_j] = v;
+						layer._Y[index_map * layer._sizei_map * layer._sizej_map + index_i * layer._sizej_map + index_j] = v;
 					}
 				}
 			}
+#endif
 		} else {
 			std::cerr << "Propagate front: invalid layer " << layer._type << std::endl;
 		}
@@ -567,11 +597,39 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 				}
 			}
 		} else if (layer._type == LAYER_CONVOLUTIONAL) {
-			const unsigned int X_shift = (layer._sizei_kernel-1)/2 * (1+prev_layer._sizej_map);
-			const unsigned int map_size = prev_layer._sizei_map*prev_layer._sizej_map;
-
 			memset(layer._d_E_X, 0, layer._X_size*sizeof(*layer._d_E_X));
 			memset(layer._d_E_W, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
+
+#ifndef VT_CONV_ALGO
+			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
+				for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
+					unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
+					pop::F32* start_map_d_E_Y = layer._d_E_Y + index_map * layer._sizei_map * layer._sizej_map;
+
+					// error on X
+					pop::F32* start_previous_map_d_E_X = prev_layer._d_E_X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+					pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
+
+					// error on W
+					pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+					pop::F32* start_kernel_d_E_W = layer._d_E_W + index_kernel * layer._W_width;
+
+					for (unsigned int i=0; i<layer._sizei_map; i++) {
+						for (unsigned int j=0; j<layer._sizej_map; j++) {
+							for (unsigned int n=0; n<layer._sizei_kernel; n++) {
+								for (unsigned int m=0; m<layer._sizej_kernel; m++) {
+									start_previous_map_d_E_X[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor] += start_map_d_E_Y[i*layer._sizej_map+j] * start_kernel[n*layer._sizej_kernel+m];
+									start_kernel_d_E_W[n*layer._sizej_kernel+m] += start_map_d_E_Y[i*layer._sizej_map+j] * start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor];
+								}
+							}
+							start_kernel_d_E_W[layer._sizei_kernel*layer._sizej_kernel] += start_map_d_E_Y[layer._sizei_map*layer._sizej_map];
+						}
+					}
+				}
+			}
+#else
+			const unsigned int X_shift = (layer._sizei_kernel-1)/2 * (1+prev_layer._sizej_map);
+			const unsigned int map_size = prev_layer._sizei_map*prev_layer._sizej_map;
 			pop::F32* ptr_d_E_Y_incr = layer._d_E_Y;
 
 			for (unsigned int index_map=0; index_map<layer._nbr_map; index_map++) {
@@ -604,6 +662,7 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 					}
 				}
 			}
+#endif
 
 			for (unsigned int idx=0; idx<layer._W_height*layer._W_width; idx++) {
 				layer._W[idx] = layer._W[idx] - h_network->_eta*layer._d_E_W[idx];
@@ -851,7 +910,7 @@ __global__ void printNetworkOnGPU(struct neural_network *network) {
 		printf("\n--Layer %d, type = %s, _X_size = %d, _Y_size = %d, _W_height = %d, _W_width = %d\n", l, gpu_typeLayer2String(layer._type), layer._X_size, layer._Y_size, layer._W_height, layer._W_width);
 		if (layer._type == LAYER_CONVOLUTIONAL || layer._type == LAYER_INPUT_MATRIX) {
 			printf("\tnbr_map = %d, sizei_map = %d, sizej_map = %d\n", layer._nbr_map, layer._sizei_map, layer._sizej_map);
-			printf("\tt_sub_resolution_factor = %d, nbr_map = %d, sizei_map = %d, sizej_map = %d\n", layer._sub_resolution_factor, layer._nbr_kernel, layer._sizei_kernel, layer._sizej_kernel);
+			printf("\tt_sub_resolution_factor = %d, nbr_kernel = %d, sizei_kernel = %d, sizej_kernel = %d\n", layer._sub_resolution_factor, layer._nbr_kernel, layer._sizei_kernel, layer._sizej_kernel);
 		}
 
 		printVectorOnGPU(layer._X, layer._X_size, (char*)"_X");
@@ -1957,11 +2016,74 @@ void test_neural_net_conv_gpu_mnist(const int nb_epoch) {
 }
 
 void test_neural_net() {
-	const int nb_epoch = 1;
-	//int size_input_matrix = 7;
-	//int nbr_map=1;
+	pop::Vec2I32 domain(640, 480);
+	std::vector<struct layer_representation> v_layer;
+	struct layer_representation lr;
+	lr.type = LAYER_INPUT_MATRIX;
+	lr.sizei_map = domain(0);
+	lr.sizej_map = domain(1);
+	lr.nbr_map = 1;
+	v_layer.push_back(lr);
+	lr.type = LAYER_CONVOLUTIONAL;
+	lr.nbr_map = 2;
+	lr.radius_kernel = 1;
+	lr.sub_resolution_factor = 1;
+	v_layer.push_back(lr);
+	lr.type = LAYER_CONVOLUTIONAL;
+	lr.nbr_map = 1;
+	lr.radius_kernel = 1;
+	lr.sub_resolution_factor = 1;
+	v_layer.push_back(lr);
+	GPUNeuralNetwork network(v_layer, 0.01);
+
+	/*
+	 * For this example, you need to specify the filters when creating the network. In createNetwork():
+		{
+			//layer 1 : kernels are ID
+			struct layer& l = h_network->_layers[1];
+			for (unsigned int j=0; j<l._W_height * l._W_width; j++) {
+			l._W[j] = 0;
+			}
+			l._W[4] = 1;
+			l._W[13] = 1;
+		}
+		{
+			//layer 2: kernels are Sobel
+			struct layer& l = h_network->_layers[2];
+			l._W[0] = -1; l._W[1] = -2; l._W[2] = -1;
+			l._W[3] =  0; l._W[4] =  0; l._W[5] =  0;
+			l._W[6] =  1; l._W[7] =  2; l._W[8] =  1; l._W[9] = 0; //bias neuron
+			l._W[10] = -1; l._W[11] = 0; l._W[12] = 1;
+			l._W[13] = -2; l._W[14] = 0; l._W[15] = 2;
+			l._W[16] = -1; l._W[17] = 0; l._W[18] = 1; l._W[19] = 0; //bias neuron
+		}
+	 */
+
+	network.displayNetwork();
+
+	pop::Mat2UI8 image_in(domain);
+	image_in.load("/home/pl/workspace/Population/image/Bikesgray.jpg");
+	pop::VecF32 vin = pop::NNLayerMatrix::inputMatrixToInputNeuron(image_in,domain,pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
+
+	pop::VecF32 vout;
+	network.propagateFront(vin, vout);
+
+	std::cout << "Propagate front ok" << std::endl;
+
+	pop::Vec2I32 domain_out(domain(0)-4, domain(1)-4);
+	pop::Mat2UI8 image_out(domain_out);
+	for (int i=0; i<domain_out(0); i++) {
+		for (int j=0; j<domain_out(1); j++) {
+			image_out(i, j) = (vout(i*domain_out(1)+j)/* <= 0 ? 0 : 255*/);
+		}
+	}
+	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-pl.jpg");
+
+
+#if 0
+	const int nb_epoch = 200;
 	int size_input_matrix = 7;
-	int nbr_map=2;
+	int nbr_map=1;
 
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
@@ -2044,6 +2166,7 @@ void test_neural_net() {
 		network.propagateFront(v_in(0), vout);
 		std::cout << "cpu: " << vout << std::endl;
 	}
+#endif
 }
 
 #endif
