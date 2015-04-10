@@ -472,7 +472,7 @@ void GPUNeuralNetwork::propagateFront(const pop::VecF32& in , pop::VecF32 &out) 
 			}
 		} else if (layer._type == LAYER_CONVOLUTIONAL) {
 #ifndef VT_CONV_ALGO
-			memset(layer._Y, 0, layer._Y_size);
+			memset(layer._Y, 0, layer._Y_size*sizeof(*layer._Y));
 
 			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
 				for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
@@ -948,7 +948,7 @@ __global__ void gpu_propagateFront_setOutput(struct neural_network *network, pop
 	}
 }
 
-__global__ void gpu_propagateFront_convolution(struct neural_network *network, int l, int index_map) {
+__global__ void gpu_propagateFront_convolution_vt_algo(struct neural_network *network, int l, int index_map) {
 	struct layer& layer = network->_layers[l];
 	struct layer& prev_layer = network->_layers[l-1];
 	int tid = blockDim.x*blockIdx.x + threadIdx.x;
@@ -978,6 +978,32 @@ __global__ void gpu_propagateFront_convolution(struct neural_network *network, i
 			v += *ptr_W_incr; //bias weight;
 		}
 		layer._Y[tid + index_map * layer._sizei_map * layer._sizej_map] = v;
+	}
+}
+
+__global__ void gpu_propagateFront_convolution(struct neural_network *network, int l, int index_map_previous) {
+	struct layer& layer = network->_layers[l];
+	struct layer& prev_layer = network->_layers[l-1];
+	int tid = blockDim.x*blockIdx.x + threadIdx.x;
+
+	// as many threads as the number of elements in a map times the number of maps
+	if (tid < layer._sizei_map * layer._sizej_map * layer._nbr_map) {
+		unsigned int index_map = tid / (layer._sizei_map * layer._sizej_map);
+		int tid_in_map = tid % (layer._sizei_map * layer._sizej_map);
+		const unsigned int i = tid_in_map / (layer._sizej_map);
+		const unsigned int j = tid_in_map % (layer._sizej_map);
+
+		unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
+		pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+		pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
+		pop::F32* start_map = layer._Y + index_map * layer._sizei_map * layer._sizej_map;
+
+		for (unsigned int n=0; n<layer._sizei_kernel; n++) {
+			for (unsigned int m=0; m<layer._sizej_kernel; m++) {
+				start_map[i*layer._sizej_map+j] += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
+			}
+		}
+		start_map[i*layer._sizej_map+j] += start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
 	}
 }
 
@@ -1017,12 +1043,23 @@ void GPUNeuralNetwork::gpu_propagateFront(pop::F32* in_set, unsigned int in_elt_
 				std::cout << "Cublas error in _Y[l+1] = _W[l+1] * _X[l] for layer l = " << l << ", cublas status: " << popcuda::cublasGetErrorString(stat) << std::endl;
 			}
 		} else if (layer._type == LAYER_CONVOLUTIONAL) {
+#ifndef VT_CONV_ALGO
+			cudaMemset(d_Y, 0, layer._Y_size*sizeof(*d_Y));
+
+			unsigned int nb_elements = layer._sizei_map * layer._sizej_map * layer._nbr_map;
+			block = (nb_elements < max_nb_threads ? nb_elements : max_nb_threads);
+			grid = nb_elements / max_nb_threads + (nb_elements%max_nb_threads ? 1 : 0);
+			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
+				gpu_propagateFront_convolution<<<grid, block>>>(d_network, l+1, index_map_previous);
+			}
+#else
 			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
 				unsigned int nb_elements = layer._sizei_map * layer._sizej_map;
 				block = (nb_elements < max_nb_threads ? nb_elements : max_nb_threads);
 				grid = nb_elements / max_nb_threads + (nb_elements%max_nb_threads ? 1 : 0);
-				gpu_propagateFront_convolution<<<grid, block>>>(d_network, l+1, index_map);
+				gpu_propagateFront_convolution_vt_algo<<<grid, block>>>(d_network, l+1, index_map);
 			}
+#endif
 		} else {
 			std::cerr << "Propagate front: invalid layer " << layer._type << std::endl;
 		}
@@ -1083,7 +1120,7 @@ __global__ void gpu_propagateBackFirstDerivate_setPreviousXError(struct neural_n
 	}
 }
 
-__global__ void gpu_propagateBackFirstDerivate_convolution(struct neural_network *network, int l, int index_map) {
+__global__ void gpu_propagateBackFirstDerivate_convolution_vt_algo(struct neural_network *network, int l, int index_map) {
 	struct layer& layer = network->_layers[l];
 	struct layer& prev_layer = network->_layers[l-1];
 	int tid = blockDim.x*blockIdx.x + threadIdx.x;
@@ -1118,6 +1155,39 @@ __global__ void gpu_propagateBackFirstDerivate_convolution(struct neural_network
 			}
 			*ptr_d_E_W_incr += d_E_Y_value;
 		}
+	}
+}
+
+__global__ void gpu_propagateBackFirstDerivate_convolution(struct neural_network *network, int l, int index_map_previous) {
+	struct layer& layer = network->_layers[l];
+	struct layer& prev_layer = network->_layers[l-1];
+	int tid = blockDim.x*blockIdx.x + threadIdx.x;
+
+	// as many threads as the number of elements in a map times the number of maps
+	if (tid < layer._sizei_map * layer._sizej_map * layer._nbr_map) {
+		unsigned int index_map = tid / (layer._sizei_map * layer._sizej_map);
+		int tid_in_map = tid % (layer._sizei_map * layer._sizej_map);
+		const unsigned int i = tid_in_map / (layer._sizej_map);
+		const unsigned int j = tid_in_map % (layer._sizej_map);
+
+		unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
+		pop::F32* start_map_d_E_Y = layer._d_E_Y + index_map * layer._sizei_map * layer._sizej_map;
+
+		// error on X
+		pop::F32* start_previous_map_d_E_X = prev_layer._d_E_X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+		pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
+
+		// error on W
+		pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+		pop::F32* start_kernel_d_E_W = layer._d_E_W + index_kernel * layer._W_width;
+
+		for (unsigned int n=0; n<layer._sizei_kernel; n++) {
+			for (unsigned int m=0; m<layer._sizej_kernel; m++) {
+				start_previous_map_d_E_X[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor] += start_map_d_E_Y[i*layer._sizej_map+j] * start_kernel[n*layer._sizej_kernel+m];
+				start_kernel_d_E_W[n*layer._sizej_kernel+m] += start_map_d_E_Y[i*layer._sizej_map+j] * start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor];
+			}
+		}
+		start_kernel_d_E_W[layer._sizei_kernel*layer._sizej_kernel] += start_map_d_E_Y[layer._sizei_map*layer._sizej_map];
 	}
 }
 
@@ -1197,12 +1267,21 @@ void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigne
 			cudaMemset(start + layer._X_size+layer._Y_size+layer._W_height*layer._W_width, 0, layer._X_size*sizeof(*layer._d_E_X));
 			cudaMemset(start + 2*(layer._X_size+layer._Y_size)+layer._W_height*layer._W_width, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
 
+#ifndef VT_CONV_ALGO
+			unsigned int nb_elements = layer._sizei_map * layer._sizej_map * layer._nbr_map;
+			block = (nb_elements < max_nb_threads ? nb_elements : max_nb_threads);
+			grid = nb_elements / max_nb_threads + (nb_elements%max_nb_threads ? 1 : 0);
+			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
+				gpu_propagateBackFirstDerivate_convolution<<<grid, block>>>(d_network, l+1, index_map_previous);
+			}
+#else
 			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
 				unsigned int nb_elements = layer._sizei_map * layer._sizej_map;
 				block = (nb_elements < max_nb_threads ? nb_elements : max_nb_threads);
 				grid = nb_elements / max_nb_threads + (nb_elements%max_nb_threads ? 1 : 0);
-				gpu_propagateBackFirstDerivate_convolution<<<grid, block>>>(d_network, l, index_map);
+				gpu_propagateBackFirstDerivate_convolution_vt_algo<<<grid, block>>>(d_network, l, index_map);
 			}
+#endif
 
 			unsigned int nb_weights = layer._W_height * layer._W_width;
 			block = (nb_weights < max_nb_threads ? nb_weights : max_nb_threads);
@@ -2065,19 +2144,43 @@ void test_neural_net() {
 	image_in.load("/home/pl/workspace/Population/image/Bikesgray.jpg");
 	pop::VecF32 vin = pop::NNLayerMatrix::inputMatrixToInputNeuron(image_in,domain,pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
 
+	pop::Vec2I32 domain_out(domain(0)-4, domain(1)-4);
+	pop::Mat2UI8 image_out(domain_out);
+
+	std::cout << "Test on CPU" << std::endl;
+
 	pop::VecF32 vout;
 	network.propagateFront(vin, vout);
 
-	std::cout << "Propagate front ok" << std::endl;
-
-	pop::Vec2I32 domain_out(domain(0)-4, domain(1)-4);
-	pop::Mat2UI8 image_out(domain_out);
 	for (int i=0; i<domain_out(0); i++) {
 		for (int j=0; j<domain_out(1); j++) {
-			image_out(i, j) = (vout(i*domain_out(1)+j)/* <= 0 ? 0 : 255*/);
+			image_out(i, j) = vout(i*domain_out(1)+j);
 		}
 	}
-	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-pl.jpg");
+	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-cpu.jpg");
+
+	std::cout << "Test on GPU" << std::endl;
+
+	pop::F32* d_in;
+	cudaMalloc(&d_in, vin.size()*sizeof(*d_in));
+	cudaMemcpy(d_in, vin.data(), vin.size()*sizeof(vin(0)), cudaMemcpyHostToDevice);
+	pop::F32* d_out;
+	cudaMalloc(&d_out, domain_out(0)*domain_out(1)*sizeof(*d_out));
+
+	network.gpu_propagateFront(d_in, vin.size(), 0, d_out);
+
+	cudaMemcpy(vout.data(), d_out, vout.size()*sizeof(vout(0)), cudaMemcpyDeviceToHost);
+	for (int i=0; i<domain_out(0); i++) {
+		for (int j=0; j<domain_out(1); j++) {
+			image_out(i, j) = vout(i*domain_out(1)+j);
+		}
+	}
+	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-gpu.jpg");
+
+	cudaFree(d_out);
+	cudaFree(d_in);
+
+	std::cout << "Tests ok!" << std::endl;
 
 
 #if 0
