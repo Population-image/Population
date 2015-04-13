@@ -262,7 +262,7 @@ struct POP_EXPORTS Representation
     Mat2UI8 img;
     img.load("/home/vincent/Desktop/bin/Population/doc/html/lena.bmp");
     Mat2ComplexF32 imgc;
-    imgc.fromRealImaginary(img);
+    Convertor::fromRealImaginary(Mat2F32(img),imgc);
     imgc = Representation::FFT(imgc,1);
     imgc = Representation::highPass(imgc,7);
     imgc = Representation::FFT(imgc,0);

@@ -2673,8 +2673,9 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
         DistributionRegularStep d = Statistics::computedStaticticsFromRealRealizationsWithWeight(angles,weight,1);
         d.smoothGaussian(4);
-        angle_rot_radian =  PI/2-Statistics::argMax(d,80,100,1)*PI/180;
-        return GeometricalTransformation::rotate(f,angle_rot_radian);
+
+        angle_rot_radian =  Statistics::argMax(d,-10,10,1)*PI/180;
+        return GeometricalTransformation::rotate(f,-angle_rot_radian);
     }
     //@}
 

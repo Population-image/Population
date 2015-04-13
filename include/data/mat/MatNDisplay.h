@@ -194,7 +194,7 @@ public:
     virtual MatNDisplayInterface & 	waitTime (const unsigned int milliseconds)=0;
     virtual MatNDisplayInterface & 	paint ()=0;
 };
-POP_EXPORTS void waitKey( );
+POP_EXPORTS void waitKey( std::string text="");
 class POP_EXPORTS MatNDisplay
 {
 private:

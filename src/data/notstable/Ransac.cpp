@@ -1,6 +1,15 @@
 #include"data/notstable/Ransac.h"
 #include"algorithm/GeometricalTransformation.h"
 namespace pop {
+LinearLeastSquareRANSACModel::LinearLeastSquareRANSACModel()
+:_error(NumericLimits<F32>::maximumRange()){
+
+
+}
+std::ostream& operator << (std::ostream& out, const LinearLeastSquareRANSACModel::Data & m){
+    out<<m.X<<" and Y="<<m.Y<<std::endl;
+    return out;
+}
 LinearLeastSquareRANSACModel::LinearLeastSquareRANSACModel(const Vec<Data >& data)
 {
     Mat2F32 X(static_cast<int>(data.size()),static_cast<int>(data[0].X.size()));

@@ -111,13 +111,14 @@ public:
         pop::VecF32 X;
         pop::F32 Y;
     };
+    LinearLeastSquareRANSACModel();
     LinearLeastSquareRANSACModel(const Vec<Data >& data);
     F32 getError();
     F32 getError(const Data & p);
      unsigned int getNumberDataFitModel()const;
     pop::VecF32 getBeta();
 };
-
+std::ostream& operator << (std::ostream& out, const LinearLeastSquareRANSACModel::Data & m);
 
 class POP_EXPORTS GeometricalTransformationRANSACModel
 {

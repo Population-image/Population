@@ -233,10 +233,10 @@ public:
 
 enum ModelGermGrainEnum
 {
-    Boolean=0,
-    DeadLeave=1,
-    Transparent=2,
-    SpotNoise=3
+    MODEL_BOOLEAN=0,
+    MODEL_DEADLEAVE=1,
+    MODEL_TRANSPARENT=2,
+    MODEL_SHOTNOISE=3
 };
 
 /*! \ingroup Other
@@ -302,7 +302,7 @@ public:
     * default constructor
     */
     ModelGermGrain()
-        :_model(Boolean),_transparency(1),_boundary(MATN_BOUNDARY_CONDITION_PERIODIC)
+        :_model(MODEL_BOOLEAN),_transparency(1),_boundary(MATN_BOUNDARY_CONDITION_PERIODIC)
     {
     }
     /*!

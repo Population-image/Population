@@ -78,7 +78,7 @@ public:
         edge.display("edge",false);
         Mat2F32 hough = Feature::transformHough(edge);
         hough.display("hough",false);
-        std::vector< std::pair<Vec2I32, Vec2I32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
+        std::vector< std::pair<Vec2F32, Vec2F32 > > v_lines = Feature::HoughToLines(hough,edge ,0.5);
         Mat2RGBUI8 m_hough(m);
         for(unsigned int i=0;i<v_lines.size();i++){
             Draw::line(m_hough,v_lines[i].first,v_lines[i].second,  RGBUI8(255,0,0),2);

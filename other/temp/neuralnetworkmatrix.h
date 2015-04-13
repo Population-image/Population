@@ -374,7 +374,6 @@ public:
         }
         for(unsigned int layer_index=1;layer_index<_v_layer.size();layer_index++){
             propagateFront(layer_index);
-            std::cout<<_v_layer(layer_index)._X<<std::endl;
         }
         std::copy(_v_layer.rbegin()->_X.begin(),_v_layer.rbegin()->_X.begin()+out.size(),out.begin());
     }
@@ -385,6 +384,8 @@ public:
         for(unsigned int layer_index=1;layer_index<_v_layer.size();layer_index++){
             propagateFront(layer_index);
         }
+        if(out.size()<_v_layer.rbegin()->_X.size()-1)//1 for the shift layer
+            out.resize(_v_layer.rbegin()->_X.size()-1);
         std::copy(_v_layer.rbegin()->_X.begin(),_v_layer.rbegin()->_X.begin()+out.size(),out.begin());
     }
     void propagateBackFirstDerivate(int index_layer){
@@ -424,8 +425,129 @@ public:
     }
 };
 
+void neuralNetworkForRecognitionForHandwrittenDigits()
+{
 
+    Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST("/home/vincent/train-images.idx3-ubyte","/home/vincent/train-labels.idx1-ubyte");
+
+    Vec<Vec<Mat2UI8> > number_test =  TrainingNeuralNetwork::loadMNIST("/home/vincent/t10k-images.idx3-ubyte","/home/vincent/t10k-labels.idx1-ubyte");
+    Vec2I32 domain(29,29);
+    NeuralNetworkFullyConnected2 neural;
+    neural.addInputNeuronMatrix(domain,1);
+    neural.addConvolutionnal(2,20,2);
+    neural.addConvolutionnal(2,75,2);
+    neural.addFullyConnected(100);
+    neural.addFullyConnected(10);
+
+
+
+    Vec<VecF32> trainingins;
+    Vec<VecF32> trainingouts;
+
+    for(unsigned int i=0;i<number_training.size();i++){
+        for(unsigned int j=0;j<number_training(i).size();j++){
+            Mat2UI8 binary = number_training(i)(j);
+            VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain);
+            trainingins.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
+            v_out(i)=1;
+            trainingouts.push_back(v_out);
+
+        }
+    }
+    Vec<VecF32> testins;
+    Vec<VecF32> testouts;
+    for(unsigned int i=0;i<number_test.size();i++){
+        for(unsigned int j=0;j<number_test(i).size();j++){
+            Mat2UI8 binary = number_test(i)(j);
+            VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain);
+            testins.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_test.size()),-1);
+            v_out(i)=1;
+            testouts.push_back(v_out);
+        }
+    }
+    F32 eta = 0.001f;
+    int nbr_epoch =20;
+    neural.setEta(eta);
+    std::vector<int> v_global_rand(trainingins.size());
+    for(unsigned int i=0;i<v_global_rand.size();i++)
+        v_global_rand[i]=i;
+    std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+
+    for(unsigned int i=0;i<nbr_epoch;i++){
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+        int error_training=0,error_test=0;
+        for(unsigned int j=0;j<v_global_rand.size();j++){
+            VecF32 vout;
+            neural.propagateFront(trainingins(v_global_rand[j]),vout);
+//            std::cout<<trainingouts(v_global_rand[j])<<std::endl;
+//            std::cout<<vout<<std::endl;
+            neural.propagateBackFirstDerivate(trainingouts(v_global_rand[j]));
+            neural.learningFirstDerivate();
+            neural.propagateFront(trainingins(v_global_rand[j]),vout);
+//            std::cout<<vout<<std::endl;
+
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(trainingouts(v_global_rand[j]).begin(),std::max_element(trainingouts(v_global_rand[j]).begin(),trainingouts(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error_training++;
+            if(j*10%v_global_rand.size()==0)
+                std::cout<<j*1.f/v_global_rand.size()<<std::endl;
+        }
+        for(unsigned int j=0;j<testins.size();j++){
+            VecF32 vout;
+            neural.propagateFront(testins(j),vout);
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(testouts(j).begin(),std::max_element(testouts(j).begin(),testouts(j).end()));
+            if(label1!=label2)
+                error_test++;
+        }
+        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<std::endl;
+        eta *=0.9f;
+        neural.setEta(eta);
+    }
+}
 void neuralnetwortest2(){
+    {
+        neuralNetworkForRecognitionForHandwrittenDigits();
+        NeuralNetworkFeedForward n;
+        Vec2I32 domain(29,29);
+        n.addInputLayerMatrix(domain(0),domain(1));
+        n.addLayerConvolutionalPlusSubScaling(6,5,2,1);
+        n.addLayerConvolutionalPlusSubScaling(50,5,2,1);
+        n.addLayerFullyConnected(100,1);
+        n.addLayerFullyConnected(10,1);
+
+        Mat2F32 m(29,29);
+
+                    VecF32 b_in = n.inputMatrixToInputNeuron(m);
+        VecF32 b_out(10);
+        int time1 =time(NULL);
+        for(unsigned int i=0;i<10000;i++){
+
+            n.propagateFront(b_in,b_out);
+        }
+        int time2 =time(NULL);
+        std::cout<<time2-time1<<std::endl;
+
+        NeuralNetworkFullyConnected2 neural;
+        neural.addInputNeuronMatrix(domain,1);
+        neural.addConvolutionnal(1,6,2);
+        neural.addConvolutionnal(1,50,2);
+        neural.addFullyConnected(100);
+        neural.addFullyConnected(10);
+
+         time1 =time(NULL);
+        for(unsigned int i=0;i<10000;i++){
+
+            neural.propagateFront(b_in,b_out);
+        }
+         time2 =time(NULL);
+        std::cout<<time2-time1<<std::endl;
+        return ;
+
+    }
     int size_input_matrix = 7;
     int nbr_map=1;
     NeuralNetworkFeedForward neural;
@@ -505,21 +627,21 @@ void neuralnetwortest2(){
         std::cout<<"propagate front "<<v_out(0)<<std::endl;
 
 
-//        std::cout<<"error"<<std::endl;
-//        for( int layer=2;layer>=0;layer--){
-//            std::cout<<"layer "<<layer<<std::endl;
-//            //            for(unsigned int i=0;i<neural.layers()(layer)->_neurons.size();i++)
-//            //                std::cout<<(neural.layers()(layer)->_neurons(i)->_dErr_dXn)<<" ";
-//            //            std::cout<<std::endl;
-//            //            std::cout<<test._v_layer(layer)._d_E_X<<std::endl;
+        //        std::cout<<"error"<<std::endl;
+        //        for( int layer=2;layer>=0;layer--){
+        //            std::cout<<"layer "<<layer<<std::endl;
+        //            //            for(unsigned int i=0;i<neural.layers()(layer)->_neurons.size();i++)
+        //            //                std::cout<<(neural.layers()(layer)->_neurons(i)->_dErr_dXn)<<" ";
+        //            //            std::cout<<std::endl;
+        //            //            std::cout<<test._v_layer(layer)._d_E_X<<std::endl;
 
-//            for(unsigned int i=0;i<neural.layers()(layer)->_weights.size();i++)
-//                std::cout<<(neural.layers()(layer)->_weights(i)->_dE_dWn)<<" ";
-//            std::cout<<std::endl;
-//            std::cout<<test._v_layer(layer)._d_E_W<<std::endl;
+        //            for(unsigned int i=0;i<neural.layers()(layer)->_weights.size();i++)
+        //                std::cout<<(neural.layers()(layer)->_weights(i)->_dE_dWn)<<" ";
+        //            std::cout<<std::endl;
+        //            std::cout<<test._v_layer(layer)._d_E_W<<std::endl;
 
-//        }
-//        exit(0);
+        //        }
+        //        exit(0);
 
         //        for(unsigned int i=0;i<neural.layers()(1)->_neurons.size();i++)
         //            std::cout<<(neural.layers()(1)->_neurons(i)->_dErr_dXn)<<" ";

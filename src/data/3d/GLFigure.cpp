@@ -678,6 +678,7 @@ void keyPressed(unsigned char key, int, int )
     /* If escape is pressed, kill everything. */
     if (key == ESCAPE)
     {
+        std::cout<<"Escape opengl windows stops the program !";
         glutDestroyWindow(window);
 
     }else if(key ==(unsigned char) '1'){
@@ -773,6 +774,7 @@ void drawglut(void *)
     {
         std::cout<<msg<<std::endl;
     }
+    std::cout<<"Escape opengl windows stops the program !";
 
 }
 #endif
@@ -1113,54 +1115,54 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
             0, 0, 0                                        // Layer Masks Ignored
 };
 
-if (!(hDC=GetDC(hWnd)))                            // Did We Get A Device Context?
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Can't Create A GL Device Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if (!(hDC=GetDC(hWnd)))                            // Did We Get A Device Context?
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Can't Create A GL Device Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-if (!(PixelFormat=ChoosePixelFormat(hDC,&pfd)))    // Did Windows Find A Matching Pixel Format?
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Can't Find A Suitable PixelFormat."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if (!(PixelFormat=ChoosePixelFormat(hDC,&pfd)))    // Did Windows Find A Matching Pixel Format?
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Can't Find A Suitable PixelFormat."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-if(!SetPixelFormat(hDC,PixelFormat,&pfd))        // Are We Able To Set The Pixel Format?
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Can't Set The PixelFormat."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if(!SetPixelFormat(hDC,PixelFormat,&pfd))        // Are We Able To Set The Pixel Format?
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Can't Set The PixelFormat."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-if (!(hRC=wglCreateContext(hDC)))                // Are We Able To Get A Rendering Context?
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Can't Create A GL Rendering Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if (!(hRC=wglCreateContext(hDC)))                // Are We Able To Get A Rendering Context?
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Can't Create A GL Rendering Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-if(!wglMakeCurrent(hDC,hRC))                    // Try To Activate The Rendering Context
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Can't Activate The GL Rendering Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if(!wglMakeCurrent(hDC,hRC))                    // Try To Activate The Rendering Context
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Can't Activate The GL Rendering Context."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-ShowWindow(hWnd,SW_SHOW);                        // Show The Window
-SetForegroundWindow(hWnd);                        // Slightly Higher Priority
-SetFocus(hWnd);                                    // Sets Keyboard Focus To The Window
-ReSizeGLScene(width, height);                    // Set Up Our Perspective GL Screen
+    ShowWindow(hWnd,SW_SHOW);                        // Show The Window
+    SetForegroundWindow(hWnd);                        // Slightly Higher Priority
+    SetFocus(hWnd);                                    // Sets Keyboard Focus To The Window
+    ReSizeGLScene(width, height);                    // Set Up Our Perspective GL Screen
 
-if (!InitGL())                                    // Initialize Our Newly Created GL Window
-{
-    KillGLWindow();                                // Reset The Display
-    MessageBox(NULL,ctow("Initialization Failed."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
-    return FALSE;                                // Return FALSE
-}
+    if (!InitGL())                                    // Initialize Our Newly Created GL Window
+    {
+        KillGLWindow();                                // Reset The Display
+        MessageBox(NULL,ctow("Initialization Failed."),ctow("ERROR"),MB_OK|MB_ICONEXCLAMATION);
+        return FALSE;                                // Return FALSE
+    }
 
-return TRUE;                                    // Success
+    return TRUE;                                    // Success
 }
 
 LRESULT CALLBACK WndProc(    HWND    hWnd,            // Handle For This Window

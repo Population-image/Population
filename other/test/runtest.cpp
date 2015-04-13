@@ -314,14 +314,6 @@ int main(){
     img.load("/home/vincent/Desktop/Gold.jpg");
     img.display();
     img = Processing::threshold(img,125);
-    Mat2F32 corre = Analysis::correlationDirectionByFFT(img);
-    corre = corre(Vec2I32(0,0),Vec2I32(40,40));
-    corre(0,0)=0;
-    corre= pop::Processing::greylevelRange(corre,1,5);//0 is black color so start at 1
-    corre = pop::exp(corre);
-    corre= pop::Processing::greylevelRange(corre,1,255);//0 is black color so start at 1
-    Mat2UI8 dcorre(corre);
-    Visualization::labelToRGBGradation(dcorre).display();//color gradation
 
     Mat2RGBUI8 mask(img);
 

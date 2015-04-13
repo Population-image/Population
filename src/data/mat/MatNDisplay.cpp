@@ -58,10 +58,12 @@ MatNDisplay & MatNDisplay::display(const MatN<2, UI8 > &m){
 
 
 
-void waitKey(){
+void waitKey(std::string text){
 #if defined(HAVE_CIMG)
     Mat2UI8 m(100,350);
-    Draw::text(m,"Press this windows to end the infinite loop",Vec2I32(m.sizeI()/3,0),255,1);
+    if(text=="")
+        text = "Press this windows to end the infinite loop";
+    Draw::text(m,text,Vec2I32(m.sizeI()/3,0),255,1);
     MatNDisplayCImg disp;
     disp.display(m);
     do{

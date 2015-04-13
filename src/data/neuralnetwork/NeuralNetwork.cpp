@@ -459,6 +459,7 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
 
         unsigned int height = (height_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
         unsigned int width  = (width_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
+        std::cout<<height<<std::endl;
         NNLayerMatrixConvolutionalPlusSubScaling * layer = new NNLayerMatrixConvolutionalPlusSubScaling(nbr_map,height,width);
         layer->_size_convolutution = kernelsize;
         layer->_sub_scaling = sub_scale_sampling;
@@ -1238,7 +1239,6 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
         }
     }
 
-    int sum=0;
     Vec<VecF32> vtest_in;
     Vec<VecF32> vtest_out;
     for(unsigned int i=0;i<number_test.size();i++){
@@ -1249,7 +1249,6 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
             VecF32 v_out(static_cast<int>(number_test.size()),-1);
             v_out(i)=1;
             vtest_out.push_back(v_out);
-            sum++;
         }
     }
 

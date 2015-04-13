@@ -186,7 +186,7 @@ public:
     * \sa ModelGermGrain
     */
     template<int DIM>
-    static ModelGermGrain<DIM>    poissonPointProcess(VecN<DIM,F32> domain,F32 lambda);
+    static ModelGermGrain<DIM>          poissonPointProcess(VecN<DIM,F32> domain,F32 lambda);
 
 
     /*!
@@ -222,7 +222,7 @@ public:
         DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
         RandomGeometry::sphere(grain,d);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
         aborigenart.display();
     * \endcode
@@ -253,7 +253,7 @@ public:
         DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
         RandomGeometry::sphere(grain,d);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
         aborigenart.display();
     * \endcode
@@ -283,7 +283,7 @@ public:
         DistributionDirac d (radius);//because the Poisson point process has a surface equal to 0, we associate each germ with mono-disperse sphere to display the result
         RandomGeometry::sphere(grain,d);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
         Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
@@ -361,7 +361,7 @@ public:
 
         RandomGeometry::box(grain,d_radius,d_angle);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
         Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
@@ -624,7 +624,7 @@ public:
         DistributionRegularStep dproba = pop::Statistics::toProbabilityDistribution(d,5,128);
         RandomGeometry::box(grain,DistributionMultiVariateProduct(dproba,dproba),DistributionMultiVariateProduct(DistributionUniformReal(0,PI)));
         RandomGeometry::RGBRandomBlackOrWhite(grain);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_PERIODIC);
         Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
         deadleave_blackwhite.display();
@@ -651,7 +651,7 @@ public:
         DistributionMultiVariateProduct d_rgb (DistributionUniformInt(0,255),DistributionUniformInt(0,255),DistributionUniformInt(0,255));
 
         RandomGeometry::RGBRandom(grain,d_rgb);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_PERIODIC);
         Mat2RGBUI8 deadleave_blackwhite = RandomGeometry::continuousToDiscrete(grain);
         deadleave_blackwhite.display();
@@ -684,7 +684,7 @@ public:
 
         RandomGeometry::box(grain,d_radius,d_angle);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
         grain.setBoundaryCondition(MATN_BOUNDARY_CONDITION_BOUNDED);
         Mat2RGBUI8 aborigenart = RandomGeometry::continuousToDiscrete(grain);
 
@@ -715,7 +715,7 @@ public:
 
         RandomGeometry::sphere(grain,dproba);
         RandomGeometry::RGBFromMatrix(grain,img);
-        grain.setModel( DeadLeave);
+        grain.setModel( MODEL_DEADLEAVE);
 
         int i=0;
         MatNDisplay windows;
@@ -1658,16 +1658,14 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
             if(v_hit.size()!=0)
             {
                 //Max
-                if(grainlist.getModel()==Boolean)
+                if(grainlist.getModel()==MODEL_BOOLEAN)
                 {
                     Vec<int>::iterator it;
                     for(it=v_hit.begin();it!=v_hit.end();it++)
                         img(ximg) = std::max (img(ximg),   (grainlist.grains()[*it])->color);
-                }else if(grainlist.getModel()==DeadLeave){
+                }else if(grainlist.getModel()==MODEL_DEADLEAVE){
                     int value_=0;
                     Vec<int>::iterator it;
-                    if(v_hit.size()>6)
-                        value_=0;
                     for(it=v_hit.begin();it!=v_hit.end();it++){
                         if(value_<*it){
                             img(ximg) =   grainlist.grains()[*it]->color;
@@ -1675,14 +1673,23 @@ void RandomGeometry::divideTilling(const Vec<int> & v,Private::IntersectionRecta
                         }
                     }
                 }
-                else if(grainlist.getModel()==Transparent){
+                else if(grainlist.getModel()==MODEL_TRANSPARENT){
                     std::sort(v_hit.begin(),v_hit.end());
                     img(ximg) =   (grainlist.grains()[*(v_hit.begin())])->color;
                     Vec<int>::iterator it;
                     for(it=v_hit.begin()+1;it!=v_hit.end();it++){
                         img(ximg) = grainlist.getTransparency()*RGBF32(  (grainlist.grains()[*it])->color)+(1-grainlist.getTransparency())*RGBF32(img(ximg));
                     }
-                }else{
+                }
+                else if(grainlist.getModel()==MODEL_SHOTNOISE){
+                    std::sort(v_hit.begin(),v_hit.end());
+                    img(ximg) =   0;
+                    Vec<int>::iterator it;
+                    for(it=v_hit.begin();it!=v_hit.end();it++){
+                        img(ximg) = img(ximg)+  grainlist.grains()[*it]->color;
+                    }
+                }
+                else{
                     Vec<int>::iterator it;
                     for(it=v_hit.begin();it!=v_hit.end();it++){
                         img(ximg) +=   grainlist.grains()[*it]->color;
