@@ -618,7 +618,7 @@ void GPUNeuralNetwork::propagateBackFirstDerivate(const pop::VecF32& desired_out
 						for (unsigned int j=0; j<layer._sizej_map; j++) {
 							for (unsigned int n=0; n<layer._sizei_kernel; n++) {
 								for (unsigned int m=0; m<layer._sizej_kernel; m++) {
-									start_previous_map_d_E_X[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor] += start_map_d_E_Y[i*layer._sizej_map+j] * start_kernel[n*layer._sizej_kernel+m];
+									start_previous_map_d_E_X[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] += start_map_d_E_Y[i*layer._sizej_map+j] * start_kernel[n*layer._sizej_kernel+m];
 									start_kernel_d_E_W[n*layer._sizej_kernel+m] += start_map_d_E_Y[i*layer._sizej_map+j] * start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor];
 								}
 							}
@@ -1148,7 +1148,7 @@ __global__ void gpu_propagateBackFirstDerivate_convolution_vt_algo(struct neural
 			for (unsigned int index_i_W=0; index_i_W<layer._sizei_kernel; index_i_W++) {
 				for (unsigned int index_j_W=0; index_j_W<layer._sizej_kernel; index_j_W++, ptr_d_E_X_previous++, ptr_W_incr++, ptr_X_previous++, ptr_d_E_W_incr++) {
 					*ptr_d_E_X_previous += d_E_Y_value * *ptr_W_incr;
-					*ptr_d_E_W_incr += d_E_Y_value * *ptr_X_previous ;
+					*ptr_d_E_W_incr += d_E_Y_value * *ptr_X_previous;
 				}
 				ptr_d_E_X_previous += prev_layer._sizej_map-layer._sizej_kernel;
 				ptr_X_previous += prev_layer._sizej_map-layer._sizej_kernel;
@@ -1158,36 +1158,40 @@ __global__ void gpu_propagateBackFirstDerivate_convolution_vt_algo(struct neural
 	}
 }
 
-__global__ void gpu_propagateBackFirstDerivate_convolution(struct neural_network *network, int l, int index_map_previous) {
+__global__ void gpu_propagateBackFirstDerivate_convolution(struct neural_network *network, int l/*, int index_map_previous*/) {
 	struct layer& layer = network->_layers[l];
 	struct layer& prev_layer = network->_layers[l-1];
 	int tid = blockDim.x*blockIdx.x + threadIdx.x;
 
-	// as many threads as the number of elements in a map times the number of maps
-	if (tid < layer._sizei_map * layer._sizej_map * layer._nbr_map) {
-		unsigned int index_map = tid / (layer._sizei_map * layer._sizej_map);
-		int tid_in_map = tid % (layer._sizei_map * layer._sizej_map);
-		const unsigned int i = tid_in_map / (layer._sizej_map);
-		const unsigned int j = tid_in_map % (layer._sizej_map);
+	// as many threads as the number of elements in a previous map times the number of previous maps
+	if (tid < prev_layer._sizei_map * prev_layer._sizej_map * prev_layer._nbr_map / layer._sub_resolution_factor) {
+		unsigned int index_map_previous = tid / (prev_layer._sizei_map * prev_layer._sizej_map);
+		int tid_in_previous_map = (tid % (prev_layer._sizei_map * prev_layer._sizej_map)) * layer._sub_resolution_factor;
+		const unsigned int i = tid_in_previous_map / (prev_layer._sizej_map);
+		const unsigned int j = tid_in_previous_map % (prev_layer._sizej_map);
 
-		unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
-		pop::F32* start_map_d_E_Y = layer._d_E_Y + index_map * layer._sizei_map * layer._sizej_map;
+		for (unsigned int index_map=0; index_map<layer._nbr_map; index_map++) {
+			unsigned int index_kernel = index_map_previous * layer._nbr_map + index_map;
+			pop::F32* start_map_d_E_Y = layer._d_E_Y + index_map * layer._sizei_map * layer._sizej_map;
 
-		// error on X
-		pop::F32* start_previous_map_d_E_X = prev_layer._d_E_X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
-		pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
+			// error on X
+			pop::F32* start_previous_map_d_E_X = prev_layer._d_E_X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+			pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
 
-		// error on W
-		pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
-		pop::F32* start_kernel_d_E_W = layer._d_E_W + index_kernel * layer._W_width;
+			// error on W
+			pop::F32* start_previous_map = prev_layer._X + index_map_previous * prev_layer._sizei_map * prev_layer._sizej_map;
+			pop::F32* start_kernel_d_E_W = layer._d_E_W + index_kernel * layer._W_width;
 
-		for (unsigned int n=0; n<layer._sizei_kernel; n++) {
-			for (unsigned int m=0; m<layer._sizej_kernel; m++) {
-				start_previous_map_d_E_X[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor] += start_map_d_E_Y[i*layer._sizej_map+j] * start_kernel[n*layer._sizej_kernel+m];
-				start_kernel_d_E_W[n*layer._sizej_kernel+m] += start_map_d_E_Y[i*layer._sizej_map+j] * start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map+ m+j*layer._sub_resolution_factor];
+			for (unsigned int n=0; n<layer._sizei_kernel; n++) {
+				for (unsigned int m=0; m<layer._sizej_kernel; m++) {
+					if ((int)i-(int)n >= 0 && (int)j-(int)m >= 0) {
+						start_previous_map_d_E_X[i*prev_layer._sizej_map+j] += start_map_d_E_Y[(i-n)*layer._sizej_map+j-m] * start_kernel[n*layer._sizej_kernel+m];
+						start_kernel_d_E_W[n*layer._sizej_kernel+m] += start_map_d_E_Y[(i-n)*layer._sizej_map+j-m] * start_previous_map[i*prev_layer._sizej_map+j];
+					}
+				}
 			}
+			start_kernel_d_E_W[layer._sizei_kernel*layer._sizej_kernel] += start_map_d_E_Y[layer._sizei_map*layer._sizej_map];
 		}
-		start_kernel_d_E_W[layer._sizei_kernel*layer._sizej_kernel] += start_map_d_E_Y[layer._sizei_map*layer._sizej_map];
 	}
 }
 
@@ -1268,12 +1272,10 @@ void GPUNeuralNetwork::gpu_propagateBackFirstDerivate(pop::F32* out_set, unsigne
 			cudaMemset(start + 2*(layer._X_size+layer._Y_size)+layer._W_height*layer._W_width, 0, layer._W_height*layer._W_width*sizeof(*layer._d_E_W));
 
 #ifndef VT_CONV_ALGO
-			unsigned int nb_elements = layer._sizei_map * layer._sizej_map * layer._nbr_map;
+			unsigned int nb_elements = prev_layer._sizei_map * prev_layer._sizej_map * prev_layer._nbr_map / layer._sub_resolution_factor;
 			block = (nb_elements < max_nb_threads ? nb_elements : max_nb_threads);
 			grid = nb_elements / max_nb_threads + (nb_elements%max_nb_threads ? 1 : 0);
-			for (unsigned int index_map_previous = 0; index_map_previous < prev_layer._nbr_map; index_map_previous++) {
-				gpu_propagateBackFirstDerivate_convolution<<<grid, block>>>(d_network, l+1, index_map_previous);
-			}
+			gpu_propagateBackFirstDerivate_convolution<<<grid, block>>>(d_network, l+1);
 #else
 			for (unsigned int index_map = 0; index_map < layer._nbr_map; index_map++) {
 				unsigned int nb_elements = layer._sizei_map * layer._sizej_map;
