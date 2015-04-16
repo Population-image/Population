@@ -222,8 +222,6 @@ void NeuralNetworkFeedForward::addLayerConvolutional( unsigned int nbr_map, unsi
 
         unsigned int height = (height_previous-(kernelsize-1));
         unsigned int width  = (width_previous-(kernelsize-1));
-        std::cout<<width<<std::endl;
-        std::cout<<height<<std::endl;
         NNLayerMatrixConvolutional * layer = new NNLayerMatrixConvolutional(nbr_map,height,width);
         layer->_size_convolutution = kernelsize;
 
@@ -459,7 +457,6 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
 
         unsigned int height = (height_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
         unsigned int width  = (width_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
-        std::cout<<height<<std::endl;
         NNLayerMatrixConvolutionalPlusSubScaling * layer = new NNLayerMatrixConvolutionalPlusSubScaling(nbr_map,height,width);
         layer->_size_convolutution = kernelsize;
         layer->_sub_scaling = sub_scale_sampling;
