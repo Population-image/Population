@@ -49,8 +49,8 @@ enum  MatNBoundaryConditionType{
 class POP_EXPORTS MatNBoundaryConditionBounded
 {
 public:
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & domain,const VecN<DIM,int> & x){
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & domain,const VecN<DIM,CoordinateType> & x){
         if(x.allSuperiorEqual(0)&&x.allInferior(domain)){
             return true;
         }
@@ -58,8 +58,9 @@ public:
             return false;
         }
     }
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x,int direction){
+
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,CoordinateType> & x,int direction){
         if(x(direction)>=0&&x(direction)<domain(direction)){
             return true;
         }
@@ -67,8 +68,8 @@ public:
             return false;
         }
     }
-    template<int DIM>
-    static void apply(const VecN<DIM,int> & , VecN<DIM,int> & )
+    template<int DIM,typename CoordinateType>
+    static void apply(const VecN<DIM,int> & , VecN<DIM,CoordinateType> & )
     {
 
     }
@@ -77,25 +78,25 @@ public:
 class POP_EXPORTS MatNBoundaryConditionMirror
 {
 public:
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ){
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,CoordinateType> & ){
         return true;
     }
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ,int){
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,CoordinateType> & ,int){
         return true;
     }
 
-    template<int DIM>
-    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x)
+    template<int DIM,typename CoordinateType>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x)
     {
         for(int direction=0;direction<VecN<DIM,int>::DIM;direction++)
         {
             apply(domain,x,direction);
         }
     }
-    template<int DIM>
-    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction)
+    template<int DIM,typename CoordinateType>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x,int direction)
     {
 
         if(x(direction)<0){
@@ -108,24 +109,24 @@ public:
 class POP_EXPORTS MatNBoundaryConditionPeriodic
 {
 public:
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ){
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,CoordinateType> & ){
         return true;
     }
-    template<int DIM>
-    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,int> & ,int){
+    template<int DIM,typename CoordinateType>
+    static bool isValid(const VecN<DIM,int> & ,const  VecN<DIM,CoordinateType> & ,int){
         return true;
     }
-    template<int DIM>
-    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x)
+    template<int DIM,typename CoordinateType>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x)
     {
         for(int direction=0;direction<VecN<DIM,int>::DIM;direction++)
         {
             apply(domain,x,direction);
         }
     }
-    template<int DIM>
-    static void apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction)
+    template<int DIM,typename CoordinateType>
+    static void apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x,int direction)
     {
         if(x(direction)<0)
             x(direction)= domain(direction)+x(direction);
@@ -140,8 +141,8 @@ public:
     MatNBoundaryCondition(MatNBoundaryConditionType condition=MATN_BOUNDARY_CONDITION_BOUNDED)
         :_condition(condition)
     {}
-    template<int DIM>
-    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x){
+    template<int DIM,typename CoordinateType>
+    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,CoordinateType> & x){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -154,8 +155,8 @@ public:
             return true;
         }
     }
-    template<int DIM>
-    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,int> & x,int direction){
+    template<int DIM,typename CoordinateType>
+    bool isValid(const VecN<DIM,int> & domain,const  VecN<DIM,CoordinateType> & x,int direction){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -168,8 +169,8 @@ public:
             return true;
         }
     }
-    template<int DIM>
-    void  apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x){
+    template<int DIM,typename CoordinateType>
+    void  apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :
@@ -183,8 +184,8 @@ public:
             break;
         }
     }
-    template<int DIM>
-    void  apply(const VecN<DIM,int> & domain, VecN<DIM,int> & x,int direction){
+    template<int DIM,typename CoordinateType>
+    void  apply(const VecN<DIM,int> & domain, VecN<DIM,CoordinateType> & x,int direction){
         switch(_condition)
         {
         case MATN_BOUNDARY_CONDITION_BOUNDED :

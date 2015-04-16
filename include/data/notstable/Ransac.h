@@ -40,7 +40,20 @@ Vec<LinearLeastSquareRANSACModel::Data> dataconsencus;
 ransac(data,2,10,2,1,m,dataconsencus);
 std::cout<<m.getBeta()<<std::endl;
 std::cout<<m.getError()<<std::endl;
+
   * \endcode
+The equation solved is
+\f$
+\begin{alignat}{3}
+\beta_1  +  1\beta_2 &&\; = \;&& 5.2 & \\
+\beta_1  +  2\beta_2 &&\; = \;&& 5.8 & \\
+\beta_1  +  3\beta_2 &&\; = \;&& 6.8 & \\
+\beta_1  +  4\beta_2 &&\; = \;&& 8.2 & \\
+\beta_1  +  5\beta_2 &&\; = \;&& 13 & \\
+\end{alignat}
+\f$
+And Ransac give \f$\beta_1=4\f$ and \f$\beta_2=1\f$
+
   */
 
 template<typename Model>

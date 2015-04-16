@@ -195,7 +195,7 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lenarotpi6.png
     */
     template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType> rotate(const MatN<DIM,PixelType> & f,F32 angle)
+    static MatN<DIM,PixelType> rotate(const MatN<DIM,PixelType> & f,F32 angle,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_BOUNDED)
     {
         if(DIM==2){
             Mat2x22F32 rot22 = GeometricalTransformation::rotation2D(angle);
@@ -204,11 +204,15 @@ struct POP_EXPORTS GeometricalTransformation
             MatN<DIM,PixelType> g(f.getDomain());
             Vec2F32 c(f.getDomain()/2);
             it.init();
+            MatNBoundaryCondition condition(boundarycondtion);
             while(it.next()){
                 Vec2F32 y =Vec2F32(it.x()(0),it.x()(1))-c;
                 y= (rot22*y)+c;
-                if(f.isValid(y))
+
+                if(condition.isValid(f.getDomain(),y)){
+                    condition.apply(f.getDomain(),y);
                     g(it.x())= f.interpolationBilinear(y);
+                }
             }
             return g;
         }else{

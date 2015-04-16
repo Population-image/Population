@@ -59,7 +59,17 @@ public:
         }
         return _euler_tab[value];
     }
-
+    bool isIrrecductible(const MatN<1,UI8> & img,const VecN<1,int>& x ){
+        if(x(0)>0){
+            if(img(x(0)-1)>0)
+                return false;
+        }
+        if(x(0)<img.getDomain()(0)-1){
+            if(img(x(0)+1)>0)
+                return false;
+        }
+        return true;
+    }
     bool isIrrecductible(const MatN<2,UI8> & img,const VecN<2,int>& x ){
         VecN<2,int> y;
          int power=1;
@@ -195,26 +205,11 @@ struct AnalysisAdvanced
     }
 
     template<typename Function,typename IteratorGlobal>
-    static Mat2F32 histogram(const Function & f, IteratorGlobal & itg)
+    static Mat2F32 histogram(const Function & f, IteratorGlobal & it)
     {
-        Mat2F32 m;
-        while(itg.next()){
-            int value = static_cast<int>(normValue(f(itg.x())));
-            if(value>=static_cast<int>(m.sizeI())){
-                m.resizeInformation(value+1,2);
-            }
-            m(value,1) ++;
+        FunctorF::FunctorAccumulatorHistogram<Mat2F32> func;
+        return forEachFunctorAccumulator(f,func,it);
 
-        }
-        int count =0;
-        for(unsigned int i =0;i<m.sizeI();i++){
-            count +=static_cast<int>(m(i,1));
-        }
-        for(unsigned int i =0;i<m.sizeI();i++){
-            m(i,1)/=count;
-            m(i,0)=static_cast<F32>(i);
-        }
-        return m;
     }
     template<typename Function,typename IteratorGlobal>
     static Mat2F32 area(const Function & f, IteratorGlobal & itg)

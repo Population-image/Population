@@ -574,6 +574,50 @@ struct POP_EXPORTS FunctorF
             return _sum/_occurence;
         }
     };
+    template<typename TabHistogram>
+    class POP_EXPORTS FunctorAccumulatorHistogram
+    {
+        /*!
+         * \class pop::FunctorF::FunctorAccumulatorMedian
+         * \brief variance of the list of acculuated values
+         * \author Tariel Vincent
+         * \tparam TabHistogram Mat2F32
+         *
+         * \sa pop::Analysis::standardDeviationValu
+         */
+    private:
+        TabHistogram _tab;
+    public:
+        typedef TabHistogram ReturnType;
+        FunctorAccumulatorHistogram()
+        {}
+        template<typename PixelType>
+        void operator()(PixelType p)
+        {
+            int value = static_cast<int>(normValue(p));
+            if(value>=static_cast<int>(_tab.sizeI())){
+                _tab.resizeInformation(value+1,2);
+            }
+            _tab(value,1) ++;
+        }
+        void init()
+        {
+            _tab.clear();
+        }
+        TabHistogram getValue()
+        {
+            int count =0;
+            for(unsigned int i =0;i<_tab.sizeI();i++){
+                count +=static_cast<int>(_tab(i,1));
+            }
+            for(unsigned int i =0;i<_tab.sizeI();i++){
+                _tab(i,1)/=count;
+                _tab(i,0)=static_cast<F32>(i);
+            }
+            return _tab;
+        }
+    };
+
     //@}
     //-------------------------------------
     //

@@ -50,7 +50,43 @@ namespace pop
 
 struct ProcessingAdvanced
 {
+    template<int DIM,typename PixelType, typename IteratorEDomain>
+    static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,PixelType>& f,int & thresholdvalue,IteratorEDomain& it){
 
+        Mat2F32 m = AnalysisAdvanced::histogram(f,it);
+        F32 variane_between_class_max=0;
+        int threshold_max =0;
+        F32 mean = 0;
+        for (unsigned int i=0 ; i<m.sizeI() ; i++)
+            mean += m(i,0) * m(i,1);
+        F32 sumB = 0;
+        F32 wB = 0;
+        F32 wF = 0;
+        for(unsigned int i=0;i<m.sizeI();i++){
+            wB += m(i,1);               // Weight Background
+            if (wB == 0) continue;
+
+            wF = 1 - wB;                 // Weight Foreground
+            if (wF == 0) break;
+
+            sumB += m(i,0) * m(i,1);
+
+            F32 meanB = sumB / wB;            // Mean Background
+            F32 meanF = (mean - sumB) / wF;    // Mean Foreground
+
+            // Calculate Between Class Variance
+            F32 variane_between_class = wB * wF * (meanB - meanF) * (meanB - meanF);
+
+            // Check if new maximum found
+            if (variane_between_class > variane_between_class_max) {
+                variane_between_class_max = variane_between_class;
+                threshold_max = i+1;
+            }
+        }
+        thresholdvalue = threshold_max;
+        it.init();
+        return ProcessingAdvanced::threshold(f,UI8(threshold_max),NumericLimits<PixelType>::maximumRange(),it);
+    }
     template<typename PixelType>
     static MatN<2,PixelType>  integral(const MatN<2,PixelType> & f)
     {

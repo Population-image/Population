@@ -1805,16 +1805,25 @@ void MatN<Dim,PixelType>::resizeInformation(unsigned int sizei,unsigned int size
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resizeInformation(const VecN<Dim,int>& d){
-    MatN<Dim,PixelType> temp(*this);
-    _domain=d;
-    std::vector<PixelType>::resize(_domain.multCoordinate());
 
-    IteratorEDomain it(this->getIteratorEDomain());
-    while(it.next()){
-        if(temp.isValid(it.x())){
-            this->operator ()(it.x())=temp(it.x());
-        }else{
-            this->operator ()(it.x())=0;
+    if(Dim==2&&d(1)==_domain(1)){
+        _domain=d;
+        std::vector<PixelType>::resize(_domain.multCoordinate());
+    }else if(Dim==3&&d(0)==_domain(0)&&d(1)==_domain(1)){
+        _domain=d;
+        std::vector<PixelType>::resize(_domain.multCoordinate());
+    }else{
+        MatN<Dim,PixelType> temp(*this);
+        _domain=d;
+        std::vector<PixelType>::resize(_domain.multCoordinate());
+
+        IteratorEDomain it(this->getIteratorEDomain());
+        while(it.next()){
+            if(temp.isValid(it.x())){
+                this->operator ()(it.x())=temp(it.x());
+            }else{
+                this->operator ()(it.x())=0;
+            }
         }
     }
 }
@@ -2178,17 +2187,17 @@ MatN<Dim, PixelType>  MatN<Dim,PixelType>::operator/(PixelType value)const{
 
 
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::deleteRow(unsigned int i)const{
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::deleteRow(unsigned int i)const{
     POP_DbgAssert(i<sizeI());
-     MatN<DIM,PixelType> temp(*this);
+    MatN<DIM,PixelType> temp(*this);
     temp._domain(0)--;
     temp.erase( temp.begin()+i*temp._domain(1), temp.begin()+(i+1)*temp._domain(1)  );
     return temp;
 }
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::deleteCol(unsigned int j)const{
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::deleteCol(unsigned int j)const{
     POP_DbgAssert(j<sizeJ());
-     MatN<DIM,PixelType> temp(this->sizeI(),this->sizeJ()-1);
+    MatN<DIM,PixelType> temp(this->sizeI(),this->sizeJ()-1);
 
     for(unsigned int i=0;i<temp.sizeI();i++)
         for(unsigned int j1=0;j1<temp.sizeJ();j1++)
@@ -2254,8 +2263,8 @@ PixelType MatN<DIM,PixelType>::cofactor(unsigned int i,unsigned int j)const{
         return -this->minorDet(i,j);
 }
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::cofactor()const{
-     MatN<DIM,PixelType> temp(this->getDomain());
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::cofactor()const{
+    MatN<DIM,PixelType> temp(this->getDomain());
     for(unsigned int i=0;i<this->sizeI();i++)
         for(unsigned int j=0;j<this->sizeJ();j++)
         {
@@ -2264,11 +2273,11 @@ template<int DIM, typename PixelType>
     return temp;
 }
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::transpose()const
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::transpose()const
 {
     const unsigned int sizei= this->sizeI();
     const unsigned int sizej= this->sizeJ();
-     MatN<DIM,PixelType> temp(sizej,sizei);
+    MatN<DIM,PixelType> temp(sizej,sizei);
     for(unsigned int i=0;i<sizei;i++){
         typename  MatN<DIM,PixelType>::const_iterator this_ptr  =  this->begin() + i*sizej;
         typename  MatN<DIM,PixelType>::const_iterator this_end_ptr  =  this_ptr + sizej;
@@ -2311,10 +2320,10 @@ PixelType MatN<DIM,PixelType>::trace() const
 
 }
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::identity(int size_mat)const{
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::identity(int size_mat)const{
     if(size_mat==0)
         size_mat=this->sizeI();
-     MatN<DIM,PixelType> I(size_mat,size_mat);
+    MatN<DIM,PixelType> I(size_mat,size_mat);
     for(unsigned int i=0;i<I.sizeI();i++){
         I(i,i)=1;
     }
@@ -2322,9 +2331,9 @@ template<int DIM, typename PixelType>
 }
 
 template<int DIM, typename PixelType>
- MatN<DIM,PixelType>  MatN<DIM,PixelType>::inverse()const{
+MatN<DIM,PixelType>  MatN<DIM,PixelType>::inverse()const{
     if(sizeI()==2&&sizeJ()==2){
-         MatN<DIM,PixelType> temp(*this);
+        MatN<DIM,PixelType> temp(*this);
         const PixelType det= PixelType(1)/ (temp.operator[](0) * temp.operator[](3) - temp.operator[](1) * temp.operator[](2)) ;
                 std::swap(temp.operator[](0),temp.operator[](3));
                 temp.operator[](1)=-temp.operator[](1)*det;
@@ -2333,12 +2342,12 @@ template<int DIM, typename PixelType>
         temp.operator[](3)*=det;
         return temp;
     }else if(sizeI()==3&&sizeJ()==3){
-         MatN<DIM,PixelType > temp(*this);
+        MatN<DIM,PixelType > temp(*this);
         const PixelType det= PixelType(1)/(temp.operator[](0) * (temp.operator[](4)*temp.operator[](8) - temp.operator[](7) * temp.operator[](5))-temp.operator[](1) * (temp.operator[](3)*temp.operator[](8) - temp.operator[](6) * temp.operator[](5)) +temp.operator[](2) * (temp.operator[](3)*temp.operator[](7) - temp.operator[](4) * temp.operator[](6)));
-                                                                                                                                                              const PixelType t0=  temp.operator[](4)*temp.operator[](8)-temp.operator[](7)*temp.operator[](5);
-                                                       const PixelType t1=-(temp.operator[](3)*temp.operator[](8)-temp.operator[](6)*temp.operator[](5));
+                                                                                                                                                                        const PixelType t0=  temp.operator[](4)*temp.operator[](8)-temp.operator[](7)*temp.operator[](5);
+                                                                 const PixelType t1=-(temp.operator[](3)*temp.operator[](8)-temp.operator[](6)*temp.operator[](5));
                 const PixelType t2=  temp.operator[](3)*temp.operator[](7)-temp.operator[](6)*temp.operator[](4);
-                                 const PixelType t3=-(temp.operator[](1)*temp.operator[](8)-temp.operator[](7)*temp.operator[](2));
+                                           const PixelType t3=-(temp.operator[](1)*temp.operator[](8)-temp.operator[](7)*temp.operator[](2));
                 const PixelType t4= temp.operator[](0)*temp.operator[](8)-temp.operator[](6)*temp.operator[](2);
                 const PixelType t5=-(temp.operator[](0)*temp.operator[](7)-temp.operator[](6)*temp.operator[](1));
                 const PixelType t6= temp.operator[](1)*temp.operator[](5)-temp.operator[](4)*temp.operator[](2);
@@ -2367,7 +2376,7 @@ template<int DIM, typename PixelType>
     }
     else
     {
-         MatN<DIM,PixelType> temp;
+        MatN<DIM,PixelType> temp;
         PixelType det = this->determinant();
         temp = this->cofactor();
         temp = temp.transpose();

@@ -282,39 +282,8 @@ struct POP_EXPORTS Processing
     */
     template<int DIM,typename PixelType>
     static MatN<DIM,UI8>  thresholdOtsuMethod(const MatN<DIM,PixelType>& f,int & thresholdvalue){
-
-        Mat2F32 m = Analysis::histogram(f);
-        F32 variane_between_class_max=0;
-        int threshold_max =0;
-        F32 mean = 0;
-        for (unsigned int i=0 ; i<m.sizeI() ; i++)
-            mean += m(i,0) * m(i,1);
-        F32 sumB = 0;
-        F32 wB = 0;
-        F32 wF = 0;
-        for(unsigned int i=0;i<m.sizeI();i++){
-            wB += m(i,1);               // Weight Background
-            if (wB == 0) continue;
-
-            wF = 1 - wB;                 // Weight Foreground
-            if (wF == 0) break;
-
-            sumB += m(i,0) * m(i,1);
-
-            F32 meanB = sumB / wB;            // Mean Background
-            F32 meanF = (mean - sumB) / wF;    // Mean Foreground
-
-            // Calculate Between Class Variance
-            F32 variane_between_class = wB * wF * (meanB - meanF) * (meanB - meanF);
-
-            // Check if new maximum found
-            if (variane_between_class > variane_between_class_max) {
-                variane_between_class_max = variane_between_class;
-                threshold_max = i+1;
-            }
-        }
-        thresholdvalue = threshold_max;
-        return Processing::threshold(f,UI8(threshold_max));
+        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
+        return ProcessingAdvanced::thresholdOtsuMethod(f,thresholdvalue,it);
     }
     /*!
      *  \brief automatic threshold following the morphological ToggleMapping http://cmm.ensmp.fr/~marcoteg/cv/publi_pdf/jonathan/fabrizio_marcotegui_cord_icip09.pdf

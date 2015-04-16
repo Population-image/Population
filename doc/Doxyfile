@@ -764,6 +764,7 @@ INPUT  =  ../include/data/typeF/TypeF.h \
 			 ../include/data/3d/GLFigure.h \
 			 ../include/data/video/Video.h \
 			 ../include/data/neuralnetwork/NeuralNetwork.h \
+			 ../include/data/nostable/Ransac.h \
 			 ../include/data/utility/BasicUtility.h \		
 			 ../include/algorithm/Processing.h \
 			 ../include/algorithm/Visualization.h \ 	

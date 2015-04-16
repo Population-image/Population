@@ -46,25 +46,121 @@ struct Line{
 
 };
 
+template<typename PixelType>
+void findLine( MatN<2,PixelType>  m){
+    int value;
+    MatN<2,PixelType> m_thresh = Processing::thresholdOtsuMethod(m,value);
+    //    m_thresh = Processing::opening(m_thresh,1);
+    Mat2UI32 imglabel =Processing::clusterToLabel(m_thresh);
+
+    GeometricalTransformation::scale(Visualization::labelToRandomRGB(imglabel),Vec2F32(3,3)).display("false",true,false);
+
+    Vec<int> v_count;
+    Vec<Vec2F32> v_bary;
+    ForEachDomain2D(x,imglabel){
+        int label = imglabel(x);
+        if(label>0){
+            if(label>v_count.size()){
+                v_count.resize(label);
+                v_bary.resize(label);
+            }
+            v_count(label-1)++;
+            v_bary(label-1)+=x;
+        }
+    }
+
+    Vec<LinearLeastSquareRANSACModel::Data> data;
+
+    for(unsigned int i=0;i<v_bary.size();i++){
+        v_bary(i)=v_bary(i)/v_count(i);
+        VecF32 x(2);F32 y;
+        x(0)=1;x(1)=v_bary(i)(1);y=v_bary(i)(0);data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        std::cout<<v_bary(i)(1)<<" "<<v_bary(i)(0)<<std::endl;
+
+        m(v_bary(i))=255;
+    }
+    GeometricalTransformation::scale(m,Vec2F32(3,3)).display("point ",true,false);
+
+
+    //    F32 mean_value =Analysis::meanValue(m);
+    //    Vec<LinearLeastSquareRANSACModel::Data> data;
+
+    //    for(unsigned int j=0;j<m.sizeJ();j++){
+    //        F32 sum = 0;
+    //        F32 barycentre = 0;
+    //        for(unsigned int i=0;i<m.sizeI();i++){
+    //            barycentre+=i*m(i,j);
+    //            sum+=m(i,j);
+    //        }
+    //        barycentre/=sum;
+    //        sum/=m.sizeI();
+    //        if(sum>mean_value){
+
+    //            VecF32 x(2);F32 y;
+    //            x(0)=1;x(1)=j;y=barycentre;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+    //            std::cout<<j<<" "<<barycentre<<std::endl;
+    //        }
+    //    }
+    LinearLeastSquareRANSACModel model;
+    Vec<LinearLeastSquareRANSACModel::Data> dataconsencus;
+    ransac(data,1000,1,15,model,dataconsencus);
+    std::cout<<model.getBeta()<<std::endl;
+    std::cout<<model.getError()<<std::endl;
+    std::cout<<dataconsencus<<std::endl;
+
+    Vec2I32 x1(model.getBeta()(0),0);
+    Vec2I32 x2(model.getBeta()(0)+m.sizeJ()*model.getBeta()(1),m.sizeJ());
+    Draw::line(m,x1,x2,128);
+    GeometricalTransformation::scale(m,Vec2F32(3,3)).display("rotate",true,false);
+    ;
+    double angle = std::atan(model.getBeta()(1));
+    std::cout<<angle<<std::endl;
+    m= GeometricalTransformation::scale(m,Vec2F32(3,3));
+    GeometricalTransformation::rotate(m,-angle).display("rotate",true,false);
+}
+
 
 
 int main(){
-    {
-        Vec<LinearLeastSquareRANSACModel::Data> data;
-        VecF32 x(2);F32 y;
-        x(0)=1;x(1)=1;y=5.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
-        x(0)=1;x(1)=2;y=5.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
-        x(0)=1;x(1)=3;y=6.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
-        x(0)=1;x(1)=4;y=8.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
-        x(0)=1;x(1)=5;y=13; data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+    //    {
+    //        Mat2UI8 m;
+    //        m.load("plate1.pgm");
+    //        //        m.display();
+    //        findLine(m);
+    //       return 0;
 
-        LinearLeastSquareRANSACModel m;
-        Vec<LinearLeastSquareRANSACModel::Data> dataconsencus;
-        ransac(data,10,1,2,m,dataconsencus);
-        std::cout<<m.getBeta()<<std::endl;
-        std::cout<<m.getError()<<std::endl;
-        std::cout<<dataconsencus<<std::endl;
-        return 1;
+    //    }
+    {
+        //        Vec<LinearLeastSquareRANSACModel::Data> data;
+        //        VecF32 x(2);F32 y;
+        //        x(0)=1;x(1)=1;y=5.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //        x(0)=1;x(1)=2;y=5.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //        x(0)=1;x(1)=3;y=6.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //        x(0)=1;x(1)=4;y=8.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //        x(0)=1;x(1)=5;y=13; data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+
+        //        LinearLeastSquareRANSACModel m;
+        //        Vec<LinearLeastSquareRANSACModel::Data> dataconsencus;
+        //        ransac(data,10,1,2,m,dataconsencus);
+        //        std::cout<<m.getBeta()<<std::endl;
+        //        std::cout<<m.getError()<<std::endl;
+        //        std::cout<<dataconsencus<<std::endl;
+
+        //                Vec<LinearLeastSquareRANSACModel::Data> data;
+        //                VecF32 x(2);F32 y;
+        //                x(0)=1;x(1)=1;y=5.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //                x(0)=1;x(1)=2;y=5.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //                x(0)=1;x(1)=3;y=6.8;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //                x(0)=1;x(1)=4;y=8.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+        //                x(0)=1;x(1)=5;y=13; data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
+
+        //                LinearLeastSquareRANSACModel m;
+        //                Vec<LinearLeastSquareRANSACModel::Data> dataconsencus;
+        //                ransac(data,10,1,3,m,dataconsencus);
+        //                std::cout<<m.getBeta()<<std::endl;
+        //                std::cout<<m.getError()<<std::endl;
+        //                std::cout<<dataconsencus<<std::endl;
+        //        return 1;
     }
     //    {
     //        Mat2UI8 m;
@@ -81,9 +177,8 @@ int main(){
     //        m_hough.display();
     //    }
     Mat2UI8 m_init;
-     m_init.load("/home/vincent/Desktop/leslie.jpg");
+    m_init.load("/home/vincent/Desktop/leslie.jpg");
 //    m_init.load("/home/vincent/Desktop/coutin.jpg");
-
     F32 scalefactor =400./m_init.sizeJ();
     pop::Vec2F32 border_extra=pop::Vec2F32(0.01f,0.1f);
     Mat2UI8 m = GeometricalTransformation::scale(m_init,Vec2F32(scalefactor,scalefactor));
@@ -110,25 +205,125 @@ int main(){
 
 
 
-    Mat2UI32 imglabel =Processing::clusterToLabel(binary);
+    Mat2UI32 imglabel =ProcessingAdvanced::clusterToLabel(binary, binary.getIteratorENeighborhood(1,0),binary.getIteratorEOrder(1));
     Visualization::labelToRandomRGB(imglabel).display("label",false);
     pop::Vec<pop::Vec2I32> v_xmin;
     pop::Vec<pop::Vec2I32> v_xmax;
     pop::Vec<Mat2UI8> v_img = Analysis::labelToMatrices(imglabel,v_xmin,v_xmax);
 
+    OCRNeuralNetwork ocr;
+    ocr.setDictionnary("/home/vincent/DEV2/DEV/LAPI-API/neuralnetwork.xml");
 
-
-    for(unsigned int i =0;i<v_img.size();i++){
-        Vec2I32 domain = v_img[i].getDomain();
+    for(unsigned int index_label =0;index_label<v_img.size();index_label++){
+        Vec2I32 domain = v_img[index_label].getDomain();
         if(domain(1)>0.5*binary.sizeJ()){
-            Vec2F32 x_min_i = Vec2F32(v_xmin[i])/scalefactor;
-            Vec2F32 x_max_i = Vec2F32(v_xmax[i])/scalefactor;
 
-            int height = x_max_i(0)- x_min_i(0);
-            x_min_i(0)-= height/2;
-            x_max_i(0)+= height/2;
-            F32 angle_rot_radian;
-            Processing::rotateAtHorizontal(m_init(x_min_i,x_max_i),angle_rot_radian).display("label",true,false);
+            Vec2I32 xmin =  v_xmin[index_label];
+            xmin(1)+=10;
+            Vec2I32 xmax =  v_xmax[index_label];
+            xmax(1)-=10;
+            int sum_0=0;
+            int sum_1=0;
+            int bary_i_0=0;
+            int bary_i_1=0;
+            int index_j_0 = xmin(1)+10;
+            int index_j_1 = xmax(1)-10;
+            unsigned int index_i_0_min=10000;
+            unsigned int index_i_0_max=0;
+            unsigned int index_i_1_min=10000;
+            unsigned int index_i_1_max=0;
+            for(unsigned int i=xmin(0);i<xmax(0);i++){
+                if(binary(i,index_j_0)>0){
+                    index_i_0_min=std::min(i,index_i_0_min);
+                    index_i_0_max=std::max(i,index_i_0_max);
+                    sum_0++;
+                    bary_i_0+=i;
+                }
+                if(binary(i,index_j_1)>0){
+                    index_i_1_min=std::min(i,index_i_1_min);
+                    index_i_1_max=std::max(i,index_i_1_max);
+                    sum_1++;
+                    bary_i_1+=i;
+                }
+            }
+            bary_i_0/=sum_0;
+            bary_i_1/=sum_1;
+            double delta_y = index_j_1-index_j_0;
+            double delta_x = bary_i_1-bary_i_0;
+            double rot = atan2(delta_x,delta_y);
+            xmin =  v_xmin[index_label];
+            xmin(1)=std::max(0,xmin(1)-10);
+            xmin(0)=std::max(0,xmin(0)-3);
+            xmax =  v_xmax[index_label];
+            xmax(1)=std::min(tophat_init.getDomain()(1)-1,xmax(1)+25);
+            xmax(0)=std::min(tophat_init.getDomain()(0)-1,xmax(0)+3);
+            Mat2UI8 m_lign = GeometricalTransformation::rotate(m_init(Vec2F32(xmin)/scalefactor,Vec2F32(xmax)/scalefactor),-rot,MATN_BOUNDARY_CONDITION_MIRROR);
+            //GeometricalTransformation::scale(,Vec2F32(3,3)).display("rot",true,false);
+
+            xmin(0)=std::abs(delta_x/2)*1./scalefactor;
+
+            xmin(1)=0;
+            xmax(0)=m_lign.getDomain()(0)-1-std::abs(delta_x/2)*1./scalefactor;
+            xmax(1)=m_lign.getDomain()(1)-1;
+            std::cout<<xmin<<std::endl;
+            std::cout<<xmax<<std::endl;
+            std::cout<<m_lign.getDomain()<<std::endl;
+            m_lign = m_lign(xmin,xmax);
+            Mat2UI8 tophat_letter = Processing::closing(m_lign,4)-m_lign;
+
+            int value = 0;
+            Processing::thresholdOtsuMethod(tophat_letter,value).display("rot",false,false);
+
+            GeometricalTransformation::scale(tophat_letter,Vec2F32(3,3)).display("rot",false,false);
+
+            MatN<1,UI16> m2(VecN<1,int>(tophat_letter.sizeJ()));
+            Mat2UI16 m(tophat_letter.sizeJ(),2);
+            int maxi=0,mini=NumericLimits<int>::maximumRange();
+            for(unsigned int j=0;j<tophat_letter.sizeJ();j++){
+                int sum=0;
+               for(unsigned int i=0;i<tophat_letter.sizeI();i++){
+                   sum+=tophat_letter(i,j);
+               }
+               m(j,0)=j;
+               m(j,1)=sum;
+               m2(j)=sum;
+               maxi=std::max(maxi,sum);
+               mini=std::min(mini,sum);
+            }
+            for(unsigned int i=0;i<m2.getDomain()(0);i++){
+                m2(i)= (m2(i)-mini)*100/(maxi-mini);
+            }
+            m2= Processing::smoothGaussian(m2,3);
+            m2= Processing::dynamic(m2,5);
+            m2 = Processing::minimaRegional(m2,1);
+
+
+            MatN<1,UI8> thhinning = Analysis::thinningAtConstantTopology(MatN<1,UI8>(m2));
+            int min_previous=-1;
+
+            for(unsigned int j=0;j<m2.getDomain()(0);j++){
+                if(thhinning(j)>0){
+                    if(min_previous==-1)
+                        min_previous =j;
+                    else{
+                        int value;
+
+                        Mat2UI8 m_letter = Processing::clusterMax(Processing::thresholdOtsuMethod(tophat_letter(Vec2I32(0,min_previous),Vec2I32(tophat_letter.getDomain()(0)-1,j)),value));//.display();
+                        ;
+                        std::cout<<ocr.parseMatrix(m_letter)<<" ";
+                        min_previous =j;
+                    }
+
+                }
+
+
+            }
+            std::cout<<std::endl;
+//           m.display();
+//            return 0;
+
+
+
 
         }
     }
