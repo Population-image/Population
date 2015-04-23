@@ -44,15 +44,42 @@ public:
         return v;
     }
 };
+template<typename PixelType>
+Vec<WaveletHaar<2,I32 > > windowsScan(WaveletHaar<2,I32 > haar_mother,int radius,double step =2){
+//    Vec<WaveletHaar<2,PixelType > > x;
+
+//    for(int i=-radius;i<=radius;i+=radius){
+//        for(int j=-radius;j<=radius;j+=radius){
+//            WaveletHaar<2,I32 > haar(haar_mother);
+//            haar.translate(Vec2I32(i,j));
+//            if(haar.
+
+
+
+//        }
+//    }
+}
 
 int main(){
     Mat2UI8 m(7,7);
 
 
-    m(2,2)=100;m(2,3)=100;m(2,4)=100;
+    m(2,2)=100;m(2,3)=99;m(2,4)=100;
     m(3,2)=100;m(3,3)=100;m(3,4)=100;
     m(4,2)=100;m(4,3)=100;m(4,4)=100;
-    std::vector<WaveletHaar<2,I32 > > v_wavelet = WaveletHaar<2,I32>::baseWaveletHaar();
+
+    WaveletHaar<2,UI32> haar(Vec2F32(-1,-1),Vec2F32(1,1),Vec2F32(0,-1),Vec2F32(1,1));
+//    WaveletHaar<2,I32 > & wavelet = v_wavelet[i];
+    haar.setMatrix(m);
+    haar.scale(2);
+    Vec2I32 x(3,3);
+    std::cout<<m<<std::endl;
+    std::cout<<haar.operator ()(x)<<std::endl;
+    return 1;
+//    wavelet.scale(2);
+
+
+    Vec<WaveletHaar<2,I32 > > v_wavelet = WaveletHaar<2,I32>::baseWaveletHaar();
     for(unsigned int i=0;i<v_wavelet.size();i++){
         WaveletHaar<2,I32 > & wavelet = v_wavelet[i];
         wavelet.setMatrix(m);

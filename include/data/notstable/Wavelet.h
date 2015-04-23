@@ -40,13 +40,6 @@ public:
      * if you call it two time, the trranslation is the sum of the two vector
      */
     virtual void translate(const VecN<Dim,F32> & x)=0;
-    /*!
-     \brief translate the wavelet \f$ \psi_x\leftarrow (\psi,x)  \f$
-     \param x translate vector
-     *
-     * if you call it two times, the translation is the vector of the last call
-     */
-    virtual void translateTemp(const VecN<Dim,F32> & x)=0;
 
     /*!
      \brief wavelet coefficient as inner product between the wavelet and the input function \f$a(\psi_{\lambda,x},f) =\langle \psi_{\lambda,x} , f \rangle=\int_{R^n} \psi_{\lambda,x}(x')f(x')\,dx'.\f$
@@ -136,29 +129,7 @@ class POP_EXPORTS WaveletHaar :public Wavelet<Dim,PixelType >
     */
 public:
     typedef VecN<Dim,I32> Feature;
-    /*!
-      \brief constructor
-    */
-    WaveletHaar()
-    {}
-    /*!
-      \brief copy constructor
-    */
-    WaveletHaar(const WaveletHaar & haar)
-        :_x1_windows(haar._x1_windows),
-          _x2_windows(haar._x2_windows),
-          _x3_windows(haar._x3_windows),
-          _x4_windows(haar._x4_windows),
-          _x1_windows_negative(haar._x1_windows_negative),
-          _x2_windows_negative(haar._x2_windows_negative),
-          _x3_windows_negative(haar._x3_windows_negative),
-          _x4_windows_negative(haar._x4_windows_negative)
 
-    {
-        _area_windows = (_x4_windows-_x1_windows).multCoordinate();
-        _area_windows_negative = (_x4_windows_negative-_x1_windows_negative).multCoordinate();
-        _area_windows_possitive = _area_windows - _area_windows_negative;
-    }
     /*!
       \brief constructor by defining the rectangular windows \f$\sqcap\f$=[windows_min,windows_max] and the negative rectangular windows\f$\sqcap_-\f$=[windows_negative_min,windows_negative_max]
     such that the possitive rectangular windows is equal to \f$\sqcap\setminus\sqcap_- \f$
@@ -198,57 +169,60 @@ public:
         _area_windows_possitive = _area_windows - _area_windows_negative;
 
     }
-
-    void translateTemp(const VecN<Dim,F32> & x){
-
-        _x1_windows_translate = x + _x1_windows;
-        _x2_windows_translate = x + _x2_windows;
-        _x3_windows_translate = x + _x3_windows;
-        _x4_windows_translate = x + _x4_windows;
+    virtual void translate(const VecN<Dim,F32> & x){
+        _x1_windows+=x;
+        _x2_windows+=x;
+        _x3_windows+=x;
+        _x4_windows+=x;
 
 
-        _x1_windows_negative_translate = x + _x1_windows_negative;
-        _x2_windows_negative_translate = x + _x2_windows_negative;
-        _x3_windows_negative_translate = x + _x3_windows_negative;
-        _x4_windows_negative_translate = x + _x4_windows_negative;
+        _x1_windows_negative+=x;
+        _x2_windows_negative+=x;
+        _x3_windows_negative+=x;
+        _x4_windows_negative+=x;
     }
-    void translate(const VecN<Dim,F32> & x){
 
-        _x1_windows = x + _x1_windows;
-        _x2_windows = x + _x2_windows;
-        _x3_windows = x + _x3_windows;
-        _x4_windows = x + _x4_windows;
-
-
-        _x1_windows_negative = x + _x1_windows_negative;
-        _x2_windows_negative = x + _x2_windows_negative;
-        _x3_windows_negative = x + _x3_windows_negative;
-        _x4_windows_negative = x + _x4_windows_negative;
-    }
     F32 operator ()(const VecN<Dim,I32> & x){
-//        std::cout<<_funtion_integral<<std::endl;
-        translateTemp(x);
+        VecN<Dim,F32> x1_windows_translate;
+        VecN<Dim,F32> x2_windows_translate;
+        VecN<Dim,F32> x3_windows_translate;
+        VecN<Dim,F32> x4_windows_translate;
+
+        VecN<Dim,F32> x1_windows_negative_translate;
+        VecN<Dim,F32> x2_windows_negative_translate;
+        VecN<Dim,F32> x3_windows_negative_translate;
+        VecN<Dim,F32> x4_windows_negative_translate;
+        x1_windows_translate = x + _x1_windows;
+        x2_windows_translate = x + _x2_windows;
+        x3_windows_translate = x + _x3_windows;
+        x4_windows_translate = x + _x4_windows;
+
+
+        x1_windows_negative_translate = x + _x1_windows_negative;
+        x2_windows_negative_translate = x + _x2_windows_negative;
+        x3_windows_negative_translate = x + _x3_windows_negative;
+        x4_windows_negative_translate = x + _x4_windows_negative;
 
         F32 sumwindowspower2;
-        sumwindowspower2 = _funtion_integral_power2(_x1_windows_translate)+_funtion_integral_power2(_x4_windows_translate)-(_funtion_integral_power2(_x2_windows_translate)+_funtion_integral_power2(_x3_windows_translate));
+        sumwindowspower2 = _funtion_integral_power2(x1_windows_translate)+_funtion_integral_power2(x4_windows_translate)-(_funtion_integral_power2(x2_windows_translate)+_funtion_integral_power2(x3_windows_translate));
 
         F32 sumwindows;
-        sumwindows =      _funtion_integral(_x1_windows_translate)+_funtion_integral(_x4_windows_translate)-(_funtion_integral(_x2_windows_translate)+_funtion_integral(_x3_windows_translate));
+        sumwindows =      _funtion_integral(x1_windows_translate)+_funtion_integral(x4_windows_translate)-(_funtion_integral(x2_windows_translate)+_funtion_integral(x3_windows_translate));
         F32 mean_windows      = sumwindows/_area_windows;
         F32 mean_deviation_windows =sumwindowspower2/_area_windows-mean_windows*mean_windows;
         if(mean_deviation_windows>0)
             mean_deviation_windows = std::sqrt( mean_deviation_windows);
         else
-            mean_deviation_windows =1;
+            return 0;
 
         F32 sumwindows_negative;
 
-        sumwindows_negative =        _funtion_integral(_x1_windows_negative_translate)+_funtion_integral(_x4_windows_negative_translate)-(_funtion_integral(_x2_windows_negative_translate)+_funtion_integral(_x3_windows_negative_translate));
-        F32 diff_mean_negative = sumwindows_negative/_area_windows_negative-mean_windows;
+        sumwindows_negative =        _funtion_integral(x1_windows_negative_translate)+_funtion_integral(x4_windows_negative_translate)-(_funtion_integral(x2_windows_negative_translate)+_funtion_integral(x3_windows_negative_translate));
+        F32 mean_negative = sumwindows_negative/_area_windows_negative;
         // use this relation xox = xxx -  x
         F32 sumwindows_possitive = sumwindows-sumwindows_negative;
-        F32 diff_mean_possitive = sumwindows_possitive/_area_windows_possitive-mean_windows;
-        F32 result = (diff_mean_possitive -  diff_mean_negative)/  mean_deviation_windows;
+        F32 mean_possitive = sumwindows_possitive/_area_windows_possitive;
+        F32 result = (mean_possitive -  mean_negative)/  mean_deviation_windows;
         return result;
 
     }
@@ -257,8 +231,8 @@ public:
      \brief nice elementary base of Haar wavelet with these properties area(positive)=area(negative) and  area(positive)+area(negative)=2
      \return wavelet base
      */
-    static std::vector<WaveletHaar<Dim,PixelType > > baseWaveletHaar(){
-        std::vector<WaveletHaar<Dim,PixelType > > v_haar_feature;
+    static Vec<WaveletHaar<Dim,PixelType > > baseWaveletHaar(){
+        Vec<WaveletHaar<Dim,PixelType > > v_haar_feature;
 
         if(Dim==2){
 
@@ -311,31 +285,46 @@ public:
         }
         return v_haar_feature;
     }
-    bool isValid(const VecN<Dim,F32>& xmin,const VecN<Dim,F32>& xmax ){
-        if(_x1_windows>=xmin && _x4_windows<=xmax)
+    bool isValid(const VecN<Dim,I32> & x ){
+        VecN<Dim,F32> x1_windows_translate;
+        VecN<Dim,F32> x2_windows_translate;
+        VecN<Dim,F32> x3_windows_translate;
+        VecN<Dim,F32> x4_windows_translate;
+        x1_windows_translate = x + _x1_windows;
+        x2_windows_translate = x + _x2_windows;
+        x3_windows_translate = x + _x3_windows;
+        x4_windows_translate = x + _x4_windows;
+        if(_funtion_integral.isValid(x1_windows_translate)&&_funtion_integral.isValid(x2_windows_translate)&&_funtion_integral.isValid(x3_windows_translate)&&_funtion_integral.isValid(x4_windows_translate))
             return true;
         else
             return false;
     }
+    bool isValid(VecN<Dim,I32> radius_min,VecN<Dim,I32> radius_max ){
+        //TODO
+//        if(VecN<Dim,I32>(_x1_windows).allSuperiorEqual(radius_min) &&VecN<Dim,I32>(_x1_windows).allInferiorEqual(radius_max)&&
+
+//            return true;
+//        else
+//            return false;
+    }
+
     void setMatrix(const MatN<Dim,PixelType> & f){
         _funtion = &f;
-        MatN<Dim,PixelType> temp = Processing::greylevelRange(f,0,1);
-        _funtion_integral = Processing::integral(temp);
-        _funtion_integral_power2= Processing::integralPower2(temp);
+        _funtion_integral = Processing::integral(*_funtion);
+        _funtion_integral_power2= Processing::integralPower2(*_funtion);
     }
     // we use this formula xox = xxx - o where xox is the Harr wavelet, xxx is the windows and  x is the negative part in the the Harr wavelet
 
-    void display(){
+    Mat2RGBUI8 display(const VecN<Dim,I32> & x){
         Mat2RGBUI8 out(_funtion->getDomain());
-        Mat2RGBUI8::IteratorERectangle itrec(out.getIteratorERectangle(_x1_windows_translate,_x4_windows_translate));
+        Mat2RGBUI8::IteratorERectangle itrec(out.getIteratorERectangle(_x1_windows+ x,_x4_windows+x));
         while(itrec.next()){
-            if(itrec.x()>=_x1_windows_negative_translate && itrec.x()<=_x4_windows_negative_translate){
+            if(itrec.x()>=(_x1_windows_negative +x) && itrec.x()<=(_x4_windows_negative+x)){
                 out(itrec.x())=RGBUI8( (*_funtion)(itrec.x()),0,0);
             }else
                 out(itrec.x())=RGBUI8(0,0,(*_funtion)(itrec.x()));
         }
-        out.display();
-
+        return out;
     }
 
     void save(std::ostream& out)const{
@@ -380,15 +369,7 @@ private:
     VecN<Dim,F32> _x3_windows_negative;
     VecN<Dim,F32> _x4_windows_negative;
 
-    VecN<Dim,F32> _x1_windows_translate;
-    VecN<Dim,F32> _x2_windows_translate;
-    VecN<Dim,F32> _x3_windows_translate;
-    VecN<Dim,F32> _x4_windows_translate;
 
-    VecN<Dim,F32> _x1_windows_negative_translate;
-    VecN<Dim,F32> _x2_windows_negative_translate;
-    VecN<Dim,F32> _x3_windows_negative_translate;
-    VecN<Dim,F32> _x4_windows_negative_translate;
     double _area_windows;
     double _area_windows_negative;
     double _area_windows_possitive;
@@ -410,18 +391,6 @@ template<int Dim,typename PixelType>
 MatN<Dim,PixelType>   WaveletHaar<Dim,PixelType>::_funtion_integral_power2;
 
 
-template<int Dim,typename PixelType>
-std::istream& operator >> (std::istream& in,  pop::WaveletHaar<Dim,PixelType>& m)
-{
-    m.load(in);
-    return in;
-}
-template<int Dim,typename PixelType>
-std::ostream& operator << (std::ostream& out, const pop::WaveletHaar<Dim,PixelType>& m)
-{
-    m.save(out);
-    return out;
-}
 
 
 
