@@ -121,7 +121,272 @@ void findLine( MatN<2,PixelType>  m){
 
 
 
+struct NeuralLayer
+{
+    /** @brief Using the CPU device, compute the output values . */
+    virtual void forwardCPU(const NeuralLayer& layer_previous) = 0;
+
+    /** @brief Using the CPU device, compute the error of the output values of the layer prrevious. */
+    virtual void backwardCPU(NeuralLayer& layer_previous) = 0;
+    virtual void learn()=0;
+
+
+    /** @brief get output value */
+    virtual const VecF32& X()const=0;
+    virtual VecF32& X()=0;
+    /** @brief get output value */
+    virtual VecF32& d_E_X()=0;
+    /** @brief set the layer to be trainable */
+    virtual void setTrainable(bool istrainable)=0;
+
+
+    void setLearnableParameter(F32 mu){
+        _mu = mu;
+    }
+protected:
+    F32 _mu;
+};
+
+
+struct NeuronSigmoid
+{
+    F32 activation(F32 y){ return 1.7159*tanh(0.66666667*y);}
+    F32 derivedActivation(F32 ,F32 x){ return 0.666667f/1.7159f*(1.7159f+(x))*(1.7159f-(x));}  // derivative of the sigmoid as a function of the sigmoid's output
+
+};
+
+struct NeuralLayerInput : public NeuralLayer
+{
+
+     void forwardCPU(const NeuralLayer& layer_previous) {}
+     void backwardCPU(NeuralLayer& layer_previous) {}
+     void learn(){}
+     const VecF32& X()const{return _X;}
+     VecF32& X(){return _X;}
+     VecF32& d_E_X(){return _X;}
+     void setTrainable(bool ){}
+private:
+    VecF32 _X;
+};
+struct NeuralLayerInputMatrix : public NeuralLayerMatrix
+{
+
+     void forwardCPU(const NeuralLayer& layer_previous) {}
+     void backwardCPU(NeuralLayer& layer_previous) {}
+     void learn(){}
+     const VecF32& X()const{return _X;}
+     VecF32& X(){return _X;}
+     VecF32& d_E_X(){return _X;}
+     void setTrainable(bool ){}
+private:
+    VecF32 _X;
+};
+
+
+template<typename Neuron=NeuronSigmoid>
+struct NeuralLayerFullyConnected : public Neuron,public NeuralLayer
+{
+    NeuralLayerFullyConnected(int nbr_neurons_previous,int nbr_neurons)
+        :_Y(nbr_neurons),_X(nbr_neurons),_W(nbr_neurons,nbr_neurons_previous+1),_X_biais(nbr_neurons_previous+1,1)
+    {
+
+        DistributionNormal n(0,1./std::sqrt(nbr_neurons_previous+1));
+        for(unsigned int i=0;i<_W.size();i++){
+            _W(i)=n.randomVariable();
+        }
+    }
+    void setTrainable(bool istrainable){
+        if(istrainable==true){
+            _d_E_Y = _Y;
+            _d_E_W = _W;
+            _d_E_X = _X;
+        }else{
+            _d_E_Y.clear();
+            _d_E_W.clear();
+            _d_E_X.clear();
+        }
+    }
+
+    virtual void forwardCPU(const NeuralLayer& layer_previous){
+        std::copy(layer_previous.X().begin(),layer_previous.X().end(),_X_biais.begin());
+        _Y = _W * _X_biais;
+        for(unsigned int i=0;i<_Y.size();i++){
+            _X(i) = Neuron::activation(_Y(i));
+        }
+
+    }
+    virtual void backwardCPU(NeuralLayer& layer_previous){
+
+        VecF32& d_E_X_previous= layer_previous.d_E_X();
+        for(unsigned int i=0;i<_Y.size();i++){
+            _d_E_Y(i) = _d_E_X(i)*Neuron::derivedActivation(_Y(i),_X(i));
+        }
+        for(unsigned int i=0;i<_W.sizeI();i++){
+            for(unsigned int j=0;j<_W.sizeJ();j++){
+                _d_E_W(i,j)=_X_biais(j)*_d_E_Y(i);
+            }
+        }
+        for(unsigned int j=0;j<d_E_X_previous.size();j++){
+            d_E_X_previous(j)=0;
+            for(unsigned int i=0;i<_W.sizeI();i++){
+                d_E_X_previous(j)+=_d_E_Y(i)*_W(i,j);
+            }
+        }
+    }
+    void learn(){
+        for(unsigned int i=0;i<_W.sizeI();i++){
+            for(unsigned int j=0;j<_W.sizeJ();j++){
+                _W(i,j)= _W(i,j) -  _mu*_d_E_W(i,j);
+            }
+        }
+    }
+
+
+    VecF32& X(){return _X;}
+    const VecF32& X()const{return _X;}
+    VecF32& d_E_X(){return _d_E_X;}
+    //private:
+
+    VecF32 _Y;
+    VecF32 _X;
+    Mat2F32 _W;
+    VecF32 _X_biais;
+
+    VecF32 _d_E_Y;
+    Mat2F32 _d_E_W;
+    VecF32 _d_E_X;
+};
+
+struct NeuralNet
+{
+    Vec<NeuralLayer*> _v_layer;
+
+    void addLayerFullyConnected(int nbr_neurons){
+        if(_v_layer.size()==0){
+            this->_v_layer.push_back(new NeuralLayerFullyConnected<>(0,nbr_neurons));
+        }else{
+            this->_v_layer.push_back(new NeuralLayerFullyConnected<>((*(_v_layer.rbegin()))-> X().size(),nbr_neurons));
+        }
+    }
+    void setLearnableParameter(F32 mu){
+        for(unsigned int i=0;i<_v_layer.size();i++){
+            _v_layer(i)->setLearnableParameter(mu);
+        }
+    }
+    void setTrainable(bool istrainable){
+        for(unsigned int i=0;i<_v_layer.size();i++){
+            _v_layer(i)->setTrainable(istrainable);
+        }
+    }
+    void learn(){
+        for(unsigned int i=0;i<_v_layer.size();i++){
+            _v_layer(i)->learn();
+        }
+    }
+    void forwardCPU(const VecF32& X_in, VecF32& X_out){
+        std::copy(X_in.begin(),X_in.end(), (*(_v_layer.begin()))->X().begin());
+        for(unsigned int i=1;i<_v_layer.size();i++){
+            _v_layer(i)->forwardCPU(*_v_layer(i-1));
+        }
+        std::copy((*(_v_layer.rbegin()))->X().begin(),(*(_v_layer.rbegin()))->X().end(),X_out.begin());
+    }
+
+    void backwardCPU(VecF32& X_expected){
+
+        //first output layer
+        NeuralLayer* layer_last = _v_layer[_v_layer.size()-1];
+        for(unsigned int j=0;j<X_expected.size();j++){
+            layer_last->d_E_X()(j) = ( layer_last->X()(j)-X_expected(j));
+        }
+
+        for( int index_layer=_v_layer.size()-1;index_layer>0;index_layer--){
+            NeuralLayer* layer = _v_layer[index_layer];
+            NeuralLayer* layer_previous = _v_layer[index_layer-1];
+            layer->backwardCPU(* layer_previous);
+        }
+    }
+};
+
 int main(){
+    NeuralNetworkFeedForward n_ref;
+    n_ref.addInputLayer(2);
+    n_ref.addLayerFullyConnected(3);
+    n_ref.addLayerFullyConnected(1);
+    n_ref.setLearningRate(0.1);
+
+
+    NeuralNet neural;
+    neural.addLayerFullyConnected(2);
+    neural.addLayerFullyConnected(3);
+    neural.addLayerFullyConnected(1);
+    neural.setTrainable(true);
+    neural.setLearnableParameter(0.1);
+
+
+
+    Vec<VecF32> v_in(4,VecF32(2)),v_out(4,VecF32(1));
+    v_in(0)(0)=-1;v_in(0)(1)=-1;v_out(0)(0)= 1;
+    v_in(1)(0)= 1;v_in(1)(1)=-1;v_out(1)(0)=-1;
+    v_in(2)(0)=-1;v_in(2)(1)= 1;v_out(2)(0)=-1;
+    v_in(3)(0)= 1;v_in(3)(1)= 1;v_out(3)(0)= 1;
+
+    VecF32 v_out_net(1);
+
+
+    for(unsigned int i=1;i<=2;i++){
+        NNLayer* layer_neural = n_ref.layers()(i);
+        if(NeuralLayerFullyConnected<>* layer_new = dynamic_cast<NeuralLayerFullyConnected<> *>(neural._v_layer(i))){
+            //        std::cout<<layer_neural->_weights.size()<<std::endl;
+            //        std::cout<<test._v_layer(i)._W.size()<<std::endl;
+            //fully connected
+            for(unsigned int i=0;i<layer_new->_W.sizeI();i++){
+                for(unsigned int j=0;j<layer_new->_W.sizeJ();j++){
+                    if(j<layer_new->_W.sizeJ()-1){
+                        layer_new->_W(i,j)=layer_neural->_weights(j+i*layer_new->_W.sizeJ()+1)->_Wn;
+                    }else{
+                        layer_new->_W(i,j)=layer_neural->_weights(i*layer_new->_W.sizeJ())->_Wn;
+                    }
+                }
+            }
+        }
+
+
+        //        for(unsigned int index_weight=0;index_weight<layer_neural->_weights.size();index_weight++){
+        //            if(index_weight==0){
+        //                layer_new->_W(layer_neural->_weights.size()-1)=layer_neural->_weights(index_weight)->_Wn;
+        //            }else{
+        //                 layer_new->_W(index_weight-1)=layer_neural->_weights(index_weight)->_Wn;
+        //            }
+        //        }
+
+    }
+
+
+    Vec<int> v_global_rand(4);
+    for(unsigned int i=0;i<v_global_rand.size();i++)
+        v_global_rand(i)=i;
+
+    for(unsigned int i=0;i<100;i++){
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+        for(unsigned int j=0;j<v_global_rand.size();j++){
+
+            n_ref.propagateFront(v_in(v_global_rand(j)),v_out_net);
+            std::cout<<v_out_net<<std::endl;
+            neural.forwardCPU(v_in(v_global_rand(j)),v_out_net);
+            std::cout<<v_out_net<<std::endl;
+            //            exit(0);
+            neural.backwardCPU(v_out(v_global_rand(j)));
+            n_ref.propagateBackFirstDerivate(v_out(v_global_rand(j)));
+            neural.learn();
+            n_ref.learningFirstDerivate();
+            neural.forwardCPU(v_in(v_global_rand(j)),v_out_net);
+            std::cout<<"neural1 "<<v_out_net<<std::endl;
+            n_ref.propagateFront(v_in(v_global_rand(j)),v_out_net);
+            std::cout<<"neural2 "<<v_out_net<<std::endl;
+            std::cout<<"expected "<<v_out(v_global_rand(j))<<std::endl;
+        }
+    }
+    return 0;
     //    {
     //        Mat2UI8 m;
     //        m.load("plate1.pgm");
@@ -131,6 +396,18 @@ int main(){
 
     //    }
     {
+
+        Mat2F32 m(2,2);
+        m(0,0)=1;m(0,1)=1;
+        m(1,0)=3;m(1,1)=5;
+        Mat2F32 m_lign(2,1);
+        m_lign(0,0)=3;
+        m_lign(1,0)=2;
+        VecF32 & v = m_lign;
+        std::cout<<m*v<<std::endl;
+        return 1;
+
+
         //        Vec<LinearLeastSquareRANSACModel::Data> data;
         //        VecF32 x(2);F32 y;
         //        x(0)=1;x(1)=1;y=5.2;data.push_back(LinearLeastSquareRANSACModel::Data(x,y));
@@ -277,8 +554,8 @@ int main(){
                 std::cout<<xmax<<std::endl;
                 std::cout<<m_lign.getDomain()<<std::endl;
 
-//                F32 ratio = m_init.sizeJ()/1000;
-//                std::cout<<ratio<<std::endl;
+                //                F32 ratio = m_init.sizeJ()/1000;
+                //                std::cout<<ratio<<std::endl;
                 m_lign = m_lign(xmin,xmax);
                 m_lign = Processing::median(m_lign,2);
                 Mat2UI8 tophat_letter = Processing::closing(m_lign,7)-m_lign;

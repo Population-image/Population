@@ -69,7 +69,7 @@ class  Mat2x;
 */
 
 template<int Dim, typename PixelType>
-class POP_EXPORTS MatN : public std::vector<PixelType>
+class POP_EXPORTS MatN : public Vec<PixelType>
 {
 public:
 
@@ -109,7 +109,7 @@ public:
     The cell values are stored in a %vector container, a class template of STL, which works like a dynamic array in a strict linear sequence. The position of the
     cell can be located by an index or a point VecN<Dim,int> as n integers (in 2D Vec2I32=(i,j), in 3D Vec3I32=(i,j,k)) as explained in the below figure:
     \image html vector.png the value f(i,j) corresponds to the element  v[j+i*ColSize] of the %vector container.
-    We make the choice to have a single std::vector and not a std::vector of std::vector as the classical ways because the matrix can be nD and also for optimization purpose in the case of iteration.\n
+    We make the choice to have a single Vec and not a Vec of Vec as the classical ways because the matrix can be nD and also for optimization purpose in the case of iteration.\n
     As explained in my book, this data-structure is a model of the Function concept represented that
     \f[ \begin{matrix}  f\colon   \mathcal{D}\subset E & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
      such that the input quantity completely determines the output quantity. The input quantity belongs to a space \f$E\f$ and the output to the space \f$F\f$
@@ -179,7 +179,7 @@ public:
         img(x)=150;
     img.display();
     \endcode
-    - \a  dereferencing: utilisation of the iterator of the STL std::vector. For instance, this code:
+    - \a  dereferencing: utilisation of the iterator of the STL Vec. For instance, this code:
     \code
     void constant (unsigned char & v) {
         v= 150;
@@ -427,18 +427,18 @@ public:
 
      \sa  begin() end()
     */
-    typedef typename std::vector<PixelType>::iterator iterator;
-    typedef typename std::vector<PixelType>::value_type					 value_type;
-    typedef typename std::vector<PixelType>::pointer           pointer;
-    typedef typename std::vector<PixelType>::const_pointer     const_pointer;
-    typedef typename std::vector<PixelType>::reference         reference;
-    typedef typename std::vector<PixelType>::const_reference   const_reference;
-    typedef typename std::vector<PixelType>::const_iterator const_iterator;
-    typedef typename std::vector<PixelType>::const_reverse_iterator  const_reverse_iterator;
-    typedef typename std::vector<PixelType>::reverse_iterator		 reverse_iterator;
-    typedef typename std::vector<PixelType>::size_type					 size_type;
-    typedef typename std::vector<PixelType>::difference_type				 difference_type;
-    typedef typename std::vector<PixelType>::allocator_type                        		 allocator_type;
+    typedef typename Vec<PixelType>::iterator iterator;
+    typedef typename Vec<PixelType>::value_type					 value_type;
+    typedef typename Vec<PixelType>::pointer           pointer;
+    typedef typename Vec<PixelType>::const_pointer     const_pointer;
+    typedef typename Vec<PixelType>::reference         reference;
+    typedef typename Vec<PixelType>::const_reference   const_reference;
+    typedef typename Vec<PixelType>::const_iterator const_iterator;
+    typedef typename Vec<PixelType>::const_reverse_iterator  const_reverse_iterator;
+    typedef typename Vec<PixelType>::reverse_iterator		 reverse_iterator;
+    typedef typename Vec<PixelType>::size_type					 size_type;
+    typedef typename Vec<PixelType>::difference_type				 difference_type;
+    typedef typename Vec<PixelType>::allocator_type                        		 allocator_type;
 
 
     //-------------------------------------
@@ -504,17 +504,17 @@ public:
     */
     explicit MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek);
     /*!
-    \fn MatN(const VecN<Dim,int>& x,const std::vector<PixelType>& data)
+    \fn MatN(const VecN<Dim,int>& x,const Vec<PixelType>& data)
     \param x domain size of the matrix
     \param data_values value of each pixel/voxel
     *
-    * construct an matrix of size domain(0),domain(1) for 2D matrix and  domain(0),domain(1),domain(2) for 3D matrix where each pixel/voxel is set by the values contained in the std::vector \n
+    * construct an matrix of size domain(0),domain(1) for 2D matrix and  domain(0),domain(1),domain(2) for 3D matrix where each pixel/voxel is set by the values contained in the Vec \n
     *   This code: \n
     \code
     Mat2UI8::Domain x;
     x(0)=2;
     x(1)=4;
-    std::vector<Mat2UI8::F> v;
+    Vec<Mat2UI8::F> v;
     v.push_back(0);v.push_back(1);v.push_back(2);v.push_back(3);
     v.push_back(3);v.push_back(2);v.push_back(1);v.push_back(0);
     Mat2UI8 img(x,v);
@@ -526,7 +526,7 @@ public:
     3 2 1 0
     \endcode
     */
-    explicit MatN(const VecN<Dim,int> & x,const std::vector<PixelType>& data_values );
+    explicit MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values );
     /*!
     \fn MatN(const VecN<Dim,int> & x,const Type* v_value )
     \param x domain size of the matrix
@@ -556,7 +556,7 @@ public:
     Mat2UI8::Domain x;
     x(0)=2;
     x(1)=4;
-    std::vector<Mat2UI8::F> v;
+    Vec<Mat2UI8::F> v;
     v.push_back(0);v.push_back(1);v.push_back(2);v.push_back(3);
     v.push_back(3);v.push_back(2);v.push_back(1);v.push_back(0);
     Mat2UI8 img1(x,v);
@@ -582,7 +582,7 @@ public:
     Mat2UI8::Domain x;
     x(0)=2;
     x(1)=4;
-    std::vector<Mat2UI8::F> v;
+    Vec<Mat2UI8::F> v;
     v.push_back(0);v.push_back(1);v.push_back(2);v.push_back(3);
     v.push_back(3);v.push_back(2);v.push_back(1);v.push_back(0);
     Mat2UI8 img1(x,v);
@@ -877,7 +877,7 @@ public:
     \param index vector index
     \return pixel/voxel value
     *
-    * access the reference of the pixel/voxel value at the vector index (std::vector contains pixel values)
+    * access the reference of the pixel/voxel value at the vector index (Vec contains pixel values)
     */
     inline PixelType & operator ()(unsigned int index);
     /*!
@@ -1378,33 +1378,33 @@ public:
     MatN deleteCol(unsigned int j)const;
     /*!
     * \param i  row entry
-    * \return the row in a std::vector
+    * \return the row in a Vec
     *
-    * the output std::vector contained the row at the given index i
+    * the output Vec contained the row at the given index i
     * \sa Vec
     */
     Vec<F> getRow(unsigned int i)const;
     /*!
     * \param j  column entry
-    * \return the column in a std::vector
+    * \return the column in a Vec
     *
-    * the output std::vector contained the column at the given index j
+    * the output Vec contained the column at the given index j
     * \sa Vec
     */
     Vec<F> getCol(unsigned int j)const;
     /*!
     * \param i  row entry
-    * \param v  std::vector
+    * \param v  Vec
     *
-    * set the row at the given row entry with the given std::vector of size equal to number of column
+    * set the row at the given row entry with the given Vec of size equal to number of column
     * \sa Vec
     */
     void setRow(unsigned int i,const Vec<F>& v);
     /*!
     * \param j  column entry
-    * \param v  std::vector
+    * \param v  Vec
     *
-    * set the column at the given column entry with the given std::vector of size equal to number of row
+    * set the column at the given column entry with the given Vec of size equal to number of row
     * \sa Vec
     */
     void setCol(unsigned int j,const Vec<F>& v);
@@ -1498,37 +1498,37 @@ public:
 
 #ifdef HAVE_SWIG
     MatN(const MatN<Dim,UI8> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI8>::Range);
     }
     MatN(const MatN<Dim,UI16> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI16>::Range);
     }
     MatN(const MatN<Dim,UI32> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI32>::Range);
     }
     MatN(const MatN<Dim,F32> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,F32>::Range);
     }
     MatN(const MatN<Dim,RGBUI8> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBUI8>::Range);
     }
     MatN(const MatN<Dim,RGBF32> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBF32>::Range);
     }
     MatN(const MatN<Dim,ComplexF32> &img)
-        :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,ComplexF32>::Range);
     }
@@ -1586,35 +1586,35 @@ MatN<Dim,PixelType>::MatN()
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const VecN<Dim,int>& domain,PixelType v)
-    :std::vector<PixelType>(domain.multCoordinate(),PixelType(v)),_domain(domain)
+    :Vec<PixelType>(domain.multCoordinate(),PixelType(v)),_domain(domain)
 {
 }
 
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei,unsigned int sizej)
-    :std::vector<PixelType>(sizei*sizej,PixelType(0))
+    :Vec<PixelType>(sizei*sizej,PixelType(0))
 {
     POP_DbgAssertMessage(Dim==2,"In MatN::MatN(int i, int j), your matrix must be 2D");
     _domain(0)=sizei;_domain(1)=sizej;
 }
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
-    :std::vector<PixelType>(sizei*sizej*sizek,PixelType(0))
+    :Vec<PixelType>(sizei*sizej*sizek,PixelType(0))
 {
     POP_DbgAssertMessage(Dim==3,"In MatN::MatN(int sizei, int sizej,int sizek), your matrix must be 3D");
     _domain(0)=sizei;_domain(1)=sizej;_domain(2)=sizek;
 }
 template<int Dim, typename PixelType>
-MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const std::vector<PixelType>& data_values )
-    :std::vector<PixelType>(data_values),_domain(x)
+MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values )
+    :Vec<PixelType>(data_values),_domain(x)
 {
-    POP_DbgAssertMessage((int)data_values.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const std::vector<PixelType>& data ), the size of input std::vector data must be equal to the number of pixel/voxel");
+    POP_DbgAssertMessage((int)data_values.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data ), the size of input Vec data must be equal to the number of pixel/voxel");
 }
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const PixelType* v_value )
-    :std::vector<PixelType>(x.multCoordinate(),PixelType()),_domain(x)
+    :Vec<PixelType>(x.multCoordinate(),PixelType()),_domain(x)
 {
     std::copy(v_value,v_value + _domain.multCoordinate(),this->begin());
 }
@@ -1622,7 +1622,7 @@ MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const PixelType* v_value )
 template<int Dim, typename PixelType>
 template<typename T1>
 MatN<Dim,PixelType>::MatN(const MatN<Dim, T1> & img )
-    :std::vector<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+    :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
 {
     std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,T1>::Range);
 }
@@ -1631,7 +1631,7 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim, T1> & img )
 #ifndef HAVE_SWIG
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img )
-    :std::vector<PixelType>(img),_domain(img.getDomain())
+    :Vec<PixelType>(img),_domain(img.getDomain())
 {
 }
 #endif
@@ -1649,7 +1649,7 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
     POP_DbgAssertMessage(xmax.allSuperior(xmin),"xmax must be superior to xmin");
     POP_DbgAssertMessage(xmax.allInferior(img.getDomain()+1),"xmax must be superior or equal to xmin");
     _domain = xmax-xmin;
-    std::vector<PixelType>::resize(_domain.multCoordinate(),0);
+    Vec<PixelType>::resize(_domain.multCoordinate(),0);
     if(  DIM==2 ){
         if(_domain(1)==img.getDomain()(1)){
             if(_domain(0)==img.getDomain()(0))
@@ -1658,9 +1658,9 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
                 std::copy(img.begin()+ xmin(0)*img._domain(1),img.begin()+xmax(0)*img._domain(1),this->begin());
         }else{
 
-            typename std::vector<PixelType>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
-            typename std::vector<PixelType>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
-            typename std::vector<PixelType>::iterator it = this->begin();
+            typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
+            typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
+            typename Vec<PixelType>::iterator it = this->begin();
             for( int i=xmin(0);i<xmax(0);i++){
                 std::copy(itb,ite,it);
                 itb+=img._domain(1);
@@ -1677,9 +1677,9 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
             else{
                 int intra_slice_add                = img._domain(1)*img._domain(0);
                 int intra_slice_add_this           = this->_domain(1)*this->_domain(0);
-                typename std::vector<PixelType>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                typename std::vector<PixelType>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                typename std::vector<PixelType>::iterator it        = this->begin();
+                typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename Vec<PixelType>::iterator it        = this->begin();
 
                 for( int k=xmin(2);k<xmax(2);k++){
                     std::copy(itb,ite,it);
@@ -1694,15 +1694,15 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
             unsigned int indexmaxi = xmax(0);
             int intra_slice_add      = img._domain(1)*img._domain(0);
             int intra_slice_add_this = this->_domain(1)*this->_domain(0);
-            typename std::vector<PixelType>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-            typename std::vector<PixelType>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-            typename std::vector<PixelType>::iterator it        = this->begin();
+            typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename Vec<PixelType>::iterator it        = this->begin();
             unsigned int indexmin = xmin(2);
             unsigned int indexmax = xmax(2);
             for(unsigned int i=indexmin;i<indexmax;i++){
-                typename std::vector<PixelType>::const_iterator itbb = itb;
-                typename std::vector<PixelType>::const_iterator itee = ite;
-                typename std::vector<PixelType>::iterator itt =it;
+                typename Vec<PixelType>::const_iterator itbb = itb;
+                typename Vec<PixelType>::const_iterator itee = ite;
+                typename Vec<PixelType>::iterator itt =it;
                 for(unsigned int j=indexmini;j<indexmaxi;j++){
                     std::copy(itbb ,itee,itt);
                     itbb+=img._domain(1);
@@ -1773,19 +1773,19 @@ template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(unsigned int sizei,unsigned int sizej){
     _domain(0)=sizei;
     _domain(1)=sizej;
-    std::vector<PixelType>::resize(_domain(0)*_domain(1));
+    Vec<PixelType>::resize(_domain(0)*_domain(1));
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(unsigned int sizei,unsigned int sizej,unsigned int sizek){
     _domain(0)=sizei;
     _domain(1)=sizej;
     _domain(2)=sizek;
-    std::vector<PixelType>::resize(_domain(0)*_domain(1)*_domain(2));
+    Vec<PixelType>::resize(_domain(0)*_domain(1)*_domain(2));
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(const VecN<Dim,int> & d){
     _domain=d;
-    std::vector<PixelType>::resize(_domain.multCoordinate());
+    Vec<PixelType>::resize(_domain.multCoordinate());
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resizeInformation(unsigned int sizei,unsigned int sizej){
@@ -1808,14 +1808,14 @@ void MatN<Dim,PixelType>::resizeInformation(const VecN<Dim,int>& d){
 
     if(Dim==2&&d(1)==_domain(1)){
         _domain=d;
-        std::vector<PixelType>::resize(_domain.multCoordinate());
+        Vec<PixelType>::resize(_domain.multCoordinate());
     }else if(Dim==3&&d(0)==_domain(0)&&d(1)==_domain(1)){
         _domain=d;
-        std::vector<PixelType>::resize(_domain.multCoordinate());
+        Vec<PixelType>::resize(_domain.multCoordinate());
     }else{
         MatN<Dim,PixelType> temp(*this);
         _domain=d;
-        std::vector<PixelType>::resize(_domain.multCoordinate());
+        Vec<PixelType>::resize(_domain.multCoordinate());
 
         IteratorEDomain it(this->getIteratorEDomain());
         while(it.next()){
@@ -1837,7 +1837,7 @@ bool MatN<Dim,PixelType>::isEmpty()const{
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::clear(){
     _domain=0;
-    std::vector<PixelType>::clear();
+    Vec<PixelType>::clear();
 }
 
 template<int Dim, typename PixelType>

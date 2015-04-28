@@ -306,8 +306,7 @@ void processingTest()
 int main(){
     testMatN();
     processingTest();
-
-    //    testAnamysis();
+    testAnamysis();
     return 1;
     Mat2UI8 img;
     //    img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/outil.bmp");

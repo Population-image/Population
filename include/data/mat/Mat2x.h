@@ -1034,7 +1034,7 @@ typename Mat2x<PixelType,2,2>::Domain Mat2x<PixelType,2,2>::getDomain()const{
 
 template<int Dim, typename Result>
 MatN<Dim, Result>::MatN(const Mat2x<Result,2,2> m)
-    :std::vector<Result>(4)
+    :Vec<Result>(4)
 {
     _domain(0)=2;
     _domain(1)=2;
@@ -1697,7 +1697,7 @@ Mat2x<PixelType,3,3> &Mat2x<PixelType,3,3>::operator =(const Mat2x& m)
 }
 template<int Dim, typename Result>
 MatN<Dim, Result>::MatN(const Mat2x<Result,3,3> m)
-:std::vector<Result>(9)
+:Vec<Result>(9)
 {
     _domain(0)=3;
     _domain(1)=3;
