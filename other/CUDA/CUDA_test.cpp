@@ -18,7 +18,7 @@ int main(void) {
 
 		//test_neural_net();
 
-		const int nb_epoch = 60;
+		const int nb_epoch = 2;
 		const int max_files_per_folder = 30;
 		//test_neural_net_cpu(1000/*nb_epoch*/);
 		//test_neural_net_gpu(1/*nb_epoch*/);
@@ -26,6 +26,7 @@ int main(void) {
 		//test_neural_net_gpu_mnist(nb_epoch);
 		//test_neural_net_gpu_augmented_database(max_files_per_folder, 1, "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base_augmented", "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base", nb_epoch);
 		//bench_propagate_front_gpu_augmented_database(max_files_per_folder, "/home/pl/Documents/alphanumericvision/deep_big_simple_neural_net/gpu/1/network.bin", "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base_augmented", "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base", nb_epoch);
+		//bench_propagate_front_gpu_augmented_database(max_files_per_folder, "/tmp/network.bin", "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base_augmented", "/media/pl/shared/PL/neural_nets_samples/ANV_light/data_base", nb_epoch);
 		//test_neural_net_conv_cpu(500/*nb_epoch*/);
 		//test_neural_net_conv_gpu(500/*nb_epoch*/);
 		//test_neural_net_conv_cpu_mnist(nb_epoch);

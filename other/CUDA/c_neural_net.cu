@@ -998,12 +998,16 @@ __global__ void gpu_propagateFront_convolution(struct neural_network *network, i
 		pop::F32* start_kernel = layer._W + index_kernel * layer._W_width;
 		pop::F32* start_map = layer._Y + index_map * layer._sizei_map * layer._sizej_map;
 
+		//XXX: trying to optimize
+		pop::F32 v = 0;
 		for (unsigned int n=0; n<layer._sizei_kernel; n++) {
 			for (unsigned int m=0; m<layer._sizej_kernel; m++) {
-				start_map[i*layer._sizej_map+j] += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
+				//start_map[i*layer._sizej_map+j] += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
+				v += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
 			}
 		}
-		start_map[i*layer._sizej_map+j] += start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
+		//start_map[i*layer._sizej_map+j] += start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
+		start_map[i*layer._sizej_map+j] = v + start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
 	}
 }
 
@@ -1434,10 +1438,13 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 	size_t total_size_test = vtest_in.size() * vtest_in(0).size() * sizeof(vtest_in(0)(0));
 	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
 
+	const bool profile_on_cpu = false;
+
 	size_t free, total;
 	cudaMemGetInfo(&free, &total);
 	const size_t available = GPU_MEMORY_PRESSURE*free;
 
+	pop::VecF32 vout;
 	pop::F32* d_out;
 	cudaMalloc(&d_out, h_network->_layers[h_network->_nb_layers-1]._X_size);
 
@@ -1456,6 +1463,9 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 		struct timespec time_start, time_end;
 		int start, stop, step;
 
+		pop::F32* d_vtraining_in = NULL;
+		pop::F32* d_vtest_in = NULL;
+
 		clock_gettime(CLOCK_REALTIME, &time_start);
 
 		//*********************** TRAINING ***********************
@@ -1464,13 +1474,21 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 		step = available / (vtraining_in(0).size()*sizeof(vtraining_in(0)(0)));
 		while (start < stop) {
 			const int nb_elts = min(step, stop-start);
-			pop::F32* d_vtraining_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_in, start, nb_elts);
-
-			for(unsigned int j=0;j<nb_elts;j++) {
-				gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
+			if (!profile_on_cpu) {
+				d_vtraining_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtraining_in, start, nb_elts);
 			}
 
-			cudaFree(d_vtraining_in);
+			for(unsigned int j=0;j<nb_elts;j++) {
+				if (profile_on_cpu) {
+					propagateFront(vtraining_in(j), vout);
+				} else {
+					gpu_propagateFront(d_vtraining_in, vtraining_in(0).size(), j, d_out);
+				}
+			}
+
+			if (!profile_on_cpu) {
+				cudaFree(d_vtraining_in);
+			}
 			start += step;
 		}
 
@@ -1480,13 +1498,21 @@ void GPUNeuralNetwork::gpu_propagate(pop::Vec<pop::VecF32>& vtraining_in, pop::V
 		step = available / (vtest_in(0).size()*sizeof(vtest_in(0)(0)));
 		while (start < stop) {
 			const int nb_elts = min(start+step, stop);
-			pop::F32* d_vtest_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_in, start, nb_elts);
-
-			for(unsigned int j=0;j<nb_elts;j++){
-				gpu_propagateFront(d_vtest_in, vtest_in(0).size(), j, d_out);
+			if (!profile_on_cpu) {
+				d_vtest_in = GPUNeuralNetwork::gpu_copyDataToGPU(vtest_in, start, nb_elts);
 			}
 
-			cudaFree(d_vtest_in);
+			for(unsigned int j=0;j<nb_elts;j++){
+				if (profile_on_cpu) {
+					propagateFront(vtest_in(j), vout);
+				} else {
+					gpu_propagateFront(d_vtest_in, vtest_in(0).size(), j, d_out);
+				}
+			}
+
+			if (!profile_on_cpu) {
+				cudaFree(d_vtest_in);
+			}
 			start += step;
 		}
 
@@ -1902,10 +1928,13 @@ void test_neural_net_gpu_augmented_database(const int max_files_per_folder, cons
 
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
-	lr.type = LAYER_FULLY_CONNECTED;
 
+#if 0
+	lr.type = LAYER_INPUT;
 	lr.nb_neurons = size_in;
 	v_layer.push_back(lr);
+
+	lr.type = LAYER_FULLY_CONNECTED;
 	switch (network_for_training) {
 	case 5:
 		for (int i=0; i<9; i++) {
@@ -1935,10 +1964,42 @@ void test_neural_net_gpu_augmented_database(const int max_files_per_folder, cons
 		std::cerr << "Database training: unknown network " << network_for_training << std::endl;
 		return;
 	}
+
+	lr.type = LAYER_FULLY_CONNECTED;
 	lr.nb_neurons = size_out;
 	v_layer.push_back(lr);
+
+#else
+
+	lr.type = LAYER_INPUT_MATRIX;
+	//Simard: input is 29x29
+	pop::Vec2I32 domain(29, 29);
+	lr.sizei_map = domain(0);
+	lr.sizej_map = domain(1);
+	lr.nbr_map = 1;
+	v_layer.push_back(lr);
+	lr.type = LAYER_CONVOLUTIONAL;
+	lr.nbr_map = 6;
+	lr.radius_kernel = 2;
+	lr.sub_resolution_factor = 2;
+	v_layer.push_back(lr);
+	lr.type = LAYER_CONVOLUTIONAL;
+	lr.nbr_map = 50;
+	lr.radius_kernel = 2;
+	lr.sub_resolution_factor = 2;
+	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = 100;
+	v_layer.push_back(lr);
+	lr.type = LAYER_FULLY_CONNECTED;
+	lr.nb_neurons = size_out;
+	v_layer.push_back(lr);
+#endif
+
 	GPUNeuralNetwork network(v_layer, 0.001);
 	std::cout << "Network created at " << getCurrentTime() << std::endl;
+	network.save("/tmp/network.bin");
+	std::cout << "saved" << std::endl;
 
 	network.gpu_learn(vtraining_in, vtraining_out, vtest_in, vtest_out, true, nb_epoch);
 }
