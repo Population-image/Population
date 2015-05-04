@@ -249,7 +249,7 @@ public:
             }
             _tab=v_tab;
         }else{
-            _radius+=v_it._radius;
+            _radius=v_it._radius;
             initBall();
         }
     }

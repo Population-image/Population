@@ -191,12 +191,12 @@ bool  MatNInOut::_load( MatN<2, RGBUI8 > &img, const char * filename){
 
 
 void  MatNInOut::_savePNG(const MatN<2, UI8 > &img, const char * filename){
-    lodepng::encode(filename, img, img._domain(1), img._domain(0),LCT_GREY,8);
+    lodepng::encode(filename, img, img.sizeJ(), img.sizeI(),LCT_GREY,8);
 }
 
 void  MatNInOut::_savePNG(const MatN<2, RGBUI8 > &img, const char * filename){
 
-    std::vector<unsigned char> byte_array(img._domain(0)* img._domain(1)*3);
+    std::vector<unsigned char> byte_array(img.sizeI()* img.sizeJ()*3);
     std::vector<unsigned char>::iterator itin =byte_array.begin();
     std::vector<RGBUI8>::const_iterator itout =img.begin();
     for(;itin!=byte_array.end();){
@@ -208,7 +208,7 @@ void  MatNInOut::_savePNG(const MatN<2, RGBUI8 > &img, const char * filename){
         itin++;
         itout++;
     }
-    lodepng::encode(filename, byte_array, img._domain(1), img._domain(0),LCT_RGB,8);
+    lodepng::encode(filename, byte_array, img.sizeJ(), img.sizeI(),LCT_RGB,8);
 }
 
 bool  MatNInOut::_loadPNG( MatN<2, UI8 > &img, const char * filename)
@@ -232,9 +232,7 @@ bool  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)
             std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
             return false;
         }
-        img._domain(1)=width;
-        img._domain(0)=height;
-        img.std::vector<RGBUI8>::resize(width*height);
+        img.resize(height,width);
         std::vector<unsigned char>::iterator itin =byte_array.begin();
         std::vector<RGBUI8>::iterator itout =img.begin();
         for(;itin!=byte_array.end();){
@@ -258,9 +256,7 @@ bool  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename){
         std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
         return false;
     }
-    img._domain(1)=bimg.GetWidth();
-    img._domain(0)=bimg.GetHeight();
-    img.std::vector<UI8>::resize(bimg.GetWidth()*bimg.GetHeight());
+    img.resize(bimg.GetHeight(),bimg.GetWidth());
     for(unsigned int i=0;i<bimg.GetWidth();i++){
         for(unsigned int j=0;j<bimg.GetHeight();j++){
             img(img.getDomain()(0)-1-j,i) =(UI8)RGBUI8(static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Red,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Green,static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Blue).lumi();
@@ -276,9 +272,7 @@ bool  MatNInOut::_loadBMP( MatN<2, RGBUI8 > &img, const char * filename){
         std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
         return false;
     }
-    img._domain(1)=bimg.GetWidth();
-    img._domain(0)=bimg.GetHeight();
-    img.std::vector<RGBUI8>::resize(bimg.GetWidth()*bimg.GetHeight());
+    img.resize(bimg.GetHeight(),bimg.GetWidth());
     for(unsigned int i=0;i<bimg.GetWidth();i++)
         for(unsigned int j=0;j<bimg.GetHeight();j++){
             img(img.getDomain()(0)-1-j,i).r()= static_cast<BIPMAP::RGBA*>(bimg.GetBits())[j*bimg.GetWidth()+i].Red;
@@ -340,11 +334,9 @@ bool  MatNInOut::_loadJPG( MatN<2, UI8 > &img, const char * filename){
         std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
         return false;
     }
-    img._domain(1)=width;
-    img._domain(0)=height;
-    img.std::vector<UI8>::resize(img._domain[1]*img._domain[0]);
+    img.resize(height,width);
     unsigned char * ptr=dat;
-    std::copy(ptr,ptr+img._domain[1]*img._domain[0],img.begin());
+    std::copy(ptr,ptr+height*width,img.begin());
     free(dat);
     return true;
 }
@@ -358,9 +350,7 @@ bool  MatNInOut::_loadJPG( MatN<2, RGBUI8 > &img, const char * filename){
         std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
         return false;
     }
-    img._domain(1)=width;
-    img._domain(0)=height;
-    img.std::vector<RGBUI8>::resize(img._domain[0]*img._domain[1]);
+    img.resize(height,width);
     unsigned char * ptr=dat;
     for(std::vector<RGBUI8>::iterator itb = img.begin();itb!=img.end();itb++){
         itb->r()=* ptr;
@@ -380,45 +370,4 @@ void  MatNInOut::_saveJPG(const MatN<2, RGBUI8 > &img, const char * filename){
 void  MatNInOut::_saveJPG(const MatN<2, UI8 > &img, const char * filename){
     jpge::compress_image_to_jpeg_file(filename,img.getDomain()(1),img.getDomain()(0),1,&(*img.begin()));
 }
-
-//#if defined(HAVE_CIMG)
-
-//#elif WITHQT
-//QImage qimg=ConvertorQT::toQImage(in);
-//if(qimg.save(file)==false){
-//    std::string msg="Your image format is not accepted :"+std::string(file)+"\nThe Accepted formats are :\n";
-//    QString err;
-//    err=msg.c_str();
-//    QList<QByteArray> list = QImageWriter::supportedImageFormats ();
-//    QList<QByteArray>::Iterator it;
-//    err+="*: pgm for a pgm format, you must add the extension .pgm in the suffix name file\n";
-//    for(it = list.begin();it!=list.end();it++)
-//        err+="*: "+*it+"\n";
-//    std::cerr<<err.toStdString();
-//}
-//#endif
-
-
-
-//#if defined(HAVE_CIMG)
-
-
-
-//#elif WITHQT
-//QImage img(file);
-//if(img.isNull()==false){
-//    in = ConvertorQT::fromQImage<DIM,Result>(img);
-//}
-//else{
-//std::string msg="Your image is not accepted :"+std::string(file)+"\nThe Accepted formats are :\n";
-//QString err;
-//err=msg.c_str();
-//QList<QByteArray> list = QImageReader::supportedImageFormats ();
-//QList<QByteArray>::Iterator it;
-//err+="*: pgm for a pgm format, you must add the extension .pgm in the suffix name file\n";
-//for(it = list.begin();it!=list.end();it++)
-//err+="*: "+*it+"\n";
-//std::cerr<<err.toStdString();
-//}
-//#endif
 }

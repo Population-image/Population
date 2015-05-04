@@ -272,10 +272,10 @@ public:
     */
 
 protected:
-
+    VecN<Dim,int> _domain;
 
 public:
-    VecN<Dim,int> _domain;
+
     /*!
     \typedef F
     * Pixel/voxel type
