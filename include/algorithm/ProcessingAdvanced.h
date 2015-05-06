@@ -92,22 +92,24 @@ struct ProcessingAdvanced
     {
         MatN<2,PixelType> s (f.getDomain());
         MatN<2,PixelType> out(f.getDomain());
+
+#if defined(HAVE_OPENMP)
+    #pragma omp parallel for
+#endif
         for(int i=0;i<f.getDomain()(0);i++){
             for(int j=0;j<f.getDomain()(1);j++){
-                if(j==0){
-                    s(i,j)=f(i,j);
-                }
-                else{
-                    s(i,j)=f(i,j)+s(i,j-1);
-                }
-                if(i==0){
-                    out(i,j)=s(i,j);
-                }
-                else{
-                    out(i,j)=s(i,j)+out(i-1,j);
-                }
+                s(i,j)=f(i,j) + (j==0?0:s(i,j-1));
             }
         }
+#if defined(HAVE_OPENMP)
+    #pragma omp parallel for
+#endif
+        for(int j=0;j<f.getDomain()(1);j++){
+            for(int i=0;i<f.getDomain()(0);i++){
+                out(i,j)=s(i,j) + (i==0?0:out(i-1,j));
+            }
+        }
+
         return out;
     }
     template<typename VoxelType>
@@ -439,7 +441,7 @@ struct ProcessingAdvanced
         MatN<DIM,UI8> outcast(f.getDomain());
         it.init();
         while(it.next()){
-			outcast(it.x())= ArithmeticsSaturation<UI8,F32>::Range(std::pow( (f(it.x())+d.randomVariable())/256,pow_current)*256);
+            outcast(it.x())= ArithmeticsSaturation<UI8,F32>::Range(std::pow( (f(it.x())+d.randomVariable())/256,pow_current)*256);
         }
         return outcast;
     }

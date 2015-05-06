@@ -9,6 +9,7 @@
 #include <vector>
 #include "data/vec/Vec.h"
 #include "data/mat/MatN.h"
+#include "data/notstable/MatNReference.h"
 #include"algorithm/GeometricalTransformation.h"
 #include"data/utility/XML.h"
 
@@ -845,15 +846,15 @@ struct POP_EXPORTS TrainingNeuralNetwork
 
     static Vec<Vec<pop::Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
     static Vec<pop::Mat2UI8>   geometricalTransformationDataBaseMatrix(Vec<pop::Mat2UI8>  number_training,
-                                                                            unsigned int number=10,
-                                                                            F32 sigma_elastic_distortion_min=5,
-                                                                            F32 sigma_elastic_distortion_max=6,
-                                                                            F32 alpha_elastic_distortion_min=36,
-                                                                            F32 alpha_elastic_distortion_max=38,
-                                                                            F32 beta_angle_degree_rotation=15,
-                                                                            F32 beta_angle_degree_shear=15,
-                                                                            F32 gamma_x_scale=15,
-                                                                            F32 gamma_y_scale=15);
+                                                                       unsigned int number=10,
+                                                                       F32 sigma_elastic_distortion_min=5,
+                                                                       F32 sigma_elastic_distortion_max=6,
+                                                                       F32 alpha_elastic_distortion_min=36,
+                                                                       F32 alpha_elastic_distortion_max=38,
+                                                                       F32 beta_angle_degree_rotation=15,
+                                                                       F32 beta_angle_degree_shear=15,
+                                                                       F32 gamma_x_scale=15,
+                                                                       F32 gamma_y_scale=15);
     static void  convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value);
 
 
@@ -865,8 +866,13 @@ template<typename TypeScalarPixel>
 VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & img,Vec2I32 domain,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
 
     if(method==NNLayerMatrix::BoundingBox){
+        std::cout<<"bounding box"<<std::endl;
         //cropping
         pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
+        for(unsigned int i=0;i<img.size();i++){
+
+        }
+
         ForEachDomain2D(x,img){
             if(img(x)!=0){
                 xmin=minimum(xmin,x);
@@ -967,6 +973,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
                 mrf(xxx) = (mrf(xxx)-mini)/diff;
             }
         }
+//        mrf.display();
         return VecF32(mrf);
     }
 }
@@ -992,6 +999,165 @@ public:
     void propagateFront();
     void propagateBackFirstDerivate();
     void initPropagateBackFirstDerivate();
+};
+
+
+
+
+
+
+
+class NeuralLayer
+{
+public:
+    /** @brief Using the CPU device, compute the output values . */
+    virtual void forwardCPU(const NeuralLayer& layer_previous) = 0;
+    /** @brief Using the CPU device, compute the error of the output values of the layer prrevious. */
+    virtual void backwardCPU(NeuralLayer& layer_previous) = 0;
+    virtual void learn()=0;
+    /** @brief get output value */
+    virtual const VecF32& X()const=0;
+    virtual VecF32& X()=0;
+    /** @brief get output value */
+    virtual VecF32& d_E_X()=0;
+    /** @brief set the layer to be trainable */
+    virtual void setTrainable(bool istrainable)=0;
+    void setLearnableParameter(F32 mu);
+    virtual NeuralLayer * clone()=0;
+    F32 _mu;
+};
+
+
+struct NeuronSigmoid
+{
+    inline F32 activation(F32 y){ return 1.7159*tanh(0.66666667*y);}
+    inline F32 derivedActivation(F32 x){ return 0.666667f/1.7159f*(1.7159f+(x))*(1.7159f-(x));}  // derivative of the sigmoid as a function of the sigmoid's output
+
+};
+struct NeuralLayerLinear : public NeuralLayer
+{
+    NeuralLayerLinear(int nbr_neurons);
+    VecF32& X();
+    const VecF32& X()const;
+    VecF32& d_E_X();
+    virtual void setTrainable(bool istrainable);
+
+    VecF32 _Y;
+    VecF32 _X;
+    VecF32 _d_E_Y;
+    VecF32 _d_E_X;
+};
+class NeuralLayerMatrix : public NeuralLayerLinear
+{
+public:
+    NeuralLayerMatrix(int sizei, int sizej, int nbr_map);
+    const Vec<MatNReference<2,F32> > & X_map()const;
+    Vec<MatNReference<2,F32> >& X_map();
+    const Vec<MatNReference<2,F32> > & d_E_X_map()const;
+    Vec<MatNReference<2,F32> >& d_E_X_map();
+    virtual void setTrainable(bool istrainable);
+
+    Vec<MatNReference<2,F32> > _X_reference;
+    Vec<MatNReference<2,F32> > _Y_reference;
+    Vec<MatNReference<2,F32> > _d_E_X_reference;
+    Vec<MatNReference<2,F32> > _d_E_Y_reference;
+
+
+};
+
+class NeuralLayerLinearInput : public NeuralLayerLinear
+{
+public:
+
+    NeuralLayerLinearInput(int nbr_neurons);
+    void forwardCPU(const NeuralLayer& );
+    void backwardCPU(NeuralLayer& ) ;
+    void learn();
+    void setTrainable(bool istrainable);
+    virtual NeuralLayer * clone();
+};
+class NeuralLayerMatrixInput : public NeuralLayerMatrix
+{
+public:
+
+    NeuralLayerMatrixInput(int sizei, int sizej, int nbr_map);
+    void forwardCPU(const NeuralLayer& ) ;
+    void backwardCPU(NeuralLayer& ) ;
+    void learn();
+    void setTrainable(bool istrainable);
+    virtual NeuralLayer * clone();
+};
+class NeuralLayerLinearFullyConnected : public NeuronSigmoid,public NeuralLayerLinear
+{
+public:
+    NeuralLayerLinearFullyConnected(int nbr_neurons_previous,int nbr_neurons);
+    void setTrainable(bool istrainable);
+    virtual void forwardCPU(const NeuralLayer& layer_previous);
+    virtual void backwardCPU(NeuralLayer& layer_previous);
+    void learn();
+    virtual NeuralLayer * clone();
+    Mat2F32 _W;
+    VecF32 _X_biais;
+    Mat2F32 _d_E_W;
+};
+class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
+{
+public:
+    NeuralLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel,int sizei_map_previous,int sizej_map_previous,int nbr_map_previous);
+    void setTrainable(bool istrainable);
+
+    virtual void forwardCPU(const NeuralLayer& layer_previous);
+    virtual void backwardCPU(NeuralLayer& layer_previous);
+    void learn();
+    virtual NeuralLayer * clone();
+    Vec<Mat2F32> _W_kernels;
+    Vec<F32> _W_biais;
+    Vec<Mat2F32> _d_E_W_kernels;
+    Vec<F32> _d_E_W_biais;
+    int _sub_resolution_factor;
+    int _radius_kernel;
+};
+
+class NeuralNet
+{
+public:
+
+
+    NeuralNet(NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization=NNLayerMatrix::ZeroToOne);
+    NeuralNet(const NeuralNet & neural);
+    NeuralNet & operator =(const NeuralNet & neural);
+
+    ~NeuralNet();
+    void addLayerLinearInput(int nbr_neurons);
+    void addLayerMatrixInput(int size_i,int size_j, int nbr_map);
+    void addLayerLinearFullyConnected(int nbr_neurons);
+    void addLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel);
+
+    void setLearnableParameter(F32 mu);
+
+    void setTrainable(bool istrainable);
+    void learn();
+    void forwardCPU(const VecF32& X_in,VecF32 & X_out);
+
+    VecF32 inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix);
+
+    void backwardCPU(const VecF32 &X_expected);
+    void clear();
+    void load(const char * file);
+    void loadByteArray(const char *  file);
+
+    void load(XMLDocument &doc);
+    void save(const char * file)const;
+    const Vec<std::string>& label2String()const;
+    Vec<std::string>& label2String();
+    const Vec<NeuralLayer*>& layers()const;
+    Vec<NeuralLayer*>& layers();
+
+
+    Vec<std::string> _label2string;
+    NNLayerMatrix::CenteringMethod _method;
+    NNLayerMatrix::NormalizationValue _normalization_value;
+    Vec<NeuralLayer*> _v_layer;
 };
 }
 #endif // NEURALNETWORK_H

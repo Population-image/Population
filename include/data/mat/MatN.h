@@ -879,7 +879,8 @@ public:
     *
     * access the reference of the pixel/voxel value at the vector index (Vec contains pixel values)
     */
-    inline PixelType & operator ()(unsigned int index);
+    PixelType & operator ()(unsigned int index);
+    const PixelType & operator ()(unsigned int index)const;
     /*!
     \param xf vector position in float value
     \return pixel/voxel value
@@ -1891,6 +1892,12 @@ PixelType & MatN<Dim,PixelType>::operator ()(unsigned int index)
     return this->operator[](index);
 }
 template<int Dim, typename PixelType>
+const PixelType & MatN<Dim,PixelType>::operator ()(unsigned int index)const
+{
+    POP_DbgAssert( index<this->size());
+    return this->operator[](index);
+}
+template<int Dim, typename PixelType>
 PixelType MatN<Dim,PixelType>::interpolationBilinear(const VecN<DIM,F32> xf)const
 {
 
@@ -2849,6 +2856,26 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
         }
     }
 }
+template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
+void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorERectangle it)
+{
+    int i,j;
+#if defined(HAVE_OPENMP)
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+#endif
+    {
+#if defined(HAVE_OPENMP)
+#pragma omp for schedule (static)
+#endif
+        for(i=it.xMin()(0);i<it.xMax()(0);i++){
+            for(j=it.xMin()(1);j<it.xMax()(1);j++){
+                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
+            }
+        }
+    }
+}
+
+
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
 {

@@ -454,9 +454,9 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
             std::cerr<<"The heigh of the input matrix must be pair "<<std::endl;
         }
 
-
         unsigned int height = (height_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
         unsigned int width  = (width_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
+
         NNLayerMatrixConvolutionalPlusSubScaling * layer = new NNLayerMatrixConvolutionalPlusSubScaling(nbr_map,height,width);
         layer->_size_convolutution = kernelsize;
         layer->_sub_scaling = sub_scale_sampling;
@@ -501,9 +501,8 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
                             for(unsigned int i_heigh_kernel=0;i_heigh_kernel<kernelsize;i_heigh_kernel++)
                             {
 
-                               //XXX PL: à quoi sert step_previous ?
-                                int i_width_previous =  i_width*2 + step_previous + i_width_kernel - step_previous;
-                                int i_height_previous =  i_height*2 + step_previous + i_heigh_kernel - step_previous;
+                                int i_width_previous =  i_width*2 + i_width_kernel ;
+                                int i_height_previous =  i_height*2 + i_heigh_kernel ;
 
                                 NNNeuron * nprevious = (layerprevious->_neurons_matrix(i_pattern_previous)(i_height_previous,i_width_previous)) ;
                                 unsigned int i_weight_index = 1+i_width_kernel + i_heigh_kernel*kernelsize + i_pattern*(kernelsize*kernelsize+1)+i_pattern_previous*nbr_map*(kernelsize*kernelsize+1);
@@ -1070,6 +1069,7 @@ void NNNeuron::propagateBackFirstDerivate(){
     }
 
     _dErr_dYn = fprime_Y * _dErr_dXn;
+
     for ( unsigned int i_connection =0;i_connection< _connections.size(); i_connection++  )
     {
         NNConnection& c = (_connections[i_connection]);
@@ -1542,6 +1542,533 @@ void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuro
             v_neuron_out.push_back(v_out);
 
         }
+    }
+}
+
+void NeuralLayer::setLearnableParameter(F32 mu){
+    _mu = mu;
+}
+NeuralLayerLinear::NeuralLayerLinear(int nbr_neurons)
+    :_Y(nbr_neurons),_X(nbr_neurons)
+{
+}
+VecF32& NeuralLayerLinear::X(){return _X;}
+const VecF32& NeuralLayerLinear::X()const{return _X;}
+VecF32& NeuralLayerLinear::d_E_X(){return _d_E_X;}
+void NeuralLayerLinear::setTrainable(bool istrainable){
+    if(istrainable==true){
+        this->_d_E_Y = this->_Y;
+        this->_d_E_X = this->_X;
+    }else{
+        this->_d_E_Y.clear();
+        this->_d_E_X.clear();
+    }
+}
+NeuralLayerMatrix::NeuralLayerMatrix(int sizei, int sizej, int nbr_map)
+    :NeuralLayerLinear(sizei* sizej*nbr_map)
+{
+    for(unsigned int i=0;i<nbr_map;i++){
+        MatNReference<2,F32> m(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i);
+        _Y_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i));
+        _X_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_X.data()+sizei*sizej*i));
+
+    }
+}
+const Vec<MatNReference<2,F32> > & NeuralLayerMatrix::X_map()const{return _X_reference;}
+Vec<MatNReference<2,F32> >& NeuralLayerMatrix::X_map(){return _X_reference;}
+
+
+
+const Vec<MatNReference<2,F32> > & NeuralLayerMatrix::d_E_X_map()const{return _d_E_X_reference;}
+Vec<MatNReference<2,F32> >& NeuralLayerMatrix::d_E_X_map(){return _d_E_X_reference;}
+
+
+void NeuralLayerMatrix::setTrainable(bool istrainable){
+    NeuralLayerLinear::setTrainable(istrainable);
+    if(istrainable==true){
+        for(unsigned int i=0;i<_X_reference.size();i++){
+            _d_E_Y_reference.push_back(MatNReference<2,F32>(_X_reference(0).getDomain(),_d_E_Y.data()+_X_reference(0).getDomain().multCoordinate()*i));
+            _d_E_X_reference.push_back(MatNReference<2,F32>(_X_reference(0).getDomain(),_d_E_X.data()+_X_reference(0).getDomain().multCoordinate()*i));
+        }
+    }else{
+        this->_d_E_Y_reference.clear();
+        this->_d_E_X_reference.clear();
+    }
+}
+NeuralLayerLinearFullyConnected::NeuralLayerLinearFullyConnected(int nbr_neurons_previous,int nbr_neurons)
+    :NeuralLayerLinear(nbr_neurons),_W(nbr_neurons,nbr_neurons_previous+1),_X_biais(nbr_neurons_previous+1,1)
+{
+    //normalize tbe number inverse square root of the connection feeding into the nodes)
+    DistributionNormal n(0,1./std::sqrt(nbr_neurons_previous+1));
+    for(unsigned int i=0;i<_W.size();i++){
+        _W(i)=n.randomVariable();
+    }
+}
+void NeuralLayerLinearFullyConnected::setTrainable(bool istrainable){
+    NeuralLayerLinear::setTrainable(istrainable);
+    if(istrainable==true){
+        this->_d_E_W = this->_W;
+    }else{
+        this->_d_E_W.clear();
+    }
+}
+
+void NeuralLayerLinearFullyConnected::forwardCPU(const NeuralLayer& layer_previous){
+    std::copy(layer_previous.X().begin(),layer_previous.X().end(),this->_X_biais.begin());
+    this->_Y = this->_W * this->_X_biais;
+    for(unsigned int i=0;i<_Y.size();i++){
+        this->_X(i) = NeuronSigmoid::activation(this->_Y(i));
+    }
+
+}
+void NeuralLayerLinearFullyConnected::backwardCPU(NeuralLayer& layer_previous){
+
+    VecF32& d_E_X_previous= layer_previous.d_E_X();
+    for(unsigned int i=0;i<this->_Y.size();i++){
+        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->_X(i));
+    }
+    for(unsigned int i=0;i<this->_W.sizeI();i++){
+        for(unsigned int j=0;j<this->_W.sizeJ();j++){
+            this->_d_E_W(i,j)=this->_X_biais(j)*this->_d_E_Y(i);
+        }
+    }
+    for(unsigned int j=0;j<d_E_X_previous.size();j++){
+        d_E_X_previous(j)=0;
+        for(unsigned int i=0;i<this->_W.sizeI();i++){
+            d_E_X_previous(j)+=this->_d_E_Y(i)*this->_W(i,j);
+        }
+    }
+}
+void NeuralLayerLinearFullyConnected::learn(){
+    for(unsigned int i=0;i<this->_W.sizeI();i++){
+        for(unsigned int j=0;j<this->_W.sizeJ();j++){
+            this->_W(i,j)= this->_W(i,j) -  this->_mu*this->_d_E_W(i,j);
+        }
+    }
+}
+NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
+    return new   NeuralLayerLinearFullyConnected(*this);
+}
+
+NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel,int sizei_map_previous,int sizej_map_previous,int nbr_map_previous)
+    :NeuralLayerMatrix(std::floor (  (sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,std::floor (  (sizej_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,nbr_map),
+      _W_kernels(nbr_map*nbr_map_previous,Mat2F32(radius_kernel*2+1,radius_kernel*2+1)),
+      _W_biais(nbr_map*nbr_map_previous),
+      _sub_resolution_factor (sub_scaling_factor),
+      _radius_kernel (radius_kernel)
+{
+    //normalize tbe number inverse square root of the connection feeding into the nodes)
+    DistributionNormal n(0,1./((radius_kernel*2+1)*std::sqrt(nbr_map_previous)));
+    for(unsigned int i = 0;i<_W_kernels.size();i++){
+        for(unsigned int j = 0;j<_W_kernels(i).size();j++){
+            _W_kernels(i)(j)=n.randomVariable();
+        }
+        _W_biais(i)=n.randomVariable();
+    }
+}
+void NeuralLayerMatrixConvolutionSubScaling::setTrainable(bool istrainable){
+    NeuralLayerMatrix::setTrainable(istrainable);
+    if(istrainable==true){
+        _d_E_W_kernels = _W_kernels;
+        _d_E_W_biais   = _W_biais;
+    }else{
+        _d_E_W_kernels.clear();
+        _d_E_W_biais.clear();
+    }
+}
+void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer_previous){
+    if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
+#if defined(HAVE_OPENMP)
+        #pragma omp parallel for
+#endif
+        for(unsigned int index_map=0;index_map<this->_Y_reference.size();index_map++){
+            MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
+            int index_start_kernel = index_map*neural_matrix->X_map().size();
+            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+                    F32 sum=0;
+                    //convolution
+                    for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                        sum+=_W_biais[ index_map_previous + index_start_kernel];
+                        for(unsigned int i=0,index_kernel_ij=0,index_map = (i_map_previous-_radius_kernel)*neural_matrix->X_map()(0).sizeJ()+(j_map_previous-_radius_kernel);i<_W_kernels(0).sizeI();i++,index_map+=(neural_matrix->X_map()(0).sizeJ()-_W_kernels(0).sizeJ())){
+                            for(unsigned int j=0;j<_W_kernels(0).sizeJ();j++,index_map++,index_kernel_ij++){
+                                sum+=_W_kernels(index_map_previous + index_start_kernel)(index_kernel_ij)*neural_matrix->X_map()(index_map_previous)(index_map);
+                            }
+                        }
+                    }
+                    map_out(i_map_next,j_map_next)=sum;
+                }
+            }
+        }
+    }
+    for(unsigned int i=0;i<_Y.size();i++){
+        this->_X(i) = NeuronSigmoid::activation(this->_Y(i));
+    }
+
+}
+void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_previous){
+    for(unsigned int i=0;i<this->_Y.size();i++){
+        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->_X(i));
+    }
+
+    //reset
+    for(unsigned int i=0;i<this->_d_E_W_kernels.size();i++){
+        for(unsigned int j=0;j<this->_d_E_W_kernels(i).size();j++){
+            this->_d_E_W_kernels(i)(j)=0;
+        }
+    }
+    for(unsigned int i=0;i<this->_d_E_W_biais.size();i++){
+        this->_d_E_W_biais(i)=0;
+    }
+
+
+    if( NeuralLayerMatrix * neural_matrix = dynamic_cast< NeuralLayerMatrix *>(&layer_previous)){
+        for(unsigned int i=0;i<neural_matrix->d_E_X_map().size();i++){
+            for(unsigned int j=0;j<neural_matrix->d_E_X_map()(i).size();j++){
+                neural_matrix->d_E_X_map()(i)(j)=0;
+            }
+        }
+        //            std::cout<<"yep"<<std::endl;
+        for(unsigned int index_map=0;index_map<this->_d_E_Y_reference.size();index_map++){
+            MatNReference<2,F32> &map_error_out =  this->_d_E_Y_reference[index_map];
+            //                std::cout<<map_error_out<<std::endl;
+            //                std::cout<<this->_d_E_X<<std::endl;
+            int index_start_kernel = index_map*neural_matrix->X_map().size();
+            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_error_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+                    F32 d_error_y_value = map_error_out(i_map_next,j_map_next);
+
+                    //convolution
+                    for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                        this->_d_E_W_biais(index_map_previous + index_start_kernel)+=d_error_y_value;
+                        for(unsigned int i=0,index_kernel_ij=0,index_map = (i_map_previous-_radius_kernel)*neural_matrix->X_map()(0).sizeJ()+(j_map_previous-_radius_kernel);i<_W_kernels(0).sizeI();i++,index_map+=(neural_matrix->X_map()(0).sizeJ()-_W_kernels(0).sizeJ())){
+                            for(unsigned int j=0;j<_W_kernels(0).sizeJ();j++,index_map++,index_kernel_ij++){
+
+                                this->_d_E_W_kernels(index_map_previous + index_start_kernel)(index_kernel_ij)+=neural_matrix->X_map()(index_map_previous)(index_map)*d_error_y_value;
+                                neural_matrix->d_E_X_map()(index_map_previous)(index_map)+=  this->_W_kernels(index_map_previous + index_start_kernel)(index_kernel_ij)  *d_error_y_value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
+void NeuralLayerMatrixConvolutionSubScaling::learn(){
+    for(unsigned int i=0;i<this->_d_E_W_kernels.size();i++){
+        for(unsigned int j=0;j<this->_d_E_W_kernels(i).size();j++){
+            this->_W_kernels(i)(j)=this->_W_kernels(i)(j)-_mu*this->_d_E_W_kernels(i)(j);
+        }
+    }
+    for(unsigned int i=0;i<this->_d_E_W_biais.size();i++){
+        this->_W_biais(i)=this->_W_biais(i)-_mu*this->_d_E_W_biais(i);
+    }
+}
+NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
+    NeuralLayerMatrixConvolutionSubScaling * layer = new NeuralLayerMatrixConvolutionSubScaling(*this);
+    layer->_Y_reference.clear();
+    layer->_X_reference.clear();
+    for(unsigned int i=0;i<this->X_map().size();i++){
+        layer->_Y_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_X_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+    }
+    return layer;
+}
+NeuralLayerLinearInput::NeuralLayerLinearInput(int nbr_neurons)
+    :NeuralLayerLinear(nbr_neurons){}
+void NeuralLayerLinearInput::forwardCPU(const NeuralLayer& ) {}
+void NeuralLayerLinearInput::backwardCPU(NeuralLayer& ) {}
+void NeuralLayerLinearInput::learn(){}
+void NeuralLayerLinearInput::setTrainable(bool istrainable){NeuralLayerLinear::setTrainable(istrainable);}
+NeuralLayer * NeuralLayerLinearInput::clone(){
+    return new NeuralLayerLinearInput(*this);
+}
+NeuralLayerMatrixInput::NeuralLayerMatrixInput(int sizei, int sizej, int nbr_map)
+    :NeuralLayerMatrix(sizei,  sizej,  nbr_map){}
+void NeuralLayerMatrixInput::forwardCPU(const NeuralLayer& ) {}
+void NeuralLayerMatrixInput::backwardCPU(NeuralLayer& ) {}
+void NeuralLayerMatrixInput::learn(){}
+void NeuralLayerMatrixInput::setTrainable(bool istrainable){NeuralLayerMatrix::setTrainable(istrainable);}
+NeuralLayer * NeuralLayerMatrixInput::clone(){
+    NeuralLayerMatrixInput * layer = new NeuralLayerMatrixInput(this->X_map()(0).sizeI(),this->X_map()(0).sizeJ(),this->X_map().size());
+    return layer;
+}
+
+NeuralNet::NeuralNet(NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization)
+    :_method(method),_normalization_value(normalization)
+{}
+NeuralNet::NeuralNet(const NeuralNet & neural){
+
+    this->_label2string = neural._label2string;
+    this->_method = neural._method;
+    this->_normalization_value = neural._normalization_value;
+
+    this->clear();
+    for(unsigned int i=0;i<neural._v_layer.size();i++){
+        this->_v_layer.push_back(neural._v_layer(i)->clone());
+    }
+}
+
+NeuralNet & NeuralNet::operator =(const NeuralNet & neural){
+    this->_label2string = neural._label2string;
+    this->_method = neural._method;
+    this->_normalization_value = neural._normalization_value;
+    this->clear();
+    for(unsigned int i=0;i<neural._v_layer.size();i++){
+        this->_v_layer.push_back(neural._v_layer(i)->clone());
+    }
+    return *this;
+}
+
+NeuralNet::~NeuralNet(){
+    clear();
+}
+
+void NeuralNet::addLayerLinearInput(int nbr_neurons){
+    this->_v_layer.push_back(new NeuralLayerLinearInput(nbr_neurons));
+}
+void NeuralNet::addLayerMatrixInput(int size_i,int size_j, int nbr_map){
+    this->_v_layer.push_back(new NeuralLayerMatrixInput(size_i,size_j,nbr_map));
+}
+void NeuralNet::addLayerLinearFullyConnected(int nbr_neurons){
+    if(_v_layer.size()==0){
+        this->_v_layer.push_back(new NeuralLayerLinearFullyConnected(0,nbr_neurons));
+    }else{
+        this->_v_layer.push_back(new NeuralLayerLinearFullyConnected((*(_v_layer.rbegin()))-> X().size(),nbr_neurons));
+    }
+}
+void NeuralNet::addLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel){
+    if(NeuralLayerMatrix * neural_matrix = dynamic_cast<NeuralLayerMatrix *>(*(_v_layer.rbegin()))){
+        this->_v_layer.push_back(new NeuralLayerMatrixConvolutionSubScaling( nbr_map, sub_scaling_factor,  radius_kernel,neural_matrix->X_map()(0).sizeI(),neural_matrix->X_map()(0).sizeJ(),neural_matrix->X_map().size()));
+    }
+}
+
+void NeuralNet::setLearnableParameter(F32 mu){
+    for(unsigned int i=0;i<_v_layer.size();i++){
+        _v_layer(i)->setLearnableParameter(mu);
+    }
+}
+
+void NeuralNet::setTrainable(bool istrainable){
+    for(unsigned int i=0;i<_v_layer.size();i++){
+        _v_layer(i)->setTrainable(istrainable);
+    }
+}
+void NeuralNet::learn(){
+    for(unsigned int i=0;i<_v_layer.size();i++){
+        _v_layer(i)->learn();
+    }
+}
+void NeuralNet::forwardCPU(const VecF32& X_in, VecF32& X_out){
+    std::copy(X_in.begin(),X_in.end(), (*(_v_layer.begin()))->X().begin());
+    for(unsigned int i=1;i<_v_layer.size();i++){
+        _v_layer(i)->forwardCPU(*_v_layer(i-1));
+        //            std::cout<<_v_layer(i)->X()<<std::endl;
+    }
+    if(X_out.size()!=(*(_v_layer.rbegin()))->X().size()){
+        X_out.resize((*(_v_layer.rbegin()))->X().size());
+    }
+    std::copy((*(_v_layer.rbegin()))->X().begin(),(*(_v_layer.rbegin()))->X().end(),X_out.begin());
+}
+
+void NeuralNet::backwardCPU(const VecF32& X_expected){
+
+    //first output layer
+    NeuralLayer* layer_last = _v_layer[_v_layer.size()-1];
+    for(unsigned int j=0;j<X_expected.size();j++){
+        layer_last->d_E_X()(j) = ( layer_last->X()(j)-X_expected(j));
+    }
+
+    for( int index_layer=_v_layer.size()-1;index_layer>0;index_layer--){
+        NeuralLayer* layer = _v_layer[index_layer];
+        NeuralLayer* layer_previous = _v_layer[index_layer-1];
+        layer->backwardCPU(* layer_previous);
+    }
+}
+void NeuralNet::clear(){
+    for(unsigned int i=0;i<_v_layer.size();i++){
+        delete _v_layer[i];
+    }
+    _v_layer.clear();
+}
+void NeuralNet::load(const char * file)
+{
+    XMLDocument doc;
+    doc.load(file);
+    load(doc);
+}
+void NeuralNet::loadByteArray(const char *  file)
+{
+    XMLDocument doc;
+    doc.loadFromByteArray(file);
+    load(doc);
+
+}
+
+void NeuralNet::load(XMLDocument &doc)
+{
+    this->clear();
+    XMLNode node1 = doc.getChild("label2String");
+    std::string type1 = node1.getAttribute("id");
+    BasicUtility::String2Any(type1,_label2string);
+    XMLNode node = doc.getChild("layers");
+    int i=0;
+    for (XMLNode tool = node.firstChild(); tool; tool = tool.nextSibling(),++i){
+        std::string type = tool.getAttribute("type");
+        if(type=="NNLayer::INPUTMATRIX"){
+            Vec2I32 domain;
+            int nbr_map;
+            BasicUtility::String2Any(tool.getAttribute("size"),domain);
+            BasicUtility::String2Any(tool.getAttribute("nbr_map"),nbr_map);
+            if(tool.hasAttribute("method")){
+                int method;
+                BasicUtility::String2Any(tool.getAttribute("method"),method);
+                _method = static_cast<NNLayerMatrix::CenteringMethod>(method) ;
+            }
+            if(tool.hasAttribute("normalization")){
+                int method_norm;
+                BasicUtility::String2Any(tool.getAttribute("normalization"),method_norm);
+                _normalization_value= static_cast<NNLayerMatrix::NormalizationValue>(method_norm) ;
+            }
+            this->addLayerMatrixInput(domain(0),domain(1),nbr_map);
+        }else if(type=="NNLayer::INPUTLINEAR"){
+            int domain;
+            BasicUtility::String2Any(tool.getAttribute("size"),domain);
+            this->addLayerLinearInput(domain);
+        }
+        else if(type=="NNLayer::MATRIXCONVOLUTIONNAL"){
+
+            std::string str = tool.getAttribute("nbr_map");
+            int nbr_map;
+            BasicUtility::String2Any(str,nbr_map);
+
+            str = tool.getAttribute("sizekernel");
+            int sizekernel;
+            BasicUtility::String2Any(str,sizekernel);
+
+            str = tool.getAttribute("subsampling");
+            int subsampling;
+            BasicUtility::String2Any(str,subsampling);
+
+            this->addLayerMatrixConvolutionSubScaling(nbr_map,subsampling,sizekernel);
+
+            std::string str_biais = tool.getAttribute("weight_biais");
+            std::string str_kernel = tool.getAttribute("weight_kernel");
+            if(NeuralLayerMatrixConvolutionSubScaling * neural_matrix = dynamic_cast<NeuralLayerMatrixConvolutionSubScaling *>(*(_v_layer.rbegin()))){
+                std::istringstream stream_biais(str_biais);
+                for(unsigned int index_weight=0;index_weight<neural_matrix->_W_biais.size();index_weight++){
+                    F32 weight ;
+                    str = pop::BasicUtility::getline( stream_biais, ";" );
+                    pop::BasicUtility::String2Any(str,weight );
+                    neural_matrix->_W_biais[index_weight]=weight;
+                }
+                std::istringstream stream_kernel(str_kernel);
+                for(unsigned int index_weight=0;index_weight<neural_matrix->_W_kernels.size();index_weight++){
+                    for(unsigned int index_weight_j=0;index_weight_j<neural_matrix->_W_kernels(index_weight).size();index_weight_j++){
+                        F32 weight ;
+                        str = pop::BasicUtility::getline( stream_kernel, ";" );
+                        pop::BasicUtility::String2Any(str,weight );
+                        neural_matrix->_W_kernels(index_weight)(index_weight_j)=weight;
+                    }
+                }
+            }
+        }else if(type=="NNLayer::FULLYCONNECTED"){
+            std::string str = tool.getAttribute("size");
+            int size;
+            BasicUtility::String2Any(str,size);
+            this->addLayerLinearFullyConnected(size);
+            str = tool.getAttribute("weight");
+            if(NeuralLayerLinearFullyConnected * neural_linear = dynamic_cast<NeuralLayerLinearFullyConnected *>(*(_v_layer.rbegin()))){
+                std::istringstream stream(str);
+                for(unsigned int index_weight=0;index_weight<neural_linear->_W.size();index_weight++){
+                    F32 weight ;
+                    str = pop::BasicUtility::getline( stream, ";" );
+                    pop::BasicUtility::String2Any(str,weight );
+                    neural_linear->_W[index_weight] = weight;
+                }
+            }
+        }
+    }
+}
+void NeuralNet::save(const char * file)const
+{
+    XMLDocument doc;
+    XMLNode node1 = doc.addChild("label2String");
+    node1.addAttribute("id",BasicUtility::Any2String(_label2string));
+    XMLNode node = doc.addChild("layers");
+    for(unsigned int i=0;i<this->_v_layer.size();i++){
+        NeuralLayer * layer = this->_v_layer[i];
+        if(const NeuralLayerMatrixInput *layer_matrix = dynamic_cast<const NeuralLayerMatrixInput *>(layer)){
+            XMLNode nodechild = node.addChild("layer");
+            nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
+            nodechild.addAttribute("size",BasicUtility::Any2String(layer_matrix->X_map()(0).getDomain()));
+            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_matrix->X_map().size()));
+            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
+            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+        }
+        else if(const NeuralLayerLinearInput *layer_linear = dynamic_cast<const NeuralLayerLinearInput *>(layer)){
+
+            XMLNode nodechild = node.addChild("layer");
+            nodechild.addAttribute("type","NNLayer::INPUTLINEAR");
+            nodechild.addAttribute("size",BasicUtility::Any2String(layer_linear->X().size()));
+            nodechild.addAttribute("method",BasicUtility::Any2String((_method)));
+            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+        }else if(const NeuralLayerMatrixConvolutionSubScaling *layer_conv = dynamic_cast<const NeuralLayerMatrixConvolutionSubScaling *>(layer)){
+            XMLNode nodechild = node.addChild("layer");
+            nodechild.addAttribute("type","NNLayer::MATRIXCONVOLUTIONNAL");
+            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_conv->X_map().size()));
+            nodechild.addAttribute("sizekernel",BasicUtility::Any2String(layer_conv->_radius_kernel));
+            nodechild.addAttribute("subsampling",BasicUtility::Any2String(layer_conv->_sub_resolution_factor));
+
+            std::string weight_str;
+            for(unsigned int index_w=0;index_w<layer_conv->_W_biais.size();index_w++){
+                weight_str+=BasicUtility::Any2String(layer_conv->_W_biais[index_w])+";";
+            }
+            nodechild.addAttribute("weight_biais",weight_str);
+            weight_str.clear();
+            for(unsigned int index_w=0;index_w<layer_conv->_W_kernels.size();index_w++){
+                for(unsigned int index_weight_j=0;index_weight_j<layer_conv->_W_kernels(index_w).size();index_weight_j++){
+                    weight_str+=BasicUtility::Any2String(layer_conv->_W_kernels(index_w)(index_weight_j))+";";
+                }
+            }
+            nodechild.addAttribute("weight_kernel",weight_str);
+
+        }
+        else if(const NeuralLayerLinearFullyConnected *layer_fully= dynamic_cast<const NeuralLayerLinearFullyConnected *>(layer))
+        {
+            XMLNode nodechild = node.addChild("layer");
+            nodechild.addAttribute("type","NNLayer::FULLYCONNECTED");
+            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully->X().size()));
+
+            std::string weight_str;
+            for(unsigned int index_w=0;index_w<layer_fully->_W.size();index_w++){
+                weight_str+=BasicUtility::Any2String(layer_fully->_W[index_w])+";";
+            }
+            nodechild.addAttribute("weight",weight_str);
+        }
+    }
+    doc.save(file);
+}
+const Vec<std::string>& NeuralNet::label2String()const{
+    return _label2string;
+}
+Vec<std::string>& NeuralNet::label2String(){
+    return _label2string;
+}
+const Vec<NeuralLayer*>& NeuralNet::layers()const{
+    return _v_layer;
+}
+Vec<NeuralLayer*>& NeuralNet::layers(){
+    return _v_layer;
+}
+VecF32 NeuralNet::inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix){
+    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(this->_v_layer(0))){
+        Vec2I32 domain = layer_matrix->X_map()(0).getDomain();
+        return NNLayerMatrix::inputMatrixToInputNeuron(matrix,domain,this->_method,this->_normalization_value);
+    }else{
+        std::cerr<<"No matrixlayer  for neural network"<<std::endl;
+        return VecF32();
     }
 }
 }

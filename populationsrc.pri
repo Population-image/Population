@@ -63,6 +63,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/notstable/Descriptor.h \
            $${PWD}/include/data/notstable/Ransac.h \
            $${PWD}/include/data/notstable/Wavelet.h \
+           $${PWD}/include/data/notstable/MatNReference.h \
            $${PWD}/include/data/ocr/OCR.h \
            $${PWD}/include/data/population/PopulationData.h \
            $${PWD}/include/data/population/PopulationFunctor.h \

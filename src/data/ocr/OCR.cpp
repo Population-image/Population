@@ -12,14 +12,20 @@ OCR::~OCR()
 {
 
 }
-NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward(){
+//NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward(){
+//    return _n;
+//}
+
+//const NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward()const{
+//    return _n;
+//}
+NeuralNet &   OCRNeuralNetwork::neuralNetworkFeedForward(){
     return _n;
 }
 
-const NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward()const{
+const NeuralNet &   OCRNeuralNetwork::neuralNetworkFeedForward()const{
     return _n;
 }
-
 
 char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
     if(_n.layers().size()==0)
@@ -30,7 +36,8 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
 
         VecF32 vin= _n.inputMatrixToInputNeuron(m);
         VecF32 vout;
-        _n.propagateFront(vin,vout);
+        _n.forwardCPU(vin,vout);
+        //                _n.propagateFront(vin,vout);
         VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
         int label_max = std::distance(vout.begin(),itt);
         F32 value_max = *itt;
@@ -58,11 +65,9 @@ bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
 
 }
 bool OCRNeuralNetwork::setDictionnaryByteArray(const char * byte_array){
-
-   _n.loadByteArray(byte_array);
-    return true;
-
+    _n.loadByteArray(byte_array);
 }
+
 
 bool OCRNeuralNetwork::isRecognitionCharacter(){
     return _isrecognized;

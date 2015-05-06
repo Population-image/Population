@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 2.6)
 #Déclaration du projet
 project(population)
 
-set(POP_MAJOR_VERSION 5)
+set(POP_MAJOR_VERSION 6)
 set(POP_MINOR_VERSION 0)
 set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 
@@ -22,7 +22,7 @@ include(cmake/popUtils.cmake)
 # ===================================================
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
-POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   OFF   IF (NOT ANDROID))
+POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON)
 POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
@@ -35,7 +35,7 @@ POP_OPTION(BUILD_EXPORT      "export library" ON )
 POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" ON )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
-POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
+POP_OPTION(BUILD_TEMP        "Build experimental code" ON )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )

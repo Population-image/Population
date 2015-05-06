@@ -337,57 +337,57 @@ struct POP_EXPORTS Processing
     */
     template<int DIM,typename PixelType>
     static MatN<DIM,UI8> thresholdToggleMappingMorphologicalFabrizio(const MatN<DIM,PixelType>& f,F32 c=16,F32 p=0.8,int radius=2,int norm=1){
-    MatN<DIM,PixelType> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
-    MatN<DIM,PixelType> dilation = Processing::dilationRegionGrowing(f,radius,norm);
+        MatN<DIM,PixelType> erosion  = Processing::erosionRegionGrowing(f,radius,norm);
+        MatN<DIM,PixelType> dilation = Processing::dilationRegionGrowing(f,radius,norm);
 
-    MatN<DIM,UI8> label(erosion.getDomain());
-    typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
-    while(it.next()){
-        F32 v_d = normValue(dilation(it.x()));
-        F32 v_e = normValue(erosion(it.x()));
-        F32 v = normValue(f(it.x()));
+        MatN<DIM,UI8> label(erosion.getDomain());
+        typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
+        while(it.next()){
+            F32 v_d = normValue(dilation(it.x()));
+            F32 v_e = normValue(erosion(it.x()));
+            F32 v = normValue(f(it.x()));
 
-        if(std::abs(v_d-v_e)<c){
-            label(it.x())=255;
-            dilation(it.x())= 0;
+            if(std::abs(v_d-v_e)<c){
+                label(it.x())=255;
+                dilation(it.x())= 0;
+            }
+            else if(std::abs(v_d-v)<=p*std::abs(v_e-v)){
+                label(it.x())=0;
+                dilation(it.x())=1;
+            }
+            else{
+                label(it.x())=0;
+                dilation(it.x())=2;
+            }
         }
-        else if(std::abs(v_d-v)<=p*std::abs(v_e-v)){
-            label(it.x())=0;
-            dilation(it.x())=1;
-        }
-        else{
-            label(it.x())=0;
-            dilation(it.x())=2;
-        }
-    }
-    MatN<DIM,UI32> labelled = Processing::clusterToLabel(label,0);
+        MatN<DIM,UI32> labelled = Processing::clusterToLabel(label,0);
 
-    labelled = Processing::dilation(labelled,1,1);
-    UI32 max = Analysis::maxValue(labelled);
-    Vec<int> label1(max+1);
-    Vec<int> label2(max+1);
+        labelled = Processing::dilation(labelled,1,1);
+        UI32 max = Analysis::maxValue(labelled);
+        Vec<int> label1(max+1);
+        Vec<int> label2(max+1);
 
-    it.init();
-    while(it.next()){
-        if(dilation(it.x())==PixelType(1))
-            label1(labelled(it.x()))++;
-        else if(dilation(it.x())==PixelType(2))
-            label2(labelled(it.x()))++;
-    }
-    it.init();
-    while(it.next()){
-        if(dilation(it.x())==PixelType(0)){
-            if(label1(labelled(it.x()))>label2(labelled(it.x())))
+        it.init();
+        while(it.next()){
+            if(dilation(it.x())==PixelType(1))
+                label1(labelled(it.x()))++;
+            else if(dilation(it.x())==PixelType(2))
+                label2(labelled(it.x()))++;
+        }
+        it.init();
+        while(it.next()){
+            if(dilation(it.x())==PixelType(0)){
+                if(label1(labelled(it.x()))>label2(labelled(it.x())))
+                    label(it.x())=255;
+                else
+                    label(it.x())=0;
+            }else if(dilation(it.x())==PixelType(1))
                 label(it.x())=255;
             else
                 label(it.x())=0;
-        }else if(dilation(it.x())==PixelType(1))
-            label(it.x())=255;
-        else
-            label(it.x())=0;
 
-    }
-    return label;
+        }
+        return label;
     }
     /*!
      *  \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
@@ -408,6 +408,7 @@ struct POP_EXPORTS Processing
      * \image html vitrine.jpg
      * \image html vitrinethresholdNiblack.jpg
     */
+
     template<typename PixelType>
     static MatN<2,UI8>  thresholdNiblackMethod(const MatN<2,PixelType> & f,F32 k=0.2,int radius=5,F32 offset_value=0  ){
         MatN<2,PixelType> fborder(f);
@@ -417,28 +418,30 @@ struct POP_EXPORTS Processing
         MatN<2,F32> integralpower2 = Processing::integralPower2(f_F32);
 
 
-        typename MatN<2,F32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
         F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
-        while(it.next()){
-            Vec2I32 xadd1=it.x()+Vec2I32(radius);
-            Vec2I32 xadd2=it.x()+Vec2I32(-radius);
-            Vec2I32 xsub1=it.x()-Vec2I32(radius,-radius);
-            Vec2I32 xsub2=it.x()-Vec2I32(-radius,radius);
-            F32 mean = integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
-            mean*=area_minus1;
+        Vec2I32 x;
+        for(x(0)=radius;x(0)<f_F32.sizeI()-1-radius;x(0)++){
+            for(x(1)=radius;x(1)<f_F32.sizeJ()-1-radius;x(1)++){
+                Vec2I32 xadd1=x+Vec2I32(radius);
+                Vec2I32 xadd2=x+Vec2I32(-radius);
+                Vec2I32 xsub1=x-Vec2I32(radius,-radius);
+                Vec2I32 xsub2=x-Vec2I32(-radius,radius);
+                F32 mean = integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
+                mean*=area_minus1;
 
-            F32 standartdeviation =integralpower2(xadd1)+integralpower2(xadd2)-integralpower2(xsub1)-integralpower2(xsub2);
-            standartdeviation*=area_minus1;
-            standartdeviation =standartdeviation-mean*mean;
+                F32 standartdeviation =integralpower2(xadd1)+integralpower2(xadd2)-integralpower2(xsub1)-integralpower2(xsub2);
+                standartdeviation*=area_minus1;
+                standartdeviation =standartdeviation-mean*mean;
 
-            if(standartdeviation>0)
-                standartdeviation = std::sqrt( standartdeviation);
-            else
-                standartdeviation =1;
-            if(f(it.x()-radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+k*standartdeviation)-offset_value)
-                fborder(it.x())=255;
-            else
-                fborder(it.x())=0;
+                if(standartdeviation>0)
+                    standartdeviation = std::sqrt( standartdeviation);
+                else
+                    standartdeviation =1;
+                if(f(x-radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+k*standartdeviation)-offset_value)
+                    fborder(x)=255;
+                else
+                    fborder(x)=0;
+            }
         }
         return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
     }
@@ -2634,7 +2637,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         MatN<DIM,F32> img_gradx= ProcessingAdvanced::gradGaussian(imgf,1,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
         MatN<DIM,F32> img_grady= ProcessingAdvanced::gradGaussian(imgf,0,sigma_filter,2*sigma_filter,imgf.getIteratorEDomain());
         Vec<F32> angles;
-            Vec<F32> weight;
+        Vec<F32> weight;
         typename MatN<DIM,F32>::IteratorERectangle it(img_gradx.getIteratorERectangle(border,img_gradx.getDomain()-1-border));
         while(it.next()){
             angles.push_back(std::atan2(img_grady(it.x()),img_gradx(it.x()))*180/PI);
@@ -2664,7 +2667,7 @@ MatNIteratorENeighborhoodAmoebas<Function >::MatNIteratorENeighborhoodAmoebas(co
     _label=0;
     _grad = Processing::gradientVecSobel(in);
     for(unsigned int i=0;i<Function::DIM;i++){
-         VecN<Function::DIM,I32>  x_pos;
+        VecN<Function::DIM,I32>  x_pos;
         x_pos(i)=-1;
         _x_add.push_back(x_pos);
         x_pos(i)= 1;

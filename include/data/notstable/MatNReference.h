@@ -91,7 +91,7 @@ public:
     * \sa VecN
     */
     Domain  getDomain()const;
-
+    unsigned int size()const;
     /*!
     \return  number of rows
     *
@@ -253,6 +253,7 @@ public:
     * access the reference of the pixel/voxel value at the vector index (Vec contains pixel values)
     */
     inline PixelType & operator ()(unsigned int index);
+    const PixelType & operator ()(unsigned int index)const;
     /*!
     \param xf vector position in float value
     \return pixel/voxel value
@@ -759,6 +760,11 @@ const
     return _domain;
 }
 template<int Dim, typename PixelType>
+unsigned int MatNReference<Dim,PixelType>::size()const{
+    return this->getDomain().multCoordinate();
+}
+
+template<int Dim, typename PixelType>
 unsigned int MatNReference<Dim,PixelType>::sizeI()const{
     return this->getDomain()[0];
 }
@@ -818,7 +824,16 @@ void MatNReference<Dim,PixelType>::clear(){
     _domain=0;
     Vec<PixelType>::clear();
 }
-
+//template<int Dim, typename PixelType>
+//PixelType & MatNReference<Dim,PixelType>::operator ()(int i)
+//{
+//    return  this->_data[i];
+//}
+//template<int Dim, typename PixelType>
+//const PixelType & MatNReference<Dim,PixelType>::operator ()(int i)const
+//{
+//    return  this->_data[i];
+//}
 template<int Dim, typename PixelType>
 PixelType & MatNReference<Dim,PixelType>::operator ()(const VecN<Dim,int> & x)
 {
@@ -867,6 +882,12 @@ PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int index)
     return this->_data[index];
 }
 template<int Dim, typename PixelType>
+const PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int index)const
+{
+    POP_DbgAssert( index<this->size());
+    return this->_data[index];
+}
+template<int Dim, typename PixelType>
 PixelType MatNReference<Dim,PixelType>::interpolationBilinear(const VecN<DIM,F32> xf)const
 {
     VecN<PowerGP<2,Dim>::value,std::pair<F32,VecN<Dim,I32> > > v_out =MatNInterpolationBiliniear::getWeightPosition(this->getDomain(),xf);
@@ -881,13 +902,13 @@ PixelType MatNReference<Dim,PixelType>::interpolationBilinear(const VecN<DIM,F32
 template<int Dim, typename PixelType>
 PixelType *  MatNReference<Dim,PixelType>::data()
 {
-    return &(*this->begin());
+    return this->_data;
 }
 template<int Dim, typename PixelType>
 const PixelType *  MatNReference<Dim,PixelType>::data()
 const
 {
-    return &(*this->begin());
+    return this->_data;
 }
 
 template<int Dim, typename PixelType>
@@ -1542,7 +1563,19 @@ F32  normPowerValue(const pop::MatNReference<Dim, PixelType>& f,int p=2)
 }
 
 
-
+template <class PixelType>
+std::ostream& operator << (std::ostream& out, const pop::MatNReference<2,PixelType>& in)
+{
+    Private::ConsoleOutputPixel<2,PixelType> output;
+    for( int i =0;i<in.getDomain()(0);i++){
+        for( int j =0;j<in.getDomain()(1);j++){
+            output.print(out,(in)(i,j));
+            out<<" ";
+        }
+        out<<std::endl;
+    }
+    return out;
+}
 
 
 
