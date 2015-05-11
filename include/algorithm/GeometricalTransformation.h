@@ -154,6 +154,7 @@ struct POP_EXPORTS GeometricalTransformation
         MatN<DIM,PixelType> temp(domain);
         VecN<DIM,F32> alpha = VecN<DIM,F32>(1.f)/scale;
         _FunctorScale<DIM> func(alpha,interpolation); 
+
 		forEachFunctorBinaryFunctionE(f,temp,func);
 		
         return temp;

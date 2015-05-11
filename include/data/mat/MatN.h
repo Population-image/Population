@@ -2828,18 +2828,27 @@ void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAc
     }
 }
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
-void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain)
+void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorEDomain it)
 {
+    int i_max,j_max;
+    if(it.getDomain()==f.getDomain()){
+        i_max= f.sizeI();
+        j_max= f.sizeJ();
+    }else{
+        i_max= h.sizeI();
+        j_max= h.sizeJ();
+    }
+
     int i,j;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
+#pragma omp parallel shared(f,h) private(i,j,i_max,j_max) firstprivate(func)
 #endif
     {
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-        for(i=0;i<static_cast<int>(f.sizeI());i++){
-            for(j=0;j<static_cast<int>(f.sizeJ());j++){
+        for(i=0;i<i_max;i++){
+            for(j=0;j<j_max;j++){
                 h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
             }
         }
@@ -2848,6 +2857,7 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorERectangle it)
 {
+
     int i,j;
 #if defined(HAVE_OPENMP)
 #pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
@@ -2866,19 +2876,30 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 
 
 template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
-void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain)
+void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<3,Type1>::IteratorEDomain it)
 {
+
+    int i_max,j_max,k_max;
+    if(it.getDomain()==f.getDomain()){
+        i_max= f.sizeI();
+        j_max= f.sizeJ();
+        k_max= f.sizeK();
+    }else{
+        i_max= h.sizeI();
+        j_max= h.sizeJ();
+        k_max= h.sizeK();
+    }
     int i,j,k;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
+#pragma omp parallel shared(f,h) private(i,j,k,i_max,j_max,k_max) firstprivate(func)
 #endif
     {
 #if defined(HAVE_OPENMP)
 #pragma omp for schedule (static)
 #endif
-        for(i=0;i<static_cast<int>(f.sizeI());i++){
-            for(j=0;j<static_cast<int>(f.sizeJ());j++){
-                for(k=0;k<static_cast<int>(f.sizeK());k++){
+        for(i=0;i<i_max;i++){
+            for(j=0;j<j_max;j++){
+                for(k=0;k<k_max;k++){
                     h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
                 }
             }
