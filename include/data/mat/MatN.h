@@ -2841,7 +2841,7 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 
     int i,j;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,i_max,j_max) firstprivate(func)
+#pragma omp parallel shared(f,h) private(i,j) firstprivate(func,i_max,j_max)
 #endif
     {
 #if defined(HAVE_OPENMP)
@@ -2891,7 +2891,7 @@ void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h, 
     }
     int i,j,k;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k,i_max,j_max,k_max) firstprivate(func)
+#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func,i_max,j_max,k_max)
 #endif
     {
 #if defined(HAVE_OPENMP)
