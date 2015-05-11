@@ -1030,13 +1030,13 @@ public:
 
 struct NeuronSigmoid
 {
-    inline F32 activation(F32 y){ return 1.7159*tanh(0.66666667*y);}
+    inline F32 activation(F32 y){ return 1.7159f*tanh(0.66666667f*y);}
     inline F32 derivedActivation(F32 x){ return 0.666667f/1.7159f*(1.7159f+(x))*(1.7159f-(x));}  // derivative of the sigmoid as a function of the sigmoid's output
 
 };
 struct NeuralLayerLinear : public NeuralLayer
 {
-    NeuralLayerLinear(int nbr_neurons);
+    NeuralLayerLinear(unsigned int nbr_neurons);
     VecF32& X();
     const VecF32& X()const;
     VecF32& d_E_X();
@@ -1050,7 +1050,7 @@ struct NeuralLayerLinear : public NeuralLayer
 class NeuralLayerMatrix : public NeuralLayerLinear
 {
 public:
-    NeuralLayerMatrix(int sizei, int sizej, int nbr_map);
+    NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
     const Vec<MatNReference<2,F32> > & X_map()const;
     Vec<MatNReference<2,F32> >& X_map();
     const Vec<MatNReference<2,F32> > & d_E_X_map()const;
@@ -1069,7 +1069,7 @@ class NeuralLayerLinearInput : public NeuralLayerLinear
 {
 public:
 
-    NeuralLayerLinearInput(int nbr_neurons);
+    NeuralLayerLinearInput(unsigned int nbr_neurons);
     void forwardCPU(const NeuralLayer& );
     void backwardCPU(NeuralLayer& ) ;
     void learn();
@@ -1080,7 +1080,7 @@ class NeuralLayerMatrixInput : public NeuralLayerMatrix
 {
 public:
 
-    NeuralLayerMatrixInput(int sizei, int sizej, int nbr_map);
+    NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
     void forwardCPU(const NeuralLayer& ) ;
     void backwardCPU(NeuralLayer& ) ;
     void learn();
@@ -1090,7 +1090,7 @@ public:
 class NeuralLayerLinearFullyConnected : public NeuronSigmoid,public NeuralLayerLinear
 {
 public:
-    NeuralLayerLinearFullyConnected(int nbr_neurons_previous,int nbr_neurons);
+    NeuralLayerLinearFullyConnected(unsigned int nbr_neurons_previous,unsigned int nbr_neurons);
     void setTrainable(bool istrainable);
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
@@ -1103,7 +1103,7 @@ public:
 class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
 {
 public:
-    NeuralLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel,int sizei_map_previous,int sizej_map_previous,int nbr_map_previous);
+    NeuralLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
     void setTrainable(bool istrainable);
 
     virtual void forwardCPU(const NeuralLayer& layer_previous);
@@ -1114,11 +1114,11 @@ public:
     Vec<F32> _W_biais;
     Vec<Mat2F32> _d_E_W_kernels;
     Vec<F32> _d_E_W_biais;
-    int _sub_resolution_factor;
-    int _radius_kernel;
+    unsigned int _sub_resolution_factor;
+    unsigned int _radius_kernel;
 };
 
-class NeuralNet
+class POP_EXPORTS NeuralNet
 {
 public:
 
@@ -1127,11 +1127,11 @@ public:
     NeuralNet(const NeuralNet & neural);
     NeuralNet & operator =(const NeuralNet & neural);
 
-    ~NeuralNet();
-    void addLayerLinearInput(int nbr_neurons);
-    void addLayerMatrixInput(int size_i,int size_j, int nbr_map);
-    void addLayerLinearFullyConnected(int nbr_neurons);
-    void addLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel);
+    virtual ~NeuralNet();
+    void addLayerLinearInput(unsigned int nbr_neurons);
+    void addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map);
+    void addLayerLinearFullyConnected(unsigned int nbr_neurons);
+    void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel);
 
     void setLearnableParameter(F32 mu);
 

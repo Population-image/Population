@@ -1,12 +1,9 @@
-#include <time.h>
-
 #include "data/neuralnetwork/NeuralNetwork.h"
 #include "data/distribution/DistributionAnalytic.h"
 #include "data/mat/MatN.h"
 #include "data/mat/MatNInOut.h"
 #include "data/mat/MatNDisplay.h"
 #include "PopulationConfig.h"
-
 namespace pop {
 #define SIGMOID(x) (1.7159f*tanh(0.6666667f*x))
 #define DSIGMOID(S) (0.6666667f/1.7159f*(1.7159f+(S))*(1.7159f-(S)))  // derivative of the sigmoid as a function of the sigmoid's output
@@ -1252,12 +1249,12 @@ void TrainingNeuralNetwork::neuralNetworkForRecognitionForHandwrittenDigits(Neur
     trainingFirstDerivative(n,vtraining_in,vtraining_out,vtest_in,vtest_out,0.01f,50);
 }
 
-static std::string getCurrentTime() {
-    time_t rawtime;
-    time(&rawtime);
-    struct tm * timeinfo = localtime(&rawtime);
-    return std::string(asctime(timeinfo));
-}
+//static std::string getCurrentTime() {
+//    time_t rawtime;
+//    time(&rawtime);
+//    struct tm * timeinfo = localtime(&rawtime);
+//    return std::string(asctime(timeinfo));
+//}
 
 void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n, const Vec<VecF32>& trainingins, const Vec<VecF32>& trainingouts, F32 eta, unsigned int nbr_epoch)
 {
@@ -1281,7 +1278,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n, 
                 error++;
         }
 
-        std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<"\t"<<getCurrentTime();
+        std::cout<<i<<"\t"<<error*1.0/v_global_rand.size()<<std::endl;
     }
 }
 
@@ -1318,7 +1315,7 @@ void TrainingNeuralNetwork::trainingFirstDerivative(NeuralNetworkFeedForward&n,c
         }
         n.save(("neuralnetwork"+BasicUtility::IntFixedDigit2String(i,2)+".xml").c_str() );
 
-        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<"\t"<<getCurrentTime();
+        std::cout<<i<<"\t"<<error_training*1./trainingins.size()<<"\t"<<error_test*1.0/testins.size() <<"\t"<<eta<<std::endl;
         eta *=0.9f;
         n.setLearningRate(eta);
     }
@@ -1548,7 +1545,7 @@ void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuro
 void NeuralLayer::setLearnableParameter(F32 mu){
     _mu = mu;
 }
-NeuralLayerLinear::NeuralLayerLinear(int nbr_neurons)
+NeuralLayerLinear::NeuralLayerLinear(unsigned int nbr_neurons)
     :_Y(nbr_neurons),_X(nbr_neurons)
 {
 }
@@ -1564,7 +1561,7 @@ void NeuralLayerLinear::setTrainable(bool istrainable){
         this->_d_E_X.clear();
     }
 }
-NeuralLayerMatrix::NeuralLayerMatrix(int sizei, int sizej, int nbr_map)
+NeuralLayerMatrix::NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
     for(unsigned int i=0;i<nbr_map;i++){
@@ -1595,11 +1592,11 @@ void NeuralLayerMatrix::setTrainable(bool istrainable){
         this->_d_E_X_reference.clear();
     }
 }
-NeuralLayerLinearFullyConnected::NeuralLayerLinearFullyConnected(int nbr_neurons_previous,int nbr_neurons)
+NeuralLayerLinearFullyConnected::NeuralLayerLinearFullyConnected(unsigned int nbr_neurons_previous,unsigned int nbr_neurons)
     :NeuralLayerLinear(nbr_neurons),_W(nbr_neurons,nbr_neurons_previous+1),_X_biais(nbr_neurons_previous+1,1)
 {
     //normalize tbe number inverse square root of the connection feeding into the nodes)
-    DistributionNormal n(0,1./std::sqrt(nbr_neurons_previous+1));
+    DistributionNormal n(0,1.f/std::sqrt(nbr_neurons_previous+1.f));
     for(unsigned int i=0;i<_W.size();i++){
         _W(i)=n.randomVariable();
     }
@@ -1650,7 +1647,7 @@ NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
     return new   NeuralLayerLinearFullyConnected(*this);
 }
 
-NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel,int sizei_map_previous,int sizej_map_previous,int nbr_map_previous)
+NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
     :NeuralLayerMatrix(std::floor (  (sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,std::floor (  (sizej_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,nbr_map),
       _W_kernels(nbr_map*nbr_map_previous,Mat2F32(radius_kernel*2+1,radius_kernel*2+1)),
       _W_biais(nbr_map*nbr_map_previous),
@@ -1658,7 +1655,7 @@ NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(i
       _radius_kernel (radius_kernel)
 {
     //normalize tbe number inverse square root of the connection feeding into the nodes)
-    DistributionNormal n(0,1./((radius_kernel*2+1)*std::sqrt(nbr_map_previous)));
+    DistributionNormal n(0,1.f/((radius_kernel*2+1)*std::sqrt(nbr_map_previous*1.)));
     for(unsigned int i = 0;i<_W_kernels.size();i++){
         for(unsigned int j = 0;j<_W_kernels(i).size();j++){
             _W_kernels(i)(j)=n.randomVariable();
@@ -1677,15 +1674,17 @@ void NeuralLayerMatrixConvolutionSubScaling::setTrainable(bool istrainable){
     }
 }
 void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer_previous){
+
     if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
+
 #if defined(HAVE_OPENMP)
-        #pragma omp parallel for
+    #pragma omp parallel for
 #endif
-        for(unsigned int index_map=0;index_map<this->_Y_reference.size();index_map++){
+        for( int index_map=0;index_map<static_cast<int>(this->_Y_reference.size());index_map++){
             MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
-            int index_start_kernel = index_map*neural_matrix->X_map().size();
-            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
-                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+            unsigned int index_start_kernel = index_map*neural_matrix->X_map().size();
+            for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
                     F32 sum=0;
                     //convolution
                     for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
@@ -1733,9 +1732,9 @@ void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_prev
             MatNReference<2,F32> &map_error_out =  this->_d_E_Y_reference[index_map];
             //                std::cout<<map_error_out<<std::endl;
             //                std::cout<<this->_d_E_X<<std::endl;
-            int index_start_kernel = index_map*neural_matrix->X_map().size();
-            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
-                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_error_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+            unsigned int index_start_kernel = index_map*neural_matrix->X_map().size();
+            for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_error_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
                     F32 d_error_y_value = map_error_out(i_map_next,j_map_next);
 
                     //convolution
@@ -1775,7 +1774,7 @@ NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
     }
     return layer;
 }
-NeuralLayerLinearInput::NeuralLayerLinearInput(int nbr_neurons)
+NeuralLayerLinearInput::NeuralLayerLinearInput(unsigned int nbr_neurons)
     :NeuralLayerLinear(nbr_neurons){}
 void NeuralLayerLinearInput::forwardCPU(const NeuralLayer& ) {}
 void NeuralLayerLinearInput::backwardCPU(NeuralLayer& ) {}
@@ -1784,7 +1783,7 @@ void NeuralLayerLinearInput::setTrainable(bool istrainable){NeuralLayerLinear::s
 NeuralLayer * NeuralLayerLinearInput::clone(){
     return new NeuralLayerLinearInput(*this);
 }
-NeuralLayerMatrixInput::NeuralLayerMatrixInput(int sizei, int sizej, int nbr_map)
+NeuralLayerMatrixInput::NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerMatrix(sizei,  sizej,  nbr_map){}
 void NeuralLayerMatrixInput::forwardCPU(const NeuralLayer& ) {}
 void NeuralLayerMatrixInput::backwardCPU(NeuralLayer& ) {}
@@ -1798,6 +1797,7 @@ NeuralLayer * NeuralLayerMatrixInput::clone(){
 NeuralNet::NeuralNet(NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization)
     :_method(method),_normalization_value(normalization)
 {}
+
 NeuralNet::NeuralNet(const NeuralNet & neural){
 
     this->_label2string = neural._label2string;
@@ -1825,20 +1825,20 @@ NeuralNet::~NeuralNet(){
     clear();
 }
 
-void NeuralNet::addLayerLinearInput(int nbr_neurons){
+void NeuralNet::addLayerLinearInput(unsigned int nbr_neurons){
     this->_v_layer.push_back(new NeuralLayerLinearInput(nbr_neurons));
 }
-void NeuralNet::addLayerMatrixInput(int size_i,int size_j, int nbr_map){
+void NeuralNet::addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map){
     this->_v_layer.push_back(new NeuralLayerMatrixInput(size_i,size_j,nbr_map));
 }
-void NeuralNet::addLayerLinearFullyConnected(int nbr_neurons){
+void NeuralNet::addLayerLinearFullyConnected(unsigned int nbr_neurons){
     if(_v_layer.size()==0){
         this->_v_layer.push_back(new NeuralLayerLinearFullyConnected(0,nbr_neurons));
     }else{
         this->_v_layer.push_back(new NeuralLayerLinearFullyConnected((*(_v_layer.rbegin()))-> X().size(),nbr_neurons));
     }
 }
-void NeuralNet::addLayerMatrixConvolutionSubScaling(int nbr_map,int sub_scaling_factor, int radius_kernel){
+void NeuralNet::addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel){
     if(NeuralLayerMatrix * neural_matrix = dynamic_cast<NeuralLayerMatrix *>(*(_v_layer.rbegin()))){
         this->_v_layer.push_back(new NeuralLayerMatrixConvolutionSubScaling( nbr_map, sub_scaling_factor,  radius_kernel,neural_matrix->X_map()(0).sizeI(),neural_matrix->X_map()(0).sizeJ(),neural_matrix->X_map().size()));
     }
