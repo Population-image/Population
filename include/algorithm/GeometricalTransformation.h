@@ -150,6 +150,7 @@ struct POP_EXPORTS GeometricalTransformation
     template<int DIM,  typename PixelType>
     static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {
+
         typename MatN<DIM,PixelType>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
         MatN<DIM,PixelType> temp(domain);
         VecN<DIM,F32> alpha = VecN<DIM,F32>(1.f)/scale;
