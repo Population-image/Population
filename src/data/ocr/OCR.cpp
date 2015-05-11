@@ -52,9 +52,11 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
     }
     return '?';
 }
+
 int OCRNeuralNetwork::characterConfidence(){
     return _confidence;
 }
+
 bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
     if(BasicUtility::isFile(xmlfile)){
         _n.load(xmlfile.c_str());
@@ -64,14 +66,14 @@ bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
     }
 
 }
+
 bool OCRNeuralNetwork::setDictionnaryByteArray(const char * byte_array){
     _n.loadByteArray(byte_array);
+    return true;
 }
-
 
 bool OCRNeuralNetwork::isRecognitionCharacter(){
     return _isrecognized;
-
 }
 
 }

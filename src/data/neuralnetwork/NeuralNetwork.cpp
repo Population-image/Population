@@ -444,14 +444,11 @@ void NeuralNetworkFeedForward::addLayerMaxPooling(unsigned int sub_scale_factor)
 
 void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int nbr_map, unsigned int kernelsize,unsigned int sub_scale_sampling,F32 standart_deviation_weight){
     if(NNLayerMatrix * layerprevious =dynamic_cast<NNLayerMatrix *>(_layers[_layers.size()-1])){
-
-
-        unsigned int step_previous = (kernelsize-1)/2;
         unsigned int height_previous = layerprevious->_neurons_matrix(0).getDomain()(0);
         unsigned int width_previous  = layerprevious->_neurons_matrix(0).getDomain()(1);
 
         if ((height_previous-(kernelsize-sub_scale_sampling)) % sub_scale_sampling!=0) {
-            std::cerr<<"The heigh of the input matrix must be pair "<<std::endl;
+            std::cerr<<"The height of the input matrix must be even "<<std::endl;
         }
 
         unsigned int height = (height_previous-(kernelsize-sub_scale_sampling))/sub_scale_sampling;
@@ -468,7 +465,6 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
         // (kernelsize*kernelsize+1)* nbr_map_previous_layer*nbr_map_layer
         unsigned int nbr_map_previous = static_cast<unsigned int>(layerprevious->_neurons_matrix.size());
 
-
         //normalize tbe number inverse square root of the connection feeding into the nodes)
         pop::DistributionNormal d(0,standart_deviation_weight/kernelsize);
 
@@ -481,17 +477,13 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
             layer->_weights.push_back(new NNWeight(initweight ) );
         }
 
-
-
         for(unsigned int i_width=0;i_width<width;i_width++)
         {
             for(unsigned int i_height=0;i_height<height;i_height++)
             {
-
                 for(unsigned int i_pattern = 0;i_pattern<nbr_map;i_pattern++)
                 {
-
-                    NNNeuron * n = (layer->_neurons_matrix(i_pattern)(i_height,i_width)) ;
+                    NNNeuron * n = (layer->_neurons_matrix(i_pattern)(i_height,i_width));
                     for(unsigned int i_pattern_previous = 0;i_pattern_previous<nbr_map_previous;i_pattern_previous++)
                     {
                         unsigned int i_weight = i_pattern*(kernelsize*kernelsize+1)+i_pattern_previous*nbr_map*(kernelsize*kernelsize+1);
@@ -500,7 +492,6 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
                         {
                             for(unsigned int i_heigh_kernel=0;i_heigh_kernel<kernelsize;i_heigh_kernel++)
                             {
-
                                 int i_width_previous =  i_width*2 + i_width_kernel ;
                                 int i_height_previous =  i_height*2 + i_heigh_kernel ;
 
@@ -508,12 +499,9 @@ void NeuralNetworkFeedForward::addLayerConvolutionalPlusSubScaling( unsigned int
                                 unsigned int i_weight_index = 1+i_width_kernel + i_heigh_kernel*kernelsize + i_pattern*(kernelsize*kernelsize+1)+i_pattern_previous*nbr_map*(kernelsize*kernelsize+1);
                                 n->addConnection(layer->_weights[i_weight_index], nprevious );
                             }
-
                         }
                     }
-
                 }
-
             }
         }
     }
@@ -1567,7 +1555,7 @@ void NeuralLayerLinear::setTrainable(bool istrainable){
 NeuralLayerMatrix::NeuralLayerMatrix(int sizei, int sizej, int nbr_map)
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
-    for(unsigned int i=0;i<nbr_map;i++){
+    for(int i=0;i<nbr_map;i++){
         MatNReference<2,F32> m(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i);
         _Y_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i));
         _X_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_X.data()+sizei*sizej*i));
@@ -1684,8 +1672,8 @@ void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer
         for(unsigned int index_map=0;index_map<this->_Y_reference.size();index_map++){
             MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
             int index_start_kernel = index_map*neural_matrix->X_map().size();
-            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
-                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+            for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
                     F32 sum=0;
                     //convolution
                     for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
@@ -1734,8 +1722,8 @@ void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_prev
             //                std::cout<<map_error_out<<std::endl;
             //                std::cout<<this->_d_E_X<<std::endl;
             int index_start_kernel = index_map*neural_matrix->X_map().size();
-            for(int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
-                for(int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_error_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+            for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_error_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
                     F32 d_error_y_value = map_error_out(i_map_next,j_map_next);
 
                     //convolution
@@ -1903,7 +1891,6 @@ void NeuralNet::loadByteArray(const char *  file)
     XMLDocument doc;
     doc.loadFromByteArray(file);
     load(doc);
-
 }
 
 void NeuralNet::load(XMLDocument &doc)

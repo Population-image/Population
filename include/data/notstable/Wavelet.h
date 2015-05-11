@@ -306,6 +306,8 @@ public:
 //            return true;
 //        else
 //            return false;
+        std::cerr << "WARNING: Calling Wavelet::isValid() which does nothing for now" << std::endl;
+        return false;
     }
 
     void setMatrix(const MatN<Dim,PixelType> & f){

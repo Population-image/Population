@@ -68,7 +68,6 @@ namespace pop {
  * \endcode
 */
 
-
 class POP_EXPORTS NNWeight
 {
     /*!
@@ -105,7 +104,6 @@ public:
      *  second derivate of the error function over the weight
     */
     F32 _d2E_dWn2;
-
 };
 
 class NNNeuron;
@@ -132,18 +130,15 @@ public:
     */
     NNConnection(NNWeight* weight , NNNeuron* neuron = NULL/*NULL is the connection with biais neuron*/ );
 
-
     /*!
      * \return is biais neuron
      *
     */
     bool isBiais()const;
 
-
     NNWeight* _weight;
     NNNeuron* _neuron;
 };
-
 
 inline bool NNConnection::isBiais() const{
     return (_neuron==NULL);
@@ -232,7 +227,6 @@ public:
     *  the activation function
     */
     ActivationFunction _f_act;
-
 
     /*!
     *  propagation value \f$Y^n_i = \sum_{j\in V_i} W^{n}_{j\rightarrow i}  X^{n-1}_j   \f$
@@ -383,8 +377,6 @@ public:
     */
     NNLayerMatrix(unsigned int nbr_map,unsigned int height,unsigned int width ,CenteringMethod method=Mass,NormalizationValue normalization=ZeroToOne);
 
-
-
     void setLearningRate(F32 eta=0.01);
 
     /*!
@@ -392,17 +384,12 @@ public:
     */
     Vec<MatN<2,NNNeuron*> > _neurons_matrix;
 
-
     template<typename TypeScalarPixel>
     static VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix,Vec2I32 domain,NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization = ZeroToOne);
 
     CenteringMethod _method;
     NormalizationValue _normalization_value;
-
-
-
 };
-
 
 class POP_EXPORTS NNLayerMatrixConvolutionalPlusSubScaling : public NNLayerMatrix
 {
@@ -431,7 +418,6 @@ public:
 * sub-scaling factor in case of convolutional layer (use to save the data-structure in file)
 */
     int _sub_scaling;
-
 };
 
 class POP_EXPORTS NNLayerMatrixConvolutional : public NNLayerMatrix
@@ -459,6 +445,7 @@ public:
     int _size_convolutution;
 
 };
+
 class POP_EXPORTS NNLayerMatrixSubScale : public NNLayerMatrix
 {
 public:
@@ -481,7 +468,6 @@ public:
     * sub-scaling factor in case of convolutional layer (use to save the data-structure in file)
     */
     int _sub_scaling;
-
 };
 
 class POP_EXPORTS NNLayerMatrixMaxPooling : public NNLayerMatrix
@@ -508,7 +494,6 @@ public:
     int _sub_scaling;
 
 };
-
 
 class POP_EXPORTS NeuralNetworkFeedForward
 {
@@ -653,7 +638,6 @@ public:
     void addLayerMaxPooling(unsigned int sub_scale_factor);
     void addLayerIntegral(unsigned int nbr_integral,F32 standart_deviation_weight=1);
 
-
     /*!
     * \param file input file
     *
@@ -726,22 +710,23 @@ public:
     Vec<std::string> _label2string;
     //Debug variables
     bool _is_input_layer;
-private:
 };
 
 inline Vec<std::string>& NeuralNetworkFeedForward::label2String(){
     return _label2string;
 }
+
 inline const Vec<std::string>& NeuralNetworkFeedForward::label2String()const{
     return _label2string;
 }
+
 inline Vec<NNLayer*>& NeuralNetworkFeedForward::layers(){
     return _layers;
 }
+
 inline const Vec<NNLayer*>& NeuralNetworkFeedForward::layers()const{
     return _layers;
 }
-
 
 struct POP_EXPORTS TrainingNeuralNetwork
 {
@@ -845,7 +830,7 @@ struct POP_EXPORTS TrainingNeuralNetwork
     //@}
 
     static Vec<Vec<pop::Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
-    static Vec<pop::Mat2UI8>   geometricalTransformationDataBaseMatrix(Vec<pop::Mat2UI8>  number_training,
+    static Vec<pop::Mat2UI8> geometricalTransformationDataBaseMatrix(Vec<pop::Mat2UI8>  number_training,
                                                                        unsigned int number=10,
                                                                        F32 sigma_elastic_distortion_min=5,
                                                                        F32 sigma_elastic_distortion_max=6,
@@ -856,7 +841,6 @@ struct POP_EXPORTS TrainingNeuralNetwork
                                                                        F32 gamma_x_scale=15,
                                                                        F32 gamma_y_scale=15);
     static void  convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value);
-
 
 private:
     static int _reverseInt(int i);
@@ -925,7 +909,6 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         }
         return VecF32(mrf);
     }else{
-
         //center of gravity
         pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
 
@@ -944,10 +927,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         F32 max_i= (std::max)(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
         F32 max_j= (std::max)(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
 
-
         F32 homo = (std::max)(max_i/domain(0),max_j/domain(1));
-
-
 
         //    ForEachDomain2D(xx,mr){
 
@@ -978,7 +958,6 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
     }
 }
 
-
 //class POP_EXPORTS NeuralNetworkFeedForwardMerge
 //{
 //public:
@@ -1001,12 +980,6 @@ public:
     void initPropagateBackFirstDerivate();
 };
 
-
-
-
-
-
-
 class NeuralLayer
 {
 public:
@@ -1024,9 +997,10 @@ public:
     virtual void setTrainable(bool istrainable)=0;
     void setLearnableParameter(F32 mu);
     virtual NeuralLayer * clone()=0;
+    //XXX TODO: need a destructor in order to avoid an undefined behaviour
+    //virtual ~NeuralLayer()=0;
     F32 _mu;
 };
-
 
 struct NeuronSigmoid
 {
@@ -1034,6 +1008,7 @@ struct NeuronSigmoid
     inline F32 derivedActivation(F32 x){ return 0.666667f/1.7159f*(1.7159f+(x))*(1.7159f-(x));}  // derivative of the sigmoid as a function of the sigmoid's output
 
 };
+
 struct NeuralLayerLinear : public NeuralLayer
 {
     NeuralLayerLinear(int nbr_neurons);
@@ -1047,6 +1022,7 @@ struct NeuralLayerLinear : public NeuralLayer
     VecF32 _d_E_Y;
     VecF32 _d_E_X;
 };
+
 class NeuralLayerMatrix : public NeuralLayerLinear
 {
 public:
@@ -1076,6 +1052,7 @@ public:
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
+
 class NeuralLayerMatrixInput : public NeuralLayerMatrix
 {
 public:
@@ -1087,6 +1064,7 @@ public:
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
+
 class NeuralLayerLinearFullyConnected : public NeuronSigmoid,public NeuralLayerLinear
 {
 public:
@@ -1100,6 +1078,7 @@ public:
     VecF32 _X_biais;
     Mat2F32 _d_E_W;
 };
+
 class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
 {
 public:
@@ -1121,8 +1100,6 @@ public:
 class NeuralNet
 {
 public:
-
-
     NeuralNet(NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization=NNLayerMatrix::ZeroToOne);
     NeuralNet(const NeuralNet & neural);
     NeuralNet & operator =(const NeuralNet & neural);
@@ -1159,5 +1136,7 @@ public:
     NNLayerMatrix::NormalizationValue _normalization_value;
     Vec<NeuralLayer*> _v_layer;
 };
+
 }
+
 #endif // NEURALNETWORK_H

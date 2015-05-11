@@ -420,8 +420,8 @@ struct POP_EXPORTS Processing
 
         F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
         Vec2I32 x;
-        for(x(0)=radius;x(0)<f_F32.sizeI()-1-radius;x(0)++){
-            for(x(1)=radius;x(1)<f_F32.sizeJ()-1-radius;x(1)++){
+        for(x(0)=radius;x(0)<static_cast<int>(f_F32.sizeI()-1-radius);x(0)++){
+            for(x(1)=radius;x(1)<static_cast<int>(f_F32.sizeJ()-1-radius);x(1)++){
                 Vec2I32 xadd1=x+Vec2I32(radius);
                 Vec2I32 xadd2=x+Vec2I32(-radius);
                 Vec2I32 xsub1=x-Vec2I32(radius,-radius);
