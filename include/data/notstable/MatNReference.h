@@ -74,6 +74,9 @@ public:
     typedef typename Vec<PixelType>::difference_type				 difference_type;
     typedef typename Vec<PixelType>::allocator_type                        		 allocator_type;
 
+	MatNReference()
+	:_domain(0),_data(NULL){}
+
     MatNReference(const VecN<Dim,int>& domain,PixelType *v);
     MatN<Dim,PixelType> toMatN()const;
 

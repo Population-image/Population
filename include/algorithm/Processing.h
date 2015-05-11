@@ -389,6 +389,44 @@ struct POP_EXPORTS Processing
         }
         return label;
     }
+
+    struct __FunctorNiblackMethod
+    {
+        const Mat2UI32* _integral;
+        const Mat2UI32* _integral_power_2;
+        F32 area_minus1;
+        F32 _k;
+        int _radius;
+        F32 _offset_value;
+        __FunctorNiblackMethod(const Mat2UI32 & integral,const Mat2UI32& integral_power_2,F32 _area_minus1,F32 k,int radius,F32 offset_value)
+            :_integral(&integral),_integral_power_2(&integral_power_2),area_minus1(_area_minus1),_k(k),_radius(radius),_offset_value(offset_value){
+
+        }
+
+        template<typename PixelType>
+        UI8 operator()(const MatN<2,PixelType > & f,const  typename MatN<2,PixelType>::E & x){
+            Vec2I32 xadd1=x+Vec2I32(_radius);
+            Vec2I32 xadd2=x+Vec2I32(-_radius);
+            Vec2I32 xsub1=x-Vec2I32(_radius,-_radius);
+            Vec2I32 xsub2=x-Vec2I32(-_radius,_radius);
+            F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
+            mean*=area_minus1;
+
+            F32 standartdeviation =(*_integral_power_2)(xadd1)+(*_integral_power_2)(xadd2)-(*_integral_power_2)(xsub1)-(*_integral_power_2)(xsub2);
+            standartdeviation*=area_minus1;
+            standartdeviation =standartdeviation-mean*mean;
+
+            if(standartdeviation>0)
+                standartdeviation = std::sqrt( standartdeviation);
+            else
+                standartdeviation =1;
+            if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+_k*standartdeviation)-_offset_value)
+                return 255;
+            else
+                return  0;
+        }
+    };
+
     /*!
      *  \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
      * \param f input function
@@ -413,36 +451,14 @@ struct POP_EXPORTS Processing
     static MatN<2,UI8>  thresholdNiblackMethod(const MatN<2,PixelType> & f,F32 k=0.2,int radius=5,F32 offset_value=0  ){
         MatN<2,PixelType> fborder(f);
         Draw::addBorder(fborder,radius,typename MatN<2,PixelType>::F(0),MATN_BOUNDARY_CONDITION_MIRROR);
-        MatN<2,F32> f_F32(fborder);
-        MatN<2,F32> integral = Processing::integral(f_F32);
-        MatN<2,F32> integralpower2 = Processing::integralPower2(f_F32);
-
+        MatN<2,UI32> f_F32(fborder);
+        MatN<2,UI32> integral = Processing::integral(f_F32);
+        MatN<2,UI32> integralpower2 = Processing::integralPower2(f_F32);
+        typename MatN<2,UI32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
 
         F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
-        Vec2I32 x;
-        for(x(0)=radius;x(0)<static_cast<int>(f_F32.sizeI()-1-radius);x(0)++){
-            for(x(1)=radius;x(1)<static_cast<int>(f_F32.sizeJ()-1-radius);x(1)++){
-                Vec2I32 xadd1=x+Vec2I32(radius);
-                Vec2I32 xadd2=x+Vec2I32(-radius);
-                Vec2I32 xsub1=x-Vec2I32(radius,-radius);
-                Vec2I32 xsub2=x-Vec2I32(-radius,radius);
-                F32 mean = integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
-                mean*=area_minus1;
-
-                F32 standartdeviation =integralpower2(xadd1)+integralpower2(xadd2)-integralpower2(xsub1)-integralpower2(xsub2);
-                standartdeviation*=area_minus1;
-                standartdeviation =standartdeviation-mean*mean;
-
-                if(standartdeviation>0)
-                    standartdeviation = std::sqrt( standartdeviation);
-                else
-                    standartdeviation =1;
-                if(f(x-radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+k*standartdeviation)-offset_value)
-                    fborder(x)=255;
-                else
-                    fborder(x)=0;
-            }
-        }
+        __FunctorNiblackMethod func(integral,integralpower2,area_minus1,k, radius, offset_value);
+        forEachFunctorBinaryFunctionE(f,fborder,func,it);
         return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
     }
     /*!

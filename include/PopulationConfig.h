@@ -35,7 +35,9 @@ namespace pop{
 #endif
 
 
-
+#ifdef HAVE_OPENMP
+#include "omp.h"
+#endif
 
 #if Pop_OS==2
     #define POP_EXPORTS __declspec(dllexport)

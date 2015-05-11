@@ -2098,34 +2098,23 @@ MatN<Dim,PixelType>  MatN<Dim,PixelType>::operator*(const MatN<Dim,PixelType> &m
     POP_DbgAssertMessage(DIM==2&&this->sizeJ()==m.sizeI() ,"In Matrix::operator*, Not compatible size for the operator * of the class Matrix (A_{n,k}*B_{k,p})");
     MatN<Dim,PixelType> mtrans = m.transpose();
     MatN<Dim,PixelType> mout(this->sizeI(),m.sizeJ());
-    PixelType sum = 0;
-    int i,j;
-    typename MatN::const_iterator this_it,mtrans_it;
 #if defined(HAVE_OPENMP)
-#pragma omp parallel shared(mtrans,mout) private(i,j,sum,this_it,mtrans_it)
+#pragma omp parallel for
 #endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<static_cast<int>(this->sizeI());i++){
-            for(j=0;j<static_cast<int>(m.sizeJ());j++){
-                sum = 0;
-                this_it  = this->begin() +  i*this->sizeJ();
-                mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
-                for(unsigned int k=0;k<this->sizeJ();k++){
-                    sum+=(* this_it) * (* mtrans_it);
-                    this_it++;
-                    mtrans_it++;
-                }
-                mout(i,j)=sum;
+    for( int i=0;i<static_cast<int>(this->sizeI());i++){
+        for(unsigned  j=0;j<(m.sizeJ());j++){
+            PixelType sum = 0;
+            typename MatN<Dim,PixelType>::const_iterator this_it  = this->begin() +  i*this->sizeJ();
+            typename MatN<Dim,PixelType>::const_iterator mtrans_it= mtrans.begin() + j*mtrans.sizeJ();
+            for(unsigned int k=0;k<this->sizeJ();k++){
+                sum+=(* this_it) * (* mtrans_it);
+                this_it++;
+                mtrans_it++;
             }
-
+            mout(i,j)=sum;
         }
     }
     return mout;
-
-
 }
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType> & MatN<Dim,PixelType>::operator*=(const MatN<Dim,PixelType> &m)

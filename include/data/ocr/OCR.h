@@ -45,6 +45,7 @@ private:
     int _confidence;
     bool _isrecognized;
 public:
+    ~OCRNeuralNetwork();
 //    NeuralNetworkFeedForward &   neuralNetworkFeedForward();
 //    const NeuralNetworkFeedForward &   neuralNetworkFeedForward()const;
     NeuralNet &   neuralNetworkFeedForward();

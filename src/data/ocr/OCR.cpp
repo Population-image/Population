@@ -12,6 +12,10 @@ OCR::~OCR()
 {
 
 }
+OCRNeuralNetwork::~OCRNeuralNetwork(){
+
+}
+
 //NeuralNetworkFeedForward &   OCRNeuralNetwork::neuralNetworkFeedForward(){
 //    return _n;
 //}
