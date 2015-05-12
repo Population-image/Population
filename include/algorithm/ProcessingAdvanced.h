@@ -1207,10 +1207,10 @@ struct ProcessingAdvanced
         }
         return pop.getRegion();
     }
+
     template<int DIM,typename IteratorE>
     static inline MatN<DIM,UI32> clusterToLabel(const MatN<DIM,UI8> & f, typename MatN<DIM,UI8>::IteratorENeighborhood  it,IteratorE it_order)
     {
-		std::cout << "VINCENT WAS THERE" << std::endl;
         Mat2UI32 map(f.getDomain());
         it.removeCenter();
         int cluster=0;

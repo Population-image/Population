@@ -585,7 +585,7 @@ public:
         init();
     }
 
-    void setLastLoop(typename Vec2I32::E lastloop)
+    void setLastLoop(Vec2I32::E lastloop)
     {
         initInverseLoopOrder(lastloop);
         init();
@@ -625,11 +625,11 @@ public:
         else
             return _domain[_inverselooporder(_e)]-1 - _x[_inverselooporder(_e)];
     }
-    typename Vec2I32::E getIndexLastLoop()
+    Vec2I32::E getIndexLastLoop()
     {
         return _inverselooporder(0);
     }
-    typename Vec2I32::E  getWayLastLoop()
+    Vec2I32::E  getWayLastLoop()
     {
         return _direction(_inverselooporder(0));
     }
