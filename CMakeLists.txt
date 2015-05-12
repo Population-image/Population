@@ -38,6 +38,8 @@ POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
+POP_OPTION(BUILD_WITH_C11        "build C11" On )
+
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -110,6 +112,20 @@ if(WITH_OPENCV)
     set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${OpenCV_LIBS})
     set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${${OpenCV_INCLUDE_DIRS}})
 endif(WITH_OPENCV)
+
+# C++11
+if(BUILD_WITH_C11)
+   include(CheckCXXCompilerFlag)
+   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+   CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+   if(COMPILER_SUPPORTS_CXX11)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+   elseif(COMPILER_SUPPORTS_CXX0X)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+   else()
+      message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support.")
+   endif()
+endif()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUNICODE=1")
 

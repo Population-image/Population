@@ -1642,6 +1642,7 @@ NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(u
       _sub_resolution_factor (sub_scaling_factor),
       _radius_kernel (radius_kernel)
 {
+    std::cout<<(sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor)+1<<std::endl;
     //normalize tbe number inverse square root of the connection feeding into the nodes)
     DistributionNormal n(0,1.f/((radius_kernel*2+1)*std::sqrt(nbr_map_previous*1.)));
     for(unsigned int i = 0;i<_W_kernels.size();i++){
