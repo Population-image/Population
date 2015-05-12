@@ -386,54 +386,54 @@ struct ProcessingAdvanced
     template<typename Function,typename Iterator>
     static Function greylevelRemoveEmptyValue(const Function & f,  Iterator & it)
     {
-		std::vector<typename Function::F> values(256, 0);
+        std::vector<typename Function::F> values(256, 0);
         Function h(f.getDomain());
         while(it.next()) {
             typename Function::F i = f(it.x());
-			if (i >= values.size()) {
-				values.resize(i+1, 0);
-			}
-			values[i] = 1;
+            if (i >= values.size()) {
+                values.resize(i+1, 0);
+            }
+            values[i] = 1;
         }
 
-		typename Function::F v = 0;
-		for (unsigned int i=0; i<values.size(); i++) {
-			if (values[i] == 1) {
-				values[i] = v;
-				v++;
-			}
-		}
+        typename Function::F v = 0;
+        for (unsigned int i=0; i<values.size(); i++) {
+            if (values[i] == 1) {
+                values[i] = v;
+                v++;
+            }
+        }
 
         it.init();
         while(it.next()) {
             typename Function::F i = f(it.x());
-			h(it.x()) = values[i];
+            h(it.x()) = values[i];
         }
         return h;
     }
 
-	template<int DIM,typename PixelType>
+    template<int DIM,typename PixelType>
     static MatN<DIM,PixelType> greylevelRemoveEmptyValue(const MatN<DIM,PixelType> & f)
     {
-		std::vector<PixelType> values(256, 0);
+        std::vector<PixelType> values(256, 0);
         MatN<DIM,PixelType> h(f.getDomain());
         for(unsigned int i=0; i<f.size(); i++) {
-			if (f(i) >= values.size()) {
-				values.resize(f(i)+1, 0);
-			}
-			values[f(i)] = 1;
+            if (f(i) >= values.size()) {
+                values.resize(f(i)+1, 0);
+            }
+            values[f(i)] = 1;
         }
 
-		PixelType v = 0;
-		for (unsigned int i=0; i<values.size(); i++) {
-			if (values[i] == 1) {
-				values[i] = v;
-				v++;
-			}
-		}
-		
+        PixelType v = 0;
+        for (unsigned int i=0; i<values.size(); i++) {
+            if (values[i] == 1) {
+                values[i] = v;
+                v++;
+            }
+        }
+
         for(unsigned int i=0; i<h.size(); i++) {
-			h(i) = values[f(i)];
+            h(i) = values[f(i)];
         }
 
         return h;
@@ -1207,74 +1207,29 @@ struct ProcessingAdvanced
         }
         return pop.getRegion();
     }
-    static inline Mat2UI32 clusterToLabel(const Mat2UI8 & f,  Mat2UI8::IteratorENeighborhood  it,Mat2UI8::IteratorEDomain )
+    template<int DIM,typename IteratorE>
+    static inline MatN<DIM,UI32> clusterToLabel(const MatN<DIM,UI8> & f, typename MatN<DIM,UI8>::IteratorENeighborhood  it,IteratorE it_order)
     {
 		std::cout << "VINCENT WAS THERE" << std::endl;
         Mat2UI32 map(f.getDomain());
         it.removeCenter();
         int cluster=0;
-        std::queue<Vec2I32> v_list;
-        Vec2I32 x;
-        for(x(0)=0;x(0)<static_cast<pop::I32>(f.sizeI());x(0)++){
-            for(x(1)=0;x(1)<static_cast<pop::I32>(f.sizeJ());x(1)++){
-                if(f(x)>0&&map(x)==0){
-                    cluster++;
-                    v_list.push(x);
-                    while(v_list.empty()==false){
-
-                        Vec2I32  y = v_list.front();
-                        v_list.pop();
-                        if(map(y)==0){
-                            //                        std::cout<<y<<std::endl;
-
-                            map(y)=cluster;
-                            it.init(y);
-                            while(it.next()){
-
-                                if(f(it.x())>0&&map(it.x())==0){
-                                    //                                std::cout<<"push "<<it.x()<<std::endl;
-                                    v_list.push(it.x());
-                                }
+        std::queue<VecN<DIM,I32> > v_list;
+        while(it_order.next()){
+            VecN<DIM,I32> &x=it_order.x();
+            if(f(x)>0&&map(x)==0){
+                cluster++;
+                v_list.push(x);
+                while(v_list.empty()==false){
+                    VecN<DIM,I32>  y = v_list.front();
+                    v_list.pop();
+                    if(map(y)==0){
+                        map(y)=cluster;
+                        it.init(y);
+                        while(it.next()){
+                            if(f(it.x())>0&&map(it.x())==0){
+                                v_list.push(it.x());
                             }
-                        }
-
-                    }
-                }
-            }
-        }
-        return map;
-    }
-    static inline Mat3UI32 clusterToLabel(const Mat3UI8 & f,  Mat3UI8::IteratorENeighborhood  it,Mat3UI8::IteratorEDomain )
-    {
-        Mat3UI32 map(f.getDomain());
-        it.removeCenter();
-        int cluster=0;
-        std::queue<Vec3I32> v_list;
-        Vec3I32 x;
-        for(x(0)=0;x(0)<static_cast<pop::I32>(f.sizeI());x(0)++){
-            for(x(1)=0;x(1)<static_cast<pop::I32>(f.sizeJ());x(1)++){
-                for(x(2)=0;x(2)<static_cast<pop::I32>(f.sizeK());x(2)++){
-                    if(f(x)>0&&map(x)==0){
-                        cluster++;
-                        v_list.push(x);
-                        while(v_list.empty()==false){
-
-                            Vec3I32  y = v_list.front();
-                            v_list.pop();
-                            if(map(y)==0){
-                                //                        std::cout<<y<<std::endl;
-
-                                map(y)=cluster;
-                                it.init(y);
-                                while(it.next()){
-
-                                    if(f(it.x())>0&&map(it.x())==0){
-                                        //                                std::cout<<"push "<<it.x()<<std::endl;
-                                        v_list.push(it.x());
-                                    }
-                                }
-                            }
-
                         }
                     }
                 }

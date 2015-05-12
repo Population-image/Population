@@ -38,6 +38,16 @@ int main()
 {
     {
         Mat2UI8 m(5,5);//
+//        Mat2UI8::IteratorEOrder it_order=m.getIteratorEOrder(1,1);
+//        while(it_order.next()){
+//            std::cout<<it_order.x()<<std::endl;
+//        }
+//        return 1;
+//        Mat2UI8::IteratorEDomain it = m.getIteratorEDomain();
+//        while(it.next()){
+//            std::cout<<it.x()<<std::endl;
+//        }
+//        return 0;
 
         //    m(0,0)=1;m(0,1)=1;m(0,2)=1;
         //    m(1,0)=1;m(1,1)=1;m(1,2)=1;
@@ -50,6 +60,7 @@ int main()
         m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         m = Processing::threshold(m,120);
         auto start_global= std::chrono::high_resolution_clock::now();
+        ProcessingAdvanced::clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEOrder(0,1));
 //        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
         auto end_global= std::chrono::high_resolution_clock::now();
         std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
