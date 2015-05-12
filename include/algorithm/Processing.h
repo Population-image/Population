@@ -643,8 +643,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM,typename PixelType>
     static MatN<DIM,PixelType> greylevelRemoveEmptyValue(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return ProcessingAdvanced::greylevelRemoveEmptyValue(f,it);
+		return ProcessingAdvanced::greylevelRemoveEmptyValue(f);
     }
 
     /*!

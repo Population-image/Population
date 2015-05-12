@@ -34,6 +34,8 @@ in the Software.
 #ifndef PROCESSINGADVANCED_H
 #define PROCESSINGADVANCED_H
 
+#include <map>
+
 #include"data/typeF/TypeTraitsF.h"
 #include"data/population/PopulationData.h"
 #include"data/distribution/DistributionFromDataStructure.h"
@@ -45,6 +47,7 @@ in the Software.
 #include"algorithm/ForEachFunctor.h"
 #include"algorithm/AnalysisAdvanced.h"
 #include"algorithm/Statistics.h"
+
 namespace pop
 {
 
@@ -383,24 +386,56 @@ struct ProcessingAdvanced
     template<typename Function,typename Iterator>
     static Function greylevelRemoveEmptyValue(const Function & f,  Iterator & it)
     {
+		std::vector<typename Function::F> values(256, 0);
         Function h(f.getDomain());
-        std::vector<typename Function::F> valueinf;
-        while(it.next())
-        {
-            typename Function::F i= f(it.x());
-            if( std::find(valueinf.begin(),valueinf.end(),i)==valueinf.end() )valueinf.push_back(i);
+        while(it.next()) {
+            typename Function::F i = f(it.x());
+			if (i >= values.size()) {
+				values.resize(i+1, 0);
+			}
+			values[i] = 1;
         }
-        std::sort (valueinf.begin(), valueinf.end());
 
-        typename std::vector<typename Function::F>::iterator  itvalue;
+		typename Function::F v = 0;
+		for (unsigned int i=0; i<values.size(); i++) {
+			if (values[i] == 1) {
+				values[i] = v;
+				v++;
+			}
+		}
+
         it.init();
-        while(it.next())
-        {
-            typename Function::F i= f(it.x());
-            itvalue=std::find(valueinf.begin(),valueinf.end(),i);
-            i=static_cast<I32>(itvalue-valueinf.begin());
-            h(it.x())=i;
+        while(it.next()) {
+            typename Function::F i = f(it.x());
+			h(it.x()) = values[i];
         }
+        return h;
+    }
+
+	template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> greylevelRemoveEmptyValue(const MatN<DIM,PixelType> & f)
+    {
+		std::vector<PixelType> values(256, 0);
+        MatN<DIM,PixelType> h(f.getDomain());
+        for(unsigned int i=0; i<f.size(); i++) {
+			if (f(i) >= values.size()) {
+				values.resize(f(i)+1, 0);
+			}
+			values[f(i)] = 1;
+        }
+
+		PixelType v = 0;
+		for (unsigned int i=0; i<values.size(); i++) {
+			if (values[i] == 1) {
+				values[i] = v;
+				v++;
+			}
+		}
+		
+        for(unsigned int i=0; i<h.size(); i++) {
+			h(i) = values[f(i)];
+        }
+
         return h;
     }
 
