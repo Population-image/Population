@@ -67,7 +67,7 @@ in the Software.
      * using namespace pop;
      * int main(){
      *     Mat2UI8 lena;
-     *     lena.load("../image/Lena.bmp");
+     *     lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      *      std::cout<<Analysis::maxValue(lena)<<std::endl;
      *     return 0;
      * }
@@ -243,7 +243,7 @@ struct POP_EXPORTS Analysis
      * using namespace pop;
      * int main(){
      *     Mat2UI8 lena;
-     *     lena.load("../image/Lena.bmp");
+     *     lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      *      std::cout<<Analysis::maxValue(lena)<<std::endl;
      *     return 0;
      * }
@@ -657,7 +657,7 @@ struct POP_EXPORTS Analysis
      * For instance, this code
      * \code
     Mat2RGBUI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     std::cout<<Analysis::maxValue(lena)<<std::endl;
     return 1;
      \endcode
@@ -665,9 +665,12 @@ struct POP_EXPORTS Analysis
     */
     template<int DIM,typename PixelType>
     static  PixelType  maxValue(const MatN<DIM,PixelType> & f){
-
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::maxValue(f,it);
+        FunctorF::FunctorAccumulatorMax<PixelType> func;
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+         return func.getValue();
     }
 
     /*!
@@ -679,7 +682,7 @@ struct POP_EXPORTS Analysis
      * For instance, this code
      * \code
     Mat2RGBUI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     std::cout<<Analysis::minValue(lena)<<std::endl;
     return 1;
      \endcode
@@ -688,8 +691,12 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename PixelType>
     static  PixelType  minValue(const MatN<DIM,PixelType> & f){
 
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::minValue(f,it);
+        FunctorF::FunctorAccumulatorMin<PixelType> func;
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+         return func.getValue();
     }
     /*!
      * \brief return the mean value
@@ -700,7 +707,7 @@ struct POP_EXPORTS Analysis
      * For instance, this code
      * \code
     Mat2UI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     F32 mean = Analysis::meanValue(lena);
     std::cout<<mean<<std::endl;
     \endcode
@@ -708,8 +715,12 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename PixelType>
     static F32 meanValue(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::meanValue( f,it);
+        FunctorF::FunctorAccumulatorMean<PixelType> func;
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+         return func.getValue();
     }
     /*!
      * \brief return the standard deviation value
@@ -720,7 +731,7 @@ struct POP_EXPORTS Analysis
      * For instance, this code
      * \code
     Mat2UI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     F32 mean = Analysis::meanValue(lena);
     std::cout<<mean<<std::endl;
     \endcode
@@ -729,8 +740,13 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename PixelType>
     static F32 standardDeviationValue(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::standardDeviationValue( f,it);
+        F32 mean = meanValue(f);
+        FunctorF::FunctorAccumulatorVariance<PixelType> func(mean);
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+        return std::sqrt(func.getValue());
     }
 
     /*!
@@ -741,7 +757,7 @@ struct POP_EXPORTS Analysis
      *  M(i,0)=i, M(i,1)=P(f(x)=i)
      * \code
      * Mat2UI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Analysis analysis;
      * Mat2F32 m = analysis.histogram(img);
      * DistributionRegularStep d(m);
@@ -752,8 +768,12 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename PixelType>
     static Mat2F32 histogram(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::histogram(f,it);
+        FunctorF::FunctorAccumulatorHistogram<Mat2F32> func;
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+         return func.getValue();
     }
 
     /*!
@@ -764,7 +784,7 @@ struct POP_EXPORTS Analysis
      *  \f$X_{j}=\{x:f(x)=j \}\f$ is the level set of f and \f$|X|\f$  is the cardinal of the set
      * \code
      * Mat2UI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Analysis analysis;
      * Mat2F32 m = analysis.area(img);
      * DistributionRegularStep d(m);
@@ -775,8 +795,12 @@ struct POP_EXPORTS Analysis
     template<int DIM,typename PixelType>
     static Mat2F32 area(const MatN<DIM,PixelType> & f)
     {
-        typename MatN<DIM,PixelType>::IteratorEDomain it(f.getIteratorEDomain());
-        return AnalysisAdvanced::area(f,it);
+        FunctorF::FunctorAccumulatorHistogram<Mat2F32> func;
+        func.init();
+        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
+            func(*it);
+        }
+         return func.getValueNotNormalized();
     }
     /*!
      * \param f input matrixE

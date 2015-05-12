@@ -616,6 +616,14 @@ struct POP_EXPORTS FunctorF
             }
             return _tab;
         }
+        TabHistogram getValueNotNormalized()
+        {
+            for(unsigned int i =0;i<_tab.sizeI();i++){
+                _tab(i,0)=static_cast<F32>(i);
+            }
+            return _tab;
+        }
+
     };
 
     //@}

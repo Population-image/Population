@@ -455,8 +455,10 @@ struct POP_EXPORTS MatNInterpolation
     typename MatN::F apply(const MatN & m, const VecN<MatN::DIM,FloatType> & x){
         if(_type==MATN_INTERPOLATION_NEAREST)
             return MatNInterpolationNearest::apply(m,x);
-        else{
+        else if(_type==MATN_INTERPOLATION_BILINEAR){
             return MatNInterpolationBiliniear::apply(m,x);
+        }else{
+            return MatNInterpolationFloor::apply(m,x);
         }
     }
 };

@@ -14,7 +14,7 @@ namespace pop
 Conversion: vectoriel image (vector field, color image,complex image) <-> list of scalar images
 \code
 Mat2RGBUI8 img;//2d grey-level image object
-img.load("../image/Lena.bmp");//replace this path by those on your computer
+img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
 Mat2UI8 r,g,b;
 Convertor::toRGB(img,r,g,b);
 r.display();
@@ -234,7 +234,7 @@ struct POP_EXPORTS Convertor
      *
      * \code
      * Mat2UI8 img;//2d grey-level image object
-     * img.load("../image/Lena.bmp");//replace this path by those on your computer
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
      * //gradient vector field
      * MatN<2,Vec2F32> gradient_vector_field = Processing::gradientVecGaussian(img,1);
      * //get each gradient in each direction in a

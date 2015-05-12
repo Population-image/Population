@@ -69,7 +69,7 @@ The most classical equation is the diffusion : \f$:\frac{\partial\phi(\mathbf{r}
 is coded as follows:
 \code
 Mat2UI8 img;
-img.load("../image/Lena.bmp");
+img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
 Mat2F32 img_timet(img);//operation on float
 Mat2F32 img_timet_plus_one(img);
 FunctorPDE::Laplacien<> laplacien;

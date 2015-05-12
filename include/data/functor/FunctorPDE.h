@@ -49,7 +49,7 @@ namespace pop
 * For instance the homogeneous diffusion equation in finite difference scheme
 * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2F32 img_timet(img);//operation on float
     Mat2F32 img_timet_plus_one(img);
     FunctorPDE::Laplacien<> laplacien;
@@ -80,7 +80,7 @@ public:
      *
      * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2F32 img_timet(img);//operation on float
     Mat2F32 img_timet_plus_one(img);
     FunctorPDE::Laplacien<> laplacien;

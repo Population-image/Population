@@ -94,7 +94,7 @@ struct ProcessingAdvanced
         MatN<2,PixelType> out(f.getDomain());
 
 #if defined(HAVE_OPENMP)
-    #pragma omp parallel for
+#pragma omp parallel for
 #endif
         for(int i=0;i<f.getDomain()(0);i++){
             for(int j=0;j<f.getDomain()(1);j++){
@@ -102,7 +102,7 @@ struct ProcessingAdvanced
             }
         }
 #if defined(HAVE_OPENMP)
-    #pragma omp parallel for
+#pragma omp parallel for
 #endif
         for(int j=0;j<f.getDomain()(1);j++){
             for(int i=0;i<f.getDomain()(0);i++){
@@ -1172,6 +1172,81 @@ struct ProcessingAdvanced
         }
         return pop.getRegion();
     }
+    static inline Mat2UI32 clusterToLabel(const Mat2UI8 & f,  Mat2UI8::IteratorENeighborhood  it,Mat2UI8::IteratorEDomain )
+    {
+        Mat2UI32 map(f.getDomain());
+        it.removeCenter();
+        int cluster=0;
+        std::queue<Vec2I32> v_list;
+        Vec2I32 x;
+        for(x(0)=0;x(0)<f.sizeI();x(0)++){
+            for(x(1)=0;x(1)<f.sizeJ();x(1)++){
+                if(f(x)>0&&map(x)==0){
+                    cluster++;
+                    v_list.push(x);
+                    while(v_list.empty()==false){
+
+                        Vec2I32  y = v_list.front();
+                        v_list.pop();
+                        if(map(y)==0){
+                            //                        std::cout<<y<<std::endl;
+
+                            map(y)=cluster;
+                            it.init(y);
+                            while(it.next()){
+
+                                if(f(it.x())>0&&map(it.x())==0){
+                                    //                                std::cout<<"push "<<it.x()<<std::endl;
+                                    v_list.push(it.x());
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        return map;
+    }
+    static inline Mat3UI32 clusterToLabel(const Mat3UI8 & f,  Mat3UI8::IteratorENeighborhood  it,Mat3UI8::IteratorEDomain )
+    {
+        Mat3UI32 map(f.getDomain());
+        it.removeCenter();
+        int cluster=0;
+        std::queue<Vec3I32> v_list;
+        Vec3I32 x;
+        for(x(0)=0;x(0)<f.sizeI();x(0)++){
+            for(x(1)=0;x(1)<f.sizeJ();x(1)++){
+                for(x(2)=0;x(2)<f.sizeK();x(2)++){
+                    if(f(x)>0&&map(x)==0){
+                        cluster++;
+                        v_list.push(x);
+                        while(v_list.empty()==false){
+
+                            Vec3I32  y = v_list.front();
+                            v_list.pop();
+                            if(map(y)==0){
+                                //                        std::cout<<y<<std::endl;
+
+                                map(y)=cluster;
+                                it.init(y);
+                                while(it.next()){
+
+                                    if(f(it.x())>0&&map(it.x())==0){
+                                        //                                std::cout<<"push "<<it.x()<<std::endl;
+                                        v_list.push(it.x());
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
     /*! \fn FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
      * \param bin input binary matrix
      * \param itneigh neighborhood IteratorE domain

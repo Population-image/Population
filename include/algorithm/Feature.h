@@ -35,7 +35,7 @@ private:
      * is an application :
      * \code
         Mat2UI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         F32 sigma = 1.6;
         Pyramid<2,F32> pyramid1 = Feature::pyramidGaussian(img,sigma);
         Vec<KeyPointPyramid<2> > keypoint1 = Feature::keyPointSIFT(pyramid1);

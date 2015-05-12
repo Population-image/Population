@@ -68,7 +68,7 @@ struct _caractere{
 In this example, I draw a circle for each key point
 \code
 Mat2RGBUI8 lena;
-lena.load("../image/Lena.bmp");
+lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
 Vec<KeyPoint<2> > keypoints = Feature::keyPointHarris(lena);
 for(int i=0;i<keypoints.size();i++){
     Draw::circle(lena,keypoints[i].x(),4,RGBUI8::randomRGB(),2);
@@ -102,7 +102,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec<KeyPoint<2> > keypoints = Feature::keyPointHarris(lena);
      * for(int i=0;i<keypoints.size();i++){
      *     Draw::circle(lena,keypoints[i].x(),4,RGBUI8::randomRGB(),2);
@@ -174,7 +174,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec<KeyPoint<2> > keypoints = Feature::keyPointHarris(lena);
      * for(int i=0;i<keypoints.size();i++){
      *     Draw::circle(lena,keypoints[i].x(),4,RGBUI8::randomRGB(),2);
@@ -215,7 +215,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Draw::rectangle(lena,Vec2I32(150,100),Vec2I32(60,20),RGBUI8(255,0,0),2,PI/8);
      * lena.display();
      * \endcode
@@ -251,7 +251,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec<Vec2I32> points;
      * points.push_back(Vec2I32(20,40));
      * points.push_back(Vec2I32(180,20));
@@ -287,7 +287,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2UI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec2I32 x1(10,40);
      * Vec2I32 x2(152,200);
      * Draw::line(lena,x1,x2,255,1);
@@ -325,7 +325,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2UI8 lena;
-     * lena.load("../image/Lena.bmp");
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec2I32 x1(10,40);
      * Vec2I32 x2(152,200);
      * Draw::arrow(lena,x1,x2,255,1);
@@ -370,7 +370,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");;
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());;
      * string str ="Join the wonderful Population community !!!";
      * Draw::text(lena,str,Vec2I32(50,200),RGBUI8(255,0,0),1.5);
      * \endcode
@@ -574,7 +574,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");;
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());;
      * int value;
      * Mat2RGBUI8 threshold = Processing::thresholdOtsuMethod(lena,value);
      * threshold = Draw::mergeTwoMatrixHorizontal(lena,threshold);
@@ -612,7 +612,7 @@ struct POP_EXPORTS Draw
      *
      * \code
      * Mat2RGBUI8 lena;
-     * lena.load("../image/Lena.bmp");;
+     * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());;
      * int value;
      * Mat2RGBUI8 threshold = Processing::thresholdOtsuMethod(lena,value);
      * threshold = Draw::mergeTwoMatrixVertical(lena,threshold);
@@ -650,7 +650,7 @@ struct POP_EXPORTS Draw
      *  Insert the matrix postit in the matrix f such that the center of the matrix postit is located at the position trans
      * \code
         Mat2RGBUI8 lena,lena_iterate,lenasmall;
-        lena.load("../image/Lena.bmp");
+        lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         lena_iterate = lena;
         lenasmall    = lena;
         lenasmall = GeometricalTransformation::scale(lenasmall,Vec2F32(0.05,0.05));
@@ -778,7 +778,7 @@ struct POP_EXPORTS Draw
     *
     * \code
     * Mat2RGBUI8 lena;
-    * lena.load("../image/Lena.bmp");;
+    * lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());;
     * Draw::addBorder(lena,50,RGBUI8(255,0,0));
     * lena.display();
     * \endcode

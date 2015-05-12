@@ -182,7 +182,7 @@ public:
     * access the reference of the pixel/voxel value at the given position
     * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
     FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
@@ -202,7 +202,7 @@ public:
     * access the reference of the pixel/voxel value at the given position
     * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
     FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
@@ -326,7 +326,7 @@ public:
     *
     * \code
     * Mat2UI8 img;
-    * img.load("../image/Lena.bmp");
+    * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     * Mat2UI8 S(3,3);
     * S(1,1)=255;S(2,2)=255;
     * Mat2UI8::IteratorENeighborhood itn(img.getIteratorENeighborhood(S,20));

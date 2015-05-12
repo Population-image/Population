@@ -152,7 +152,7 @@ struct POP_EXPORTS Processing
         * For instance this code
         \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Processing op;
         Mat2UI8 threshold = op.threshold(img,130);
         threshold.save("lenathreshold130.bmp");
@@ -470,7 +470,7 @@ struct POP_EXPORTS Processing
 
         \code
     Mat2UI8 img2;
-    img2.load("../image/Lena.bmp");
+    img2.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8 label2 = Processing::thresholdMultiValley(img2);
     Visualization::labelAverageRGB(label2,img2).display();
       \endcode
@@ -526,7 +526,7 @@ struct POP_EXPORTS Processing
      *  this code applies this transformation f(x) = (x/255)^3*255
         \code
                 Mat2UI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 DistributionExpression d("(x/255)^3*255");
                 Mat2UI8 power2 =Processing::fofx(img,d);
                 power2.display();
@@ -553,7 +553,7 @@ struct POP_EXPORTS Processing
         the RMSC of the ouput function  is equal to sigma*scale
         \code
                 Mat2RGBUI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 Mat2UI8 r,g,b;
                 Convertor::toRGB(img,r,g,b);
                 Processing processing;
@@ -582,7 +582,7 @@ struct POP_EXPORTS Processing
      * Scale the pixel/voxel value range using this formula h(x)=(f(x)-min(f))*(max-min)/(max(f)-min(f))+min
         \code
                 Mat2UI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 img = Processing::greylevelRange(img);
                 img.display();
         \endcode
@@ -605,7 +605,7 @@ struct POP_EXPORTS Processing
      *  For instance, this code:
         \code
                 Mat2UI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 img = Processing::greylevelTranslateMeanValue(img,150);
                 img.display();
         \endcode
@@ -622,7 +622,7 @@ struct POP_EXPORTS Processing
      *  Remove the grey-level values not populated by pixesl/voxels that can be usefull to analyse a segmented matrix. For instance, this code:
         \code
                 Mat2RGBUI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 Mat2UI8 bin =Processing::threshold(img,100);
                 bin =Processing::greylevelRemoveEmptyValue(bin);
                 Mat2F32 m = Analysis::histogram(bin);
@@ -757,7 +757,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      *  local minima of the input matrix
      * \code
-    Mat2UI8 lena("../image/Lena.bmp");
+    Mat2UI8 lena((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2F32 grad = Processing::gradientMagnitudeDeriche(Mat2F32(lena),0.5);
     Mat2UI32 minima= Processing::minimaLocalMap(grad);//minima
     Mat2UI32 water = Processing::watershed(minima,Mat2UI8(grad));//watershed transformation
@@ -881,7 +881,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \f$\forall x \in E:\quad h(x) =\min_{\forall x'\in N(x) }f(x') \f$ where \f$N(x)=\{x': \|x'-x\|_n<=r\} \f$. For instance,
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 erosion =processing.erosion(img,3,2);
      * erosion.display();
@@ -908,7 +908,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * The iterative stuctural element, \f$S^n\f$ is n times the dilation by itselt : \f$ S\oplus S\ldots \oplus S\f$ n times
      * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Mat2UI8 elt(3,3);
         elt(1,1)=1;
         elt(2,2)=1;
@@ -943,7 +943,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \f$\forall x \in E:\quad h(x) =\max_{\forall x'\in N(x) }f(x') \f$ where \f$N(x)=\{x': \|x'-x\|_n<=r\} \f$. For instance,
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 dilation =processing.dilation(img,3,2);
      * dilation.display();
@@ -970,7 +970,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * The iterative stuctural element, \f$S^n\f$ is n times the dilation by itselt : \f$ S\oplus S\ldots \oplus S\f$ n times
      * \code
                 Mat2RGBUI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 Mat2UI8 elt(3,3);
                 elt(1,1)=1;
                 elt(2,2)=1;
@@ -1004,7 +1004,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \f$N(x)=\{x': \|x'-x\|_n<=r\} \f$. For instance,
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 median =processing.median(img,3,2);
      * median.display();
@@ -1032,7 +1032,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * The iterative stuctural element, \f$S^n\f$ is n times the median by itselt : \f$ S\oplus S\ldots \oplus S\f$ n times
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Mat2RGBUI8 elt(3,3);
      * elt(1,1)=1;
      * elt(2,2)=1;
@@ -1065,7 +1065,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \f$\forall x \in E:\quad h(x) =\mbox{mean}_{\forall x'\in N(x) }f(x') \f$ where \f$N(x)=\{x': \|x'-x\|_n<=r\} \f$. For instance,
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 mean =processing.mean(img,3,2);
      * mean.display();
@@ -1092,7 +1092,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * The iterative stuctural element, \f$S^n\f$ is n times the mean by itselt : \f$ S\oplus S\ldots \oplus S\f$ n times
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Mat2RGBUI8 elt(3,3);
      * elt(1,1)=1;
      * elt(2,2)=1;
@@ -1125,7 +1125,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  h =eorion(dilation(f,radius,norm),radius,norm)
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 closing =processing.closing(img,3,2);
      * closing.display();
@@ -1151,7 +1151,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 
      * \code
                 Mat2RGBUI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 Mat2UI8 elt(3,3);
                 elt(1,1)=1;
                 elt(2,2)=1;
@@ -1187,7 +1187,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  h =eorion(dilation(f,radius,norm),radius,norm)
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Processing processing;
      * Mat2RGBUI8 opening =processing.opening(img,3,2);
      * opening.display();
@@ -1213,7 +1213,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 
      * \code
                 Mat2RGBUI8 img;
-                img.load("../image/Lena.bmp");
+                img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
                 Mat2UI8 elt(3,3);
                 elt(1,1)=1;
                 elt(2,2)=1;
@@ -1518,7 +1518,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Magnitude of the Sobel's gradient http://en.wikipedia.org/wiki/Sobel_operator
      * \code
         Mat2RGBUI8 img;
-         img.load("../image/Lena.bmp");
+         img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
          Processing processing;
          img = processing.gradientMagnitudeSobel(img);
          img.display();
@@ -1563,7 +1563,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      *  Sobel's gradient http://en.wikipedia.org/wiki/Sobel_operator
      * \code
-    Mat2UI8 lena("../image/Lena.bmp");
+    Mat2UI8 lena((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     lena = Processing::smoothDeriche(lena,0.3);
     Mat2Vec2F32 grad = Processing::gradientVecSobel(lena);
     Visualization::vectorField2DToArrows(grad,RGBUI8(0,0,255),RGBUI8(255,0,0),16).display();
@@ -1591,7 +1591,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Magnitude of the gaussian
      * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Mat2UI8 grad;
         grad = Processing::gradientMagnitudeGaussian(img,2);
         grad.display();
@@ -1613,7 +1613,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Gaussian gaussian in the follownig direction
     \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Mat2RGBF32 imgf;
         imgf=img;
         imgf = Processing::gradientGaussian(imgf,0,2);
@@ -1642,7 +1642,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      *  Gaussian gradient
      * \code
-    Mat2UI8 lena("../image/Lena.bmp");
+    Mat2UI8 lena((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2Vec2F32 grad = Processing::gradientVecGaussian(Mat2F32(lena),8);
     Visualization::vectorField2DToArrows(grad,RGBUI8(0,0,255),RGBUI8(255,0,0),16).display();
      *  \endcode
@@ -1668,7 +1668,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  Gaussian smooth
     \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         img = Processing::smoothGaussian(img,3,10);
         img.display();
     \endcode
@@ -1699,7 +1699,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * Smooth the input matrix with the inverse scale parameter (alpha=2=low, alpha=0.5=high)
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * img = Processing::smoothDeriche(img,0.5);
      * img.display();
      * \endcode
@@ -1719,7 +1719,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * Derivate the input matrix in the following direction with the inverse scale parameter (alpha=2=low, alpha=0.5=high)
      * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Mat2RGBF32 gradx(img);
         gradx = Processing::gradientDeriche(gradx,0,1);//Calculate the gradient in the direction 0
         img = Processing::greylevelRange(gradx,0,255);//to display the matrix with a float type, the
@@ -1767,7 +1767,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * caculate the gradient magnitude following the Deriche's gradient (0.5=smooth gradient, 2=sharp gradient)
      * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         img = Processing::gradientMagnitudeDeriche(img,1);//Calculate the magnitude of Deriche gradient
         img.display();
      * \endcode
@@ -2087,7 +2087,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * The output labelled matrix is the minima of the input binary matrix such that each minumum has a specific label. This code is the swamping segmentation
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Mat2UI8 grad;
      * grad = Processing::gradientMagnitudeDeriche(img,1);
      * grad = Processing::dynamic(grad,5);//Vertical filter
@@ -2113,7 +2113,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * Watershed transformation on the topographic surface initialiased by the seeds withoutboundary
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Mat2UI8 grad;
      * grad = Processing::gradientMagnitudeDeriche(img,1);
      * grad = Processing::dynamic(grad,5);
@@ -2283,7 +2283,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Mat2UI8 grad;
      * grad = Processing::gradientMagnitudeDeriche(img,1);
      * grad = Processing::dynamic(grad,5);
@@ -2600,7 +2600,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  closing(f) = dilation(erosion(f))
           \code
         Mat2UI8 lena;
-        lena.load("../image/Lena.bmp");
+        lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Processing::closingRegionGrowing(lena,15,2).display();
         \endcode
         */
@@ -2619,7 +2619,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  opening(f) = erosion(dilation(f))
           \code
         Mat2UI8 lena;
-        lena.load("../image/Lena.bmp");
+        lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Processing::openingRegionGrowing(lena,15,2).display();
         \endcode
         */

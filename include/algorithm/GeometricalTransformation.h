@@ -20,7 +20,7 @@ namespace pop
 * - by creating the the geometrical transformation matrix following by its application (projective, affine, composition of transformations).
 \code
     Mat2UI8 m;
-    m.load("../image/Lena.bmp");
+    m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     MatNDisplay disp;
     Mat2x33F32 maffine2 = GeometricalTransformation::translation2DHomogeneousCoordinate(m.getDomain()/2);//go back to the buttom left corner (origin)
     maffine2 *= GeometricalTransformation::rotation2DHomogeneousCoordinate(0.1);//rotate
@@ -169,7 +169,7 @@ struct POP_EXPORTS GeometricalTransformation
     *
     * \code
     Mat2UI8 m;
-    m.load("../image/Lena.bmp");
+    m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     m=GeometricalTransformation::rotateMultPi_2(m,1);
     m.display();
     m.save("../doc/image2/lenarotpi2.png");
@@ -203,7 +203,7 @@ struct POP_EXPORTS GeometricalTransformation
     *
     * \code
         Mat2UI8 lena;
-        lena.load("../image/Lena.bmp");
+        lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         GeometricalTransformation::rotate( lena, PI/6).display();
     * \endcode
     * \image html lena.png
@@ -244,7 +244,7 @@ struct POP_EXPORTS GeometricalTransformation
     *
     * \code
     Mat2UI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     GeometricalTransformation::mirror( lena, 1).display();
     * \endcode
     * \image html lena.png
@@ -298,7 +298,7 @@ struct POP_EXPORTS GeometricalTransformation
     *
     * \code
     Mat2UI8 lena;
-    lena.load("../image/Lena.bmp");
+    lena.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     GeometricalTransformation::elasticDeformation( lena, 20, 8).display();
     * \endcode
     * \image html lenaED.png
@@ -586,7 +586,7 @@ struct POP_EXPORTS GeometricalTransformation
      *
      * \code
     Mat2RGBUI8 m;
-    m.load("../image/Lena.bmp");
+    m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Vec2F32 src[4];
     Vec2F32 dst[4];
     src[0]=Vec2F32(0,0);
@@ -657,7 +657,7 @@ struct POP_EXPORTS GeometricalTransformation
      *
      * \code
     Mat2RGBUI8 m;
-    m.load("../image/Lena.bmp");
+    m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Vec2F32 src[3];
     Vec2F32 dst[3];
     src[0]=Vec2F32(0,0);
@@ -715,7 +715,7 @@ struct POP_EXPORTS GeometricalTransformation
      *
      * \code
      * Mat2RGBUI8 m;
-     * m.load("../image/Lena.bmp");
+     * m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * Vec2F32 src[4];
      * Vec2F32 dst[4];
      * src[0]=Vec2F32(0,0);

@@ -55,7 +55,7 @@ The choice of the representation depends on the particular problem.
 For instance, the noise can be seen as fluctuation with a short length correlation. In the Fourier space, this noise corresponds to high frequency and it is removed easily with a low pass.
 \code
 Mat2UI8 img;//2d grey-level image object
-img.load("../image/Lena.bmp");//replace this path by those on your computer
+img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
 Mat2F32 noisemap;
 Distribution d(DistributionNormal(0,20));
 Processing::randomField(img.getDomain(),d,noisemap);

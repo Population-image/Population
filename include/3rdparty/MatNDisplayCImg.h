@@ -24,7 +24,7 @@ public:
      * As the implementation is similar to the class CImgDisplay,   for the documentation see http://cimg.sourceforge.net/reference/structcimg__library_1_1CImgDisplay.html .
      * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     MatNDisplay disp;
     while(1==1){
         img = Processing::erosion(img,1);

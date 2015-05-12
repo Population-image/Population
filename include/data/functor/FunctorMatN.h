@@ -582,7 +582,7 @@ struct POP_EXPORTS FunctorMatN
      * Smooth the input matrix with the inverse scale parameter (alpha=2=low, alpha=0.5=high)
      * \code
      * Mat2RGBUI8 img;
-     * img.load("../image/Lena.bmp");
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
      * img = Processing::smoothDeriche(img,0.5);
      * img.display();
      * \endcode
@@ -640,7 +640,7 @@ struct POP_EXPORTS FunctorMatN
      * Derivate the input matrix in the following direction with the inverse scale parameter (alpha=2=low, alpha=0.5=high)
      * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Mat2RGBF32 gradx(img);
         gradx = Processing::gradientDeriche(gradx,0,1);//Calculate the gradient in the direction 0
         img = Processing::greylevelRange(gradx,0,255);//to display the matrix with a float type, the

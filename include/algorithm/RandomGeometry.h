@@ -211,7 +211,7 @@ public:
     * The resulting point process is a hard-core point process with minimal inter-germ distance R. The following code presents an art application
     *  \code
         Mat2RGBUI8 img;
-        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
         F32 radius=10;
         Vec2F32 domain;
@@ -241,7 +241,7 @@ public:
     *  \code
     * //Initial field with a local porosity equal to img(x)/255
         Mat2RGBUI8 img;
-        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
         F32 radius=10;
         Vec2F32 domain;
@@ -271,7 +271,7 @@ public:
     * The resulting point process is the intersectionpoint process where each germ has a center x such that img(x) is not equal to zero
     *  \code
         Mat2RGBUI8 img;
-        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         img= GeometricalTransformation::scale(img,Vec2F32(1024./img.getDomain()(0)));
         F32 radius=15;
         Vec2F32 domain;
@@ -347,7 +347,7 @@ public:
     *
     * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Vec2F32 domain;
         domain= img.getDomain();
         ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
@@ -670,7 +670,7 @@ public:
     *
     * \code
         Mat2RGBUI8 img;
-        img.load("../image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Vec2F32 domain;
         domain= img.getDomain();
         ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process
@@ -706,7 +706,7 @@ public:
     *
     * \code
         Mat2RGBUI8 img;
-        img.load(std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp");
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         Vec2F32 domain;
         domain= img.getDomain();
         ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,0.1);//generate the 2d Poisson point process

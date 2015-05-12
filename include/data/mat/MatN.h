@@ -195,7 +195,7 @@ public:
     -  \a for: utilisation of the for statement. For instance, the erosion code is:
     \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");//load lena matrix
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//load lena matrix
     Mat2UI8 erosion(img.sizeI(),img.sizeJ());//construct an matrix with the same domain
     int radius=4;
     //Domain loop
@@ -221,7 +221,7 @@ public:
     the member \a x() returns the current element and the member \a init(const E & x)  initializes the neighborhood on the VecN x. For instance, the erosion code is:
     \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8 erosion(img.getDomain());//construct an matrix with the same domain
     Mat2UI8::IteratorEDomain itdomain(img.getIteratorEDomain());//Domain IteratorE
     Mat2UI8::IteratorENeighborhood itneigh (img.getIteratorENeighborhood(4,2));//Neighborhood IteratorE with the norm euclidean and the radius 4
@@ -238,7 +238,7 @@ public:
     -  \a ForEachNeighborhood idiom: implicit iteration defined by a preprocessor directive.. Note we do have to set the type of the point
     \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8 erosion(img.getDomain());//construct an matrix with the same domain
     ForEachDomain2D(x,img)
     {
@@ -309,7 +309,7 @@ public:
     we can write this code:
     \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Mat2UI8::F v =100;
     FunctorF::FunctorAdditionF2<UI8,UI8,UI8> op;
@@ -337,7 +337,7 @@ public:
     we can write this code:
     \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8 mask;
     mask.load("mask.pgm");
     Mat2UI8::IteratorEROI it(mask.getIteratorEROI());
@@ -373,7 +373,7 @@ public:
     we can write this code:
     \code
     Mat2RGBUI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2RGBUI8 img_erosion(img.getDomain());
     Mat2RGBUI8::IteratorEDomain it_total(img.getIteratorEDomain());
     F32 norm =2;
@@ -407,7 +407,7 @@ public:
 
      \code
     Mat2UI8 img2;
-    img2.load("../image/Lena.bmp");
+    img2.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorERectangle itrec = img2.getIteratorERectangle(Vec2I32(50,200),Vec2I32(500,300));
     Mat2UI8::IteratorENeighborhood itloc =img2.getIteratorENeighborhood(3,2);
     img2  = maximum(img2,ProcessingAdvanced::dilation(img2,itrec,itloc));
@@ -635,7 +635,7 @@ public:
     in 2D
     \code
     Mat3UI8 img2;
-    img2.load("../image/Lena.bmp");
+    img2.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8 img3 (img2,Vec2I32(300,200),Vec2I32(400,400));
     img3.display();
     \endcode
@@ -793,7 +793,7 @@ public:
     * access the reference of the pixel/voxel value at the given position
     * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
     FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
@@ -813,7 +813,7 @@ public:
     * access the reference of the pixel/voxel value at the given position
     * \code
     Mat2UI8 img;
-    img.load("../image/Lena.bmp");
+    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     Mat2UI8::IteratorEDomain it(img.getIteratorEDomain());
     Distribution d(0,20,"NORMAL");
     FunctorF::FunctorAdditionF2<Mat2UI8::F,F32,Mat2UI8::F> op;
@@ -1009,7 +1009,7 @@ public:
     * Display the matrix using the CIMG facility.
     * \code
     * Mat2UI8 img;
-    * img.load("../image/Lena.bmp");
+    * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     * img.display();
     * Mat2F32 gradx(img);
     * gradx = pop::Processing::gradientDeriche(gradx,0,0.5);
@@ -1069,7 +1069,7 @@ public:
     *
     * \code
     * Mat2UI8 img;
-    * img.load("../image/Lena.bmp");
+    * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
     * Mat2UI8 S(3,3);
     * S(1,1)=255;S(2,2)=255;
     * Mat2UI8::IteratorENeighborhood itn(img.getIteratorENeighborhood(S,20));
