@@ -39,6 +39,7 @@ in the Software.
 #include"data/typeF/TypeF.h"
 #include<algorithm>
 #include"data/vec/Vec.h"
+#include"data/vec/VecN.h"
 #include<queue>
 namespace pop
 {
@@ -96,7 +97,47 @@ public:
         return _domain;
     }
 };
+template<>
+class MatNIteratorEDomain<Vec2I32>
+{
+private:
+    Vec2I32 _domain;
+    Vec2I32 _x;
+public:
+    typedef Vec2I32  Domain;
 
+    MatNIteratorEDomain(const MatNIteratorEDomain& it)
+        :_domain(it.getDomain())
+    {
+        init();
+    }
+
+    MatNIteratorEDomain(const Vec2I32 & domain)
+        :    _domain(domain){init();}
+    void init(){
+        _x=0;_x(0)--;
+    }
+    bool next()
+    {
+        _x(0)++;
+        if(_x(0)==_domain(0)){
+            _x(1)++;
+            _x(0)=0;
+            if(_x(1)==_domain(1))
+                return false;
+
+        }
+        return true;
+    }
+    Vec2I32 & x()
+    {
+        return _x;
+    }
+    Vec2I32 getDomain()const
+    {
+        return _domain;
+    }
+};
 
 
 
@@ -469,7 +510,154 @@ public:
         return _x;
     }
 };
+template<>
+class MatNIteratorEOrder<Vec2I32>
+{
+private:
+    Vec2I32 _domain;
+    Vec2I32 _inverselooporder;
+    Vec2I32 _direction;
+    Vec2I32 _x;
+    int _e;
+    void initInverseLoopOrder(I32 lastloop)
+    {
+        _inverselooporder(0) = lastloop;
+        for(I32 i=0;i<2;i++)
+        {
 
+            if(i<lastloop)
+                _inverselooporder(i+1)=i;
+            else if(i>lastloop)
+                _inverselooporder(i)=i;
+
+        }
+    }
+    void check()
+    {
+        Vec2I32 check_value;
+        for(I32 i=0;i<2;i++)
+        {
+            check_value(i)=i;
+        }
+        for(I32 i=0;i<2;i++)
+        {
+            bool test=false;
+            for(I32 j=0;j<2;j++)
+            {
+                if(_inverselooporder(j)==check_value(i))
+                {
+                    test=true;
+                }
+            }
+            if(test==false)
+            {
+                std::cerr<<"Error in MatNIteratorEOrder\n Your looporder is not correct: "<<_inverselooporder<<std::endl;
+                _inverselooporder=check_value;
+                std::cerr<<"By default your looporder becomes "<<_inverselooporder<<std::endl;
+            }
+
+        }
+    }
+public:
+    typedef std::pair<Vec2I32,std::pair<Vec2I32,Vec2I32> >  Domain;
+    std::pair<Vec2I32,std::pair<Vec2I32,Vec2I32> > getDomain()const{
+        return std::make_pair(_domain,std::make_pair( _inverselooporder ,_direction ));
+    }
+    MatNIteratorEOrder(const MatNIteratorEOrder& it)
+        :    _domain(it.getDomain().first),_inverselooporder(it.getDomain().second.first),_direction(it.getDomain().second.second)
+    {
+    }
+    MatNIteratorEOrder(const Domain & domain)
+        :    _domain(domain.first),_inverselooporder(domain.second.first),_direction(domain.second.second)
+    {
+        init();
+    }
+
+    MatNIteratorEOrder(const Vec2I32 & domain,const Vec2I32 & inverselooporder,const Vec2I32 & direction )
+        :    _domain(domain),_inverselooporder(inverselooporder),_direction(direction)
+    {
+        init();
+    }
+    MatNIteratorEOrder(const Vec2I32 & domain,I32 lastloop,const Vec2I32 & direction )
+        :    _domain(domain),_direction(direction)
+    {
+        initInverseLoopOrder(lastloop);
+        init();
+    }
+
+    void setLastLoop(typename Vec2I32::E lastloop)
+    {
+        initInverseLoopOrder(lastloop);
+        init();
+    }
+
+    void setOrder(Vec2I32 order)
+    {
+        _inverselooporder=order;
+        init();
+    }
+
+    void setDirection(const Vec2I32 & direction)
+    {
+        _direction= direction;
+        init();
+    }
+    void init()
+    {
+        check();
+        for(I32 i=0;i<2;i++)
+        {
+            if(_direction(i)==-1)_x(i)=_domain(i)-1;
+            else
+            {
+                _direction(i)=1;
+                _x(i)=0;
+            }
+        }
+        _x(_inverselooporder(0))-=_direction(_inverselooporder(0));
+        _e=0;
+    }
+
+    I32 getBordeLenghtLastLoop()
+    {
+        if (_direction(_inverselooporder(_e))==1 )
+            return _x[_inverselooporder(_e)];
+        else
+            return _domain[_inverselooporder(_e)]-1 - _x[_inverselooporder(_e)];
+    }
+    typename Vec2I32::E getIndexLastLoop()
+    {
+        return _inverselooporder(0);
+    }
+    typename Vec2I32::E  getWayLastLoop()
+    {
+        return _direction(_inverselooporder(0));
+    }
+
+    bool next()
+    {
+        _x[_inverselooporder(0)]+=_direction(_inverselooporder(0));
+        if((_direction(_inverselooporder(0))==1 &&  _x[_inverselooporder(0)]==_domain[_inverselooporder(0)])||
+             (_direction(_inverselooporder(0))!=1 &&  _x[_inverselooporder(0)]==-1)
+                ){
+            _x[_inverselooporder(1)]+=_direction(_inverselooporder(1));
+            if(_direction(_inverselooporder(0))==1)
+                   _x[_inverselooporder(0)]=0;
+             else
+                _x[_inverselooporder(0)]=_domain[_inverselooporder(0)]-1;
+            if((_direction(_inverselooporder(1))==1 &&  _x[_inverselooporder(1)]==_domain[_inverselooporder(1)])||
+                 (_direction(_inverselooporder(1))!=1 &&  _x[_inverselooporder(1)]==-1)
+                    )
+                return false;
+
+        }
+        return true;
+    }
+    Vec2I32 & x()
+    {
+        return _x;
+    }
+};
 
 template<typename VecN>
 class MatNIteratorERectangle
