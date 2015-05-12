@@ -412,7 +412,7 @@ struct POP_EXPORTS Processing
             F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
             mean*=area_minus1;
 
-            F32 standartdeviation =(*_integral_power_2)(xadd1)+(*_integral_power_2)(xadd2)-(*_integral_power_2)(xsub1)-(*_integral_power_2)(xsub2);
+            F32 standartdeviation = static_cast<F32>((*_integral_power_2)(xadd1)+(*_integral_power_2)(xadd2)-(*_integral_power_2)(xsub1)-(*_integral_power_2)(xsub2));
             standartdeviation*=area_minus1;
             standartdeviation =standartdeviation-mean*mean;
 

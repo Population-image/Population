@@ -1209,13 +1209,14 @@ struct ProcessingAdvanced
     }
     static inline Mat2UI32 clusterToLabel(const Mat2UI8 & f,  Mat2UI8::IteratorENeighborhood  it,Mat2UI8::IteratorEDomain )
     {
+		std::cout << "VINCENT WAS THERE" << std::endl;
         Mat2UI32 map(f.getDomain());
         it.removeCenter();
         int cluster=0;
         std::queue<Vec2I32> v_list;
         Vec2I32 x;
-        for(x(0)=0;x(0)<f.sizeI();x(0)++){
-            for(x(1)=0;x(1)<f.sizeJ();x(1)++){
+        for(x(0)=0;x(0)<static_cast<pop::I32>(f.sizeI());x(0)++){
+            for(x(1)=0;x(1)<static_cast<pop::I32>(f.sizeJ());x(1)++){
                 if(f(x)>0&&map(x)==0){
                     cluster++;
                     v_list.push(x);
@@ -1250,9 +1251,9 @@ struct ProcessingAdvanced
         int cluster=0;
         std::queue<Vec3I32> v_list;
         Vec3I32 x;
-        for(x(0)=0;x(0)<f.sizeI();x(0)++){
-            for(x(1)=0;x(1)<f.sizeJ();x(1)++){
-                for(x(2)=0;x(2)<f.sizeK();x(2)++){
+        for(x(0)=0;x(0)<static_cast<pop::I32>(f.sizeI());x(0)++){
+            for(x(1)=0;x(1)<static_cast<pop::I32>(f.sizeJ());x(1)++){
+                for(x(2)=0;x(2)<static_cast<pop::I32>(f.sizeK());x(2)++){
                     if(f(x)>0&&map(x)==0){
                         cluster++;
                         v_list.push(x);
