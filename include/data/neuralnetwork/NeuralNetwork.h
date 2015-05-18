@@ -1097,6 +1097,23 @@ public:
     unsigned int _radius_kernel;
 };
 
+class NeuralLayerMatrixMergeConvolution : public NeuronSigmoid,public NeuralLayerMatrix
+{
+public:
+    NeuralLayerMatrixMergeConvolution(unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
+    void setTrainable(bool istrainable);
+    virtual void forwardCPU(const NeuralLayer& layer_previous);
+    virtual void backwardCPU(NeuralLayer& layer_previous);
+    void learn();
+    virtual NeuralLayer * clone();
+    VecF32 _W_kernel;
+    F32 _W_biais;
+    VecF32 _d_E_W_kernel;
+    F32 _d_E_W_biais;
+};
+
+
+
 class POP_EXPORTS NeuralNet
 {
 public:
@@ -1109,13 +1126,16 @@ public:
     void addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map);
     void addLayerLinearFullyConnected(unsigned int nbr_neurons);
     void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel);
-
+    void addLayerMatrixMergeConvolution();
     void setLearnableParameter(F32 mu);
 
     void setTrainable(bool istrainable);
     void learn();
     void forwardCPU(const VecF32& X_in,VecF32 & X_out);
 
+    std::pair<Vec2I32,int> getDomainMatrixInput()const;
+    std::pair<Vec2I32,int> getDomainMatrixOutput()const;
+    MatNReference<2,F32>&  getMatrixOutput(int map_index)const;
     VecF32 inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix);
 
     void backwardCPU(const VecF32 &X_expected);

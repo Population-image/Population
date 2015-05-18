@@ -667,10 +667,8 @@ struct POP_EXPORTS Analysis
     static  PixelType  maxValue(const MatN<DIM,PixelType> & f){
         FunctorF::FunctorAccumulatorMax<PixelType> func;
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
-         return func.getValue();
+        func = std::for_each (f.begin(), f.end(), func);
+        return func.getValue();
     }
 
     /*!
@@ -693,10 +691,8 @@ struct POP_EXPORTS Analysis
 
         FunctorF::FunctorAccumulatorMin<PixelType> func;
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
-         return func.getValue();
+        func = std::for_each (f.begin(), f.end(), func);
+        return func.getValue();
     }
     /*!
      * \brief return the mean value
@@ -717,10 +713,8 @@ struct POP_EXPORTS Analysis
     {
         FunctorF::FunctorAccumulatorMean<PixelType> func;
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
-         return func.getValue();
+        func = std::for_each (f.begin(), f.end(), func);
+        return func.getValue();
     }
     /*!
      * \brief return the standard deviation value
@@ -743,9 +737,7 @@ struct POP_EXPORTS Analysis
         F32 mean = meanValue(f);
         FunctorF::FunctorAccumulatorVariance<PixelType> func(mean);
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
+        func = std::for_each (f.begin(), f.end(), func);
         return std::sqrt(func.getValue());
     }
 
@@ -770,10 +762,8 @@ struct POP_EXPORTS Analysis
     {
         FunctorF::FunctorAccumulatorHistogram<Mat2F32> func;
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
-         return func.getValue();
+        func = std::for_each (f.begin(), f.end(), func);
+        return func.getValue();
     }
 
     /*!
@@ -797,10 +787,8 @@ struct POP_EXPORTS Analysis
     {
         FunctorF::FunctorAccumulatorHistogram<Mat2F32> func;
         func.init();
-        for(typename MatN<DIM,PixelType>::const_iterator it = f.begin();it!=f.end();++it){
-            func(*it);
-        }
-         return func.getValueNotNormalized();
+        func = std::for_each (f.begin(), f.end(), func);
+        return func.getValueNotNormalized();
     }
     /*!
      * \param f input matrixE
@@ -1181,7 +1169,7 @@ struct POP_EXPORTS Analysis
 
     template<int DIM>
     static Mat2F32 granulometryMatheron(const MatN<DIM,UI8> & bin, F32 norm ,MatN<DIM,UI8> & fgranulo){
-      FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
+        FunctorF::FunctorThreshold<UI8,UI8, UI8> func(1,NumericLimits<UI8>::maximumRange());
         MatN<DIM,UI8> bin2(bin.getDomain());
         fgranulo.resize(bin.getDomain());
 
@@ -1214,7 +1202,7 @@ struct POP_EXPORTS Analysis
             if(m.sizeI()>1&&m(m.sizeI()-1,1)>m(m.sizeI()-2,1))
                 m(m.sizeI()-1,1) =  m(m.sizeI()-2,1);
             m(m.sizeI()-1,2) =  m(m.sizeI()-2,1)-m(m.sizeI()-1,1);
-         radius++;
+            radius++;
 
         }
 
@@ -1285,7 +1273,7 @@ struct POP_EXPORTS Analysis
 
     template<int DIM>
     static MatN<DIM,UI8> medialAxis(const MatN<DIM,UI8> & bin,int norm=1){
-      MatN<DIM,UI8> bin_minus(bin.getDomain());
+        MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin_minus.getIteratorEDomain());
         while(it.next()){
             if(bin(it.x())!=0)
@@ -1311,7 +1299,7 @@ struct POP_EXPORTS Analysis
         int radius=0;
         while(isempty==false)
         {
-           it.init();
+            it.init();
             FunctorF::FunctorThreshold<UI8,UI8,UI8> func(radius+1,NumericLimits<UI8>::maximumRange());
             forEachFunctorUnaryF(distance,erosion,func);
 
@@ -1323,7 +1311,7 @@ struct POP_EXPORTS Analysis
             medial= maximum(medial,erosion);
             radius++;
         }
-      return medial;
+        return medial;
     }
 
 
@@ -1394,7 +1382,7 @@ struct POP_EXPORTS Analysis
     */
     template<int DIM>
     static Mat2F32 percolationErosion(const  MatN<DIM,UI8>   & bin,int norm=1){
-       MatN<DIM,UI8> bin_minus(bin.getDomain());
+        MatN<DIM,UI8> bin_minus(bin.getDomain());
         typename MatN<DIM,UI8>::IteratorEDomain it(bin.getIteratorEDomain());
         while(it.next()){
             if(bin(it.x())!=0)
@@ -1429,7 +1417,7 @@ struct POP_EXPORTS Analysis
             radius++;
 
         }
-       return m;
+        return m;
     }
 
     /*!
@@ -1481,8 +1469,8 @@ struct POP_EXPORTS Analysis
                 }
             }
             radius++;
-         }
-         return m;
+        }
+        return m;
     }
     /*!
      * \param bin input binary matrix
@@ -1499,7 +1487,7 @@ struct POP_EXPORTS Analysis
     */
     template<int DIM>
     static F32 eulerPoincare(const MatN<DIM,UI8> & bin ){
-            return AnalysisAdvanced::eulerPoincare(bin);
+        return AnalysisAdvanced::eulerPoincare(bin);
     }
     /*!
      * \param bin input binary matrix
@@ -1806,7 +1794,7 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-       return v;
+        return v;
 
 
     }
