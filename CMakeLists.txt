@@ -38,7 +38,7 @@ POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_WITH_C11        "build C11" On )
+POP_OPTION(BUILD_WITH_C11        "build C11" OFF )
 
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
