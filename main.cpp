@@ -104,6 +104,62 @@ std::pair<Mat2F32,Mat2F32> matrixOrientation(int i,int j,bool orientation){
 
 int main()
 {
+    {
+//        Mat2F32 f(2,3);
+//        f(0,0)=2;f(0,1)=5;f(0,2)=3;
+//        f(1,0)=1;f(1,1)=4;f(1,2)=1;
+
+//        Mat2F32 h(2,2);
+//        h(0,0)=1;h(0,1)=-1;
+//        h(1,0)=1;h(1,1)=1;
+
+
+
+
+
+//        int size_i_output=f.sizeI()+h.sizeI()-1;
+//        int size_j_output=f.sizeJ()+h.sizeJ()-1;
+
+//        h.resizeInformation(size_i_output,size_j_output);
+
+
+
+
+//        std::cout<<h<<std::endl;
+//        return 1;
+
+
+
+    }
+
+    {
+        NeuralNet net;
+        net.load("/home/vincent/DEV2/DEV/CVSA/bin/dictionaries/neuralnetwork.xml");
+        Mat2UI8 m("/home/vincent/Desktop/_.jpg");
+
+        VecF32 vin= net.inputMatrixToInputNeuron(m);
+        VecF32 vout;
+        auto start_global =  std::chrono::high_resolution_clock::now();
+        net.forwardCPU(vin,vout);
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+        VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
+        int label_max = std::distance(vout.begin(),itt);
+        std::cout<<label_max<<std::endl;
+        return 1;
+
+//        NeuralNet net;
+//        int size_windows=9;
+//        net.addLayerMatrixInput(size_windows,size_windows,1);
+
+
+
+
+//        net.add
+
+    }
+
+
     //    {
     //        NeuralNet net;
     //        net.addLayerMatrixInput(2,2,2);
