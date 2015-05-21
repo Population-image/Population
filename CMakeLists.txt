@@ -9,7 +9,7 @@ set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # ----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_WITH_C11        "build C11" On )
+POP_OPTION(BUILD_WITH_C11        "build C11" OFF )
 
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
