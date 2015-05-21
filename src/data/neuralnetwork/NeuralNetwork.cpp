@@ -1534,16 +1534,16 @@ void NeuralLayer::setLearnableParameter(F32 mu){
     _mu = mu;
 }
 NeuralLayerLinear::NeuralLayerLinear(unsigned int nbr_neurons)
-    :_Y(nbr_neurons),_X(nbr_neurons)
+    :__Y(nbr_neurons),__X(nbr_neurons)
 {
 }
-VecF32& NeuralLayerLinear::X(){return _X;}
-const VecF32& NeuralLayerLinear::X()const{return _X;}
+VecF32& NeuralLayerLinear::X(){return __X;}
+const VecF32& NeuralLayerLinear::X()const{return __X;}
 VecF32& NeuralLayerLinear::d_E_X(){return _d_E_X;}
 void NeuralLayerLinear::setTrainable(bool istrainable){
     if(istrainable==true){
-        this->_d_E_Y = this->_Y;
-        this->_d_E_X = this->_X;
+        this->_d_E_Y = this->__X;
+        this->_d_E_X = this->__X;
     }else{
         this->_d_E_Y.clear();
         this->_d_E_X.clear();
@@ -1553,9 +1553,9 @@ NeuralLayerMatrix::NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsig
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
     for(int i=0;i<nbr_map;i++){
-        MatNReference<2,F32> m(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i);
-        _Y_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_Y.data()+sizei*sizej*i));
-        _X_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->_X.data()+sizei*sizej*i));
+        MatNReference<2,F32> m(Vec2I32(sizei, sizej),this->__Y.data()+sizei*sizej*i);
+        _Y_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->__Y.data()+sizei*sizej*i));
+        _X_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->__X.data()+sizei*sizej*i));
 
     }
 }
@@ -1600,17 +1600,17 @@ void NeuralLayerLinearFullyConnected::setTrainable(bool istrainable){
 
 void NeuralLayerLinearFullyConnected::forwardCPU(const NeuralLayer& layer_previous){
     std::copy(layer_previous.X().begin(),layer_previous.X().end(),this->_X_biais.begin());
-    this->_Y = this->_W * this->_X_biais;
-    for(unsigned int i=0;i<_Y.size();i++){
-        this->_X(i) = NeuronSigmoid::activation(this->_Y(i));
+    this->__Y = this->_W * this->_X_biais;
+    for(unsigned int i=0;i<__Y.size();i++){
+        this->__X(i) = NeuronSigmoid::activation(this->__Y(i));
     }
 
 }
 void NeuralLayerLinearFullyConnected::backwardCPU(NeuralLayer& layer_previous){
 
     VecF32& d_E_X_previous= layer_previous.d_E_X();
-    for(unsigned int i=0;i<this->_Y.size();i++){
-        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->_X(i));
+    for(unsigned int i=0;i<this->__Y.size();i++){
+        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->__X(i));
     }
 
     //TODO ADD THE ERROR
@@ -1691,14 +1691,14 @@ void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer
             }
         }
     }
-    for(unsigned int i=0;i<_Y.size();i++){
-        this->_X(i) = NeuronSigmoid::activation(this->_Y(i));
+    for(unsigned int i=0;i<__Y.size();i++){
+        this->__X(i) = NeuronSigmoid::activation(this->__Y(i));
     }
 
 }
 void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_previous){
-    for(unsigned int i=0;i<this->_Y.size();i++){
-        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->_X(i));
+    for(unsigned int i=0;i<this->__Y.size();i++){
+        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->__X(i));
     }
 
     //TODO not reset
@@ -1760,8 +1760,8 @@ NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
     layer->_Y_reference.clear();
     layer->_X_reference.clear();
     for(unsigned int i=0;i<this->X_map().size();i++){
-        layer->_Y_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
-        layer->_X_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_Y_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->__Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_X_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->__X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
     }
     return layer;
 }
@@ -1800,14 +1800,14 @@ void NeuralLayerMatrixMergeConvolution::forwardCPU(const NeuralLayer& layer_prev
             }
         }
     }
-    for(unsigned int i=0;i<_Y.size();i++){
-        this->_X(i) = NeuronSigmoid::activation(this->_Y(i));
+    for(unsigned int i=0;i<__Y.size();i++){
+        this->__X(i) = NeuronSigmoid::activation(this->__Y(i));
     }
 
 }
 void NeuralLayerMatrixMergeConvolution::backwardCPU(NeuralLayer& layer_previous){
-    for(unsigned int i=0;i<this->_Y.size();i++){
-        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->_X(i));
+    for(unsigned int i=0;i<this->__Y.size();i++){
+        this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->__X(i));
     }
 
     //TODO not reset
@@ -1847,8 +1847,8 @@ NeuralLayer * NeuralLayerMatrixMergeConvolution::clone(){
     layer->_Y_reference.clear();
     layer->_X_reference.clear();
     for(unsigned int i=0;i<this->X_map().size();i++){
-        layer->_Y_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
-        layer->_X_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->_X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_Y_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->__Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_X_reference.push_back(MatNReference<2,F32>(this->X_map()(0).getDomain(),layer->__X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
     }
     return layer;
 }

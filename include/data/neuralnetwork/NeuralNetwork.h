@@ -1017,8 +1017,8 @@ struct NeuralLayerLinear : public NeuralLayer
     VecF32& d_E_X();
     virtual void setTrainable(bool istrainable);
 
-    VecF32 _Y;
-    VecF32 _X;
+    VecF32 __Y;
+    VecF32 __X;
     VecF32 _d_E_Y;
     VecF32 _d_E_X;
 };

@@ -1,6 +1,8 @@
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
-#include"chrono"
+#if __cplusplus > 199711L // c++11
+#include <chrono>
+#endif
 #include<map>
 VecF32 normalizedImageToNeuralNet( const Mat2UI8& f,Vec2I32 domain ,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR) {
     F32 mean     = Analysis::meanValue(f);
@@ -85,8 +87,8 @@ std::pair<Mat2F32,Mat2F32> matrixOrientation(int i,int j,bool orientation){
     //    std::cout<<m_out_expected<<std::endl;
 
     Mat2F32 m_in(7,7);
-    for(unsigned int i=0;i<m_in.size();i++){
-        m_in(i)=-1;//(i%2)*2.-1;
+    for(unsigned int l=0;l<m_in.size();l++){
+        m_in(l)=-1;//(i%2)*2.-1;
     }
     for( int k=-1;k<=1;k++){
         if(orientation==true)
@@ -198,7 +200,7 @@ int main()
 
         net.addLayerMatrixConvolutionSubScaling(2,1,1);
         net.addLayerMatrixConvolutionSubScaling(4,1,1);
-//        net.addLayerMatrixConvolutionSubScaling(20,1,1);
+        //        net.addLayerMatrixConvolutionSubScaling(20,1,1);
         net.addLayerMatrixMergeConvolution();
         {
             Mat2F32 m(7,7);
@@ -210,9 +212,9 @@ int main()
             std::cout<<net.getMatrixOutput(0)<<std::endl;
             m.fill(-1);
             m(1,4)=1;m(2,4)=1;m(3,4)=1;
-//            m(3,1)=1;
-//            m(3,2)=1;
-//            m(3,3)=1;
+            //            m(3,1)=1;
+            //            m(3,2)=1;
+            //            m(3,3)=1;
             std::cout<<m<<std::endl;
             net.forwardCPU(m,v_out);
             std::cout<<net.getMatrixOutput(0)<<std::endl;
@@ -292,7 +294,6 @@ int main()
 
         //        std::cout<<v_out<<std::endl;
 
-
         return 1;
     }
 
@@ -327,30 +328,43 @@ int main()
     v_in = normalizedImageToNeuralNet(plate,domain);
 
     VecF32 v_out;
-    auto start_global= std::chrono::high_resolution_clock::now();
-    net.setTrainable(true);
-    net.setLearnableParameter(0.001);
-    F32 sum=0;
-    for(unsigned int i=0;i<20;i++){
-        net.forwardCPU(v_in,v_out);
-        sum=0;
-        for(unsigned int j=0;j<v_out.size();j++){
-            sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
+    for(unsigned int i=0;i<100;i++){
+#if __cplusplus > 199711L // c++11
+        auto start_global = std::chrono::high_resolution_clock::now();
+#else
+        unsigned int start_global = time(NULL);
+#endif
+        net.setTrainable(true);
+        net.setLearnableParameter(0.001);
+        F32 sum=0;
+        for(unsigned int i=0;i<20;i++){
+            net.forwardCPU(v_in,v_out);
+            sum=0;
+            for(unsigned int j=0;j<v_out.size();j++){
+                sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
+            }
+            std::cout<<sum<<std::endl;
+            net.backwardCPU(v_out_expected);
+            net.learn();
+            net.forwardCPU(v_in,v_out);
+            sum=0;
+            for(unsigned int j=0;j<v_out.size();j++){
+                sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
+            }
+            std::cout<<sum<<std::endl;
         }
-        std::cout<<sum<<std::endl;
-        net.backwardCPU(v_out_expected);
-        net.learn();
-        net.forwardCPU(v_in,v_out);
-        sum=0;
-        for(unsigned int j=0;j<v_out.size();j++){
-            sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
-        }
-        std::cout<<sum<<std::endl;
+        displayOutput(v_out,domain_out).display();
+#if __cplusplus > 199711L // c++11
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+#else
+        unsigned int end_global = time(NULL);
+        std::cout << "processing: " << (start_global-end_global) << "s" << std::endl;
+#endif
+        return 1;
     }
-    displayOutput(v_out,domain_out).display();
-    auto end_global= std::chrono::high_resolution_clock::now();
-    std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
-    return 1;
+
+    //        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
 
 
     //    omp_set_num_threads(6);
@@ -381,5 +395,6 @@ int main()
     //    threshold.save("iexthreshold.pgm");
     //    Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
     //    color.display();
+
     return 0;
 }
