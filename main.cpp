@@ -1,6 +1,8 @@
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
-#include"chrono"
+#if __cplusplus > 199711L // c++11
+#include <chrono>
+#endif
 #include<map>
 
 //UI32 minValue(const std::vector<UI32> & v_values, int index_in){
@@ -38,16 +40,16 @@ int main()
 {
     {
         Mat2UI8 m(5,5);//
-//        Mat2UI8::IteratorEOrder it_order=m.getIteratorEOrder(1,1);
-//        while(it_order.next()){
-//            std::cout<<it_order.x()<<std::endl;
-//        }
-//        return 1;
-//        Mat2UI8::IteratorEDomain it = m.getIteratorEDomain();
-//        while(it.next()){
-//            std::cout<<it.x()<<std::endl;
-//        }
-//        return 0;
+        //        Mat2UI8::IteratorEOrder it_order=m.getIteratorEOrder(1,1);
+        //        while(it_order.next()){
+        //            std::cout<<it_order.x()<<std::endl;
+        //        }
+        //        return 1;
+        //        Mat2UI8::IteratorEDomain it = m.getIteratorEDomain();
+        //        while(it.next()){
+        //            std::cout<<it.x()<<std::endl;
+        //        }
+        //        return 0;
 
         //    m(0,0)=1;m(0,1)=1;m(0,2)=1;
         //    m(1,0)=1;m(1,1)=1;m(1,2)=1;
@@ -56,22 +58,39 @@ int main()
 
         m(4,0)=1;m(4,1)=1;m(4,2)=1;m(4,3)=1;m(4,4)=1;
 
-
         m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
         m = Processing::threshold(m,120);
-        auto start_global= std::chrono::high_resolution_clock::now();
+#if __cplusplus > 199711L // c++11
+        auto start_global = std::chrono::high_resolution_clock::now();
+#else
+        unsigned int start_global = time(NULL);
+#endif
         ProcessingAdvanced::clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEOrder(0,1));
-//        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
+        //        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
+#if __cplusplus > 199711L // c++11
         auto end_global= std::chrono::high_resolution_clock::now();
         std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+#else
+        unsigned int end_global = time(NULL);
+        std::cout << "processing: " << (start_global-end_global) << "s" << std::endl;
+#endif
 
-         start_global= std::chrono::high_resolution_clock::now();
+#if __cplusplus > 199711L // c++11
+        start_global= std::chrono::high_resolution_clock::now();
+#else
+        start_global = time(NULL);
+#endif
         Processing::clusterToLabel(m);
-         end_global= std::chrono::high_resolution_clock::now();
+#if __cplusplus > 199711L // c++11
+        auto end_global= std::chrono::high_resolution_clock::now();
         std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+#else
+        start_global = time(NULL);
+        std::cout << "processing: " << (start_global-end_global) << "s" << std::endl;
+#endif
 
 
-//        Visualization::labelToRandomRGB().display();
+        //        Visualization::labelToRandomRGB().display();
         //    m = Processing::threshold(m,120);
         //    m.display();
         //    std::cout<<clusterToLabel(m)<<std::endl;
@@ -119,13 +138,24 @@ int main()
     //    }
 
     VecF32 v_out;
-    auto start_global= std::chrono::high_resolution_clock::now();
+#if __cplusplus > 199711L // c++11
+    auto start_global = std::chrono::high_resolution_clock::now();
+#else
+    unsigned int start_global = time(NULL);
+#endif
     for(unsigned int i=0;i<100;i++){
         net.forwardCPU(v_in,v_out);
     }
+#if __cplusplus > 199711L // c++11
     auto end_global= std::chrono::high_resolution_clock::now();
     std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+#else
+    unsigned int end_global = time(NULL);
+    std::cout << "processing: " << (start_global-end_global) << "s" << std::endl;
+#endif
     return 1;
+
+    //        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
 
 
     //    omp_set_num_threads(6);
