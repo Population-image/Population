@@ -33,13 +33,12 @@ bool BasicUtility::String2Any(std::string s,  bool & Dest ){
     }
     return true;
 }
+bool BasicUtility::String2Any(std::string s,  F32 & Dest ){
+		Dest = atof(s.c_str());
+		return true;
+}
 bool BasicUtility::Any2String(bool Value,  std::string & s){
-    if(Value){
-        s="true";
-    }
-    else{
-        s="false";
-    }
+    s = (Value ? "true" : "false");
     return true;
 }
 std::string BasicUtility::Any2String(bool Value){
@@ -70,8 +69,6 @@ std::string BasicUtility::IntFixedDigit2String(unsigned int value,int digitnumbe
     return s;
 }
 std::string BasicUtility::getline(std::istream& in,std::string del){
-
-
     std::string str;
     std::string temp;
     int index=0;
