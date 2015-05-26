@@ -171,9 +171,10 @@ ENDIF(FFMPEG_INCLUDE_DIR)
 
 
 if(HAVE_FFMPEG)
-set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${FFMPEG_LIBRARIES})
+    set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${FFMPEG_LIBRARIES})
+   message(STATUS "FFMPEG FOUND")
 else()
-message(ERROR " FFMPEG not found! Install FFMPEG. In ubuntu sudo apt-get install ffmpeg")
+    message(STATUS "FFMPEG NOT FOUND (In ubuntu sudo apt-get install ffmpeg)")
 endif()
 
 endif(WITH_FFMPEG)

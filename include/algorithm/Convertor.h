@@ -35,7 +35,7 @@ struct POP_EXPORTS Convertor
         \author Tariel Vincent
     */
     template<int DIM,typename TypeRGBChannel>
-    static  void fromRGBToHSL(const pop::MatN<DIM,RGB<TypeRGBChannel> > & fRGB, MatN<DIM,TypeRGBChannel>& img_H, MatN<DIM,TypeRGBChannel> & img_S, MatN<DIM,TypeRGBChannel> & img_L)
+    static  void toHSL(const pop::MatN<DIM,RGB<TypeRGBChannel> > & fRGB, MatN<DIM,TypeRGBChannel>& img_H, MatN<DIM,TypeRGBChannel> & img_S, MatN<DIM,TypeRGBChannel> & img_L)
     {
         img_H.resize(fRGB.getDomain());
         img_S.resize(fRGB.getDomain());

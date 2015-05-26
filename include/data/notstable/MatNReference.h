@@ -972,13 +972,13 @@ typename MatNReference<Dim,PixelType>::IteratorENeighborhoodAmoebas MatNReferenc
 template<int Dim, typename PixelType>
 MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator=(PixelType value)
 {
-    std::fill (this->begin(),this->end(),value);
+   std::fill (this->_data,this->_data+_domain.multCoordinate(),value);
     return *this;
 }
 template<int Dim, typename PixelType>
 MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::fill(PixelType value)
 {
-    std::fill (this->begin(),this->end(),value);
+    std::fill (this->_data,this->_data+_domain.multCoordinate(),value);
     return *this;
 }
 template<int Dim, typename PixelType>

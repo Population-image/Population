@@ -1,5 +1,5 @@
 if(NOT WITH_OPENMP)
-    message(STATUS "Not paralization with OPENMP")
+    message(STATUS "OPENMP NOT")
     return()
 endif()
 find_package(OpenMP)

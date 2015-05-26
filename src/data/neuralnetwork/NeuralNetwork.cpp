@@ -1671,25 +1671,48 @@ void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer
 #if defined(HAVE_OPENMP)
 #pragma omp parallel for
 #endif
-        for( int index_map=0;index_map<static_cast<int>(this->_Y_reference.size());index_map++){
-            MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
-            int index_start_kernel = index_map*neural_matrix->X_map().size();
-            for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
-                for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
-                    F32 sum=0;
-                    //convolution
-                    for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
-                        sum+=_W_biais[ index_map_previous + index_start_kernel];
-                        for(unsigned int i=0,index_kernel_ij=0,index_map = (i_map_previous-_radius_kernel)*neural_matrix->X_map()(0).sizeJ()+(j_map_previous-_radius_kernel);i<_W_kernels(0).sizeI();i++,index_map+=(neural_matrix->X_map()(0).sizeJ()-_W_kernels(0).sizeJ())){
-                            for(unsigned int j=0;j<_W_kernels(0).sizeJ();j++,index_map++,index_kernel_ij++){
-                                sum+=_W_kernels(index_map_previous + index_start_kernel)(index_kernel_ij)*neural_matrix->X_map()(index_map_previous)(index_map);
+
+//        for( int index_map=0;index_map<static_cast<int>(this->_Y_reference.size());index_map++){
+//            MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
+//            map_out.fill(0);
+//            for(unsigned int index_map_previous=0;index_map_previous< neural_matrix->X_map().size();index_map_previous++){
+//                Mat2F32 &kernel = _W_kernels[index_map*neural_matrix->X_map().size()+index_map_previous];
+//                const MatNReference<2,F32>& map_in = neural_matrix->X_map()(index_map_previous);
+//                //for all point of the output matrix
+//                for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+//                    for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+//                        //to the convolutuon
+//                        F32 sum=0;
+//                        for(unsigned int index_kernel_i=0,index_map = (i_map_previous-_radius_kernel)*neural_matrix->X_map()(0).sizeJ()+(j_map_previous-_radius_kernel);index_kernel_i<kernel.sizeI();index_kernel_i++,index_map+=(neural_matrix->X_map()(0).sizeJ()-kernel.sizeJ())){
+//                            sum = std::inner_product(kernel.begin()+index_kernel_i*kernel.sizeJ(),kernel.begin()+index_kernel_i*(kernel.sizeJ()+1),map_in.data()+index_map,sum);
+//                        }
+//                        map_out(i_map_next,j_map_next)=sum+_W_biais[ index_map*neural_matrix->X_map().size()+index_map_previous ];
+//                    }
+//                }
+
+
+//            }
+//        }
+                for( int index_map=0;index_map<static_cast<int>(this->_Y_reference.size());index_map++){
+                    MatNReference<2,F32> &map_out =  this->_Y_reference[index_map];
+                    int index_start_kernel = index_map*neural_matrix->X_map().size();
+                    for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
+                        for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
+                            F32 sum=0;
+                            //convolution
+                            for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                                sum+=_W_biais[ index_map_previous + index_start_kernel];
+                                for(unsigned int i=0,index_kernel_ij=0,index_map = (i_map_previous-_radius_kernel)*neural_matrix->X_map()(0).sizeJ()+(j_map_previous-_radius_kernel);i<_W_kernels(0).sizeI();i++,index_map+=(neural_matrix->X_map()(0).sizeJ()-_W_kernels(0).sizeJ())){
+                                    for(unsigned int j=0;j<_W_kernels(0).sizeJ();j++,index_map++,index_kernel_ij++){
+                                        sum+=_W_kernels(index_map_previous + index_start_kernel)(index_kernel_ij)*neural_matrix->X_map()(index_map_previous)(index_map);
+                                    }
+                                }
                             }
+                            map_out(i_map_next,j_map_next)=sum;
                         }
                     }
-                    map_out(i_map_next,j_map_next)=sum;
                 }
-            }
-        }
+
     }
     for(unsigned int i=0;i<__Y.size();i++){
         this->__X(i) = NeuronSigmoid::activation(this->__Y(i));
@@ -1776,7 +1799,7 @@ NeuralLayerMatrixMergeConvolution::NeuralLayerMatrixMergeConvolution(unsigned in
         _W_kernel(i)=0.4;
         //_W_kernel(i)=n.randomVariable();
     }
-//    _W_biais=n.randomVariable();
+    //    _W_biais=n.randomVariable();
     _W_biais=0;
 }
 void NeuralLayerMatrixMergeConvolution::setTrainable(bool istrainable){

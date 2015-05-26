@@ -419,7 +419,7 @@ struct POP_EXPORTS Processing
             if(standartdeviation>0)
                 standartdeviation = std::sqrt( standartdeviation);
             else
-                standartdeviation =1;
+                return  0;
             if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+_k*standartdeviation)-_offset_value)
                 return 255;
             else

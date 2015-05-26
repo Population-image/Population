@@ -141,10 +141,15 @@ int main()
 
         VecF32 vin= net.inputMatrixToInputNeuron(m);
         VecF32 vout;
-        auto start_global =  std::chrono::high_resolution_clock::now();
-        net.forwardCPU(vin,vout);
+        int number_iteration = 10000;
+        auto start_global =  std::chrono::high_resolution_clock::now();{
+        for(unsigned int i=0;i<number_iteration;i++)
+            net.forwardCPU(vin,vout);
+//            vin(0)=vout(0);
+        }
+        std::cout<<vout<<std::endl;
         auto end_global= std::chrono::high_resolution_clock::now();
-        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
         VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
         int label_max = std::distance(vout.begin(),itt);
         std::cout<<label_max<<std::endl;

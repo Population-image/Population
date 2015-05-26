@@ -522,7 +522,9 @@ public:
     * \sa http://en.wikipedia.org/wiki/YUV
     *
     */
-    void toHSL(F32& h,F32& s,F32& l)const{
+    template<typename Type1>
+    void toHSL(Type1& hh,Type1& ss,Type1& ll)const{
+        F32 h,s,l;
         F32 Max_value= pop::NumericLimits<ChannelType>::maximumRange();
         F32 var_R, var_G, var_B , var_min, var_max, var_delta;
 
@@ -587,6 +589,9 @@ public:
                 h -= Max_value;
             }
         }
+        hh =pop::ArithmeticsSaturation<Type1,F32 >::Range(h*pop::NumericLimits<ChannelType>::maximumRange());
+        ll =pop::ArithmeticsSaturation<Type1,F32 >::Range(l*pop::NumericLimits<ChannelType>::maximumRange());
+        ss =pop::ArithmeticsSaturation<Type1,F32 >::Range(s*pop::NumericLimits<ChannelType>::maximumRange());
     }
 
 
