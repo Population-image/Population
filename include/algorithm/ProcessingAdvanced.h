@@ -93,25 +93,35 @@ struct ProcessingAdvanced
     template<typename PixelType>
     static MatN<2,PixelType>  integral(const MatN<2,PixelType> & f)
     {
-        MatN<2,PixelType> s (f.getDomain());
         MatN<2,PixelType> out(f.getDomain());
 
 #if defined(HAVE_OPENMP)
+        MatN<2,PixelType> s (f.getDomain());
+
 #pragma omp parallel for
-#endif
         for(int i=0;i<f.getDomain()(0);i++){
-            for(int j=0;j<f.getDomain()(1);j++){
-                s(i,j)=f(i,j) + (j==0?0:s(i,j-1));
+            s(i,0)=f(i,0);
+            for(int j=1;j<f.getDomain()(1);j++){
+                s(i,j)=f(i,j) + s(i,j-1);
             }
         }
-#if defined(HAVE_OPENMP)
 #pragma omp parallel for
-#endif
         for(int j=0;j<f.getDomain()(1);j++){
-            for(int i=0;i<f.getDomain()(0);i++){
-                out(i,j)=s(i,j) + (i==0?0:out(i-1,j));
+            out(0,j)=s(0,j);
+            for(int i=1;i<f.getDomain()(0);i++){
+                out(i,j)=s(i,j) + out(i-1,j);
             }
         }
+#else
+        for(int i=0;i<out.getDomain()(0);i++){
+            for(int j=0;j<out.getDomain()(1);j++){
+                PixelType a = (i>0?out(i-1, j):0);
+                PixelType b = (j>0?out(i, j-1):0);
+                PixelType c = (i>0&&j>0?out(i-1, j-1):0);
+                out(i, j) = f(i, j) + a + b - c;
+            }
+        }
+#endif
 
         return out;
     }
