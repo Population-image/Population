@@ -692,7 +692,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXCONVOLUTIONNAL2"){
@@ -713,7 +713,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXSUBSALE"){
@@ -735,7 +735,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
                 }
             }else if(type=="NNLayer::MATRIXMAXPOOLING"){
@@ -761,7 +761,7 @@ void NeuralNetworkFeedForward::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<layer->_weights.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     layer->_weights[index_weight]->_Wn = weight;
                 }
             }
@@ -2066,7 +2066,7 @@ void NeuralNet::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<neural_matrix->_W_biais.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream_biais, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     neural_matrix->_W_biais[index_weight]=weight;
                 }
                 std::istringstream stream_kernel(str_kernel);
@@ -2074,7 +2074,7 @@ void NeuralNet::load(XMLDocument &doc)
                     for(unsigned int index_weight_j=0;index_weight_j<neural_matrix->_W_kernels(index_weight).size();index_weight_j++){
                         F32 weight ;
                         str = pop::BasicUtility::getline( stream_kernel, ";" );
-                        pop::BasicUtility::String2Any(str,weight );
+                        pop::BasicUtility::String2Float(str,weight );
                         neural_matrix->_W_kernels(index_weight)(index_weight_j)=weight;
                     }
                 }
@@ -2090,7 +2090,7 @@ void NeuralNet::load(XMLDocument &doc)
                 for(unsigned int index_weight=0;index_weight<neural_linear->_W.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream, ";" );
-                    pop::BasicUtility::String2Any(str,weight );
+                    pop::BasicUtility::String2Float(str,weight );
                     neural_linear->_W[index_weight] = weight;
                 }
             }
