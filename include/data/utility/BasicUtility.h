@@ -208,7 +208,7 @@ public:
         return iss >> Dest != 0;
     }
     static bool String2Any(std::string s,  bool & Dest );
-    static bool String2Any(std::string s,  F32 & Dest );
+    static bool String2Float(std::string s,  F32 & Dest);
     /*!
     \brief convert a string representing an hexadecimal number to any type
     \param s input string (the 0x prefix is optional)

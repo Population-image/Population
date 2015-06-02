@@ -25,17 +25,13 @@
 namespace pop
 {
 bool BasicUtility::String2Any(std::string s,  bool & Dest ){
-    if(s=="true"){
-        Dest=true;
-    }
-    else{
-        Dest=false;
-    }
+    Dest = (s=="true");
     return true;
 }
-bool BasicUtility::String2Any(std::string s,  F32 & Dest ){
-		Dest = atof(s.c_str());
-		return true;
+bool BasicUtility::String2Float(std::string s,  F32 & Dest ){
+    std::cout << "reading a float: " << s << std::endl;
+    Dest = atof(s.c_str());
+    return true;
 }
 bool BasicUtility::Any2String(bool Value,  std::string & s){
     s = (Value ? "true" : "false");
