@@ -29,7 +29,6 @@ bool BasicUtility::String2Any(std::string s,  bool & Dest ){
     return true;
 }
 bool BasicUtility::String2Float(std::string s,  F32 & Dest ){
-    std::cout << "reading a float: " << s << std::endl;
     Dest = atof(s.c_str());
     return true;
 }

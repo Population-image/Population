@@ -1552,7 +1552,7 @@ void NeuralLayerLinear::setTrainable(bool istrainable){
 NeuralLayerMatrix::NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
-    for(int i=0;i<nbr_map;i++){
+    for(unsigned int i=0;i<nbr_map;i++){
         MatNReference<2,F32> m(Vec2I32(sizei, sizej),this->__Y.data()+sizei*sizej*i);
         _Y_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->__Y.data()+sizei*sizej*i));
         _X_reference.push_back(MatNReference<2,F32>(Vec2I32(sizei, sizej),this->__X.data()+sizei*sizej*i));
