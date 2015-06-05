@@ -937,7 +937,7 @@ __global__ void gpu_propagateFront_convolution(struct neural_network *network, i
 				v += start_previous_map[(n+i*layer._sub_resolution_factor)*prev_layer._sizej_map + m+j*layer._sub_resolution_factor] * start_kernel[n*layer._sizej_kernel+m];
 			}
 		}
-		start_map[i*layer._sizej_map+j] = v + start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
+		start_map[i*layer._sizej_map+j] += v + start_kernel[layer._sizei_kernel*layer._sizej_kernel]; // bias neuron
 	}
 }
 
