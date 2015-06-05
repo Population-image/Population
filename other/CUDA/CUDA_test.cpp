@@ -3,7 +3,7 @@
 #include "popconfig.h"
 #include "popcuda.h"
 #include "cuda_test.h"
-#include "c_neural_net.h"
+#include "neural_net_test.h"
 
 int main(void) {
 #if defined(HAVE_CUDA)

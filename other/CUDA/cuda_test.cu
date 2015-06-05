@@ -926,9 +926,9 @@ void test_convolution(void) {
 	out_gpu.save("/home/pl/workspace/Population/image/NYC-gpu.jpg");
 #endif
 
+#if 0
 	bool cpu = false;
 
-#if 0
 	std::cout << "Test convolution on " << (cpu ? "CPU" : "GPU") << std::endl;
 	std::cout << std::endl;
 
