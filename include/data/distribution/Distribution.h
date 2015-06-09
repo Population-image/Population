@@ -163,7 +163,7 @@ public:
     *  clone pattern
     */
     virtual Distribution * clone()const=0 ;
-    void display(F32 xmin,F32 xmax)const;
+    void display(F32 xmin=0,F32 xmax=255)const;
 };
 
 

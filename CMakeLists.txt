@@ -9,7 +9,7 @@ set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # ----------------------------------------------------------------------------
@@ -50,9 +50,23 @@ set(POPULATION_CMAKE_DIR  CMake CACHE PATH  "Installation directory for CMake fi
 set(POPULATION_LIB_NAME population CACHE PATH  "Installation lib name")
 set(POPULATION_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}/include" CACHE PATH "Include directory")
 
+if (FFTW_INCLUDES)
+  # Already in cache, be silent
+  set (FFTW_FIND_QUIETLY TRUE)
+endif (FFTW_INCLUDES)
 
+find_path (FFTW_INCLUDES fftw3.h)
 
+find_library (FFTW_LIBRARIES NAMES fftw3)
 
+# handle the QUIETLY and REQUIRED arguments and set FFTW_FOUND to TRUE if
+# all listed variables are TRUE
+include (FindPackageHandleStandardArgs)
+find_package_handle_standard_args (FFTW DEFAULT_MSG FFTW_LIBRARIES FFTW_INCLUDES)
+
+mark_as_advanced (FFTW_LIBRARIES FFTW_INCLUDES)
+message(STATUS ${FFTW_LIBRARIES})
+set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${FFTW_LIBRARIES} )
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)

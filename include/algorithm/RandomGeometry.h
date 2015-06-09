@@ -1889,7 +1889,7 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(Mat2F32 correlation,
     DistributionExpression f_beta(str_cummulative_gausssian);
     F32 beta= Statistics::maxRangeIntegral(f_beta,1-correlation(0,1),-4,4,0.001);
 
-    correlation = Representation::truncateMulitple2(correlation);
+    Representation::truncatePower2(correlation,correlation);
     MatN<1,F32> autocorrelation;
     autocorrelation.resize(VecN<1,int>(correlation.sizeI()));
     for(unsigned int i= 0; i<autocorrelation.size();i++){
@@ -1918,14 +1918,14 @@ MatN<DIM,UI8> RandomGeometry::gaussianThesholdedRandomField(Mat2F32 correlation,
     }
     MatN<1,ComplexF32> rhocomplex;
     Convertor::fromRealImaginary(rho,rhocomplex);
-    MatN<1,ComplexF32> fft = Representation::FFT(rhocomplex,1);
+    MatN<1,ComplexF32> fft = Representation::FFT(rhocomplex,FFT_FORWARD);
     for(unsigned int i=0;i<fft.size();i++){
         if(fft(i).real()>0)
             fft(i).real()=sqrt(fft(i).real());
         else
             fft(i).real()=-sqrt(-fft(i).real());
     }
-    MatN<1,ComplexF32> weigh= Representation::FFT(fft,0);
+    MatN<1,ComplexF32> weigh= Representation::FFT(fft,FFT_BACKWARD);
     double sum2=0;
     int size=200;
     for(unsigned int i=0;i<weigh.size();i++){

@@ -1295,6 +1295,8 @@ std::istream& operator >> (std::istream& in,  pop::VecN<D, Type>& x)
     return in;
 }
 
+
+
 template<int DIM>
 struct VecNIndice
 {
@@ -1377,5 +1379,56 @@ struct VecNIndice<3>
         return x;
     }
 };
+
+template<int DIM>
+struct VecN2IndiceByTable
+{
+        Vec< int> _table;
+    VecN2IndiceByTable(const VecN<DIM,int>  & =VecN<DIM,int> (0))
+    {
+    }
+
+    int VecN2Indice(const VecN<DIM,int> & size, const VecN<DIM,int> & x)const
+    {
+        int value=0;
+        int temp=1;
+        for(int i=0;i<DIM;i++)
+        {
+            value+=temp*x(i);
+            temp*=size(i);
+        }
+        return value;
+
+    }
+    int VecN2Indice(const VecN<DIM,int> & size, const Vec<int> & x)const
+    {
+        int value=0;
+        int temp=1;
+        for(int i=0;i<DIM;i++)
+        {
+            value+=temp*x(i);
+            temp*=size(i);
+        }
+        return value;
+
+    }
+    VecN<DIM,int> Indice2VecN(const VecN<DIM,int> & size, int indice)const
+    {
+        VecN<DIM,int> x;
+        for(int i=0;i<DIM;i++)
+        {
+            int temp=1;
+            for(int j=0;j<DIM-(i+1);j++)
+                temp*=size(j);
+            x(DIM-(i+1)) = indice/temp ;
+            indice -= (x(DIM-(i+1)) *temp);
+        }
+        return x;
+    }
+};
+
+
+
+
 }
 #endif

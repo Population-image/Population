@@ -1,4 +1,6 @@
 #include"Population.h"//Single header
+#include <fftw3.h>
+#include <fftw3.h>
 using namespace pop;//Population namespace
 #if __cplusplus > 199711L // c++11
 #include <chrono>
@@ -65,74 +67,331 @@ VecF32 normalizedImageToOutputNet( const Mat2UI8& binary,Vec2I32 domain,MatNInte
     //    m.display();
     return v_in;
 }
-Mat2UI8 displayOutput(VecF32 v_out, Vec2I32 domain){
-    Mat2UI8 m(domain(0),domain(1));
-    int k=0;
-    for(unsigned int i=0;i<domain(0);i++){
-        for(unsigned int j=0;j<domain(1);j++,k++){
-            m(i,j)=ArithmeticsSaturation<UI8,F64>::Range( (v_out[k]+1)*127.5);
+
+#define N2 8
+struct ConvolutionFourier
+{
+
+    Mat2ComplexF32 weightReal2Fourrier(const Mat2F32& W , Vec2I32 domain_mult_2){
+        Mat2ComplexF32 m_W(domain_mult_2);
+        MatNBoundaryConditionPeriodic c;
+        Vec2I32 radius(W.getDomain()(0)/2,W.getDomain()(1)/2);
+        Vec2I32 x;
+        for(x(0)=0;x(0)<W.sizeI();x(0)++){
+            for(x(1)=0;x(1)<W.sizeJ();x(1)++){
+                Vec2I32 y =x -radius;
+                c.apply(m_W.getDomain(),y);
+                m_W(y)=ComplexF32(W(x),0);
+            }
         }
+        return Representation::FFT(m_W);
     }
-    return m;
-}
-std::pair<Mat2F32,Mat2F32> matrixOrientation(int i,int j,bool orientation){
-    Mat2F32 m_out_expected(3,3);
-    m_out_expected.fill(-1);
-    m_out_expected(i,j)=1;
-
-
-
-
-
-    //    std::cout<<m_out_expected<<std::endl;
-
-    Mat2F32 m_in(7,7);
-    for(unsigned int l=0;l<m_in.size();l++){
-        m_in(l)=-1;//(i%2)*2.-1;
-    }
-    for( int k=-1;k<=1;k++){
-        if(orientation==true)
-            m_in(i+2+k,j+2  )=1;
-        else
-            m_in(i+2  ,j+2+k)=1;
+    Mat2F32 weightFourrier2Real( Mat2ComplexF32 m_W , Vec2I32 domain_W){
+        m_W = Representation::FFT(m_W,FFT_BACKWARD);
+        Representation::scale(m_W);
+        Mat2F32 W(domain_W);
+        MatNBoundaryConditionPeriodic c;
+        Vec2I32 radius(W.getDomain()(0)/2,W.getDomain()(1)/2);
+        Vec2I32 x;
+        for(x(0)=0;x(0)<W.sizeI();x(0)++){
+            for(x(1)=0;x(1)<W.sizeJ();x(1)++){
+                Vec2I32 y =x -radius;
+                c.apply(m_W.getDomain(),y);
+                 W(x)= m_W(y).real();
+            }
+        }
+        return W;
     }
 
 
+    void convolution(Mat2F32& m,const Mat2F32& W ,F32  W_biais=0){
+        Mat2ComplexF32 m_i;
+        Convertor::fromRealImaginary(m,m_i);
+        Mat2ComplexF32 m_W = weightReal2Fourrier(W,m_i.getDomain());
 
-    std::cout<<m_in<<std::endl;
-    return std::make_pair(m_in,m_out_expected);
-}
+        m_i = Representation::FFT(m_i);
 
+
+        m_i= m_i.multTermByTerm(m_W);
+        m_i(0,0) +=W_biais*m_i.getDomain().multCoordinate();
+        m_i = Representation::FFT(m_i,FFT_BACKWARD);
+        Representation::scale(m_i);
+        Convertor::toRealImaginary(m_i,m);
+    }
+};
+
+//class NeuralLayerMatrixConvolutionFFT : public NeuronSigmoid,public NeuralLayerMatrix
+//{
+//public:
+//    NeuralLayerMatrixConvolutionFFT(unsigned int nbr_map,unsigned int radius_kernel,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
+//        :NeuralLayerMatrix(std::floor (  sizei_map_previous-1-2*radius_kernel)+1,std::floor (  (sizej_map_previous-1-2*radius_kernel))+1,nbr_map),
+//          _W_kernels(nbr_map*nbr_map_previous,Mat2F32(sizei_map_previous,sizej_map_previous)),
+//          _W_biais(nbr_map*nbr_map_previous),
+//          _sub_resolution_factor (sub_scaling_factor),
+//          _radius_kernel (radius_kernel){
+
+//    }
+
+//    void setTrainable(bool istrainable);
+
+//    virtual void forwardCPU(const NeuralLayer& layer_previous);
+//    virtual void backwardCPU(NeuralLayer& layer_previous);
+//    void learn();
+//    virtual NeuralLayer * clone();
+//    Vec<Mat2ComplexF32> _W_kernels;
+//    Vec<F32> _W_biais;
+//    Vec<Mat2F32> _d_E_W_kernels;
+//    Vec<F32> _d_E_W_biais;
+//    unsigned int _sub_resolution_factor;
+//    unsigned int _radius_kernel;
+//};
 
 int main()
 {
     {
-//        Mat2F32 f(2,3);
-//        f(0,0)=2;f(0,1)=5;f(0,2)=3;
-//        f(1,0)=1;f(1,1)=4;f(1,2)=1;
+        Mat2UI8 img(8,8);
+        img(0,0)=100;
+        img(2,2)=100;
 
-//        Mat2F32 h(2,2);
-//        h(0,0)=1;h(0,1)=-1;
-//        h(1,0)=1;h(1,1)=1;
-
-
-
-
-
-//        int size_i_output=f.sizeI()+h.sizeI()-1;
-//        int size_j_output=f.sizeJ()+h.sizeJ()-1;
-
-//        h.resizeInformation(size_i_output,size_j_output);
+        Mat2F32 biais(8,8);
+        biais.fill(10);
+        //        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
+        Mat2F32 W(3,3);
+        W(0,0)=0.1;W(0,1)=0.1;W(0,2)=0.1;
+        W(1,0)=0.1;W(1,1)=0.2;W(1,2)=0.8;
+        W(2,0)=0.1;W(2,1)=0.1;W(2,2)=0.1;
 
 
 
 
-//        std::cout<<h<<std::endl;
-//        return 1;
+        Mat2F32 imgf(img);
+        Mat2F32 img2 = Processing::convolution(imgf,W,MatNBoundaryConditionPeriodic())+biais;
+        std::cout<<img2<<std::endl;
+        ConvolutionFourier c;
+
+        std::cout<<W<<std::endl;
+        Mat2ComplexF32 m_W = c.weightReal2Fourrier(W,img.getDomain());
+        std::cout<<c.weightFourrier2Real(m_W,W.getDomain());
+
+//        c.convolution(imgf,W,10);
+//        std::cout<<imgf<<std::endl;
 
 
 
+        return 1;
+                //        ConvolutionFourier c;
+                //        Mat2F32 imgf(img);
+                //        //imgf.display();
+                //        MatNDisplay disp;
+                //        while(1==1){
+                //            c.convolution(imgf,W);
+                ////            std::cout<<imgf<<std::endl;
+                ////
+                //            disp.display(imgf);
+                //        }
+                //
+                //imgf.display();
+
+                //        Representation::correlationDirectionByFFT(img).display();
+                //        Mat2ComplexF32 imgc;
+                //        Convertor::fromRealImaginary(Mat2F32(img),imgc);
+                //        imgc = Representation::FFT(imgc);
+                //        img = Representation::FFTDisplay(imgc);
+                //        img.display();
     }
+    {
+        Mat2ComplexF32 m(8,8);
+        DistributionUniformInt d(0,7);
+        for(unsigned int i=0;i<m.size();i++)
+            m(i)=ComplexF32(d.randomVariable(),0);
+        std::cout<<m<<std::endl;
+
+        //        std::cout<<out<<std::endl;
+        auto start_global =  std::chrono::high_resolution_clock::now();
+        m=Representation::FFT(m);
+        m=Representation::FFT(m,FFT_BACKWARD);
+        Representation::scale(m);
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+
+        std::cout<<m<<std::endl;
+        return 1;
+    }
+    int number_iteration=1000;
+    {
+        Mat2F32 m(N2,N2);
+        /* prepare a cosine wave */
+        for (int i = 0; i < N2; i++) {
+            for (int j = 0; j < N2; j++) {
+                m(i,j) = sin(3 * 2*M_PI*(i+j)/N2);
+            }
+        }
+        int radius=3;
+        Mat2F32 W(radius,radius);
+        W(0,0)=-1;W(0,2)=1;
+        W(1,0)=-2;W(1,2)=2;
+        W(2,0)=-1;W(2,2)=1;
+        //        auto start_global =  std::chrono::high_resolution_clock::now();
+        //        for(unsigned int i=0;i<number_iteration;i++)
+        //            Processing::convolution(m,W,MatNBoundaryConditionPeriodic());
+        //        auto end_global= std::chrono::high_resolution_clock::now();
+        //        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+        //        std::cout<<std::endl;
+
+
+        //        start_global =  std::chrono::high_resolution_clock::now();
+        //        for(unsigned int i=0;i<number_iteration;i++)
+        //            c.convolution(m,W);
+        //        end_global= std::chrono::high_resolution_clock::now();
+        //        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+        //        //        std::cout<<m<<std::endl;
+
+
+        return 1;
+
+
+        //        std::cout<<m<<std::endl;
+        //        FFT2D<N2,N2,F32> fft;
+
+        //        //    auto start_global =  std::chrono::high_resolution_clock::now();
+        //        //    for(unsigned int i=0;i<number_iteration;i++){
+        //        //    fft.apply(m);
+        //        //    }
+        //        //    auto end_global= std::chrono::high_resolution_clock::now();
+        //        //    std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+        //        //    return 0;
+        //        //    std::cout<<m<<std::endl;
+        //        fft.apply(m);
+        //        fft.apply(m,FFT_BACKWARD);
+        //        std::cout<<m<<std::endl;
+    }
+    //int N=16;
+    //    fftw_complex in[N], out[N], in2[N]; /* double [2] */
+    //    fftw_plan p, q;
+    //    int i;
+
+    //    /* prepare a cosine wave */
+    //    for (i = 0; i < N; i++) {
+    //        in[i][0] = sin(3 * 2*M_PI*i/N)+cos(5 * 2*M_PI*i/N);
+    //        in[i][1] = 0;
+    //    }
+
+    //    /* forward Fourier transform, save the result in 'out' */
+    //    p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    //    fftw_execute(p);
+    //    //    for (i = 0; i < N; i++)
+    //    //        printf("freq: %3d %+9.5f %+9.5f I\n", i, out[i][0], out[i][1]);
+    //    fftw_destroy_plan(p);
+
+    //    /* backward Fourier transform, save the result in 'in2' */
+    //    //    printf("\nInverse transform:\n");
+    //    q = fftw_plan_dft_1d(N, out, in2, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+    //    {
+    //        auto start_global =  std::chrono::high_resolution_clock::now();
+    //        for(unsigned int i=0;i<number_iteration;i++){
+    //            fftw_execute(q);
+    //        }
+    //        auto end_global= std::chrono::high_resolution_clock::now();
+    //        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+    //    }
+
+    //    /* normalize */
+    //    for (i = 0; i < N; i++) {
+    //        in2[i][0] *= 1./N;
+    //        in2[i][1] *= 1./N;
+    //    }
+    //    //    for (i = 0; i < N; i++)
+    //    //        printf("recover: %3d %+9.5f %+9.5f I vs. %+9.5f %+9.5f I\n",
+    //    //               i, in[i][0], in[i][1], in2[i][0], in2[i][1]);
+    //    fftw_destroy_plan(q);
+
+    //    fftw_cleanup();
+
+    //    Vec<ComplexF32> data2(N*2);
+
+
+    //    for (int i = 0; i < N; i++) {
+    //        //        data[i*2]= sin(3 * 2*M_PI*i/N);
+    //        //        data[i*2+1]=0;
+    //        data2(i)=ComplexF32(sin(3 * 2*M_PI*i/N),0);
+    //    }
+    //    F32 * data = data2.data()->data();
+    //    for(unsigned int i=0;i<2*N;i++){
+    //        if(std::abs(data[i])>0.01)
+    //            std::cout<<data[i]<<" ";
+    //        else
+    //            std::cout<<"0 ";
+    //    }
+    //    std::cout<<std::endl;
+    //    FFTDanielsonLanczos<N,F32> d;
+    //    d.apply(data);
+    //    d.apply(data,FFT_BACKWARD);
+    //    for(unsigned int i=0;i<2*N;i++){
+    //        if(std::abs(data[i])>0.01)
+    //            std::cout<<data[i]<<" ";
+    //        else
+    //            std::cout<<"0 ";
+    //    }
+    //    auto start_global =  std::chrono::high_resolution_clock::now();
+    //    for(unsigned int i=0;i<number_iteration;i++){
+
+    //        d.apply(data);
+    //    }
+    //    auto end_global= std::chrono::high_resolution_clock::now();
+    //    std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+
+
+    //    std::cout<<"data 2"<<std::endl;
+    //    for(unsigned int i=0;i<2*N;i++){
+    //        std::cout<<data2[i]<<" ";
+    //    }
+    //    std::cout<<std::endl;
+
+    //    four1(data.data(), N);
+    //    for(unsigned int i=0;i<2*N;i++){
+    //        std::cout<<data[i]<<" ";
+    //    }
+    //    std::cout<<std::endl;
+    //    for(unsigned int i=0;i<2*N;i++){
+    //        std::cout<<data2[i]<<" ";
+    //    }
+
+    //    std::cout<<std::endl;
+    //    std::cout<<Representation::FFT(f1,1)<<std::endl;
+
+    return 1;
+    //    Mat2F32 m(29,29);
+    //    for(unsigned int i=0;i<m.sizeI();i++)
+    //        for(unsigned int j=0;j<m.sizeJ();j++){
+    //            m(i,j)=i+j;
+    //        }
+    //    std::cout<<m<<std::endl;
+    //    Mat2F32 kernel(3,3);
+    //    kernel(0,0)=-1;
+    //    kernel(1,0)=-2;
+    //    kernel(2,0)=-1;
+
+    //    kernel(0,2)=1;
+    //    kernel(1,2)=2;
+    //    kernel(2,2)=3;
+
+    //    //    Mat2F32
+
+
+    //    std::cout<<Processing::convolution(m,kernel,MatNBoundaryConditionMirror())<<std::endl;
+    //    Mat2F32 H = toeplitzMatrix(m.getDomain(),kernel);
+    //    H = toeplitzMatrixRemoveBorder(m.getDomain(),kernel,H,2);
+    ////    std::cout<<H<<std::endl;
+    //    std::cout<<H.getDomain()<<std::endl;
+    //    VecF32 & m_v= m;
+    //    std::cout<<Mat2F32(Vec2I32(3,3),H*m_v)<<std::endl;
+
+
+
+    return 1;
+
+
 
     {
         NeuralNet net;
@@ -143,9 +402,9 @@ int main()
         VecF32 vout;
         int number_iteration = 10000;
         auto start_global =  std::chrono::high_resolution_clock::now();{
-        for(unsigned int i=0;i<number_iteration;i++)
-            net.forwardCPU(vin,vout);
-//            vin(0)=vout(0);
+            for(unsigned int i=0;i<number_iteration;i++)
+                net.forwardCPU(vin,vout);
+            //            vin(0)=vout(0);
         }
         std::cout<<vout<<std::endl;
         auto end_global= std::chrono::high_resolution_clock::now();
@@ -155,22 +414,22 @@ int main()
         std::cout<<label_max<<std::endl;
         return 1;
 
-//        NeuralNet net;
-//        int size_windows=9;
-//        net.addLayerMatrixInput(size_windows,size_windows,1);
+        //        NeuralNet net;
+        //        int size_windows=9;
+        //        net.addLayerMatrixInput(size_windows,size_windows,1);
 
 
 
 
-//        net.add
+        //        net.add
 
     }
 
 
     //    {
-    //        NeuralNet net;
+    //          NeuralNet net;
     //        net.addLayerMatrixInput(2,2,2);
-    //        net.addLayerMatrixConvolutionSubScaling(3,1,0);
+    //            net.addLayerMatrixConvolutionSubScaling(3,1,0);
     //        net.addLayerMatrixMergeConvolution();
     //        net.setTrainable(true);
     //        net.setLearnableParameter(0.1);
@@ -232,12 +491,12 @@ int main()
         Vec<Mat2F32> v_outputs;
         for(unsigned int i=0;i<=1;i++)
             for(unsigned int j=0;j<=1;j++){
-                std::pair<Mat2F32,Mat2F32> m= matrixOrientation(i,j,false);
-                v_inputs.push_back(m.first);
-                v_outputs.push_back(m.second);
-                m= matrixOrientation(i,j,true);
-                v_inputs.push_back(m.first);
-                v_outputs.push_back(m.second);
+                //                std::pair<Mat2F32,Mat2F32> m= matrixOrientation(i,j,false);
+                //                v_inputs.push_back(m.first);
+                //                v_outputs.push_back(m.second);
+                //                m= matrixOrientation(i,j,true);
+                //                v_inputs.push_back(m.first);
+                //                v_outputs.push_back(m.second);
             }
         //        std::pair<Mat2F32,Mat2F32> m1 = matrixOrientation(1,0,false);
         //        std::pair<Mat2F32,Mat2F32> m2 = matrixOrientation(0,0,true);
@@ -358,7 +617,7 @@ int main()
             }
             std::cout<<sum<<std::endl;
         }
-        displayOutput(v_out,domain_out).display();
+        //        displayOutput(v_out,domain_out).display();
 #if __cplusplus > 199711L // c++11
         auto end_global= std::chrono::high_resolution_clock::now();
         std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;

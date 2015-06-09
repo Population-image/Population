@@ -168,6 +168,14 @@ public:
     {
         return _data[1];
     }
+
+
+    ScalarType *data(){
+        return _data;
+    }
+    const ScalarType *data()const {
+        return _data;
+    }
     /*!
     * \return reference of this complex number
     *

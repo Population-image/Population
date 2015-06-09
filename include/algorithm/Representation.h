@@ -54,27 +54,157 @@ The Fourier transform allows the correspondence between the space-domain and the
 The choice of the representation depends on the particular problem.
 For instance, the noise can be seen as fluctuation with a short length correlation. In the Fourier space, this noise corresponds to high frequency and it is removed easily with a low pass.
 \code
-Mat2UI8 img;//2d grey-level image object
-img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
-Mat2F32 noisemap;
-Distribution d(DistributionNormal(0,20));
-Processing::randomField(img.getDomain(),d,noisemap);
-img = Mat2F32(img) +noisemap;
-img.save("../doc/image2/lenanoise.jpg");
-Mat2ComplexF32 imgcomplex;
-Convertor::fromRealImaginary(img,imgcomplex);
-Mat2ComplexF32 fft = Representation::FFT(imgcomplex,1);
-Mat2UI8 filterlowpass = Representation::lowPass(fft,60);
-imgcomplex = Representation::FFT(filterlowpass,-1);
-Mat2F32 imgd;
-Convertor::toRealImaginary(imgcomplex,imgd);
-img = Processing::greylevelRange(imgd,0,255);
-img.display();
-img.save("../doc/image2/lenalowpass.jpg");
+        Mat2UI8 img;//2d grey-level image object
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
+        Mat2F32 noisemap;
+        DistributionNormal d(0,20);
+        Processing::randomField(img.getDomain(),d,noisemap);
+        Mat2F32 imgf = Mat2F32(img) +noisemap;
+        Mat2ComplexF32 imgcomplex;
+        Convertor::fromRealImaginary(imgf,imgcomplex);
+        Mat2ComplexF32 fft(imgcomplex);
+        fft = Representation::FFT(fft,FFT_FORWARD);
+        Mat2ComplexF32 filterlowpass = Representation::lowPass(fft,60);
+        imgcomplex = Representation::FFT(filterlowpass,FFT_BACKWARD);
+        Representation::scale(imgcomplex);
+        Mat2F32 imgd;
+        Convertor::toRealImaginary(imgcomplex,imgd);
+        img = Processing::greylevelRange(imgd,0,255);
+        img.display();
 \endcode
 \image html lenanoise.jpg "noisy image"
 \image html lenalowpass.jpg "filter image with low pass"
 */
+
+enum FFT_WAY{
+    FFT_FORWARD=1,
+    FFT_BACKWARD=-1,
+};
+namespace Private{
+template<typename T>
+struct FFTAbtract{
+    virtual void apply(T*  data,FFT_WAY way=FFT_FORWARD)=0;
+};
+
+template<unsigned N, typename T=F32>
+struct FFTDanielsonLanczos :public FFTAbtract<T>{
+    void apply(T* data,FFT_WAY way=FFT_FORWARD) {
+        _sift(data);
+        _exec(data, way);
+    }
+    FFTDanielsonLanczos<N/2,T> _scale_two;
+    void _sift(T* data){
+        int m;
+        int n = N<<1;
+        int j=1;
+        for (int i=1; i<n; i+=2) {
+            if (j>i) {
+                std::swap(data[j-1], data[i-1]);
+                std::swap(data[j], data[i]);
+            }
+            m = N;
+            while (m>=2 && j>m) {
+                j -= m;
+                m >>= 1;
+            }
+            j += m;
+        };
+    }
+    void _exec(T* data,FFT_WAY way){
+        _scale_two._exec(data,way);
+        _scale_two._exec(data+N,way);
+
+        T wtemp,tempr,tempi,wr,wi,wpr,wpi;
+        wtemp = sin(M_PI/N);
+        wpr = -2.0*wtemp*wtemp;
+        wpi = -way*sin(2*M_PI/N);
+
+        wr = 1.0;
+        wi = 0.0;
+        for (unsigned i=0; i<N; i+=2) {
+            tempr = data[i+N]*wr - data[i+N+1]*wi;
+            tempi = data[i+N]*wi + data[i+N+1]*wr;
+            data[i+N] = data[i]-tempr;
+            data[i+N+1] = data[i+1]-tempi;
+            data[i] += tempr;
+            data[i+1] += tempi;
+
+            wtemp = wr;
+            wr += wr*wpr - wi*wpi;
+            wi += wi*wpr + wtemp*wpi;
+        }
+
+    }
+};
+template<typename T>
+struct FFTDanielsonLanczos<1,T>:public FFTAbtract<T> {
+    void apply(T* ,FFT_WAY =FFT_FORWARD){}
+    void _exec(T* ,FFT_WAY ) {}
+};
+
+
+template<int POW>
+struct Pow2{
+    enum{value=2*Pow2<POW-1>::value};
+};
+template<>
+struct Pow2<0>{
+    enum{value=1};
+};
+template<int SCALE,int SCALE2>
+struct _InitFFT{
+    static void init(Vec<FFTAbtract<F32> *>&fft_op,Vec<int>& fft_size ){
+        fft_op.push_back(new FFTDanielsonLanczos<Pow2<SCALE>::value >);
+        fft_size.push_back(Pow2<SCALE>::value);
+        _InitFFT<SCALE+1,SCALE2>::init(fft_op,fft_size);
+    }
+};
+template<int SCALE>
+struct _InitFFT<SCALE,SCALE>{
+    static void init(Vec<FFTAbtract<F32> *>&fft_op,Vec<int>& fft_size ){
+        fft_op.push_back(new FFTDanielsonLanczos<Pow2<SCALE>::value >);
+        fft_size.push_back(Pow2<SCALE>::value);
+    }
+};
+
+
+
+template<int SCALE1=2,int SCALE2=12>
+struct FFTConcrete{
+    Vec<FFTAbtract<F32> *> _fft_op;
+    Vec<int> _fft_size;
+    int _select;
+    FFTConcrete():_select(-1){
+        _InitFFT<SCALE1,SCALE2>::init(_fft_op,_fft_size);
+    }
+    void select(int nbr_element){
+        for(unsigned int i=0;i<=_fft_size.size();i++){
+            if(_fft_size[i]==nbr_element){
+                _select =i;
+            }
+            if(i==_fft_size.size()){
+                std::cerr<<"Cannot find the FFT for this size"<<std::endl;
+            }
+        }
+    }
+
+    void apply(F32 *  data,int nbr_element,FFT_WAY way=FFT_FORWARD){
+        if(_select>=0)
+            _fft_op(_select)->apply(data,way);
+        else{
+            for(unsigned int i=0;i<=_fft_size.size();i++){
+                if(_fft_size[i]==nbr_element){
+                    _fft_op(i)->apply(data,way);
+                    break;
+                }
+                if(i==_fft_size.size()){
+                    std::cerr<<"Cannot find the FFT for this size"<<std::endl;
+                }
+            }
+        }
+    }
+};
+}
 
 struct POP_EXPORTS Representation
 {
@@ -103,72 +233,83 @@ struct POP_EXPORTS Representation
          * \return return the fft
         * \brief Apply the FFT on the input matrix
 
-        In this example, we apply a low pass filter:
-         \code
-        Mat2UI8 img;//2d grey-level image object
-        img.load("/home/vincent/Dropbox/MyArticle/PhaseField/lena.pgm");//replace this path by those on your computer
-        Mat2ComplexF32 imgcomplex;
-        Convertor::fromRealImaginary(img,imgcomplex);
-        Mat2ComplexF32 fft = Representation::FFT(imgcomplex);
-        Mat2ComplexF32 filterlowpass(fft.getDomain());
-        Vec2I32 x(0,0);
-        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF32>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
-        fft = Processing::mask(fft,filterlowpass);
-        imgcomplex = Representation::FFT(fft,-1);
-        Mat2F32 imgd;
-        Convertor::toRealImaginary(imgcomplex,imgd);
-        img = Processing::greylevelRange(imgd,0,255);
-        img.display();
-        \endcode
          *
         */
-    template<int DIM>
-    static MatN<DIM,ComplexF32>  FFT(const MatN<DIM,ComplexF32> & f ,int direction=1)
+    static Mat2ComplexF32  FFT(const Mat2ComplexF32 & f ,FFT_WAY way=FFT_FORWARD)
     {
-        MatN<DIM,ComplexF32> in;
-        if(isPowerOfTwo(f.getDomain()(0))==false||isPowerOfTwo(f.getDomain()(1))==false){
-            in =truncateMulitple2(f);
-        }else{
-            in =f;
+        Mat2ComplexF32  data;
+        truncatePower2(f,data);
+        Private::FFTConcrete<> fft;
+        for(unsigned int i=0;i<data.sizeI();i++){
+            ComplexF32 *line = data.data()+i*data.sizeJ();
+            fft.apply(line->data(),data.sizeJ(),way);
         }
-
-        typename MatN<DIM-1,ComplexF32>::E x;
-        MatN<DIM,ComplexF32>  F (in);
-
-        for(int fixed_coordinate=0;fixed_coordinate<DIM;fixed_coordinate++){
-            x = in.getDomain().removeCoordinate(fixed_coordinate);
-            typename MatN<DIM-1,ComplexF32>::IteratorEDomain it(x);
-            MatN<1,ComplexF32> lign(in.getDomain()(fixed_coordinate));
-            MatN<1,ComplexF32> lign2(in.getDomain()(fixed_coordinate));
-            while(it.next()){
-                typename MatN<DIM,ComplexF32>::E xx;
-                for(int i=0;i<DIM;i++){
-                    if(i<fixed_coordinate)
-                        xx(i) =it.x()(i);
-                    else if(i>fixed_coordinate)
-                        xx(i) =it.x()(i-1);
-                }
-                for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
-                    lign(xx(fixed_coordinate))=F(xx);
-                }
-                lign2 = Representation::FFT(lign,direction);
-                for(xx(fixed_coordinate)=0;xx(fixed_coordinate)<in.getDomain()(fixed_coordinate);xx(fixed_coordinate)++){
-                    F(xx)=lign2(xx(fixed_coordinate));
-                }
-
-
+        ComplexF32 t[data.sizeI()];
+        for(unsigned int j=0;j<data.sizeJ();j++){
+            unsigned int position =j;
+            for(unsigned int i=0;i<data.sizeI();i++){
+                t[i]=data(position);
+                position+=data.sizeJ();
+            }
+            fft.apply(t[0].data(),data.sizeI(),way);
+            position =j;
+            for(unsigned int i=0;i<data.sizeI();i++){
+                data(position)=t[i];
+                position+=data.sizeJ();
             }
         }
-        typename MatN<DIM,ComplexF32>::IteratorEDomain b(F.getDomain());
-        if(direction!=1)
-        {
-            int mult = F.getDomain().multCoordinate();
-            while(b.next())
-            {
-                (F)(b.x())*= mult;
+        return data;
+    }
+    static Mat3ComplexF32 FFT(const Mat3ComplexF32 & f,FFT_WAY way=FFT_FORWARD) {
+        Mat3ComplexF32  data;
+        truncatePower2(f,data);
+        Private::FFTConcrete<> fft;
+        for(unsigned int i=0;i<data.sizeI();i++){
+            for(unsigned int k=0;k<data.sizeK();k++){
+                ComplexF32 *line = data.data()+i*data.sizeJ()+k*data.sizeJ()*data.sizeI();
+                fft.apply(line->data(),data.sizeJ(),way);
             }
         }
-        return F;
+        ComplexF32 t[data.sizeI()];
+        for(unsigned int j=0;j<data.sizeJ();j++){
+            for(unsigned int k=0;k<data.sizeK();k++){
+                unsigned int position =j+k*data.sizeJ()*data.sizeI();
+                for(unsigned int i=0;i<data.sizeI();i++){
+                    t[i]=data(position);
+                    position+=data.sizeJ();
+                }
+                fft.apply(t[0].data(),data.sizeI(),way);
+                position =j+k*data.sizeJ()*data.sizeI();
+                for(unsigned int i=0;i<data.sizeI();i++){
+                    data(position)=t[i];
+                    position+=data.sizeJ();
+                }
+            }
+        }
+        ComplexF32 t2[data.sizeI()];
+        for(unsigned int i=0;i<data.sizeI();i++){
+            for(unsigned int j=0;j<data.sizeJ();j++){
+                unsigned int position =j+i*data.sizeI();
+                for(unsigned int k=0;k<data.sizeK();k++){
+                    t2[k]=data(position);
+                    position+=data.sizeJ()*data.sizeI();
+                }
+                fft.apply(t2[0].data(),data.sizeK(),way);
+                position =j+i*data.sizeI();
+                for(unsigned int k=0;k<data.sizeK();k++){
+                    data(position)=t2[k];
+                    position+=data.sizeJ()*data.sizeI();
+                }
+            }
+        }
+        return data;
+    }
+    static MatN<1,ComplexF32> FFT(MatN<1,ComplexF32> & f ,FFT_WAY way=FFT_FORWARD)
+    {
+        MatN<1,ComplexF32> data(f);
+        Private::FFTConcrete<> fft;
+        fft.apply(data.data()->data(),data.sizeI(),way);
+        return data;
     }
 
     /*! \brief visualization of the fourrier matrix in log scale h(x) = log( ||f(x)||+1)
@@ -176,13 +317,13 @@ struct POP_EXPORTS Representation
          * \return grey level matrix
         *
          \code
-    Mat2UI8 img;
-    img.load("../image/eutel.bmp");
-    Mat2ComplexF32 imgc;
-    imgc.fromRealImaginary(img);
-    imgc = Representation::FFT(imgc,1);
-    img = Representation::FFTDisplay(imgc);
-    img.display();
+        Mat2UI8 img;
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
+        Mat2ComplexF32 imgc;
+        Convertor::fromRealImaginary(Mat2F32(img),imgc);
+        imgc = Representation::FFT(imgc);
+        img = Representation::FFTDisplay(imgc);
+        img.display();
     \endcode
         */
     template<int DIM>
@@ -230,17 +371,6 @@ struct POP_EXPORTS Representation
          * \param frenquency_threshold threshold
          * \return output fourier matrix
         *
-     \code
-    Mat2UI8 img;
-    img.load("/home/vincent/Desktop/bin/Population/doc/html/lena.bmp");
-    Mat2ComplexF32 imgc;
-    imgc.fromRealImaginary(img);
-    imgc = Representation::FFT(imgc,1);
-    imgc = Representation::lowPass(imgc,7);
-    imgc = Representation::FFT(imgc,0);
-    imgc.toRealImaginary(img);
-    img.display();
-    \endcode
         */
 
     template<int DIM>
@@ -258,17 +388,6 @@ struct POP_EXPORTS Representation
          * \param frenquency_threshold threshold
          * \return output fourier matrix
         *
-     \code
-    Mat2UI8 img;
-    img.load("/home/vincent/Desktop/bin/Population/doc/html/lena.bmp");
-    Mat2ComplexF32 imgc;
-    Convertor::fromRealImaginary(Mat2F32(img),imgc);
-    imgc = Representation::FFT(imgc,1);
-    imgc = Representation::highPass(imgc,7);
-    imgc = Representation::FFT(imgc,0);
-    imgc.toRealImaginary(img);
-    img.display();
-    \endcode
         */
     template<int DIM>
     static MatN<DIM,ComplexF32> highPass(const MatN<DIM,ComplexF32> & f,F32 frenquency_threshold){
@@ -284,14 +403,25 @@ struct POP_EXPORTS Representation
      * \param f input matrix
      * \return output matrix with a float as pixel/voxel type
      *
-     *  calculated the 2-VecNd correlation function in any direction by FFT  P = FFT^(-1)(FFT(f)FFT(f)^*)
-    */
+     *  calculated the 2-Points correlation function in any direction by FFT  P = FFT^(-1)(FFT(f)FFT(f)^*)
+
+     * \code
+        Mat2UI8 img;
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
+        Representation::correlationDirectionByFFT(img).display();
+        Mat2ComplexF32 imgc;
+        Convertor::fromRealImaginary(Mat2F32(img),imgc);
+        imgc = Representation::FFT(imgc);
+        img = Representation::FFTDisplay(imgc);
+        img.display();
+     * \endcode
+     */
 
     template<int DIM,typename PixelType>
     static MatN<DIM,F32> correlationDirectionByFFT(const MatN<DIM,PixelType> & f){
 
         MatN<DIM,PixelType> bint;
-        bint = pop::Representation::truncateMulitple2(f);
+        pop::Representation::truncatePower2(f,bint);
         MatN<DIM,F32> binfloat(bint);
         typename MatN<DIM,PixelType>::IteratorEDomain it (binfloat.getIteratorEDomain());
         binfloat = pop::ProcessingAdvanced::greylevelRange(binfloat,it,0,1);
@@ -299,7 +429,7 @@ struct POP_EXPORTS Representation
 
         MatN<DIM,ComplexF32>  bin_complex(bint.getDomain());
         Convertor::fromRealImaginary(binfloat,bin_complex);
-        MatN<DIM,ComplexF32>  fft = pop::Representation::FFT(bin_complex,1);
+        MatN<DIM,ComplexF32>  fft = pop::Representation::FFT(bin_complex,FFT_FORWARD);
 
         it.init();
         while(it.next()){
@@ -308,7 +438,7 @@ struct POP_EXPORTS Representation
             fft(it.x()).real() = (c*c1.conjugate()).real();
             fft(it.x()).img() =0;
         }
-        fft  = pop::Representation::FFT(fft,0);
+        fft  = pop::Representation::FFT(fft,FFT_BACKWARD);
         MatN<DIM,F32>  fout(bint.getDomain());
         Convertor::toRealImaginary(fft,fout);
         return  fout;
@@ -328,71 +458,48 @@ struct POP_EXPORTS Representation
      *
     */
     template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType> truncateMulitple2(const MatN<DIM,PixelType> & in)
-    {
-        typename MatN<DIM,PixelType>::E x;
+    static void truncatePower2(const MatN<DIM,PixelType>& in, MatN<DIM,PixelType>& out){
+        VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
-            int j=1;
-            while(j<=in.getDomain()(i)){
-                j*=2;
-            }
-            x(i) = j/2;
+            x(i) = (1<<(int)std::floor(std::log(in.getDomain()(i))/std::log(2)));
         }
-        MatN<DIM,PixelType> out(x);
-        typename MatN<DIM,PixelType>::IteratorEDomain it       (out.getIteratorEDomain());
-        while(it.next()){
-            out(it.x())= in(it.x());
+        __resize(in,out,x,x);
+    }
+    template<int DIM,typename PixelType>
+    static void upPower2(MatN<DIM,PixelType>& in,MatN<DIM,PixelType> &out){
+        VecN<DIM,I32> x;
+        for(int i=0;i<DIM;i++){
+            x(i) = 1<<(int)(std::floor(std::log(in.getDomain()(i))/std::log(2))+1);
         }
-        return out;
+        __resize(in,out,x,in.getDomain());
+    }
+
+    template<int DIM>
+    static void scale(MatN<DIM,ComplexF32>& data){
+        for (unsigned i=0;i<data.size();i++) {
+            data[i] /= data.size();
+        }
     }
     //@}
-    static inline MatN<1,ComplexF32>  FFT(const MatN<1,ComplexF32> & in ,int direction=1){
-        if(isPowerOfTwo(in.size())==false){
-            std::cerr<<"Is no power of 2"<<std::endl;
+
+    template<int DIM,typename PixelType>
+    static void __resize(const MatN<DIM,PixelType>& in, MatN<DIM,PixelType>& out,VecN<DIM,I32> x,VecN<DIM,I32> size){
+        if(out.getDomain()!=x){
+            out.resize(x);
         }
-
-        if(in.size()>1){
-
-            MatN<1,ComplexF32> fodd (in.size()/2);
-            MatN<1,ComplexF32> feven (in.size()/2);
-
-            for(size_t i =0; i< fodd.size();i++){
-                (fodd)(i)= (in)(2*i);
-                (feven)(i)= (in)(2*i+1);
+        if(DIM==2){
+            for(unsigned int i=0;i<size(0);i++){
+                std::copy(in.begin()+i*in.sizeJ(),in.begin()+(i*in.sizeJ()+size(1)),out.begin()+i*out.sizeJ());
             }
-            MatN<1,ComplexF32>  Fodd = Representation::FFT(fodd,direction);
-            MatN<1,ComplexF32>  Feven = Representation::FFT(feven,direction);
-            MatN<1,ComplexF32> out (in.getDomain());
-            int half = in.size()/2;
-
-            ComplexF32  w1,w;
-            w1.real() = std::cos(2*PI/in.size() );
-            if(direction==1)
-                w1.img() = -std::sin(2*PI/in.size() );
-            else
-                w1.img() = std::sin(2*PI/in.size() );
-            w.real()=1;
-            w.img()=0;
-
-            for(int i =0; i< Fodd.getDomain()(0);i++)
-            {
-                (out)(i)=0.5f * ((Fodd)(i) +w* (Feven)(i)) ;
-                (out)(i+half)=0.5f * ((Fodd)(i) -w* (Feven)(i));
-                w = w*w1;
+        }else if(DIM==1){
+            std::copy(in.begin(),in.begin()+size(0),out.begin());
+        }else{
+            for(unsigned int k=0;k<size(2);k++){
+                for(unsigned int i=0;i<size(0);i++){
+                    std::copy(in.begin()+i*in.sizeJ()+k*in.sizeI()*in.sizeJ(),in.begin()+(i*in.sizeJ()+size(1))+k*in.sizeI()*in.sizeJ(),out.begin()+i*out.sizeJ()+k*out.sizeI()*out.sizeJ());
+                }
             }
-            return out;
         }
-        else
-        {
-            return in;
-        }
-    }
-
-    template<typename T>
-    static bool isPowerOfTwo (T x)
-    {
-        bool powerOfTwo = !(x == 0) && !(x & (x - 1));
-        return powerOfTwo;
     }
 };
 }
