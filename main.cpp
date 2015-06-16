@@ -123,13 +123,14 @@ struct ConvolutionFourier
 class NeuralLayerMatrixConvolutionFFT : public NeuronSigmoid,public NeuralLayerMatrix
 {
 public:
+
     int power2(int i){
         return 1<<(int)std::ceil(Arithmetic::exposant(i,2));
     }
 
     NeuralLayerMatrixConvolutionFFT(unsigned int nbr_map,unsigned int sizei,unsigned int sizej,int kernel_radius,unsigned int nbr_map_previous)
         :NeuralLayerMatrix(sizei-2*kernel_radius,sizej-2*kernel_radius,nbr_map_previous),
-//          :NeuralLayerMatrix(sizei,sizej,nbr_map_previous),
+          //          :NeuralLayerMatrix(sizei,sizej,nbr_map_previous),
           _W_kernels(nbr_map*nbr_map_previous,Mat2F32(power2(sizei),power2(sizej))),
           _W_biais(nbr_map*nbr_map_previous),
           _X_complex(power2(sizei),power2(sizej)),
@@ -220,11 +221,150 @@ public:
     unsigned int _sub_resolution_factor;
 };
 
-#define  SIZE 12
+template<unsigned N, typename T=F32>
+struct FFTDanielsonLanczosTest {
+    void apply(T* data,FFT_WAY way=FFT_FORWARD) {
+        _sift(data);
+        _exec(data, way);
+    }
+    FFTDanielsonLanczosTest<N/2,T> _scale_two;
+    void _sift(T* data){
+        int m;
+        int n = N<<1;
+        int j=1;
+        for (int i=1; i<n; i+=2) {
+            if (j>i) {
+                std::swap(data[j-1], data[i-1]);
+                std::swap(data[j], data[i]);
+            }
+            m = N;
+            while (m>=2 && j>m) {
+                j -= m;
+                m >>= 1;
+            }
+            j += m;
+        };
+
+
+
+    }
+    void _exec(T* data,FFT_WAY way){
+        _scale_two._exec(data,way);
+        _scale_two._exec(data+N,way);
+
+        T wtemp,tempr,tempi,wr,wi,wpr,wpi;
+        wtemp = sin(M_PI/N);
+        wpr = -2.0*wtemp*wtemp;
+        wpi = -way*sin(2*M_PI/N);
+
+        wr = 1.0;
+        wi = 0.0;
+        for (unsigned i=0; i<N; i+=2) {
+            tempr = data[i+N]*wr - data[i+N+1]*wi;
+            tempi = data[i+N]*wi + data[i+N+1]*wr;
+            data[i+N] = data[i]-tempr;
+            data[i+N+1] = data[i+1]-tempi;
+            data[i] += tempr;
+            data[i+1] += tempi;
+
+            wtemp = wr;
+            wr += wr*wpr - wi*wpi;
+            wi += wi*wpr + wtemp*wpi;
+        }
+
+    }
+};
+template<typename T>
+struct FFTDanielsonLanczosTest<1,T> {
+    void apply(T* ,FFT_WAY =FFT_FORWARD){}
+    void _exec(T* ,FFT_WAY ) {}
+};
+template<typename T>
+class FFTDanielsonLanczosTest<4,T> {
+public:
+    void apply(T* data,FFT_WAY way =FFT_FORWARD){
+        std::swap(data[2],data[4]);
+        std::swap(data[3],data[5]);
+        _exec(data,way);
+    }
+    void _exec(T* data,FFT_WAY way=FFT_FORWARD) {
+        T tr = data[2];
+        T ti = data[3];
+        data[2] = data[0]-tr;
+        data[3] = data[1]-ti;
+        data[0] += tr;
+        data[1] += ti;
+        tr = data[6];
+        ti = data[7];
+        if(way==FFT_FORWARD){
+            data[6] = data[5]-ti;
+            data[7] = tr-data[4];
+        }else{
+            data[6] = -(data[5]-ti);
+            data[7] = -(tr-data[4]);
+        }
+        data[4] += tr;
+        data[5] += ti;
+
+        tr = data[4];
+        ti = data[5];
+        data[4] = data[0]-tr;
+        data[5] = data[1]-ti;
+        data[0] += tr;
+        data[1] += ti;
+        tr = data[6];
+        ti = data[7];
+        data[6] = data[2]-tr;
+        data[7] = data[3]-ti;
+        data[2] += tr;
+        data[3] += ti;
+
+    }
+};
+
+template<typename T>
+class DanielsonLanczos2 {
+public:
+    void _exec(T* data) {
+        T tr = data[2];
+        T ti = data[3];
+        data[2] = data[0]-tr;
+        data[3] = data[1]-ti;
+        data[0] += tr;
+        data[1] += ti;
+    }
+};
+
+#define  SIZE 32
+
 int main()
 {
+
     {
 
+        Vec<ComplexF32> v(SIZE);
+        v(0)=ComplexF32(2,-0.55);v(1)=ComplexF32(-0.5,0.255);v(2)=ComplexF32(4,-0.2);v(3)=ComplexF32(-3,1);
+        FFTDanielsonLanczosTest<SIZE> d2;
+
+
+        int nbr_iteration = 50;
+        auto start_global =  std::chrono::high_resolution_clock::now();
+        for(unsigned int i=0;i<nbr_iteration;i++){
+            for(unsigned int i=0;i<SIZE*SIZE;i++){
+                d2.apply(v.data()->data(),FFT_BACKWARD);
+            }
+        }
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/nbr_iteration<<std::endl;
+
+        //        d.apply(v.data()->data(),FFT_BACKWARD);
+        //        std::cout<<v<<std::endl;
+        //        std::cout<<v1<<std::endl;
+        return 0;
+
+    }
+    {
         Mat2F32 m(6,6);
         m(0,0)=0;
         m(2,2)=10;
@@ -295,68 +435,58 @@ int main()
 
         Private::FFTDanielsonLanczos<32 > fft;
         Mat2F32 m1(16,16);
-        Mat2F32 m2(32,32);
-        int nbr_iteration = 6*50;
-        auto start_global =  std::chrono::high_resolution_clock::now();
-        for(unsigned int i=0;i<nbr_iteration;i++){
-            for(unsigned int k=0;k<m1.sizeI();k++){
-                for(unsigned int j=0;j<m1.sizeJ();j++){
-                    fft.apply( m1.data());
-                }
-            }
-        }
-        auto end_global= std::chrono::high_resolution_clock::now();
-        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
-        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/nbr_iteration<<std::endl;
 
-
-        Mat2UI8 img(8,8);
-        img(0,0)=100;
-        img(2,2)=100;
-
-        Mat2F32 biais(8,8);
-        biais.fill(10);
-        //        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
-        Mat2F32 W(3,3);
-        W(0,0)=0.23;W(0,1)=0.14;W(0,2)=0.14;
-        W(1,0)=0.45;W(1,1)=0.24;W(1,2)=0.84;
-        W(2,0)=0.47;W(2,1)=0.21;W(2,2)=0.14;
-
-
-
-
-        Mat2F32 imgf(img);
-        Mat2F32 img2 = Processing::convolution(imgf,W,MatNBoundaryConditionPeriodic())+biais;
-        std::cout<<img2<<std::endl;
-        ConvolutionFourier c;
-
-
-        c.convolution(imgf,W,10);
-        //        std::cout<<imgf<<std::endl;
-
-
-
-        return 1;
-        //        ConvolutionFourier c;
-        //        Mat2F32 imgf(img);
-        //        //imgf.display();
-        //        MatNDisplay disp;
-        //        while(1==1){
-        //            c.convolution(imgf,W);
-        ////            std::cout<<imgf<<std::endl;
-        ////
-        //            disp.display(imgf);
-        //        }
-        //
-        //imgf.display();
-
-        //        Representation::correlationDirectionByFFT(img).display();
-        //        Mat2ComplexF32 imgc;
-        //        Convertor::fromRealImaginary(Mat2F32(img),imgc);
-        //        imgc = Representation::FFT(imgc);
-        //        img = Representation::FFTDisplay(imgc);
-        //        img.display();
     }
+
+
+
+    Mat2UI8 img(8,8);
+    img(0,0)=100;
+    img(2,2)=100;
+
+    Mat2F32 biais(8,8);
+    biais.fill(10);
+    //        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
+    Mat2F32 W(3,3);
+    W(0,0)=0.23;W(0,1)=0.14;W(0,2)=0.14;
+    W(1,0)=0.45;W(1,1)=0.24;W(1,2)=0.84;
+    W(2,0)=0.47;W(2,1)=0.21;W(2,2)=0.14;
+
+
+
+
+    Mat2F32 imgf(img);
+    Mat2F32 img2 = Processing::convolution(imgf,W,MatNBoundaryConditionPeriodic())+biais;
+    std::cout<<img2<<std::endl;
+    ConvolutionFourier c;
+
+
+    c.convolution(imgf,W,10);
+    //        std::cout<<imgf<<std::endl;
+
+
+
+    return 1;
+    //        ConvolutionFourier c;
+    //        Mat2F32 imgf(img);
+    //        //imgf.display();
+    //        MatNDisplay disp;
+    //        while(1==1){
+    //            c.convolution(imgf,W);
+    ////            std::cout<<imgf<<std::endl;
+    ////
+    //            disp.display(imgf);
+    //        }
+    //
+    //imgf.display();
+
+    //        Representation::correlationDirectionByFFT(img).display();
+    //        Mat2ComplexF32 imgc;
+    //        Convertor::fromRealImaginary(Mat2F32(img),imgc);
+    //        imgc = Representation::FFT(imgc);
+    //        img = Representation::FFTDisplay(imgc);
+    //        img.display();
+
     {
         Mat2ComplexF32 m(8,8);
         DistributionUniformInt d(0,7);

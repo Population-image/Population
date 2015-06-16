@@ -137,7 +137,6 @@ struct FFTDanielsonLanczos :public FFTAbtract<T>{
     }
 };
 
-
 template<typename T>
 class FFTDanielsonLanczos<4,T>:public FFTAbtract<T>  {
 public:
@@ -180,6 +179,7 @@ public:
 
     }
 };
+
 template<typename T>
 struct FFTDanielsonLanczos<1,T>:public FFTAbtract<T> {
     void apply(T* ,FFT_WAY =FFT_FORWARD){}

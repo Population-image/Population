@@ -778,6 +778,10 @@ public:
 
         return RGB<ChannelType>(r,g,b);
     }
+
+    ChannelType * data(){return _data;}
+    const ChannelType * data()const{return _data;}
+
 private:
     ChannelType _data[DIM];
 };
