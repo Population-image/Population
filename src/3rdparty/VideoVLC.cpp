@@ -247,23 +247,7 @@ bool VideoVLC::isFile()const{
 }
 
 bool VideoVLC::grabMatrixRGB(){
-    bool ret = false;
-
-    if (isplaying) {
-        while(context->index <= 0 || my_index == context->index){
-#if Pop_OS==2
-            Sleep(40);
-#endif
-#if Pop_OS==1
-            usleep(40000);
-#endif
-        }
-
-        my_index = context->index;
-        ret = true;
-    }
-
-    return ret;
+    return grabMatrixGrey();
 }
 
 Mat2RGBUI8& VideoVLC::retrieveMatrixRGB(){
@@ -272,8 +256,8 @@ Mat2RGBUI8& VideoVLC::retrieveMatrixRGB(){
     if (context->image_RV32) {
         imgcolor.resize(context->image_RV32->getDomain());
         std::transform(context->image_RV32->begin(),context->image_RV32->end(),imgcolor.begin(),ConvertRV32ToRGBUI8::lumi);
-        context->pmutex->unlock();
     }
+    context->pmutex->unlock();
     return imgcolor;
 }
 
