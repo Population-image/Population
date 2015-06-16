@@ -21,7 +21,7 @@ include(cmake/popUtils.cmake)
 # ===================================================
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
-POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON)
+POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   OFF)
 POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))

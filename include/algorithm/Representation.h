@@ -136,6 +136,9 @@ struct FFTDanielsonLanczos :public FFTAbtract<T>{
 
     }
 };
+
+
+
 template<typename T>
 struct FFTDanielsonLanczos<1,T>:public FFTAbtract<T> {
     void apply(T* ,FFT_WAY =FFT_FORWARD){}
@@ -465,8 +468,8 @@ struct POP_EXPORTS Representation
         }
         __resize(in,out,x,x);
     }
-    template<int DIM,typename PixelType>
-    static void upPower2(MatN<DIM,PixelType>& in,MatN<DIM,PixelType> &out){
+    template<typename MatN1,int DIM,typename PixelType>
+    static void upPower2(const MatN1& in,MatN<DIM,PixelType> &out){
         VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
             x(i) = 1<<(int)(std::floor(std::log(in.getDomain()(i))/std::log(2))+1);
@@ -482,8 +485,8 @@ struct POP_EXPORTS Representation
     }
     //@}
 
-    template<int DIM,typename PixelType>
-    static void __resize(const MatN<DIM,PixelType>& in, MatN<DIM,PixelType>& out,VecN<DIM,I32> x,VecN<DIM,I32> size){
+    template<typename MatN1,int DIM,typename PixelType>
+    static void __resize(const MatN1& in, MatN<DIM,PixelType>& out,VecN<DIM,I32> x,VecN<DIM,I32> size){
         if(out.getDomain()!=x){
             out.resize(x);
         }

@@ -37,6 +37,7 @@ The Git repository:
 \code
 git clone git://69007hpv111117.ikoula.com/Population.git
 \endcode
+In linux, for opengl visualization, you need glut (for ubuntu distribution sudo apt-get install freeglut3-dev libx11-dev libxmu-dev libxi-dev )
 You find this \ref pagedirectoryorganisation .  
 
 \section pageC  Install C++

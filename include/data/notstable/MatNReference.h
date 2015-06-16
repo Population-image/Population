@@ -740,6 +740,20 @@ public:
 
     //@}
 
+
+    PixelType * begin(){
+        return _data;
+    }
+    const PixelType * begin()const{
+        return _data;
+    }
+    PixelType * end(){
+        return _data+_domain.multCoordinate();
+    }
+    const PixelType * end()const{
+        return _data+_domain.multCoordinate();
+    }
+
 };
 
 
