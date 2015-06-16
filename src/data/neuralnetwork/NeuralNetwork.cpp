@@ -2014,6 +2014,9 @@ void NeuralNet::loadByteArray(const char *  file)
 
 void NeuralNet::load(XMLDocument &doc)
 {
+    // We want the file to be locale-independant, so we load it with C locales for numerics (e.g., float values contains '.').
+    // At the end of this function, we set the locale to the environment default
+    std::setlocale(LC_NUMERIC, "C");
     this->clear();
     XMLNode node1 = doc.getChild("label2String");
     std::string type1 = node1.getAttribute("id");
@@ -2062,7 +2065,7 @@ void NeuralNet::load(XMLDocument &doc)
             std::string str_biais = tool.getAttribute("weight_biais");
             std::string str_kernel = tool.getAttribute("weight_kernel");
             if(NeuralLayerMatrixConvolutionSubScaling * neural_matrix = dynamic_cast<NeuralLayerMatrixConvolutionSubScaling *>(*(_v_layer.rbegin()))){
-                std::istringstream stream_biais(str_biais);
+                std::istringstream stream_biais(str_biais); 
                 for(unsigned int index_weight=0;index_weight<neural_matrix->_W_biais.size();index_weight++){
                     F32 weight ;
                     str = pop::BasicUtility::getline( stream_biais, ";" );
@@ -2096,9 +2099,13 @@ void NeuralNet::load(XMLDocument &doc)
             }
         }
     }
+    std::setlocale(LC_NUMERIC, "");
 }
 void NeuralNet::save(const char * file)const
 {
+    // We want the file to be locale-independant, so we save it with C locales for numerics (e.g., float values contains '.').
+    // At the end of this function, we set the locale to the environment default
+    std::setlocale(LC_NUMERIC, "C");
     XMLDocument doc;
     XMLNode node1 = doc.addChild("label2String");
     node1.addAttribute("id",BasicUtility::Any2String(_label2string));
@@ -2155,6 +2162,7 @@ void NeuralNet::save(const char * file)const
         }
     }
     doc.save(file);
+    std::setlocale(LC_NUMERIC, "");
 }
 const Vec<std::string>& NeuralNet::label2String()const{
     return _label2string;
