@@ -9,7 +9,7 @@ set(POP_PATCH_VERSION 0)
 set(POP_VERSION ${POP_MAJOR_VERSION}.${POP_MINOR_VERSION}.${POP_PATCH_VERSION})
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # ----------------------------------------------------------------------------
@@ -21,7 +21,7 @@ include(cmake/popUtils.cmake)
 # ===================================================
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
-POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   ON)
+POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   OFF)
 POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
 POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
@@ -31,7 +31,7 @@ POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF )
 POP_OPTION(BUILD_EXPORT      "export library" OFF )
-POP_OPTION(BUILD_EXECUTABLE  "Build executable" OFF )
+POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
 POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
@@ -39,7 +39,6 @@ POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
 POP_OPTION(BUILD_WITH_C11        "build C11" OFF )
-
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -50,22 +49,7 @@ set(POPULATION_CMAKE_DIR  CMake CACHE PATH  "Installation directory for CMake fi
 set(POPULATION_LIB_NAME population CACHE PATH  "Installation lib name")
 set(POPULATION_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}/include" CACHE PATH "Include directory")
 
-if (FFTW_INCLUDES)
-  # Already in cache, be silent
-  set (FFTW_FIND_QUIETLY TRUE)
-endif (FFTW_INCLUDES)
 
-find_path (FFTW_INCLUDES fftw3.h)
-
-find_library (FFTW_LIBRARIES NAMES fftw3)
-
-# handle the QUIETLY and REQUIRED arguments and set FFTW_FOUND to TRUE if
-# all listed variables are TRUE
-include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (FFTW DEFAULT_MSG FFTW_LIBRARIES FFTW_INCLUDES)
-
-mark_as_advanced (FFTW_LIBRARIES FFTW_INCLUDES)
-message(STATUS ${FFTW_LIBRARIES})
 set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${FFTW_LIBRARIES} )
 
 # Make relative paths absolute (needed later on)
@@ -76,7 +60,7 @@ foreach(p LIB BIN INCLUDE CMAKE)
   endif()
 endforeach()
 
-
+message(STATUS ${PROJECT_SOURCE_DIR})
 #source file
 file(
         GLOB_RECURSE
@@ -175,6 +159,7 @@ endif(BUILD_SHARED_LIBS OR BUILD_TUTORIAL OR BUILD_ARTICLE OR BUILD_TEMP )
 
 
 if(BUILD_EXECUTABLE)
+    message(STATUS ${POPULATION_SOURCES})
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)

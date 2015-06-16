@@ -2102,9 +2102,6 @@ MatN<Dim,PixelType>  MatN<Dim,PixelType>::operator*(const MatN<Dim,PixelType> &m
     POP_DbgAssertMessage(DIM==2&&this->sizeJ()==m.sizeI() ,"In Matrix::operator*, Not compatible size for the operator * of the class Matrix (A_{n,k}*B_{k,p})");
     MatN<Dim,PixelType> mtrans = m.transpose();
     MatN<Dim,PixelType> mout(this->sizeI(),m.sizeJ());
-#if defined(HAVE_OPENMP)
-#pragma omp parallel for
-#endif
     for( int i=0;i<static_cast<int>(this->sizeI());i++){
         for(unsigned  j=0;j<(m.sizeJ());j++){
             PixelType sum = 0;
@@ -2278,9 +2275,6 @@ MatN<DIM,PixelType>  MatN<DIM,PixelType>::transpose()const
     const unsigned int sizei= this->sizeI();
     const unsigned int sizej= this->sizeJ();
     MatN<DIM,PixelType> temp(sizej,sizei);
-//#if defined(HAVE_OPENMP)
-//#pragma omp parallel for
-//#endif
     for(int i=0;i<sizei;i++){
         typename  MatN<DIM,PixelType>::const_iterator this_ptr  =  this->begin() + i*sizej;
         typename  MatN<DIM,PixelType>::const_iterator this_end_ptr  =  this_ptr + sizej;

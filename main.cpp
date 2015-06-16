@@ -1,6 +1,5 @@
 #include"Population.h"//Single header
-#include <fftw3.h>
-#include <fftw3.h>
+#include"include/algorithm/Arithmetic.h"
 using namespace pop;//Population namespace
 #if __cplusplus > 199711L // c++11
 #include <chrono>
@@ -72,7 +71,7 @@ VecF32 normalizedImageToOutputNet( const Mat2UI8& binary,Vec2I32 domain,MatNInte
 struct ConvolutionFourier
 {
 
-    Mat2ComplexF32 weightReal2Fourrier(const Mat2F32& W , Vec2I32 domain_mult_2){
+    static Mat2ComplexF32 weightReal2Fourrier(const Mat2F32& W , Vec2I32 domain_mult_2){
         Mat2ComplexF32 m_W(domain_mult_2);
         MatNBoundaryConditionPeriodic c;
         Vec2I32 radius(W.getDomain()(0)/2,W.getDomain()(1)/2);
@@ -84,9 +83,13 @@ struct ConvolutionFourier
                 m_W(y)=ComplexF32(W(x),0);
             }
         }
-        return Representation::FFT(m_W);
+        Mat2ComplexF32 m_w = Representation::FFT(m_W);
+        for(unsigned int i=0;i<m_w.size();i++){
+            m_w(i)=m_w(i).conjugate();
+        }
+        return m_w;
     }
-    Mat2F32 weightFourrier2Real( Mat2ComplexF32 m_W , Vec2I32 domain_W){
+    static Mat2F32 weightFourrier2Real( Mat2ComplexF32 m_W , Vec2I32 domain_W){
         m_W = Representation::FFT(m_W,FFT_BACKWARD);
         Representation::scale(m_W);
         Mat2F32 W(domain_W);
@@ -97,7 +100,7 @@ struct ConvolutionFourier
             for(x(1)=0;x(1)<W.sizeJ();x(1)++){
                 Vec2I32 y =x -radius;
                 c.apply(m_W.getDomain(),y);
-                 W(x)= m_W(y).real();
+                W(x)= m_W(y).real();
             }
         }
         return W;
@@ -108,10 +111,7 @@ struct ConvolutionFourier
         Mat2ComplexF32 m_i;
         Convertor::fromRealImaginary(m,m_i);
         Mat2ComplexF32 m_W = weightReal2Fourrier(W,m_i.getDomain());
-
         m_i = Representation::FFT(m_i);
-
-
         m_i= m_i.multTermByTerm(m_W);
         m_i(0,0) +=W_biais*m_i.getDomain().multCoordinate();
         m_i = Representation::FFT(m_i,FFT_BACKWARD);
@@ -120,35 +120,196 @@ struct ConvolutionFourier
     }
 };
 
-//class NeuralLayerMatrixConvolutionFFT : public NeuronSigmoid,public NeuralLayerMatrix
-//{
-//public:
-//    NeuralLayerMatrixConvolutionFFT(unsigned int nbr_map,unsigned int radius_kernel,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
-//        :NeuralLayerMatrix(std::floor (  sizei_map_previous-1-2*radius_kernel)+1,std::floor (  (sizej_map_previous-1-2*radius_kernel))+1,nbr_map),
-//          _W_kernels(nbr_map*nbr_map_previous,Mat2F32(sizei_map_previous,sizej_map_previous)),
-//          _W_biais(nbr_map*nbr_map_previous),
-//          _sub_resolution_factor (sub_scaling_factor),
-//          _radius_kernel (radius_kernel){
+class NeuralLayerMatrixConvolutionFFT : public NeuronSigmoid,public NeuralLayerMatrix
+{
+public:
+    int power2(int i){
+        return 1<<(int)std::ceil(Arithmetic::exposant(i,2));
+    }
 
-//    }
+    NeuralLayerMatrixConvolutionFFT(unsigned int nbr_map,unsigned int sizei,unsigned int sizej,int kernel_radius,unsigned int nbr_map_previous)
+        :NeuralLayerMatrix(sizei-2*kernel_radius,sizej-2*kernel_radius,nbr_map_previous),
+//          :NeuralLayerMatrix(sizei,sizej,nbr_map_previous),
+          _W_kernels(nbr_map*nbr_map_previous,Mat2F32(power2(sizei),power2(sizej))),
+          _W_biais(nbr_map*nbr_map_previous),
+          _X_complex(power2(sizei),power2(sizej)),
+          _Y_complex(nbr_map,Mat2F32(power2(sizei),power2(sizej))),
+          _radius(kernel_radius)
+    {
 
-//    void setTrainable(bool istrainable);
+    }
 
-//    virtual void forwardCPU(const NeuralLayer& layer_previous);
-//    virtual void backwardCPU(NeuralLayer& layer_previous);
-//    void learn();
-//    virtual NeuralLayer * clone();
-//    Vec<Mat2ComplexF32> _W_kernels;
-//    Vec<F32> _W_biais;
-//    Vec<Mat2F32> _d_E_W_kernels;
-//    Vec<F32> _d_E_W_biais;
-//    unsigned int _sub_resolution_factor;
-//    unsigned int _radius_kernel;
-//};
+    void setTrainable(bool istrainable){
 
+
+
+    }
+
+    void setWeight(Vec<Mat2F32> v_weights,Vec<F32> v_weighs_biais){
+        for(unsigned int i=0;i<v_weights.size();i++){
+            this->_W_kernels(i) = ConvolutionFourier::weightReal2Fourrier(v_weights(i),this->_W_kernels(i).getDomain());
+        }
+        _W_biais= v_weighs_biais;
+    }
+
+    void convertReal2Complex(const MatNReference<2,F32> & map,Mat2ComplexF32 & map_complex){
+        map_complex.fill(ComplexF32(0,0));
+        for(unsigned int i=0;i<map.sizeI();i++){
+            for(unsigned int j=0;j<map.sizeJ();j++){
+                map_complex(i,j)=ComplexF32(map(i,j),0);
+            }
+        }
+
+    }
+    void FFTInverse(){
+
+    }
+    virtual void forwardCPU(const NeuralLayer& layer_previous){
+
+        //init output maps
+        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+            this->_Y_complex(index_map).fill(ComplexF32(0,0));
+        }
+
+        if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
+            //iterate over the input maps
+            for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                const MatNReference<2,F32> & map =neural_matrix->X_map()(index_map_previous);
+
+                convertReal2Complex(map,_X_complex);
+                //apply the forward FFT to the previous map
+                _X_complex = Representation::FFT(_X_complex);
+
+                //iterate of the output map
+                for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                    //get the index of the kernel
+                    int index = index_map*neural_matrix->X_map().size()+index_map_previous;
+
+                    //apply the convolution (matrix multiplication term of term in frequency domain) and add the result to the output map
+
+                    _Y_complex(index_map) += _X_complex.multTermByTerm(_W_kernels[index]);
+                    //add the biais weight
+                    _Y_complex(index_map)(0,0).real() +=_W_biais(index)*_X_complex.getDomain().multCoordinate();
+                }
+            }
+        }
+
+        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+            //apply the backward FFT ot the  map
+            _Y_complex(index_map) = Representation::FFT(_Y_complex(index_map),FFT_BACKWARD);
+            //scale the result
+            Representation::scale(_Y_complex(index_map));
+
+
+            for(unsigned int i=0;i<this->_X_reference(index_map).sizeI();i++)
+                for(unsigned int j=0;j<this->_X_reference(index_map).sizeJ();j++){
+                    this->_X_reference(index_map)(i,j) = NeuronSigmoid::activation(_Y_complex(index_map)(i,j).real());
+                }
+        }
+
+    }
+
+    virtual void backwardCPU(NeuralLayer& layer_previous){}
+    void learn(){}
+    virtual NeuralLayer * clone(){}
+    Mat2ComplexF32 _X_complex;
+    Vec<Mat2ComplexF32> _W_kernels;
+    Vec<Mat2ComplexF32> _Y_complex;
+    Vec<F32> _W_biais;
+    int _radius;
+    unsigned int _sub_resolution_factor;
+};
+
+#define  SIZE 12
 int main()
 {
     {
+
+        Mat2F32 m(6,6);
+        m(0,0)=0;
+        m(2,2)=10;
+        m(4,4)=0;
+
+        Mat2F32 m2(6,6);
+        m2(3,1)=10;
+        NeuralLayerMatrixInput input_layer(6,6,2);
+        std::copy(m.begin(),m.end(),input_layer.X().begin());
+        std::copy(m2.begin(),m2.end(),input_layer.X().begin()+6*6);
+        NeuralLayerMatrixConvolutionFFT convolution_layer(2,6,6,1,2);
+
+        Vec<Mat2F32> v_W;
+        Mat2F32 W(3,3);
+        W(1,0)=-1;W(1,2)=1;
+        v_W.push_back(W);
+        W.fill(0);
+        W(0,1)=-1;W(2,1)=1;
+        v_W.push_back(W);
+        W.fill(0);
+        W(1,0)=-1;W(1,2)=0;
+        v_W.push_back(W);
+        W.fill(0);
+        W(0,1)=-1;W(2,1)=0;
+        v_W.push_back(W);
+
+        Vec<F32> v_W_biais(4,0);
+        convolution_layer.setWeight(v_W,v_W_biais);
+
+
+        convolution_layer.forwardCPU(input_layer);
+        std::cout<<convolution_layer.X_map()(0)<<std::endl;
+        std::cout<<convolution_layer.X_map()(1)<<std::endl;
+    }
+    {
+
+        Vec<ComplexF32> v(SIZE*SIZE);
+        v(0)=ComplexF32(2,-0.55);v(1)=ComplexF32(-0.5,0.255);v(2)=ComplexF32(4,-0.2);v(3)=ComplexF32(-3,1);
+        Private::FFTDanielsonLanczos<SIZE> d2;
+
+        int nbr_iteration = 6*50;
+        auto start_global =  std::chrono::high_resolution_clock::now();
+
+
+        Vec<ComplexF32>::iterator it_other =   v.begin();
+        Vec<ComplexF32>::iterator it;
+        int j=0,k=0;
+        for(unsigned int i=0;i<nbr_iteration;i++){
+
+            for(k=0;k<SIZE;k++){
+                for(unsigned int j=0;j<SIZE;j++){
+                    Vec<ComplexF32>::iterator it = it_other+j*SIZE;
+                    d2.apply( (it)->data(),FFT_BACKWARD);
+                }
+            }
+        }
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/nbr_iteration<<std::endl;
+
+        //        d.apply(v.data()->data(),FFT_BACKWARD);
+        //        std::cout<<v<<std::endl;
+        //        std::cout<<v1<<std::endl;
+        return 1;
+
+    }
+    {
+
+        Private::FFTDanielsonLanczos<32 > fft;
+        Mat2F32 m1(16,16);
+        Mat2F32 m2(32,32);
+        int nbr_iteration = 6*50;
+        auto start_global =  std::chrono::high_resolution_clock::now();
+        for(unsigned int i=0;i<nbr_iteration;i++){
+            for(unsigned int k=0;k<m1.sizeI();k++){
+                for(unsigned int j=0;j<m1.sizeJ();j++){
+                    fft.apply( m1.data());
+                }
+            }
+        }
+        auto end_global= std::chrono::high_resolution_clock::now();
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+        std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/nbr_iteration<<std::endl;
+
+
         Mat2UI8 img(8,8);
         img(0,0)=100;
         img(2,2)=100;
@@ -157,9 +318,9 @@ int main()
         biais.fill(10);
         //        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/eutel.bmp"));
         Mat2F32 W(3,3);
-        W(0,0)=0.1;W(0,1)=0.1;W(0,2)=0.1;
-        W(1,0)=0.1;W(1,1)=0.2;W(1,2)=0.8;
-        W(2,0)=0.1;W(2,1)=0.1;W(2,2)=0.1;
+        W(0,0)=0.23;W(0,1)=0.14;W(0,2)=0.14;
+        W(1,0)=0.45;W(1,1)=0.24;W(1,2)=0.84;
+        W(2,0)=0.47;W(2,1)=0.21;W(2,2)=0.14;
 
 
 
@@ -169,35 +330,32 @@ int main()
         std::cout<<img2<<std::endl;
         ConvolutionFourier c;
 
-        std::cout<<W<<std::endl;
-        Mat2ComplexF32 m_W = c.weightReal2Fourrier(W,img.getDomain());
-        std::cout<<c.weightFourrier2Real(m_W,W.getDomain());
 
-//        c.convolution(imgf,W,10);
-//        std::cout<<imgf<<std::endl;
+        c.convolution(imgf,W,10);
+        //        std::cout<<imgf<<std::endl;
 
 
 
         return 1;
-                //        ConvolutionFourier c;
-                //        Mat2F32 imgf(img);
-                //        //imgf.display();
-                //        MatNDisplay disp;
-                //        while(1==1){
-                //            c.convolution(imgf,W);
-                ////            std::cout<<imgf<<std::endl;
-                ////
-                //            disp.display(imgf);
-                //        }
-                //
-                //imgf.display();
+        //        ConvolutionFourier c;
+        //        Mat2F32 imgf(img);
+        //        //imgf.display();
+        //        MatNDisplay disp;
+        //        while(1==1){
+        //            c.convolution(imgf,W);
+        ////            std::cout<<imgf<<std::endl;
+        ////
+        //            disp.display(imgf);
+        //        }
+        //
+        //imgf.display();
 
-                //        Representation::correlationDirectionByFFT(img).display();
-                //        Mat2ComplexF32 imgc;
-                //        Convertor::fromRealImaginary(Mat2F32(img),imgc);
-                //        imgc = Representation::FFT(imgc);
-                //        img = Representation::FFTDisplay(imgc);
-                //        img.display();
+        //        Representation::correlationDirectionByFFT(img).display();
+        //        Mat2ComplexF32 imgc;
+        //        Convertor::fromRealImaginary(Mat2F32(img),imgc);
+        //        imgc = Representation::FFT(imgc);
+        //        img = Representation::FFTDisplay(imgc);
+        //        img.display();
     }
     {
         Mat2ComplexF32 m(8,8);
