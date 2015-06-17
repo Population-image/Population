@@ -29,14 +29,8 @@ bool BasicUtility::String2Any(std::string s,  bool & Dest ){
     return true;
 }
 bool BasicUtility::String2Float(std::string s,  F32 & Dest ){
-    //XXX: we have some problems with the locale
-    //setlocale(LC_ALL|~LC_NUMERIC, "");
-    //std::setlocale(LC_NUMERIC, "C");
-    //Dest = atof(s.c_str());
-    //setlocale(LC_NUMERIC, "");
-
-    std::istringstream iss(s);
-    return iss >> Dest != 0;
+    Dest = atof(s.c_str());
+    return true;
 }
 bool BasicUtility::Any2String(bool Value,  std::string & s){
     s = (Value ? "true" : "false");
