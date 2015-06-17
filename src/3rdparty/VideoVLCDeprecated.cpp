@@ -214,32 +214,27 @@ bool VideoVLCDeprecated::tryOpen(const std::string & path){
         return false;
 }
 bool VideoVLCDeprecated::grabMatrixGrey(){
-    if(isplaying==true){
-        if(my_index!=*context->index){
-            my_index=*context->index;
-            return true;
-        }else{
-        while(my_index==*context->index){
-            if(_isfile==true&&libvlc_media_player_is_playing(mediaPlayer)==false){
-                isplaying = false;
-                return false;
-            }
-            if(_isfile==false){
-#if Pop_OS==2
-                Sleep(10);
-#endif
-#if Pop_OS==1
-                usleep(10000);
-#endif
-            }
-        }
-        return true;
-        }
-
-    }else
-    {
+    if (!isplaying) {
         return false;
     }
+
+    while(my_index==*context->index){
+        if(_isfile && !libvlc_media_player_is_playing(mediaPlayer)){
+            isplaying = false;
+            return false;
+        }
+
+        if(!_isfile) {
+#if Pop_OS==2
+            Sleep(10);
+#endif
+#if Pop_OS==1
+            usleep(10000);
+#endif
+        }
+    }
+    my_index=*context->index;
+    return true;
 }
 Mat2UI8& VideoVLCDeprecated::retrieveMatrixGrey(){
     context->pmutex->lock();
@@ -252,21 +247,27 @@ bool VideoVLCDeprecated::isFile() const{
     return _isfile;
 }
 bool VideoVLCDeprecated::grabMatrixRGB(){
-    if(isplaying==true){
-        while(my_index==*context->index){
-#if Pop_OS==2
-            Sleep(40);
-#endif
-#if Pop_OS==1
-            usleep(40000);
-#endif
-        }
-        my_index=*context->index;
-        return true;
-    }else
-    {
+    if (!isplaying) {
         return false;
     }
+
+    while(my_index==*context->index){
+        if(_isfile && !libvlc_media_player_is_playing(mediaPlayer)){
+            isplaying = false;
+            return false;
+        }
+
+        if(!_isfile) {
+#if Pop_OS==2
+            Sleep(10);
+#endif
+#if Pop_OS==1
+            usleep(10000);
+#endif
+        }
+    }
+    my_index=*context->index;
+    return true;
 }
 Mat2RGBUI8& VideoVLCDeprecated::retrieveMatrixRGB(){
     context->pmutex->lock();
