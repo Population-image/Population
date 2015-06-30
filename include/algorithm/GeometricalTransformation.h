@@ -111,6 +111,24 @@ struct POP_EXPORTS GeometricalTransformation
     }
 
 
+    template<int DIM>
+    struct _FunctorScale
+    {
+        VecN<DIM,F32> _alpha;
+        MatNInterpolation _interpolation;
+        _FunctorScale(VecN<DIM,F32> alpha,MatNInterpolation interpolation)
+            :_alpha(alpha),_interpolation(interpolation){}
+        template<typename PixelType>
+        PixelType operator()(const MatN<DIM,PixelType> & f , const typename MatN<DIM,PixelType>::E itx){
+            VecN<DIM,F32> x;
+            x=(VecN<DIM,F32>(itx)-0.5)*_alpha;
+            if(_interpolation.isValid(f.getDomain(),x)){
+                return _interpolation.apply(f,x);
+            }else{
+                return PixelType();
+            }
+        }
+    };
     /*!
      * \brief scale the image
      * \param scale vector of scale factor
@@ -129,24 +147,6 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lena.bmp
      * \image html Lenascale.png
     */
-	template<int DIM>
-	struct _FunctorScale
-	{
-		VecN<DIM,F32> _alpha;
-		MatNInterpolation _interpolation;
-		_FunctorScale(VecN<DIM,F32> alpha,MatNInterpolation interpolation)
-            :_alpha(alpha),_interpolation(interpolation){}
-		template<typename PixelType>
-		PixelType operator()(const MatN<DIM,PixelType> & f , const typename MatN<DIM,PixelType>::E itx){
-			VecN<DIM,F32> x;
-            x=(VecN<DIM,F32>(itx)-0.5)*_alpha;
-            if(_interpolation.isValid(f.getDomain(),x)){
-                return _interpolation.apply(f,x);
-            }else{
-				return PixelType(); 
-			}
-		}
-	};
     template<int DIM,  typename PixelType>
     static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {

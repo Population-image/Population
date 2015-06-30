@@ -39,9 +39,9 @@ imgfilter.display();
 \image html sand2.png
 Now the grey level inside the pore-space and the sand grains is quite homogeneous, you can apply the threshold segmentation. To find the threshold value, you plot the histogram:
 \code
-Mat2F64 m = Analysis::histogram(img);
-Distribution d(m);
-d.display();
+Mat2F32 m = Analysis::histogram(img);
+DistributionRegularStep d(m);
+DistributionDisplay::display(d,d.getXmin(),d.getXmax());
 \endcode
 \image html sand3.png
 In this histogram, the minimum value between the peaks populated by the pore phase and the granular phase correspond to the argument 155. Therefore you will threshold the matrix with this value:
