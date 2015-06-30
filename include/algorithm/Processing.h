@@ -1900,8 +1900,13 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     */
     template<int DIM,typename PixelType>
     static MatN<DIM,UI8>  edgeDetectorCanny(const MatN<DIM,PixelType>& f,F32 sigma_gaussian=1,F32 low =2,F32 high=20){
-        MatN<DIM,F32> grad;
-        MatN<DIM,UI8> maxima = ProcessingAdvanced::nonMaximumSuppression(f,sigma_gaussian,grad);
+
+        MatN<DIM,VecN<DIM,F32> > grad_vec = Processing::gradientVecGaussian(f,sigma_gaussian);
+        MatN<DIM,F32> grad(f.getDomain());
+        for(unsigned int i=0;i<grad_vec.size();i++){
+            grad(i)=grad_vec(i).norm(2);
+        }
+        MatN<DIM,UI8> maxima = ProcessingAdvanced::nonMaximumSuppression(f,grad_vec,grad);
         MatN<DIM,UI8> seed = minimum(maxima,Processing::threshold(grad,high));
         MatN<DIM,UI8> propagation =minimum(maxima,Processing::threshold(grad,low));
         MatN<DIM,UI8> thinning = Processing::voronoiTesselation(seed,propagation,1);

@@ -162,15 +162,18 @@ struct POP_EXPORTS Convertor
         In this example, we apply a low pass filter:
         \code
         Mat2UI8 img;//2d grey-level image object
-        img.load("/home/vincent/Dropbox/MyArticle/PhaseField/lena.pgm");//replace this path by those on your computer
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
+        Mat2F32 noisemap;
+        DistributionNormal d(0,20);
+        Processing::randomField(img.getDomain(),d,noisemap);
+        Mat2F32 imgf = Mat2F32(img) +noisemap;
         Mat2ComplexF32 imgcomplex;
-        Convertor::fromRealImaginary(Mat2F32(img),imgcomplex);
-        Mat2ComplexF32 fft = Representation::FFT(imgcomplex);
-        Mat2ComplexF32 filterlowpass(fft.getDomain());
-        Vec2I32 x(0,0);
-        Draw::disk(filterlowpass,x,10,NumericLimits<ComplexF32>::maximumRange(),MATN_BOUNDARY_CONDITION_MIRROR);
-        fft = Processing::mask(fft,filterlowpass);
-        imgcomplex = Representation::FFT(fft,-1);
+        Convertor::fromRealImaginary(imgf,imgcomplex);
+        Mat2ComplexF32 fft(imgcomplex);
+        fft = Representation::FFT(fft,FFT_FORWARD);
+        Mat2ComplexF32 filterlowpass = Representation::lowPass(fft,60);
+        imgcomplex = Representation::FFT(filterlowpass,FFT_BACKWARD);
+        Representation::scale(imgcomplex);
         Mat2F32 imgd;
         Convertor::toRealImaginary(imgcomplex,imgd);
         img = Processing::greylevelRange(imgd,0,255);

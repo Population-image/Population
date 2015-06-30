@@ -593,10 +593,16 @@ public:
         VecN<DIM+1,F32> ZeroCinq;
         ZeroCinq = 0.5;
         for(int index_extrema=0;index_extrema<(int)extrema.size();index_extrema++){
+            if(index_extrema==2157){
+                index_extrema++;
+                index_extrema--;
+
+            }
             int octave = extrema[index_extrema].octave();
+
             VecN<DIM+1,F32> x=extrema[index_extrema].xInPyramid();
-            int local_iteration=0;
-            for( ; local_iteration < max_iteration; local_iteration++ )
+
+            for(int local_iteration=0 ; local_iteration < max_iteration; local_iteration++ )
             {
                 VecN<DIM+1,F32> v;
                 VecN<DIM+1,int> xint = round(x);
@@ -609,11 +615,19 @@ public:
                 for(int i=0;i<DIM;i++)
                     if(round(x(i))<border||round(x(i))>pyramid_DofG.octave(octave).getDomain()(i)-1-border)
                         local_iteration= max_iteration;
-                if(round(x(DIM))<0||round(x(DIM))>=pyramid_DofG.octave(octave).getDomain()(DIM))
+                    if(round(x(DIM))<0||round(x(DIM))>=pyramid_DofG.octave(octave).getDomain()(DIM))
                     local_iteration= max_iteration;
                 if(absolute(X).allInferior(ZeroCinq)&&local_iteration!= max_iteration){
                     local_iteration= max_iteration;
+
                     v_extrema_adjust.push_back(KeyPointPyramid<DIM>(x,octave));
+                    if(v_extrema_adjust.size()==1602){
+                        local_iteration++;
+
+                    }
+                    if(v_extrema_adjust.size()==1601){
+                        local_iteration++;
+                    }
                 }
             }
         }

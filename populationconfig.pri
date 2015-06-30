@@ -21,7 +21,8 @@ HAVE_OPENGL{
     ##For linux,  install  glut (ubunto sudo apt-get install freeglut3-dev)
     DEFINES+=HAVE_OPENGL
     DEFINES+=HAVE_THREAD
-    unix:LIBS+=-lglut -lGL -lGLU  -lpthread
+    unix:LIBS+=-lglut
+    QT += opengl
     win32:LIBS += -lAdvapi32 -lgdi32 -luser32 -lshell32 -lopengl32 -lglu32
 }
 HAVE_CIMG{

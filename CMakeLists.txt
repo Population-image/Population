@@ -39,7 +39,6 @@ POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" ON )
 POP_OPTION(BUILD_CUDA        "Cuda test" ON )
 POP_OPTION(BUILD_WITH_C11        "build C11" OFF )
-
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -51,8 +50,7 @@ set(POPULATION_LIB_NAME population CACHE PATH  "Installation lib name")
 set(POPULATION_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}/include" CACHE PATH "Include directory")
 
 
-
-
+set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${FFTW_LIBRARIES} )
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)
@@ -61,7 +59,6 @@ foreach(p LIB BIN INCLUDE CMAKE)
     set(${var} "${CMAKE_CURRENT_SOURCE_DIR}/${${var}}")
   endif()
 endforeach()
-
 
 #source file
 file(

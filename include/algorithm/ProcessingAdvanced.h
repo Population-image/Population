@@ -159,24 +159,18 @@ struct ProcessingAdvanced
     }
 
 
-    template<typename Function>
-    static Function  nonMaximumSuppression(const Function & img,F32 sigma, typename FunctionTypeTraitsSubstituteF<Function,F32>::Result &gradnorm)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,UI8>  nonMaximumSuppression(const MatN<DIM,PixelType> & img,const MatN<DIM,VecN<DIM,F32> >& grad,const MatN<DIM,F32> &gradnorm)
     {
-
-        typedef typename FunctionTypeTraitsSubstituteF<Function,VecN<Function::DIM,F32> >::Result FunctionVecFloat;
-        typedef typename FunctionTypeTraitsSubstituteF<Function,F32>::Result FunctionFloat;
-        typedef typename FunctionTypeTraitsSubstituteF<Function,UI8 >::Result FunctionBinary;
-        gradnorm= ProcessingAdvanced::gradNormGaussian(FunctionFloat(img),sigma,std::min(9.f,sigma*3),img.getIteratorEDomain(),1);
-        FunctionVecFloat grad= ProcessingAdvanced::gradientVecGaussian(FunctionFloat(img),sigma);
 
         std::vector<F32> vtan;
         vtan.push_back(std::tan(-3*PI/8));
         vtan.push_back(std::tan(-PI/8));
         vtan.push_back(std::tan( PI/8));
         vtan.push_back(std::tan(3*PI/8));
-        FunctionBinary edge(img.getDomain());
+        MatN<DIM,UI8> edge(img.getDomain());
 
-        typename Function::IteratorERectangle it = img.getIteratorERectangle(1,img.getDomain()-2);
+        typename MatN<DIM,UI8>::IteratorERectangle it = img.getIteratorERectangle(1,img.getDomain()-2);
         while(it.next())
         {
             Mat2UI8::E x = it.x();
