@@ -622,6 +622,11 @@ struct POP_EXPORTS Draw
     */
     template<int DIM,typename PixelType>
     static MatN<DIM,PixelType> mergeTwoMatrixVertical(const MatN<DIM,PixelType> & img1,const MatN<DIM,PixelType> & img2){
+//        if(img1.getDomain()!=img2.getDomain()){
+//            std::cerr<<"Not the same size in mergeTwoMatrixVertical"<<std::endl;
+//            return img2;
+//        }
+
         typename MatN<DIM,PixelType>::E x = img1.getDomain();
         x(0)+=img2.getDomain()(0);
         MatN<DIM,PixelType> out(x);

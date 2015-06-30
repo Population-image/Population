@@ -60,7 +60,6 @@ foreach(p LIB BIN INCLUDE CMAKE)
   endif()
 endforeach()
 
-message(STATUS ${PROJECT_SOURCE_DIR})
 #source file
 file(
         GLOB_RECURSE
@@ -159,7 +158,6 @@ endif(BUILD_SHARED_LIBS OR BUILD_TUTORIAL OR BUILD_ARTICLE OR BUILD_TEMP )
 
 
 if(BUILD_EXECUTABLE)
-    message(STATUS ${POPULATION_SOURCES})
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)

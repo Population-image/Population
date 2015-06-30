@@ -212,8 +212,15 @@ public:
     std::vector<int> getConnectedVertex(int vertex_label)const;
 
 
-        void load(std::string file);
-        void save(std::string file)const;
+    void load(std::string file);
+    void save(std::string file)const;
+    void clear(){
+        _v_vertex.clear();
+        _v_adjency_list.clear();
+        _v_edge.clear();
+        _v_edge_link.clear();
+    }
+
 };
 template<typename VertexType1,typename EdgeType,typename VertexType2>
 struct FunctionTypeTraitsSubstituteF<GraphAdjencyList<VertexType1,EdgeType>,VertexType2 >

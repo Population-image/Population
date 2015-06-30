@@ -958,19 +958,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
     }
 }
 
-//class POP_EXPORTS NeuralNetworkFeedForwardMerge
-//{
-//public:
-//    void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
-//    void propagateBackFirstDerivate(const pop::VecF32& desired_output);
-//    void learningFirstDerivate();
-//    void setLearningRate(F32 eta=0.01);
-//    void addLayerFullyConnected(int nbr_output_neuron,NeuralNetworkFeedForward * n1,NeuralNetworkFeedForward* n2);
-//private:
-//    NeuralNetworkFeedForward * n1;
-//    NeuralNetworkFeedForward * n2;
-//    NeuralNetworkFeedForward n;
-//};
+
 class POP_EXPORTS NNNeuronMaxPool : public NNNeuron
 {
 public:
@@ -983,6 +971,7 @@ public:
 class NeuralLayer
 {
 public:
+    virtual ~NeuralLayer();
     /** @brief Using the CPU device, compute the output values . */
     virtual void forwardCPU(const NeuralLayer& layer_previous) = 0;
     /** @brief Using the CPU device, compute the error of the output values of the layer prrevious. */
@@ -1096,20 +1085,19 @@ public:
     unsigned int _sub_resolution_factor;
     unsigned int _radius_kernel;
 };
-
-class NeuralLayerMatrixMergeConvolution : public NeuronSigmoid,public NeuralLayerMatrix
+class NeuralLayerMatrixMaxPool : public NeuronSigmoid,public NeuralLayerMatrix
 {
 public:
-    NeuralLayerMatrixMergeConvolution(unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
+    NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
     void setTrainable(bool istrainable);
+
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
     void learn();
     virtual NeuralLayer * clone();
-    VecF32 _W_kernel;
-    F32 _W_biais;
-    VecF32 _d_E_W_kernel;
-    F32 _d_E_W_biais;
+    unsigned int _sub_resolution_factor;
+    bool _istrainable;
+    Vec<Mat2UI8> _v_map_index_max;
 };
 
 
@@ -1126,7 +1114,7 @@ public:
     void addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map);
     void addLayerLinearFullyConnected(unsigned int nbr_neurons);
     void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel);
-    void addLayerMatrixMergeConvolution();
+    void addLayerMatrixMaxPool(unsigned int sub_scaling_factor);
     void setLearnableParameter(F32 mu);
 
     void setTrainable(bool istrainable);
