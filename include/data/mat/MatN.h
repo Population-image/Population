@@ -201,7 +201,7 @@ public:
     //Domain loop
     for(int i =0;i<img.sizeI();i++){
         for(int j =0;j<img.sizeJ();j++){
-            Mat2UI8::F v =NumericLimits<Mat2UI8::F>::maximumRange(); //equivalent to unsigned char v=255
+            Mat2UI8::F v =NumericLimits<UI8>::maximumRange(); //equivalent to unsigned char v=255
              //Neighborhood loop
             for(int m= i-radius;m<i+radius;m++){
                 for(int n= j-radius;n<j+radius;n++){
@@ -226,7 +226,7 @@ public:
     Mat2UI8::IteratorEDomain itdomain(img.getIteratorEDomain());//Domain IteratorE
     Mat2UI8::IteratorENeighborhood itneigh (img.getIteratorENeighborhood(4,2));//Neighborhood IteratorE with the norm euclidean and the radius 4
     while(itdomain.next()){
-        Mat2UI8::F v =NumericLimits<Mat2UI8::F>::maximumRange();
+        Mat2UI8::F v =NumericLimits<UI8>::maximumRange();
         itneigh.init(itdomain.x());
         while(itneigh.next()){
             v = minimum(v,img(itneigh.x()));
@@ -242,7 +242,7 @@ public:
     Mat2UI8 erosion(img.getDomain());//construct an matrix with the same domain
     ForEachDomain2D(x,img)
     {
-        Mat2UI8::F v =NumericLimits<Mat2UI8::F>::maximumRange();
+        Mat2UI8::F v =NumericLimits<UI8>::maximumRange();
         ForEachNeighborhood(y,img,x,4,2){
             v = minimum(v,img(y));
         }
@@ -2471,9 +2471,9 @@ void FunctionAssert(const MatN<D1,F1> & f,const MatN<D2,F2> & g ,std::string mes
 template<int DIM,typename PixelType>
 struct NumericLimits< MatN<DIM,PixelType> >
 {
-    static F32 (min)() throw()
+    static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
-    static F32 (max)() throw()
+    static F32 maximumRange() throw()
     { return NumericLimits<PixelType>::maximumRange();}
 };
 

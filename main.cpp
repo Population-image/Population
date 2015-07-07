@@ -218,119 +218,8 @@ public:
     unsigned int _sub_resolution_factor;
 };
 
-template<unsigned N, typename T=F32>
-struct FFTDanielsonLanczosTest {
-    void apply(T* data,FFT_WAY way=FFT_FORWARD) {
-        _sift(data);
-        _exec(data, way);
-    }
-    FFTDanielsonLanczosTest<N/2,T> _scale_two;
-    void _sift(T* data){
-        int m;
-        int n = N<<1;
-        int j=1;
-        for (int i=1; i<n; i+=2) {
-            if (j>i) {
-                std::swap(data[j-1], data[i-1]);
-                std::swap(data[j], data[i]);
-            }
-            m = N;
-            while (m>=2 && j>m) {
-                j -= m;
-                m >>= 1;
-            }
-            j += m;
-        };
 
 
-
-    }
-    void _exec(T* data,FFT_WAY way){
-        _scale_two._exec(data,way);
-        _scale_two._exec(data+N,way);
-
-        T wtemp,tempr,tempi,wr,wi,wpr,wpi;
-        wtemp = sin(M_PI/N);
-        wpr = -2.0*wtemp*wtemp;
-        wpi = -way*sin(2*M_PI/N);
-
-        wr = 1.0;
-        wi = 0.0;
-        for (unsigned i=0; i<N; i+=2) {
-            tempr = data[i+N]*wr - data[i+N+1]*wi;
-            tempi = data[i+N]*wi + data[i+N+1]*wr;
-            data[i+N] = data[i]-tempr;
-            data[i+N+1] = data[i+1]-tempi;
-            data[i] += tempr;
-            data[i+1] += tempi;
-
-            wtemp = wr;
-            wr += wr*wpr - wi*wpi;
-            wi += wi*wpr + wtemp*wpi;
-        }
-
-    }
-};
-template<typename T>
-struct FFTDanielsonLanczosTest<1,T> {
-    void apply(T* ,FFT_WAY =FFT_FORWARD){}
-    void _exec(T* ,FFT_WAY ) {}
-};
-template<typename T>
-class FFTDanielsonLanczosTest<4,T> {
-public:
-    void apply(T* data,FFT_WAY way =FFT_FORWARD){
-        std::swap(data[2],data[4]);
-        std::swap(data[3],data[5]);
-        _exec(data,way);
-    }
-    void _exec(T* data,FFT_WAY way=FFT_FORWARD) {
-        T tr = data[2];
-        T ti = data[3];
-        data[2] = data[0]-tr;
-        data[3] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-        tr = data[6];
-        ti = data[7];
-        if(way==FFT_FORWARD){
-            data[6] = data[5]-ti;
-            data[7] = tr-data[4];
-        }else{
-            data[6] = -(data[5]-ti);
-            data[7] = -(tr-data[4]);
-        }
-        data[4] += tr;
-        data[5] += ti;
-
-        tr = data[4];
-        ti = data[5];
-        data[4] = data[0]-tr;
-        data[5] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-        tr = data[6];
-        ti = data[7];
-        data[6] = data[2]-tr;
-        data[7] = data[3]-ti;
-        data[2] += tr;
-        data[3] += ti;
-
-    }
-};
-
-template<typename T>
-class DanielsonLanczos2 {
-public:
-    void _exec(T* data) {
-        T tr = data[2];
-        T ti = data[3];
-        data[2] = data[0]-tr;
-        data[3] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-    }
-};
 
 void neuralNetworkForRecognitionForHandwrittenDigits()
 {
@@ -340,15 +229,21 @@ void neuralNetworkForRecognitionForHandwrittenDigits()
 
 
     NeuralNet net;
-    net.addLayerMatrixInput(32,32,1);
-    net.addLayerMatrixConvolutionSubScaling(6,1,2);
-    net.addLayerMatrixMaxPool(2);
-    net.addLayerMatrixConvolutionSubScaling(16,1,2);
-    net.addLayerMatrixMaxPool(2);
-    net.addLayerLinearFullyConnected(120);
-    net.addLayerLinearFullyConnected(84);
-    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
+//    net.addLayerMatrixInput(32,32,1);
+//    net.addLayerMatrixConvolutionSubScaling(6,1,2);
+//    net.addLayerMatrixMaxPool(2);
+//    net.addLayerMatrixConvolutionSubScaling(16,1,2);
+//    net.addLayerMatrixMaxPool(2);
+//    net.addLayerLinearFullyConnected(120);
+//    net.addLayerLinearFullyConnected(84);
+//    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
 
+    Vec2I32 domain(29,29);
+    net.addLayerMatrixInput(domain(0),domain(1),1);
+    net.addLayerMatrixConvolutionSubScaling(6,2,2);
+    net.addLayerMatrixConvolutionSubScaling(50,2,2);
+    net.addLayerLinearFullyConnected(100);
+    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
 
     Vec<std::string> label_digit;
     for(int i=0;i<10;i++)
@@ -399,9 +294,78 @@ void neuralNetworkForRecognitionForHandwrittenDigits()
     }
 }
 
+void neuralNetworkForRecognitionForHandwrittenDigits2()
+{
+    std::string path1="D:/Users/vtariel/Downloads/Demo-Mnist/train-images.idx3-ubyte";
+    std::string path2="D:/Users/vtariel/Downloads/Demo-Mnist/train-labels.idx1-ubyte";
+    Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST(path1,path2);
+
+
+    NeuralNetworkFeedForward net;
+    Vec2I32 domain(29,29);
+    net.addInputLayerMatrix(domain(0),domain(1));
+    net.addLayerConvolutionalPlusSubScaling(6,5,2,1);
+    net.addLayerConvolutionalPlusSubScaling(50,5,2,1);
+    net.addLayerFullyConnected(100,1);
+    net.addLayerFullyConnected(static_cast<unsigned int>(number_training.size()));
+
+
+    Vec<std::string> label_digit;
+    for(int i=0;i<10;i++)
+        label_digit.push_back(BasicUtility::Any2String(i));
+    net.label2String() = label_digit;
+
+
+    Vec<VecF32> vtraining_in;
+    Vec<VecF32> vtraining_out;
+
+    for(unsigned int i=0;i<number_training.size();i++){
+        for(unsigned int j=0;j<number_training(i).size();j++){
+            Mat2UI8 binary = number_training(i)(j);
+            VecF32 vin = net.inputMatrixToInputNeuron(binary);
+            vtraining_in.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
+            v_out(i)=1;
+            vtraining_out.push_back(v_out);
+
+        }
+    }
+    F32 eta=0.01;
+    net.setLearningRate(eta);
+    std::vector<int> v_global_rand(vtraining_in.size());
+    for(unsigned int i=0;i<v_global_rand.size();i++)
+        v_global_rand[i]=i;
+    std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+    int nbr_epoch=100;
+    for(unsigned int i=0;i<nbr_epoch;i++){
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+        int error_training=0;
+        for(unsigned int j=0;j<v_global_rand.size();j++){
+            VecF32 vout;
+            net.propagateFront(vtraining_in(v_global_rand[j]),vout);
+            net.propagateBackFirstDerivate(vtraining_out(v_global_rand[j]));
+            net.learningFirstDerivate();
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error_training++;
+        }
+
+        std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<eta<<std::endl;
+        eta *=0.9f;
+        eta = std::max(eta,0.001f);
+        net.setLearningRate(eta);
+    }
+}
+
+
+
 int main()
 {
 
+
+
+//    neuralNetworkForRecognitionForHandwrittenDigits2();
     neuralNetworkForRecognitionForHandwrittenDigits();
     NeuralNet net;
     int sizei=4,sizej=4,nbr_map=2;

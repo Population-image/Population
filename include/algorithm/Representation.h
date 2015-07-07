@@ -279,7 +279,7 @@ struct POP_EXPORTS Representation
 
          *
         */
-    static Mat2ComplexF32  FFT(const Mat2ComplexF32 & f ,FFT_WAY way=FFT_FORWARD)
+    static inline Mat2ComplexF32  FFT(const Mat2ComplexF32 & f ,FFT_WAY way=FFT_FORWARD)
     {
         Mat2ComplexF32  data;
         truncatePower2(f,data);
@@ -304,7 +304,7 @@ struct POP_EXPORTS Representation
         }
         return data;
     }
-    static Mat3ComplexF32 FFT(const Mat3ComplexF32 & f,FFT_WAY way=FFT_FORWARD) {
+    static inline Mat3ComplexF32 FFT(const Mat3ComplexF32 & f,FFT_WAY way=FFT_FORWARD) {
         Mat3ComplexF32  data;
         truncatePower2(f,data);
         Private::FFTConcrete<> fft;
@@ -348,7 +348,7 @@ struct POP_EXPORTS Representation
         }
         return data;
     }
-    static MatN<1,ComplexF32> FFT(MatN<1,ComplexF32> & f ,FFT_WAY way=FFT_FORWARD)
+    static inline MatN<1,ComplexF32> FFT(MatN<1,ComplexF32> & f ,FFT_WAY way=FFT_FORWARD)
     {
         MatN<1,ComplexF32> data(f);
         Private::FFTConcrete<> fft;
