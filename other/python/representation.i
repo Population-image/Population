@@ -2,8 +2,6 @@
 typedef pop::Representation Representation;
 
 
-%template(FFT) pop::Representation::FFT<2>;
-%template(FFT) pop::Representation::FFT<3>;
 
 %template(FFTDisplay) pop::Representation::FFTDisplay<2>;
 %template(FFTDisplay) pop::Representation::FFTDisplay<3>;

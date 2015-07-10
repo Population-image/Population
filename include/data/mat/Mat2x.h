@@ -513,9 +513,9 @@ struct FunctionTypeTraitsSubstituteF<Mat2x<F1,SIZEI,  SIZEJ>,F2 >
 template<typename PixelType, int SIZEI, int SIZEJ>
 struct NumericLimits<Mat2x<PixelType, SIZEI, SIZEJ> >
 {
-    static F32 (min)() throw()
+    static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
-    static F32 (max)() throw()
+    static F32 maximumRange() throw()
     { return NumericLimits<PixelType>::maximumRange();}
 };
 template<typename PixelType, int SIZEI, int SIZEJ>
@@ -1057,9 +1057,9 @@ typedef Mat2x<ComplexF32,2,2> Mat2x22ComplexF32;
 template<typename PixelType>
 struct NumericLimits<Mat2x<PixelType,2,2> >
 {
-    static F32 (min)() throw()
+    static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
-    static F32 (max)() throw()
+    static F32 maximumRange() throw()
     { return NumericLimits<PixelType>::maximumRange();}
 };
 template<typename PixelType>
@@ -1802,9 +1802,9 @@ typedef Mat2x<ComplexF32,3,3> Mat2x33ComplexF32;
 template<typename PixelType>
 struct NumericLimits<Mat2x<PixelType,3,3> >
 {
-    static F32 (min)() throw()
+    static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
-    static F32 (max)() throw()
+    static F32 maximumRange() throw()
     { return NumericLimits<PixelType>::maximumRange();}
 };
 template<typename PixelType>

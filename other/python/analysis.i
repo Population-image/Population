@@ -19,8 +19,6 @@ ALL_IMAGE2_UINT_TYPE(Analysis,perimeter)
 %template(fractalBox) pop::Analysis::fractalBox<3>;
 ALL_IMAGE2_UINT_TYPE(Analysis,correlation)
 ALL_IMAGE2_UINT_TYPE(Analysis,autoCorrelationFunctionGreyLevel)
-
-ALL_IMAGE2_UINT_TYPE(Analysis,correlationDirectionByFFT)
 ALL_IMAGE2_UINT_TYPE(Analysis,chord)
 %template(ldistance) pop::Analysis::ldistance<2>;
 %template(ldistance) pop::Analysis::ldistance<3>;

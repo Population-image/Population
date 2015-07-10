@@ -56,10 +56,6 @@ struct POP_EXPORTS Arithmetic
      *
     */
 
-
-
-
-
     /*!
      * \brief find exponent k for a^k=i with a the base and i the value
      * \param value value

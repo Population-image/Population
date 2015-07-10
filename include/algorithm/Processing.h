@@ -2674,7 +2674,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
 #ifdef HAVE_SWIG
     template<int DIM,typename Type>
     static pop::MatN<DIM,UI8>  _thresholdOtsuMethod(const pop::MatN<DIM,Type>& f){
-        F32 thresholdvalue;
+        int thresholdvalue;
         return thresholdOtsuMethod(f,thresholdvalue);
     }
 #endif

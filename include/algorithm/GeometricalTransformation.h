@@ -154,10 +154,10 @@ struct POP_EXPORTS GeometricalTransformation
         typename MatN<DIM,PixelType>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
         MatN<DIM,PixelType> temp(domain);
         VecN<DIM,F32> alpha = VecN<DIM,F32>(1.f)/scale;
-        _FunctorScale<DIM> func(alpha,interpolation); 
+        _FunctorScale<DIM> func(alpha,interpolation);
         typename MatN<DIM,PixelType>::IteratorEDomain it = temp.getIteratorEDomain();
         forEachFunctorBinaryFunctionE(f,temp,func,it);
-		
+
         return temp;
     }
     /*!
@@ -209,30 +209,26 @@ struct POP_EXPORTS GeometricalTransformation
     * \image html lena.png
     * \image html lenarotpi6.png
     */
-    template<int DIM,typename PixelType>
-    static MatN<DIM,PixelType> rotate(const MatN<DIM,PixelType> & f,F32 angle,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_BOUNDED)
+    template<typename PixelType>
+    static MatN<2,PixelType> rotate(const MatN<2,PixelType> & f,F32 angle,MatNBoundaryConditionType boundarycondtion=MATN_BOUNDARY_CONDITION_BOUNDED)
     {
-        if(DIM==2){
-            Mat2x22F32 rot22 = GeometricalTransformation::rotation2D(angle);
-            typename MatN<DIM,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
+        Mat2x22F32 rot22 = GeometricalTransformation::rotation2D(angle);
+        typename MatN<2,PixelType>::IteratorEDomain it = f.getIteratorEDomain();
 
-            MatN<DIM,PixelType> g(f.getDomain());
-            Vec2F32 c(f.getDomain()/2);
-            it.init();
-            MatNBoundaryCondition condition(boundarycondtion);
-            while(it.next()){
-                Vec2F32 y =Vec2F32(it.x()(0),it.x()(1))-c;
-                y= (rot22*y)+c;
+        MatN<2,PixelType> g(f.getDomain());
+        Vec2F32 c(f.getDomain()/2);
+        it.init();
+        MatNBoundaryCondition condition(boundarycondtion);
+        while(it.next()){
+            Vec2F32 y =Vec2F32(it.x()(0),it.x()(1))-c;
+            y= (rot22*y)+c;
 
-                if(condition.isValid(f.getDomain(),y)){
-                    condition.apply(f.getDomain(),y);
-                    g(it.x())= f.interpolationBilinear(y);
-                }
+            if(condition.isValid(f.getDomain(),y)){
+                condition.apply(f.getDomain(),y);
+                g(it.x())= f.interpolationBilinear(y);
             }
-            return g;
-        }else{
-            return f;
         }
+        return g;
     }
     /*!
     \brief Mirror (flip) an matrix along the specified axis given by the coordinate (0=x-axis, 1=y-axis)

@@ -145,299 +145,86 @@ public:
 
 
     }
+    // {
+    //        Mat2F32 f(2,3);
+    //        f(0,0)=2;f(0,1)=5;f(0,2)=3;
+    //        f(1,0)=1;f(1,1)=4;f(1,2)=1;
 
-
-int main()
-{
-    //    {//AND
-    //        // creation du réseau
-    //        NeuralNet net;
-    //        net.addLayerLinearInput(2);
-    //        net.addLayerLinearFullyConnected(3);
-    //        net.addLayerLinearFullyConnected(2);
-    //        net.addLayerLinearFullyConnected(1);
-
-    //        Vec<VecF32> v_in(4,VecF32(2));
-    //        v_in(0)(0)=1; v_in(0)(1)=1;
-    //        v_in(1)(0)=-1;v_in(1)(1)=1;
-    //        v_in(2)(0)=1; v_in(2)(1)=-1;
-    //        v_in(3)(0)=-1;v_in(3)(1)=-1;
-    //        Vec<VecF32> v_exp(4,VecF32(1));
-    //        v_exp(0)(0)=1;
-    //        v_exp(1)(0)=-1;
-    //        v_exp(2)(0)=-1;
-    //        v_exp(3)(0)=-1;
-
-    //        net.setTrainable(true);
-    //        float mu = 0.9;
-    //        float q = 0.6; //raison
-    //        int c = 1; //itération
-    //        net.setLearnableParameter(mu);
-
-    //        // pour chaque itération on veut calculer aléatoirement les sorties du vecteur v_in
-    //        // shuffle contient les indices du vect v_in
-    //        Vec<int> v_shuffle(4);
-    //        v_shuffle(0)=0;v_shuffle(1)=1;v_shuffle(2)=2;v_shuffle(3)=3;//mélange des indices du vect v_in
-
-    //        while(1==1){
-
-
-    //            std::random_shuffle(v_shuffle.begin(),v_shuffle.end());
-
-    //            std::cout<<"ITERATION "<<c<<std::endl;
-    //            std::cout<<"mu "<<mu<<std::endl;
-
-    //            for(unsigned int i=0;i<v_shuffle.size();i++){
-    //                VecF32 v_out;
-    //                net.forwardCPU(v_in(v_shuffle(i)),v_out);
-    //                std::cout<<"vect in : "<<v_in(v_shuffle(i))(0)<<" "<<v_in(v_shuffle(i))(1)<<std::endl;
-    //               std::cout<<"vect expected : "<<v_exp(v_shuffle(i))(0)<<" "<<"vect obtenu : "<<v_out(0)<<std::endl<<std::endl;
-    //                v_out(0)=1;
-    //                net.backwardCPU(v_exp(v_shuffle(i)));
-    //                net.learn();
-    //            }
-    //            mu=pow(q,c)*mu;
-    //            net.setLearnableParameter(mu);
-    //            c++;
-    //        }
-
-        //CONVOLUTION NEURAL NETWORK
-        NeuralNet net;
-        net.addLayerMatrixInput(7,7,1);
-        net.addLayerMatrixConvolutionSubScaling(3,1,1);//nb map, subscaling factor, (radius kernel=1 ==> 3*3)
-        net.addLayerMatrixConvolutionSubScaling(4,1,1);
-        net.addLayerMatrixMergeConvolution();
-
-        Mat2F32 m_in(7,7);
-        m_in.fill(-1);
-        m_in(1,2)=1;m_in(2,2)=1;m_in(3,2)=1;
-        std::cout<<"m_in "<<m_in<<std::endl;
-        VecF32 v_in= net.inputMatrixToInputNeuron(m_in);//conversion de la matrice d'entrée en vecteur
-
-        Vec <float> v_exp(2);
-        v_exp(0)=1;//
-        v_exp(1)=1;
-
-        net.setTrainable(true);
-        net.setLearnableParameter(0.1);
-
-        Vec<int> v_shuffle(49);
-        for(unsigned int i=0;i<v_shuffle.size();i++){
-            v_shuffle(i)=i;
-        }
-        int c = 1; //itération
-        while(1==1){
-
-
-            std::random_shuffle(v_shuffle.begin(),v_shuffle.end());//mélange des indices du vect v_in
-            std::cout<<"ITERATION "<<c<<std::endl;
-            for(unsigned int i=0;i<v_shuffle.size();i++){
-                VecF32 v_out;
-                net.forwardCPU(v_in(v_shuffle(i)),v_out);
-                std::cout<<"vect expected : "<<v_exp(0)<<" "<<v_exp(1)<<" "<<"vect obtenu : "<<v_out(0)<<v_out(1)<<std::endl<<std::endl;
-                // v_out(0)=1;
-                net.backwardCPU(v_exp);
-                net.learn();
+        void setWeight(Vec<Mat2F32> v_weights,Vec<F32> v_weighs_biais){
+            for(unsigned int i=0;i<v_weights.size();i++){
+                this->_W_kernels(i) = ConvolutionFourier::weightReal2Fourrier(v_weights(i),this->_W_kernels(i).getDomain());
             }
-
-            c++;
+            _W_biais= v_weighs_biais;
         }
 
-
-
-    return 0;
-}
-
-// {
-//        Mat2F32 f(2,3);
-//        f(0,0)=2;f(0,1)=5;f(0,2)=3;
-//        f(1,0)=1;f(1,1)=4;f(1,2)=1;
-=======
-    void setWeight(Vec<Mat2F32> v_weights,Vec<F32> v_weighs_biais){
-        for(unsigned int i=0;i<v_weights.size();i++){
-            this->_W_kernels(i) = ConvolutionFourier::weightReal2Fourrier(v_weights(i),this->_W_kernels(i).getDomain());
-        }
-        _W_biais= v_weighs_biais;
-    }
-
-    void convertReal2Complex(const MatNReference<2,F32> & map,Mat2ComplexF32 & map_complex){
-        map_complex.fill(ComplexF32(0,0));
-        for(unsigned int i=0;i<map.sizeI();i++){
-            for(unsigned int j=0;j<map.sizeJ();j++){
-                map_complex(i,j)=ComplexF32(map(i,j),0);
-            }
-        }
-
-    }
-    void FFTInverse(){
-
-    }
-    virtual void forwardCPU(const NeuralLayer& layer_previous){
-
-        //init output maps
-        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-            this->_Y_complex(index_map).fill(ComplexF32(0,0));
-        }
-
-        if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
-            //iterate over the input maps
-            for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
-                const MatNReference<2,F32> & map =neural_matrix->X_map()(index_map_previous);
-
-                convertReal2Complex(map,_X_complex);
-                //apply the forward FFT to the previous map
-                _X_complex = Representation::FFT(_X_complex);
-
-                //iterate of the output map
-                for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-                    //get the index of the kernel
-                    int index = index_map*neural_matrix->X_map().size()+index_map_previous;
-
-                    //apply the convolution (matrix multiplication term of term in frequency domain) and add the result to the output map
-                    _Y_complex(index_map) += _X_complex.multTermByTerm(_W_kernels[index]);
-                    //add the biais weight
-                    _Y_complex(index_map)(0,0).real() +=_W_biais(index)*_X_complex.getDomain().multCoordinate();
+        void convertReal2Complex(const MatNReference<2,F32> & map,Mat2ComplexF32 & map_complex){
+            map_complex.fill(ComplexF32(0,0));
+            for(unsigned int i=0;i<map.sizeI();i++){
+                for(unsigned int j=0;j<map.sizeJ();j++){
+                    map_complex(i,j)=ComplexF32(map(i,j),0);
                 }
             }
-        }
 
-        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-            //apply the backward FFT ot the  map
-            _Y_complex(index_map) = Representation::FFT(_Y_complex(index_map),FFT_BACKWARD);
-            //scale the result
-            Representation::scale(_Y_complex(index_map));
-            for(unsigned int i=0;i<this->_X_reference(index_map).sizeI();i++)
-                for(unsigned int j=0;j<this->_X_reference(index_map).sizeJ();j++){
-                    this->_X_reference(index_map)(i,j) = NeuronSigmoid::activation(_Y_complex(index_map)(i,j).real());
+        }
+        void FFTInverse(){
+
+        }
+        virtual void forwardCPU(const NeuralLayer& layer_previous){
+
+            //init output maps
+            for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                this->_Y_complex(index_map).fill(ComplexF32(0,0));
+            }
+
+            if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
+                //iterate over the input maps
+                for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                    const MatNReference<2,F32> & map =neural_matrix->X_map()(index_map_previous);
+
+                    convertReal2Complex(map,_X_complex);
+                    //apply the forward FFT to the previous map
+                    _X_complex = Representation::FFT(_X_complex);
+
+                    //iterate of the output map
+                    for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                        //get the index of the kernel
+                        int index = index_map*neural_matrix->X_map().size()+index_map_previous;
+
+                        //apply the convolution (matrix multiplication term of term in frequency domain) and add the result to the output map
+                        _Y_complex(index_map) += _X_complex.multTermByTerm(_W_kernels[index]);
+                        //add the biais weight
+                        _Y_complex(index_map)(0,0).real() +=_W_biais(index)*_X_complex.getDomain().multCoordinate();
+                    }
                 }
-        }
-
-    }
-
-    virtual void backwardCPU(NeuralLayer& layer_previous){}
-    void learn(){}
-    virtual NeuralLayer * clone(){}
-    Mat2ComplexF32 _X_complex;
-    Vec<Mat2ComplexF32> _W_kernels;
-    Vec<Mat2ComplexF32> _Y_complex;
-    Vec<F32> _W_biais;
-    int _radius;
-    unsigned int _sub_resolution_factor;
-};
-
-template<unsigned N, typename T=F32>
-struct FFTDanielsonLanczosTest {
-    void apply(T* data,FFT_WAY way=FFT_FORWARD) {
-        _sift(data);
-        _exec(data, way);
-    }
-    FFTDanielsonLanczosTest<N/2,T> _scale_two;
-    void _sift(T* data){
-        int m;
-        int n = N<<1;
-        int j=1;
-        for (int i=1; i<n; i+=2) {
-            if (j>i) {
-                std::swap(data[j-1], data[i-1]);
-                std::swap(data[j], data[i]);
             }
-            m = N;
-            while (m>=2 && j>m) {
-                j -= m;
-                m >>= 1;
+
+            for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                //apply the backward FFT ot the  map
+                _Y_complex(index_map) = Representation::FFT(_Y_complex(index_map),FFT_BACKWARD);
+                //scale the result
+                Representation::scale(_Y_complex(index_map));
+                for(unsigned int i=0;i<this->_X_reference(index_map).sizeI();i++)
+                    for(unsigned int j=0;j<this->_X_reference(index_map).sizeJ();j++){
+                        this->_X_reference(index_map)(i,j) = NeuronSigmoid::activation(_Y_complex(index_map)(i,j).real());
+                    }
             }
-            j += m;
-        };
 
-
-
-    }
-    void _exec(T* data,FFT_WAY way){
-        _scale_two._exec(data,way);
-        _scale_two._exec(data+N,way);
-
-        T wtemp,tempr,tempi,wr,wi,wpr,wpi;
-        wtemp = sin(M_PI/N);
-        wpr = -2.0*wtemp*wtemp;
-        wpi = -way*sin(2*M_PI/N);
-
-        wr = 1.0;
-        wi = 0.0;
-        for (unsigned i=0; i<N; i+=2) {
-            tempr = data[i+N]*wr - data[i+N+1]*wi;
-            tempi = data[i+N]*wi + data[i+N+1]*wr;
-            data[i+N] = data[i]-tempr;
-            data[i+N+1] = data[i+1]-tempi;
-            data[i] += tempr;
-            data[i+1] += tempi;
-
-            wtemp = wr;
-            wr += wr*wpr - wi*wpi;
-            wi += wi*wpr + wtemp*wpi;
         }
 
-    }
-};
-template<typename T>
-struct FFTDanielsonLanczosTest<1,T> {
-    void apply(T* ,FFT_WAY =FFT_FORWARD){}
-    void _exec(T* ,FFT_WAY ) {}
-};
-template<typename T>
-class FFTDanielsonLanczosTest<4,T> {
-public:
-    void apply(T* data,FFT_WAY way =FFT_FORWARD){
-        std::swap(data[2],data[4]);
-        std::swap(data[3],data[5]);
-        _exec(data,way);
-    }
-    void _exec(T* data,FFT_WAY way=FFT_FORWARD) {
-        T tr = data[2];
-        T ti = data[3];
-        data[2] = data[0]-tr;
-        data[3] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-        tr = data[6];
-        ti = data[7];
-        if(way==FFT_FORWARD){
-            data[6] = data[5]-ti;
-            data[7] = tr-data[4];
-        }else{
-            data[6] = -(data[5]-ti);
-            data[7] = -(tr-data[4]);
-        }
-        data[4] += tr;
-        data[5] += ti;
+        virtual void backwardCPU(NeuralLayer& layer_previous){}
+        void learn(){}
+        virtual NeuralLayer * clone(){}
+        Mat2ComplexF32 _X_complex;
+        Vec<Mat2ComplexF32> _W_kernels;
+        Vec<Mat2ComplexF32> _Y_complex;
+        Vec<F32> _W_biais;
+        int _radius;
+        unsigned int _sub_resolution_factor;
+    };
 
-        tr = data[4];
-        ti = data[5];
-        data[4] = data[0]-tr;
-        data[5] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-        tr = data[6];
-        ti = data[7];
-        data[6] = data[2]-tr;
-        data[7] = data[3]-ti;
-        data[2] += tr;
-        data[3] += ti;
 
-    }
-};
 
-template<typename T>
-class DanielsonLanczos2 {
-public:
-    void _exec(T* data) {
-        T tr = data[2];
-        T ti = data[3];
-        data[2] = data[0]-tr;
-        data[3] = data[1]-ti;
-        data[0] += tr;
-        data[1] += ti;
-    }
-};
+
 
 void neuralNetworkForRecognitionForHandwrittenDigits()
 {
@@ -447,15 +234,21 @@ void neuralNetworkForRecognitionForHandwrittenDigits()
 
 
     NeuralNet net;
-    net.addLayerMatrixInput(32,32,1);
-    net.addLayerMatrixConvolutionSubScaling(6,1,2);
-    net.addLayerMatrixMaxPool(2);
-    net.addLayerMatrixConvolutionSubScaling(16,1,2);
-    net.addLayerMatrixMaxPool(2);
-    net.addLayerLinearFullyConnected(120);
-    net.addLayerLinearFullyConnected(84);
-    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
+//    net.addLayerMatrixInput(32,32,1);
+//    net.addLayerMatrixConvolutionSubScaling(6,1,2);
+//    net.addLayerMatrixMaxPool(2);
+//    net.addLayerMatrixConvolutionSubScaling(16,1,2);
+//    net.addLayerMatrixMaxPool(2);
+//    net.addLayerLinearFullyConnected(120);
+//    net.addLayerLinearFullyConnected(84);
+//    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
 
+    Vec2I32 domain(29,29);
+    net.addLayerMatrixInput(domain(0),domain(1),1);
+    net.addLayerMatrixConvolutionSubScaling(6,2,2);
+    net.addLayerMatrixConvolutionSubScaling(50,2,2);
+    net.addLayerLinearFullyConnected(100);
+    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
 
     Vec<std::string> label_digit;
     for(int i=0;i<10;i++)
@@ -506,9 +299,78 @@ void neuralNetworkForRecognitionForHandwrittenDigits()
     }
 }
 
+void neuralNetworkForRecognitionForHandwrittenDigits2()
+{
+    std::string path1="D:/Users/vtariel/Downloads/Demo-Mnist/train-images.idx3-ubyte";
+    std::string path2="D:/Users/vtariel/Downloads/Demo-Mnist/train-labels.idx1-ubyte";
+    Vec<Vec<Mat2UI8> > number_training =  TrainingNeuralNetwork::loadMNIST(path1,path2);
+
+
+    NeuralNetworkFeedForward net;
+    Vec2I32 domain(29,29);
+    net.addInputLayerMatrix(domain(0),domain(1));
+    net.addLayerConvolutionalPlusSubScaling(6,5,2,1);
+    net.addLayerConvolutionalPlusSubScaling(50,5,2,1);
+    net.addLayerFullyConnected(100,1);
+    net.addLayerFullyConnected(static_cast<unsigned int>(number_training.size()));
+
+
+    Vec<std::string> label_digit;
+    for(int i=0;i<10;i++)
+        label_digit.push_back(BasicUtility::Any2String(i));
+    net.label2String() = label_digit;
+
+
+    Vec<VecF32> vtraining_in;
+    Vec<VecF32> vtraining_out;
+
+    for(unsigned int i=0;i<number_training.size();i++){
+        for(unsigned int j=0;j<number_training(i).size();j++){
+            Mat2UI8 binary = number_training(i)(j);
+            VecF32 vin = net.inputMatrixToInputNeuron(binary);
+            vtraining_in.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
+            v_out(i)=1;
+            vtraining_out.push_back(v_out);
+
+        }
+    }
+    F32 eta=0.01;
+    net.setLearningRate(eta);
+    std::vector<int> v_global_rand(vtraining_in.size());
+    for(unsigned int i=0;i<v_global_rand.size();i++)
+        v_global_rand[i]=i;
+    std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+    int nbr_epoch=100;
+    for(unsigned int i=0;i<nbr_epoch;i++){
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+        int error_training=0;
+        for(unsigned int j=0;j<v_global_rand.size();j++){
+            VecF32 vout;
+            net.propagateFront(vtraining_in(v_global_rand[j]),vout);
+            net.propagateBackFirstDerivate(vtraining_out(v_global_rand[j]));
+            net.learningFirstDerivate();
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error_training++;
+        }
+
+        std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<eta<<std::endl;
+        eta *=0.9f;
+        eta = std::max(eta,0.001f);
+        net.setLearningRate(eta);
+    }
+}
+
+
+
 int main()
 {
 
+
+
+//    neuralNetworkForRecognitionForHandwrittenDigits2();
     neuralNetworkForRecognitionForHandwrittenDigits();
     NeuralNet net;
     int sizei=4,sizej=4,nbr_map=2;
@@ -1007,9 +869,6 @@ int main()
 
 //return 0;
 //}
-
-
-=======
 //        //        std::cout<<m<<std::endl;
 //        //        FFT2D<N2,N2,F32> fft;
 
@@ -1422,4 +1281,4 @@ int main()
 
 //    return 0;
 //}
->>>>>>> d5186e1f53fbb2b8f9ff83c25564eade8a65a5c3
+

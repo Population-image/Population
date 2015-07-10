@@ -38,3 +38,8 @@ target_link_libraries (tutorial_template_programming ${POPULATION_DEP_LIBRARIES}
 
 add_executable(tutorial_iterator_matrix iterator_matrix.cpp)
 target_link_libraries (tutorial_iterator_matrix ${POPULATION_DEP_LIBRARIES} population)
+
+
+
+add_executable(PatternRecognitionMachineLearningBishopChapter1 PatternRecognitionMachineLearningBishopChapter1.cpp)
+target_link_libraries (PatternRecognitionMachineLearningBishopChapter1 ${POPULATION_DEP_LIBRARIES} population)
