@@ -40,14 +40,13 @@ private:
 class POP_EXPORTS OCRNeuralNetwork : public OCR
 {
 private:
-//    NeuralNetworkFeedForward _n;
+
     NeuralNet _n;
     int _confidence;
     bool _isrecognized;
 public:
     ~OCRNeuralNetwork();
-//    NeuralNetworkFeedForward &   neuralNetworkFeedForward();
-//    const NeuralNetworkFeedForward &   neuralNetworkFeedForward()const;
+
     NeuralNet &   neuralNetworkFeedForward();
     const NeuralNet &   neuralNetworkFeedForward()const;
     char parseMatrix(const Mat2UI8 & binary);

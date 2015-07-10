@@ -118,6 +118,9 @@ public:
         accu = Processing::greylevelRange(accu,0,1);
         return accu;
     }
+
+
+
     /*!
     * \brief get lines from the hough transformation  http://en.wikipedia.org/wiki/Hough_transform
     * \param hough transformation normalized in the range [0-1]

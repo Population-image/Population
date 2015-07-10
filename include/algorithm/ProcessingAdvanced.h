@@ -159,6 +159,7 @@ struct ProcessingAdvanced
     }
 
 
+
     template<int DIM,typename PixelType>
     static MatN<DIM,UI8>  nonMaximumSuppression(const MatN<DIM,PixelType> & img,const MatN<DIM,VecN<DIM,F32> >& grad,const MatN<DIM,F32> &gradnorm)
     {
@@ -1215,7 +1216,7 @@ struct ProcessingAdvanced
     template<int DIM,typename IteratorE>
     static inline MatN<DIM,UI32> clusterToLabel(const MatN<DIM,UI8> & f, typename MatN<DIM,UI8>::IteratorENeighborhood  it,IteratorE it_order)
     {
-        Mat2UI32 map(f.getDomain());
+        MatN<DIM,UI32> map(f.getDomain());
         it.removeCenter();
         int cluster=0;
         std::queue<VecN<DIM,I32> > v_list;
@@ -2100,5 +2101,7 @@ struct ProcessingAdvanced
         return dilationRegionGrowing(temp,radius,norm);
     }
 };
+
+
 }
 #endif // PROCESSINGADVANCED_H

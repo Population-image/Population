@@ -385,7 +385,7 @@ public:
     Vec<MatN<2,NNNeuron*> > _neurons_matrix;
 
     template<typename TypeScalarPixel>
-    static VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix,Vec2I32 domain,NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization = ZeroToOne);
+    static VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix,Vec2I32 domain,NNLayerMatrix::CenteringMethod method=NNLayerMatrix::Mass,NNLayerMatrix::NormalizationValue normalization = ZeroToOne)throw(std::string);
 
     CenteringMethod _method;
     NormalizationValue _normalization_value;
@@ -694,7 +694,7 @@ public:
     *  crop the image in a bounding box, scale the image to fit the domain of the input layer, scale the pixels values to the range [-1,1],
     */
     template<typename TypeScalarPixel>
-    VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix){
+    VecF32 inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & matrix)throw(std::string){
         if(NNLayerMatrix * layermatrix = dynamic_cast<NNLayerMatrix*>(this->_layers[0]) ) {
             return layermatrix->inputMatrixToInputNeuron(matrix,(layermatrix->_neurons_matrix)(0).getDomain(),layermatrix->_method,layermatrix->_normalization_value);
         }else{
@@ -847,10 +847,10 @@ private:
 };
 
 template<typename TypeScalarPixel>
-VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & img,Vec2I32 domain,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
+VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & img,Vec2I32 domain,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value)throw(std::string){
 
     if(method==NNLayerMatrix::BoundingBox){
-        std::cout<<"bounding box"<<std::endl;
+
         //cropping
         pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
         for(unsigned int i=0;i<img.size();i++){
@@ -896,6 +896,9 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             mini=(std::min)(mini,mr(xx));
             mrf(xx+trans)=mr(xx);
         }
+        if(maxi-mini==0){
+            throw(std::string("[ERROR] in conversion matrix to neuron values"));
+        }
         if(normalization_value==0){
             F32 diff = (maxi-mini)/2.f;
             ForEachDomain2D(xxx,mrf){
@@ -934,6 +937,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
         //         mrf(xx+trans)=mr(xx);
         F32 maxi=pop::NumericLimits<F32>::minimumRange();
         F32 mini=pop::NumericLimits<F32>::maximumRange();
+
         Mat2F32 mrf(domain);
         ForEachDomain2D(xx,mrf){
             pop::Vec2F32 xxx(xx);
@@ -941,6 +945,9 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
             mrf(xx)=img.interpolationBilinear(xxx);
             maxi=(std::max)(maxi,mrf(xx));
             mini=(std::min)(mini,mrf(xx));
+        }
+        if(maxi-mini==0){
+                        throw(std::string("[ERROR] in conversion matrix to neuron values"));
         }
         if(normalization_value==0){
             F32 diff = (maxi-mini)/2.f;
@@ -958,19 +965,7 @@ VecF32 NNLayerMatrix::inputMatrixToInputNeuron(const MatN<2,TypeScalarPixel> & i
     }
 }
 
-//class POP_EXPORTS NeuralNetworkFeedForwardMerge
-//{
-//public:
-//    void propagateFront(const pop::VecF32& in , pop::VecF32 &out);
-//    void propagateBackFirstDerivate(const pop::VecF32& desired_output);
-//    void learningFirstDerivate();
-//    void setLearningRate(F32 eta=0.01);
-//    void addLayerFullyConnected(int nbr_output_neuron,NeuralNetworkFeedForward * n1,NeuralNetworkFeedForward* n2);
-//private:
-//    NeuralNetworkFeedForward * n1;
-//    NeuralNetworkFeedForward * n2;
-//    NeuralNetworkFeedForward n;
-//};
+
 class POP_EXPORTS NNNeuronMaxPool : public NNNeuron
 {
 public:
@@ -983,11 +978,12 @@ public:
 class NeuralLayer
 {
 public:
+    virtual ~NeuralLayer();
     /** @brief Using the CPU device, compute the output values . */
     virtual void forwardCPU(const NeuralLayer& layer_previous) = 0;
     /** @brief Using the CPU device, compute the error of the output values of the layer prrevious. */
     virtual void backwardCPU(NeuralLayer& layer_previous) = 0;
-    virtual void learn()=0;
+    virtual void learn(F32 lambda_regulation=1)=0;
     /** @brief get output value */
     virtual const VecF32& X()const=0;
     virtual VecF32& X()=0;
@@ -1048,7 +1044,7 @@ public:
     NeuralLayerLinearInput(unsigned int nbr_neurons);
     void forwardCPU(const NeuralLayer& );
     void backwardCPU(NeuralLayer& ) ;
-    void learn();
+    void learn(F32 lambda_regulation=1);
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
@@ -1060,7 +1056,7 @@ public:
     NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
     void forwardCPU(const NeuralLayer& ) ;
     void backwardCPU(NeuralLayer& ) ;
-    void learn();
+    void learn(F32 lambda_regulation=1);
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
@@ -1072,11 +1068,11 @@ public:
     void setTrainable(bool istrainable);
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn();
+    void learn(F32 lambda_regulation=1);
     virtual NeuralLayer * clone();
     Mat2F32 _W;
     VecF32 _X_biais;
-    Mat2F32 _d_E_W;
+    Mat2F32 _d_E_W;    
 };
 
 class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
@@ -1087,7 +1083,7 @@ public:
 
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn();
+    void learn(F32 lambda_regulation=1);
     virtual NeuralLayer * clone();
     Vec<Mat2F32> _W_kernels;
     Vec<F32> _W_biais;
@@ -1096,20 +1092,19 @@ public:
     unsigned int _sub_resolution_factor;
     unsigned int _radius_kernel;
 };
-
-class NeuralLayerMatrixMergeConvolution : public NeuronSigmoid,public NeuralLayerMatrix
+class NeuralLayerMatrixMaxPool : public NeuronSigmoid,public NeuralLayerMatrix
 {
 public:
-    NeuralLayerMatrixMergeConvolution(unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
+    NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
     void setTrainable(bool istrainable);
+
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn();
+    void learn(F32 lambda_regulation=1);
     virtual NeuralLayer * clone();
-    VecF32 _W_kernel;
-    F32 _W_biais;
-    VecF32 _d_E_W_kernel;
-    F32 _d_E_W_biais;
+    unsigned int _sub_resolution_factor;
+    bool _istrainable;
+    Vec<Mat2UI8> _v_map_index_max;
 };
 
 
@@ -1126,11 +1121,11 @@ public:
     void addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map);
     void addLayerLinearFullyConnected(unsigned int nbr_neurons);
     void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel);
-    void addLayerMatrixMergeConvolution();
+    void addLayerMatrixMaxPool(unsigned int sub_scaling_factor);
     void setLearnableParameter(F32 mu);
 
     void setTrainable(bool istrainable);
-    void learn();
+    void learn(F32 lambda_regulation=1);
     void forwardCPU(const VecF32& X_in,VecF32 & X_out);
 
     std::pair<Vec2I32,int> getDomainMatrixInput()const;

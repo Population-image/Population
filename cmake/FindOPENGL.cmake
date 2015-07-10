@@ -30,6 +30,6 @@ if(WIN32)
   endif()
   set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${OPENGL_LIBRARIES})
   set(HAVE_OPENGL YES)
-  message(STATUS " OPENGL  FOUND")
+  message(STATUS "OPENGL  FOUND")
 endif()
 

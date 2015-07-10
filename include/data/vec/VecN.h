@@ -864,14 +864,8 @@ inline VecN<D, Type1>   operator/( Type1  value,const VecN<D, Type1>&  x)
 
 typedef VecN<2,I32> Vec2I32;
 typedef VecN<3,I32> Vec3I32;
-typedef VecN<4,I32> Vec4I32;
 typedef VecN<2,F32> Vec2F32;
-typedef VecN<2,F64> Vec2F64;
 typedef VecN<3,F32> Vec3F32;
-typedef VecN<4,F32> Vec4F32;
-
-
-
 
 
 template<typename TypeIn,typename TypeOut,int DIM>

@@ -22,11 +22,11 @@ include(cmake/popUtils.cmake)
 POP_OPTION(WITH_CIMG         "Include CIMG"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENGL       "Include OpenGl"                      ON   IF (NOT ANDROID))
 POP_OPTION(WITH_OPENMP       "Include OpenMP for parallization"   OFF)
-POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   IF (NOT ANDROID AND NOT IOS))
-POP_OPTION(WITH_QT           "Include QT"                      OFF   IF (NOT ANDROID))
-POP_OPTION(WITH_CUDA         "Include Cuda"      OFF   IF (NOT ANDROID))
-POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   IF (NOT ANDROID))
+POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF  )
+POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   )
+POP_OPTION(WITH_QT           "Include QT"                      OFF   )
+POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   )
+
 # Population build components
 # ===================================================
 POP_OPTION(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF )
@@ -35,10 +35,12 @@ POP_OPTION(BUILD_EXECUTABLE  "Build executable" ON )
 POP_OPTION(BUILD_TUTORIAL    "Build tutorial" OFF )
 POP_OPTION(BUILD_ARTICLE     "Build article code" OFF )
 POP_OPTION(BUILD_TEMP        "Build experimental code" OFF )
+
+POP_OPTION(WITH_CUDA         "Include Cuda"      OFF   )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_WITH_C11        "build C11" OFF )
+POP_OPTION(BUILD_WITH_C11    "build C11" OFF )
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -60,7 +62,6 @@ foreach(p LIB BIN INCLUDE CMAKE)
   endif()
 endforeach()
 
-message(STATUS ${PROJECT_SOURCE_DIR})
 #source file
 file(
         GLOB_RECURSE
@@ -159,7 +160,6 @@ endif(BUILD_SHARED_LIBS OR BUILD_TUTORIAL OR BUILD_ARTICLE OR BUILD_TEMP )
 
 
 if(BUILD_EXECUTABLE)
-    message(STATUS ${POPULATION_SOURCES})
     add_executable(test_main main.cpp ${POPULATION_SOURCES})
     target_link_libraries (test_main ${POPULATION_LIBRARY})
     add_test(test1 test_main)

@@ -1475,9 +1475,9 @@ void FunctionAssert(const MatNReference<D1,F1> & f,const MatNReference<D2,F2> & 
 template<int DIM,typename PixelType>
 struct NumericLimits< MatNReference<DIM,PixelType> >
 {
-    static F32 (min)() throw()
+    static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
-    static F32 (max)() throw()
+    static F32 maximumRange() throw()
     { return NumericLimits<PixelType>::maximumRange();}
 };
 
