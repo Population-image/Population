@@ -64,6 +64,11 @@ template<typename Label>
 Label RestrictedSetWithoutALL<Label>::NoRegion = NumericLimits<Label>::maximumRange();
 
 
+
+
+
+
+
 template<typename Label>
 class POP_EXPORTS RestrictedSetWithMySelf
 {
@@ -103,6 +108,40 @@ public:
 template<typename Label>
 Label RestrictedSetWithMySelfAndOneOther<Label>::NoRegion = NumericLimits<Label>::maximumRange();
 
+
+
+template<typename Label>
+class POP_EXPORTS RestrictedSetWithoutALLExceptOne
+{
+public:
+private:
+    Label _other;
+public:
+    static Label NoRegion;
+
+    void setOtherRegion(Label other)
+    {
+        _other = other;
+    }
+     bool noBelong(Label ,Label regionpos )
+    {
+        if(regionpos==NoRegion||regionpos==_other)
+            return true;
+        else
+            return false;
+    }
+     bool noBelong(Label regionpos )
+    {
+        if(regionpos==NoRegion||regionpos==_other)
+            return true;
+        else
+            return false;
+    }
+};
+template<typename Label>
+Label RestrictedSetWithoutALLExceptOne<Label>::NoRegion = NumericLimits<Label>::maximumRange();
+
+
 template<typename Label>
 class POP_EXPORTS RestrictedSetSingleRegion
 {
@@ -131,6 +170,13 @@ template<typename Label>
 Label RestrictedSetSingleRegion<Label>::SingleRegion = 0;
 template<typename Label>
 Label RestrictedSetSingleRegion<Label>::DeadRegion = 1;
+
+
+
+
+
+
+
 
 
 template<typename Label>
@@ -165,26 +211,5 @@ public:
 template<typename Label>
 Label RestrictedSetWithoutInferiorLabel<Label>::NoRegion = NumericLimits<Label>::maximumRange();
 }
-//template<typename Label,int Dead = NumericLimits<Label>::maximumRange()>
-//class RestrictedSetWithoutALL2
-//{
-//public:
-//    static Label NoRegion;
-//    static bool noBelong(Label ,Label regionpos )
-//    {
-//        if(regionpos==NoRegion)
-//            return true;
-//        else
-//            return false;
-//    }
-//    static bool noBelong(Label regionpos )
-//    {
-//        if(regionpos==NoRegion)
-//            return true;
-//        else
-//            return false;
-//    }
-//};
-//template<typename Label,int Dead>
-//Label RestrictedSetWithoutALL2<Label,Dead>::NoRegion = Dead;
+
 #endif // REGION_HPP

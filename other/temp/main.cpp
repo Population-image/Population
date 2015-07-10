@@ -204,7 +204,20 @@ MatN<Dim,PixelType>  mult(const MatN<Dim,PixelType> &other,const MatN<Dim,PixelT
 }
 int main(){
 
-    omp_set_num_threads(4);
+    Mat2UI8 m_topo(4,4);
+    m_topo(0,2)=1;
+    m_topo(1,2)=1;
+    m_topo(2,2)=1;
+    m_topo(3,1)=1;
+    std::cout<<m_topo<<std::endl;
+    Mat2UI8 m_label(4,4);
+    m_label(0,0)=1;
+    m_label(3,3)=2;
+
+    std::cout<<Processing::watershedBoundary(m_label,m_topo,1)<<std::endl;
+    return 1;
+
+    //omp_set_num_threads(4);
     {
 
         //omp_set_num_threads(1);

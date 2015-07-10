@@ -52,35 +52,38 @@ public:
     }
 
 };
-template<typename Function=Mat2UI8>
+template<int DIM,typename TypePixel>
 class CharacteristicGreyLevel
 {
-    const Function * _m;
+    const MatN<DIM,TypePixel> * _m;
         int _nbr_point;
-    F32  _mean;
-    F32  _variance;
-    mutable F32  _standart_deviation;
+    typename ArithmeticsTrait<TypePixel,F32>::Result  _mean;
+    typename ArithmeticsTrait<TypePixel,F32>::Result  _variance;
 
 public:
     CharacteristicGreyLevel()
-        :_m(NULL),_nbr_point(0),_mean(0),_variance(0),_standart_deviation(0){}
-    void addPoint(const typename Function::E & x){
+        :_m(NULL),_nbr_point(0),_mean(0),_variance(0)
+    {}
+
+    void addPoint(const VecN<DIM,I32> & x){
         POP_DbgAssertMessage(_m==NULL,"Set an sMatrix to the CharacteristicGreyLevelMean");
         _mean= (_mean *_nbr_point +_m->operator ()(x))/(_nbr_point+1);
         _variance = (_mean *_nbr_point + (_m->operator ()(x)-_mean)*(_m->operator ()(x)-_mean) )/(_nbr_point+1);
         _nbr_point++;
     }
-    void setMatrix(const Function *m){
+    void setMatrix(const MatN<DIM,TypePixel>  *m){
         _m = m;
     }
 
-    F32 getMean()const{
+    typename ArithmeticsTrait<TypePixel,F32>::Result getMean()const{
         return _mean;
     }
     F32 getStandartDeviation()const{
-        if(_standart_deviation==0)
-            _standart_deviation = std::sqrt(_variance);
-        return _standart_deviation;
+        F32 value = normValue(_variance);
+        if(value==0)
+            return 0;
+        return
+             std::sqrt(value);
     }
 };
 
@@ -108,7 +111,7 @@ struct DistanceCharacteristicMass : public DistanceCharacteristic<TypeCharacteri
 template<typename TypeCharacteristic >
 struct DistanceCharacteristicGreyLevel : public DistanceCharacteristic<TypeCharacteristic>{
     F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
-        return std::abs(a.getMean()-b.getMean())/(std::min)(a.getStandartDeviation(),b.getStandartDeviation());
+        return pop::normValue(a.getMean()-b.getMean())/(std::min)(a.getStandartDeviation(),b.getStandartDeviation());
     }
 };
 template<typename TypeCharacteristic >
@@ -155,13 +158,13 @@ struct DistanceSumCharacteristic  : public DistanceCharacteristic<TypeCharacteri
         return sum;
     }
 };
-template<typename Function>
-struct CharacteristicClusterMix :  CharacteristicMass, CharacteristicBoundingBox<typename Function::E>, CharacteristicGreyLevel< Function>
+template<int DIM,typename TypePixel>
+struct CharacteristicClusterMix :  CharacteristicMass, CharacteristicBoundingBox<VecN<DIM,I32> >, CharacteristicGreyLevel<DIM ,TypePixel >
 {
-    void addPoint(const typename Function::E & x){
+    void addPoint(const VecN<DIM,I32> & x){
         CharacteristicMass::addPoint(x);
-        CharacteristicBoundingBox<typename Function::E>::addPoint(x);
-        CharacteristicGreyLevel<Function>::addPoint(x);
+        CharacteristicBoundingBox<VecN<DIM,I32> >::addPoint(x);
+        CharacteristicGreyLevel<DIM ,TypePixel>::addPoint(x);
     }
 };
 }

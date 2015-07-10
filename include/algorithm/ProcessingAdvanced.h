@@ -1438,7 +1438,7 @@ struct ProcessingAdvanced
     static FunctionLabel watershedBoundary(const FunctionLabel & seed, const FunctionTopo & topo, typename FunctionTopo::IteratorENeighborhood itneigh )
     {
         FunctorTopography<FunctionTopo  > functortopo(topo);
-        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL> pop(topo.getDomain(),functortopo,itneigh);
 
         typename FunctionTopo::IteratorEDomain it(topo.getDomain());
         while(it.next()){
@@ -1453,17 +1453,22 @@ struct ProcessingAdvanced
             }
         }
 
-        for(I32 i=0;i<functortopo.nbrLevel();i++)
-        {
+        for(I32 i=0;i<functortopo.nbrLevel();i++){
             pop.setLevel(i);
             functortopo.setLevel(i);
             while(pop.next())
             {
-                if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
-                {
-                    pop.growth(pop.x().first,pop.x().second);
+                int label_growth = pop.x().first;
+                itneigh.init(pop.x().second);
+                bool hit=false;
+                while(itneigh.next()){
+                    int label_other = pop.getRegion()(itneigh.x());
+                    if(label_other!=pop.getLabelNoRegion()&&label_other!=label_growth)
+                        hit =true;
                 }
-                else{
+                if(hit==false){
+                    pop.growth(pop.x().first,pop.x().second);
+                }else{
                     pop.setRegion(0,pop.x().second);
                 }
             }
@@ -1489,7 +1494,7 @@ struct ProcessingAdvanced
     static FunctionLabel watershedBoundary(const FunctionLabel & seed,const FunctionTopo & topo,const FunctionMask & mask, typename FunctionTopo::IteratorENeighborhood itneigh )
     {
         FunctorTopography<FunctionTopo  > functortopo(topo);
-        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutSuperiorLabel> pop(topo.getDomain(),functortopo,itneigh);
+        Population<FunctionLabel,FunctorTopography<FunctionTopo>, RestrictedSetWithoutALL> pop(topo.getDomain(),functortopo,itneigh);
         typename FunctionTopo::IteratorEDomain it(topo.getIteratorEDomain());
         while(it.next()){
             if(mask(it.x())==0){
@@ -1512,10 +1517,20 @@ struct ProcessingAdvanced
             functortopo.setLevel(i);
             while(pop.next())
             {
-                if(pop.getRegion()(pop.x().second)==pop.getLabelNoRegion())
+                int label_growth = pop.x().first;
+                itneigh.init(pop.x().second);
+                bool hit=false;
+                while(itneigh.next()){
+                    int label_other = pop.getRegion()(itneigh.x());
+                    if(label_other!=pop.getLabelNoRegion()&&label_other!=label_growth)
+                        hit =true;
+                }
+                if(hit==false){
                     pop.growth(pop.x().first,pop.x().second);
-                else
+                }else{
                     pop.setRegion(1,pop.x().second);
+                }
+
             }
         }
         return pop.getRegion();
