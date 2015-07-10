@@ -1865,5 +1865,35 @@ struct POP_EXPORTS Analysis
     }
     //@}
 };
+
+struct FunctorMeanStandardDeviationIntegral{
+    Mat2UI32 integral;
+    Mat2UI32 integralpower2;
+    int _radius;
+    template<typename PixelType>
+    void setImage(const MatN<2,PixelType> & m){
+        Mat2UI32 mm(m);
+        integral = ProcessingAdvanced::integral(mm);
+        integralpower2 = ProcessingAdvanced::integral(mm.multTermByTerm(mm));
+    }
+
+    inline F32 standartDeviation(const Vec2I32 &x,int radius){
+        Vec2I32 xadd1=x+Vec2I32(radius);
+        Vec2I32 xadd2=x+Vec2I32(-radius);
+        Vec2I32 xsub1=x-Vec2I32(radius,-radius);
+        Vec2I32 xsub2=x-Vec2I32(-radius,radius);
+        F32 mean =(F32) integral(xadd1)+integral(xadd2)-integral(xsub1)-integral(xsub2);
+        mean/=(2*radius*2*radius);
+
+        F32 standartdeviation = static_cast<F32>((integralpower2)(xadd1)+(integralpower2)(xadd2)-(integralpower2)(xsub1)-(integralpower2)(xsub2));
+        standartdeviation/=(2*radius*2*radius);
+        standartdeviation =standartdeviation-mean*mean;
+
+        if(standartdeviation>0)
+            return std::sqrt( standartdeviation);
+        else
+            return  0;
+    }
+};
 }
 #endif // ANALYSIS_H

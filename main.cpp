@@ -145,78 +145,83 @@ public:
 
 
     }
+    // {
+    //        Mat2F32 f(2,3);
+    //        f(0,0)=2;f(0,1)=5;f(0,2)=3;
+    //        f(1,0)=1;f(1,1)=4;f(1,2)=1;
 
-    void setWeight(Vec<Mat2F32> v_weights,Vec<F32> v_weighs_biais){
-        for(unsigned int i=0;i<v_weights.size();i++){
-            this->_W_kernels(i) = ConvolutionFourier::weightReal2Fourrier(v_weights(i),this->_W_kernels(i).getDomain());
-        }
-        _W_biais= v_weighs_biais;
-    }
-
-    void convertReal2Complex(const MatNReference<2,F32> & map,Mat2ComplexF32 & map_complex){
-        map_complex.fill(ComplexF32(0,0));
-        for(unsigned int i=0;i<map.sizeI();i++){
-            for(unsigned int j=0;j<map.sizeJ();j++){
-                map_complex(i,j)=ComplexF32(map(i,j),0);
+        void setWeight(Vec<Mat2F32> v_weights,Vec<F32> v_weighs_biais){
+            for(unsigned int i=0;i<v_weights.size();i++){
+                this->_W_kernels(i) = ConvolutionFourier::weightReal2Fourrier(v_weights(i),this->_W_kernels(i).getDomain());
             }
+            _W_biais= v_weighs_biais;
         }
 
-    }
-    void FFTInverse(){
-
-    }
-    virtual void forwardCPU(const NeuralLayer& layer_previous){
-
-        //init output maps
-        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-            this->_Y_complex(index_map).fill(ComplexF32(0,0));
-        }
-
-        if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
-            //iterate over the input maps
-            for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
-                const MatNReference<2,F32> & map =neural_matrix->X_map()(index_map_previous);
-
-                convertReal2Complex(map,_X_complex);
-                //apply the forward FFT to the previous map
-                _X_complex = Representation::FFT(_X_complex);
-
-                //iterate of the output map
-                for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-                    //get the index of the kernel
-                    int index = index_map*neural_matrix->X_map().size()+index_map_previous;
-
-                    //apply the convolution (matrix multiplication term of term in frequency domain) and add the result to the output map
-                    _Y_complex(index_map) += _X_complex.multTermByTerm(_W_kernels[index]);
-                    //add the biais weight
-                    _Y_complex(index_map)(0,0).real() +=_W_biais(index)*_X_complex.getDomain().multCoordinate();
+        void convertReal2Complex(const MatNReference<2,F32> & map,Mat2ComplexF32 & map_complex){
+            map_complex.fill(ComplexF32(0,0));
+            for(unsigned int i=0;i<map.sizeI();i++){
+                for(unsigned int j=0;j<map.sizeJ();j++){
+                    map_complex(i,j)=ComplexF32(map(i,j),0);
                 }
             }
-        }
 
-        for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
-            //apply the backward FFT ot the  map
-            _Y_complex(index_map) = Representation::FFT(_Y_complex(index_map),FFT_BACKWARD);
-            //scale the result
-            Representation::scale(_Y_complex(index_map));
-            for(unsigned int i=0;i<this->_X_reference(index_map).sizeI();i++)
-                for(unsigned int j=0;j<this->_X_reference(index_map).sizeJ();j++){
-                    this->_X_reference(index_map)(i,j) = NeuronSigmoid::activation(_Y_complex(index_map)(i,j).real());
+        }
+        void FFTInverse(){
+
+        }
+        virtual void forwardCPU(const NeuralLayer& layer_previous){
+
+            //init output maps
+            for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                this->_Y_complex(index_map).fill(ComplexF32(0,0));
+            }
+
+            if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
+                //iterate over the input maps
+                for(unsigned int index_map_previous=0;index_map_previous<neural_matrix->X_map().size();index_map_previous++){
+                    const MatNReference<2,F32> & map =neural_matrix->X_map()(index_map_previous);
+
+                    convertReal2Complex(map,_X_complex);
+                    //apply the forward FFT to the previous map
+                    _X_complex = Representation::FFT(_X_complex);
+
+                    //iterate of the output map
+                    for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                        //get the index of the kernel
+                        int index = index_map*neural_matrix->X_map().size()+index_map_previous;
+
+                        //apply the convolution (matrix multiplication term of term in frequency domain) and add the result to the output map
+                        _Y_complex(index_map) += _X_complex.multTermByTerm(_W_kernels[index]);
+                        //add the biais weight
+                        _Y_complex(index_map)(0,0).real() +=_W_biais(index)*_X_complex.getDomain().multCoordinate();
+                    }
                 }
+            }
+
+            for(unsigned int index_map=0;index_map<this->_Y_complex.size();index_map++){
+                //apply the backward FFT ot the  map
+                _Y_complex(index_map) = Representation::FFT(_Y_complex(index_map),FFT_BACKWARD);
+                //scale the result
+                Representation::scale(_Y_complex(index_map));
+                for(unsigned int i=0;i<this->_X_reference(index_map).sizeI();i++)
+                    for(unsigned int j=0;j<this->_X_reference(index_map).sizeJ();j++){
+                        this->_X_reference(index_map)(i,j) = NeuronSigmoid::activation(_Y_complex(index_map)(i,j).real());
+                    }
+            }
+
         }
 
-    }
+        virtual void backwardCPU(NeuralLayer& layer_previous){}
+        void learn(){}
+        virtual NeuralLayer * clone(){}
+        Mat2ComplexF32 _X_complex;
+        Vec<Mat2ComplexF32> _W_kernels;
+        Vec<Mat2ComplexF32> _Y_complex;
+        Vec<F32> _W_biais;
+        int _radius;
+        unsigned int _sub_resolution_factor;
+    };
 
-    virtual void backwardCPU(NeuralLayer& layer_previous){}
-    void learn(){}
-    virtual NeuralLayer * clone(){}
-    Mat2ComplexF32 _X_complex;
-    Vec<Mat2ComplexF32> _W_kernels;
-    Vec<Mat2ComplexF32> _Y_complex;
-    Vec<F32> _W_biais;
-    int _radius;
-    unsigned int _sub_resolution_factor;
-};
 
 
 
@@ -589,7 +594,281 @@ int main()
 
 //        return 1;
 
+//        h.resizeInformation(size_i_output,size_j_output);
+//        std::cout<<h<<std::endl;
+//        return 1;
+//  }
 
+//{
+//NeuralNet net;
+//net.load("/home/vincent/DEV2/DEV/CVSA/bin/dictionaries/neuralnetwork.xml");
+//Mat2UI8 m("/home/vincent/Desktop/_.jpg");
+
+//VecF32 vin= net.inputMatrixToInputNeuron(m);
+//VecF32 vout;
+//int number_iteration = 10000;
+//#if __cplusplus > 199711L // c++11
+//auto start_global =  std::chrono::high_resolution_clock::now();
+//#endif
+//{
+//for(unsigned int i=0;i<number_iteration;i++)
+//net.forwardCPU(vin,vout);
+////            vin(0)=vout(0);
+//}
+//std::cout<<vout<<std::endl;
+//#if __cplusplus > 199711L // c++11
+//auto end_global= std::chrono::high_resolution_clock::now();
+//std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()/number_iteration<<std::endl;
+//#endif
+//VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
+//int label_max = std::distance(vout.begin(),itt);
+//std::cout<<label_max<<std::endl;
+//return 1;
+
+//        NeuralNet net;
+//        int size_windows=9;
+//        net.addLayerMatrixInput(size_windows,size_windows,1);
+//        net.add
+
+//}
+
+
+//    {
+//        NeuralNet net;
+//        net.addLayerMatrixInput(2,2,2);
+//        net.addLayerMatrixConvolutionSubScaling(3,1,0);
+//        net.addLayerMatrixMergeConvolution();
+//        net.setTrainable(true);
+//        net.setLearnableParameter(0.1);
+//        VecF32 v(2*2*2);
+//        v(0)=1;v(1)=-1;v(2)=-1;v(3)= 1;
+//        v(4)=1;v(5)=-1;v(6)= 1;v(7)=-1;
+
+//        VecF32 v_exp(2*2);
+//        v_exp(0)=1;v_exp(1)=1;v_exp(2)=-1;v_exp(3)=-1;
+////        //        v_exp(4)=1;v_exp(5)=-1;v_exp(6)= 1;v_exp(7)=-1;
+
+//        while(1==1){
+//            VecF32 v_out;
+//            net.forwardCPU(v,v_out);
+//            std::cout<<v<<std::endl;
+//            std::cout<<v_out<<std::endl;
+//            std::cout<<v_exp<<std::endl;
+//            net.backwardCPU(v_exp);
+//            net.learn();
+//        }
+//////        net.forwardCPU(v,v_out);
+
+//////        std::cout<<v_out<<std::endl;
+////        return 1;
+
+
+//    }
+
+//{
+//NeuralNet net;
+//net.addLayerMatrixInput(7,7,1);
+
+//net.addLayerMatrixConvolutionSubScaling(2,1,1);
+//net.addLayerMatrixConvolutionSubScaling(4,1,1);
+////        net.addLayerMatrixConvolutionSubScaling(20,1,1);
+//net.addLayerMatrixMergeConvolution();
+//{
+//Mat2F32 m(7,7);
+//m.fill(-1);
+//m(1,2)=1;m(2,2)=1;m(3,2)=1;
+//std::cout<<m<<std::endl;
+//Mat2F32 v_out;
+//net.forwardCPU(m,v_out);
+//std::cout<<net.getMatrixOutput(0)<<std::endl;
+//m.fill(-1);
+//m(1,4)=1;m(2,4)=1;m(3,4)=1;
+////            m(3,1)=1;
+////            m(3,2)=1;
+////            m(3,3)=1;
+//std::cout<<m<<std::endl;
+//net.forwardCPU(m,v_out);
+//std::cout<<net.getMatrixOutput(0)<<std::endl;
+//}
+////net.addLayerMatrixConvolutionSubScaling(2,1,1);
+////        net.addLayerMatrixConvolutionSubScaling(2,2,1);
+////                     net.addLayerLinearFullyConnected(9);
+////    std::cout<<net.getDomainMatrixOutput().first<<std::endl;
+//Vec<Mat2F32> v_inputs;
+//Vec<Mat2F32> v_outputs;
+//for(unsigned int i=0;i<=1;i++)
+//for(unsigned int j=0;j<=1;j++){
+//    std::pair<Mat2F32,Mat2F32> m= matrixOrientation(i,j,false);
+//    v_inputs.push_back(m.first);
+//    v_outputs.push_back(m.second);
+//    m= matrixOrientation(i,j,true);
+//    v_inputs.push_back(m.first);
+//    v_outputs.push_back(m.second);
+//}
+////        std::pair<Mat2F32,Mat2F32> m1 = matrixOrientation(1,0,false);
+////        std::pair<Mat2F32,Mat2F32> m2 = matrixOrientation(0,0,true);
+////        std::pair<Mat2F32,Mat2F32> m3 = matrixOrientation(2,2,false);
+////        std::pair<Mat2F32,Mat2F32> m4 = matrixOrientation(1,1,tur);
+////        std::pair<Mat2F32,Mat2F32> m5 = matrixOrientation(2,2,false);
+
+////        v_inputs.push_back(m1.first);
+////        v_inputs.push_back(m2.first);
+////        v_inputs.push_back(m3.first);
+
+////        v_outputs.push_back(m1.second);
+////        v_outputs.push_back(m2.second);
+////        v_outputs.push_back(m3.second);
+
+//VecF32 v_out;
+
+//net.setTrainable(true);
+//double eta=0.001;
+//net.setLearnableParameter(eta);
+
+
+//Vec<int> v_global_rand(v_inputs.size());
+//for(unsigned int i=0;i<v_global_rand.size();i++)
+//v_global_rand[i]=i;
+
+//for(unsigned int i=0;i<1000;i++){
+//    int error =0;
+//    std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+//    for(unsigned int j=0;j<v_global_rand.size();j++){
+//        net.forwardCPU(v_inputs(v_global_rand(j)),v_out);
+//        net.backwardCPU(v_outputs(v_global_rand(j)));
+//        net.learn();
+//        int label1 = std::distance(v_out.begin(),std::max_element(v_out.begin(),v_out.end()));
+//        int label2 = std::distance(v_outputs(v_global_rand[j]).begin(),std::max_element(v_outputs(v_global_rand[j]).begin(),v_outputs(v_global_rand[j]).end()));
+//        if(label1!=label2){
+//            error++;
+//        }
+//        if(i>80){
+//            Mat2F32 m(7,7);
+//            m.fill(-1);
+//            m(1,2)=1;m(2,2)=1;m(3,2)=1;
+//            net.forwardCPU(m,v_out);
+//            std::cout<<net.getMatrixOutput(0)<<std::endl;
+//            m.fill(-1);
+//            m(3,1)=1;
+//            m(3,2)=1;
+//            m(3,3)=1;
+//            net.forwardCPU(m,v_out);
+//            std::cout<<net.getMatrixOutput(0)<<std::endl;
+//        }
+//    }
+//    eta*=0.95;
+//    eta=std::max(eta,0.0001);
+//    net.setLearnableParameter(eta);
+//    std::cout<<error<<" "<<eta <<" "<<i<<std::endl;
+//}
+//return 1;
+
+////        std::cout<<v_out<<std::endl;
+
+//return 1;
+//}
+
+
+
+//std::string plaque = "/home/vincent/Desktop/plate.jpeg";
+//std::string plaque_mask = "/home/vincent/Desktop/plate_mask.jpeg";
+//Mat2RGBUI8 plate;
+//plate.load(plaque);
+//Mat2UI8 plate_mask;
+//plate_mask.load(plaque_mask);
+
+
+//Vec2I32 domain(100,100*800./322);
+
+//NeuralNet net;
+//int size_i=domain(0);
+//int size_j=domain(1);
+//int nbr_map=3;
+//net.addLayerMatrixInput(size_i,size_j,nbr_map);
+//net.addLayerMatrixConvolutionSubScaling(20,2,2);
+//net.addLayerMatrixConvolutionSubScaling(30,2,2);
+//net.addLayerMatrixConvolutionSubScaling(40,2,2);
+
+//Vec2I32 domain_out = net.getDomainMatrixOutput().first;
+//VecF32 v_out_expected;
+//v_out_expected = normalizedImageToOutputNet(plate_mask,domain_out);
+
+//std::cout<<domain_out.multCoordinate()<<std::endl;
+//std::cout<<v_out_expected.size()<<std::endl;
+//VecF32 v_in;
+//v_in = normalizedImageToNeuralNet(plate,domain);
+
+//VecF32 v_out;
+//for(unsigned int i=0;i<100;i++){
+//#if __cplusplus > 199711L // c++11
+//    auto start_global = std::chrono::high_resolution_clock::now();
+//#else
+//    unsigned int start_global = time(NULL);
+//#endif
+//    net.setTrainable(true);
+//    net.setLearnableParameter(0.001);
+//    F32 sum=0;
+//    for(unsigned int i=0;i<20;i++){
+//        net.forwardCPU(v_in,v_out);
+//        sum=0;
+//        for(unsigned int j=0;j<v_out.size();j++){
+//            sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
+//        }
+//        std::cout<<sum<<std::endl;
+//        net.backwardCPU(v_out_expected);
+//        net.learn();
+//        net.forwardCPU(v_in,v_out);
+//        sum=0;
+//        for(unsigned int j=0;j<v_out.size();j++){
+//            sum+=std::abs(  v_out(j)  - v_out_expected(j)  );
+//        }
+//        std::cout<<sum<<std::endl;
+//    }
+//    displayOutput(v_out,domain_out).display();
+//#if __cplusplus > 199711L // c++11
+//    auto end_global= std::chrono::high_resolution_clock::now();
+//    std::cout<<"processing : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+//#else
+//    unsigned int end_global = time(NULL);
+//    std::cout << "processing: " << (start_global-end_global) << "s" << std::endl;
+//#endif
+//    return 1;
+//}
+
+////        clusterToLabel(m,m.getIteratorENeighborhood(1,1),m.getIteratorEDomain());
+
+
+////    omp_set_num_threads(6);
+////    pop::Mat2UI8 m(1200,1600);
+////    //auto start_global = std::chrono::high_resolution_clock::now();
+
+////    m=thresholdNiblackMethod(m);
+////    //auto end_global = std::chrono::high_resolution_clock::now();
+////    std::cout<<"processing nimblack1 : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+
+////    int time1 = time(NULL);
+////     //start_global = std::chrono::high_resolution_clock::now();
+
+////    m=Processing::thresholdNiblackMethod(m);
+////     //end_global = std::chrono::high_resolution_clock::now();
+////    std::cout<<"processing nimblack2 : "<<std::chrono::duration<double, std::milli>(end_global-start_global).count()<<std::endl;
+
+////    return 1;
+
+////    //	m = m*m;
+////    int time2 = time(NULL);
+////    std::cout<<time2-time1<<std::endl;
+////    Mat2UI8 img;//2d grey-level image object
+////    img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
+////    img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
+////    int value;
+////    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation
+////    threshold.save("iexthreshold.pgm");
+////    Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
+////    color.display();
+
+//return 0;
+//}
 //        //        std::cout<<m<<std::endl;
 //        //        FFT2D<N2,N2,F32> fft;
 
@@ -1002,3 +1281,4 @@ int main()
 
 //    return 0;
 //}
+

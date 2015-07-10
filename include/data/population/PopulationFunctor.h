@@ -238,6 +238,7 @@ public:
         return maximum(F32(0.0),absolute( (_topo(x)-_v_X[label]))/_v_standard_deviation[label] );
     }
 };
+
 template<typename FunctionTopo>
 class POP_EXPORTS FunctorMeanMerge
 {

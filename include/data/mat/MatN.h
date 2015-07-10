@@ -2908,6 +2908,14 @@ void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h, 
     }
 }
 
+template<int DIM,typename PixelType,typename FunctorAccumulatorF>
+typename FunctorAccumulatorF::ReturnType forEachFunctorAccumulator(const MatN<DIM,PixelType> & f,  FunctorAccumulatorF & func, typename MatN<DIM,PixelType>::IteratorEDomain &it){
+    for(unsigned int i=0;i<f.size();i++){
+        func( f(i));
+    }
+    return func.getValue();
+}
+
 
 }
 #endif

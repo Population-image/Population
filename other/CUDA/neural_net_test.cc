@@ -105,15 +105,15 @@ void test_neural_net_cpu(const int nb_epoch) {
 	// ( 1, 1)->-1
 	pop::Vec<pop::VecF32> v_in(4,pop::VecF32(2));//4 vector of two scalar values
 	v_in(0)(0)=-1;v_in(0)(1)=-1; // (-1,-1)
-	v_in(1)(0)= 1;v_in(1)(1)=-1; // ( 1,-1)
+    v_in(1)(0)= 1;v_in(1)(1)=-1; // ( 1,-1)
 	v_in(2)(0)=-1;v_in(2)(1)= 1; // (-1, 1)
 	v_in(3)(0)= 1;v_in(3)(1)= 1; // ( 1, 1)
 
 	pop::Vec<pop::VecF32> v_out(4,pop::VecF32(1));//4 vector of one scalar value
-	v_out(0)(0)=-1;// -1
-	v_out(1)(0)= 1;//  1
-	v_out(2)(0)= 1;//  1
-	v_out(3)(0)=-1;// -1
+    v_out(0)(0)=-1;// -1
+    v_out(1)(0)= 1;//  1
+    v_out(2)(0)= 1;//  1
+    v_out(3)(0)=-1;// -1
 
 	//use the backpropagation algorithm with first order method
 	std::vector<int> v_global_rand(v_in.size());
@@ -148,8 +148,8 @@ void test_neural_net_cpu(const int nb_epoch) {
 }
 
 void test_neural_net_cpu_mnist(const int nb_epoch) {
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/train-images-idx3-ubyte","/home/olivia/workspace/MNIST/train-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/t10k-images-idx3-ubyte","/home/olivia/workspace/MNIST/t10k-labels-idx1-ubyte");
 
 	double size_in = number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
 	std::cout << "size trainings: " << number_training(0).size() << std::endl;
@@ -266,8 +266,8 @@ void test_neural_net_conv_cpu(const int nb_epoch) {
 }
 
 void test_neural_net_conv_cpu_mnist(const int nb_epoch) {
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/train-images-idx3-ubyte","/home/olivia/workspace/MNIST/train-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/t10k-images-idx3-ubyte","/home/olivia/workspace/MNIST/t10k-labels-idx1-ubyte");
 
 	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
 	std::cout << "size trainings: " << number_training(0).size() << std::endl;
@@ -301,6 +301,7 @@ void test_neural_net_conv_cpu_mnist(const int nb_epoch) {
 
 	pop::Vec<pop::VecF32> vtraining_in;
 	pop::Vec<pop::VecF32> vtraining_out;
+    //convertit mat en vecteur
 	pop::TrainingNeuralNetwork::convertMatrixToInputValueNeuron(vtraining_in,vtraining_out,number_training,domain,pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
 
 	pop::Vec<pop::VecF32> vtest_in;
@@ -314,26 +315,35 @@ void test_neural_net_conv_cpu_mnist(const int nb_epoch) {
 	size_t total_size_test = (vtest_in.size()*vtest_in(0).size() + vtest_out.size()*vtest_out(0).size()) * sizeof(vtest_in(0)(0));
 	std::cout << "total training size: " << total_size_training << ", total size test: " << total_size_test << std::endl;
 
+
+    //choisir ordre des images
 	std::vector<int> v_global_rand(vtraining_in.size());
 	for(unsigned int i=0;i<v_global_rand.size();i++)
-		v_global_rand[i]=i;
+        v_global_rand[i]=i; // vecteur de pointeurs qui pointent sur img
 
 	std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
 
-	for (unsigned int i=0;i<nb_epoch;i++) {
+    for (unsigned int i=0;i<nb_epoch;i++) {//une itération avec un set d'images ordonné différemment à chaque fois
 		std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,pop::Distribution::irand());
 		int error_training=0,error_test=0;
 
+            //phase training
 		for(unsigned int j=0;j<v_global_rand.size();j++){
 			pop::VecF32 vout;
-			network.propagateFront(vtraining_in(v_global_rand[j]),vout);
-			int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            //algo propagate front
+            network.propagateFront(vtraining_in(v_global_rand[j]),vout); // vtraining_in = images
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));//distance entre begin et la case max pour atteindre la case ou ya le max
+            //propagate back
 			network.propagateBackFirstDerivate(vtraining_out(v_global_rand[j]));
+            //v_training_out = valeur désiré
+            //v_out = valeur reelle
 			int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
 			if(label1!=label2){
-				error_training++;
+                error_training++; //calcul de erreur en plus
 			}
 		}
+
+        //phase test
 		for(unsigned int j=0;j<vtest_in.size();j++){
 			pop::VecF32 vout;
 			network.propagateFront(vtest_in(j),vout);
@@ -350,7 +360,7 @@ void test_neural_net_conv_cpu_mnist(const int nb_epoch) {
 }
 
 #if defined(HAVE_CUDA)
-void test_neural_net_gpu(const int nb_epoch) {
+void test_neural_net_gpu(const int nb_epoch) {//
 	std::vector<struct layer_representation> v_layer;
 	struct layer_representation lr;
 	lr.type = LAYER_INPUT;
@@ -377,6 +387,8 @@ void test_neural_net_gpu(const int nb_epoch) {
 	v_out(2)(0)= 1;//  1
 	v_out(3)(0)=-1;// -1
 
+
+    //on verifie que on a assez de place sur la carte pour nos donnees
 	size_t total_size_sets = (v_in.size()*v_in(0).size() + v_out.size()*v_out(0).size()) * sizeof(v_in(0)(0));
 	size_t free, total;
 	cudaMemGetInfo(&free, &total);
@@ -386,13 +398,16 @@ void test_neural_net_gpu(const int nb_epoch) {
 	}
 
 	//use the backpropagation algorithm with first order method
-	std::vector<int> v_global_rand(v_in.size());
+    std::vector<int> v_global_rand(v_in.size()); //tableau des indices qui accedent aux img
 	for(unsigned int i=0;i<v_global_rand.size();i++)
 		v_global_rand[i]=i;
 
+    //copie des img sur le gpu d_in_set pointeur vers copie
 	pop::F32* d_in_set = GPUNeuralNetwork::gpu_copyDataToGPU(v_in, 0, v_in.size());
+    //valeurs desirees
 	pop::F32* d_out_set = GPUNeuralNetwork::gpu_copyDataToGPU(v_out, 0, v_out.size());
 
+    //valeurs de sortie reelles
 	pop::F32* d_out;
 	cudaMalloc(&d_out, v_out(0).size() * sizeof(v_in(0)(0)));
 
@@ -407,6 +422,7 @@ void test_neural_net_gpu(const int nb_epoch) {
 		error = 0;
 		cudaMemcpy(d_error, &error, sizeof(error), cudaMemcpyHostToDevice);
 
+        //algos
 		for(unsigned int j=0;j<v_global_rand.size();j++){
 			network.gpu_propagateFront(d_in_set, v_in(0).size(), v_global_rand[j], d_out);
 			network.gpu_propagateBackFirstDerivate(d_out_set, v_out(0).size(), v_global_rand[j]);
@@ -422,9 +438,10 @@ void test_neural_net_gpu(const int nb_epoch) {
 	cudaFree(d_in_set);
 	cudaFree(d_out_set);
 
+    //copie du reseau (x,y,w) sur le cpu
 	network.copyNetworkFromGPU();
 
-	//test the training
+    //test the training on cpu
 	for(int j=0;j<4;j++){
 		pop::VecF32 vout;
 		network.propagateFront(v_in(j), vout);
@@ -668,8 +685,8 @@ void test_neural_net_conv_gpu(const int nb_epoch) {
 }
 
 void test_neural_net_conv_gpu_mnist(const int nb_epoch) {
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/train-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/train-labels-idx1-ubyte");
-	pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-images-idx3-ubyte","/media/pl/shared/PL/neural_nets_samples/MNIST/t10k-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_training =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/train-images-idx3-ubyte","/home/olivia/workspace/MNIST/train-labels-idx1-ubyte");
+    pop::Vec<pop::Vec<pop::Mat2UI8> > number_test =  pop::TrainingNeuralNetwork::loadMNIST("/home/olivia/workspace/MNIST/t10k-images-idx3-ubyte","/home/olivia/workspace/MNIST/t10k-labels-idx1-ubyte");
 
 	double size_in= number_training(0)(0).getDomain()(0) * number_training(0)(0).getDomain()(1);
 	std::cout << "size trainings: " << number_training(0).size() << std::endl;
@@ -762,7 +779,7 @@ void test_neural_net() {
 	network.displayNetwork();
 
 	pop::Mat2UI8 image_in(domain);
-	image_in.load("/home/pl/workspace/Population/image/Bikesgray.jpg");
+    image_in.load("/home/olivia/workspace/Population/image/Bikesgray.jpg");
 	pop::VecF32 vin = pop::NNLayerMatrix::inputMatrixToInputNeuron(image_in,domain,pop::NNLayerMatrix::Mass,pop::NNLayerMatrix::MinusOneToOne);
 
 	pop::Vec2I32 domain_out(domain(0)-4, domain(1)-4);
@@ -778,7 +795,7 @@ void test_neural_net() {
 			image_out(i, j) = vout(i*domain_out(1)+j);
 		}
 	}
-	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-cpu.jpg");
+    image_out.save("/home/olivia/workspace/Population/image/Bikesgray-sobel-cpu.jpg");
 
 	std::cout << "Test on GPU" << std::endl;
 
@@ -796,7 +813,7 @@ void test_neural_net() {
 			image_out(i, j) = vout(i*domain_out(1)+j);
 		}
 	}
-	image_out.save("/home/pl/workspace/Population/image/Bikesgray-sobel-gpu.jpg");
+    image_out.save("/home/olivia/workspace/Population/image/Bikesgray-sobel-gpu.jpg");
 
 	cudaFree(d_out);
 	cudaFree(d_in);

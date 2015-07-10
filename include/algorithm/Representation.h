@@ -115,9 +115,9 @@ struct FFTDanielsonLanczos :public FFTAbtract<T>{
         _scale_two._exec(data+N,way);
 
         T wtemp,tempr,tempi,wr,wi,wpr,wpi;
-        wtemp = sin(M_PI/N);
+        wtemp = sin(pop::PI/N);
         wpr = -2.0*wtemp*wtemp;
-        wpi = -way*sin(2*M_PI/N);
+        wpi = -way*sin(2*pop::PI/N);
 
         wr = 1.0;
         wi = 0.0;

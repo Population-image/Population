@@ -35,7 +35,7 @@ public:
 
 
     }
-    Vec2F64 randomVariable()const {
+    Vec2F32 randomVariable()const {
         double r_random =_regular_step.randomVariable();
         double r_angle  = _random_angle.randomVariable();
         VecF32 v(2);

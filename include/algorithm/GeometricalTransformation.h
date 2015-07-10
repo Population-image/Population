@@ -111,24 +111,6 @@ struct POP_EXPORTS GeometricalTransformation
     }
 
 
-    /*!
-     * \brief scale the image
-     * \param scale vector of scale factor
-     * \param f input matrix
-     * \param interpolation: 0=no, 1=BI-LINEAR
-     *
-     * scale the matrix with its domain of definition. For instance, in this code:
-     * \code
-     * Mat2RGBUI8 img;
-     * img.load("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lena.bmp");
-     * std::cout<<img.getDomain()<<std::endl;
-     * img = GeometricalTransformation::scale(img,Vec2F32(0.5,2));
-     * img.save("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lenascale.png");
-     * \endcode
-     *  the initial domain is (256,,256) and then (128,512)
-     * \image html Lena.bmp
-     * \image html Lenascale.png
-    */
     template<int DIM>
     struct _FunctorScale
     {
@@ -147,6 +129,24 @@ struct POP_EXPORTS GeometricalTransformation
             }
         }
     };
+    /*!
+     * \brief scale the image
+     * \param scale vector of scale factor
+     * \param f input matrix
+     * \param interpolation: 0=no, 1=BI-LINEAR
+     *
+     * scale the matrix with its domain of definition. For instance, in this code:
+     * \code
+     * Mat2RGBUI8 img;
+     * img.load("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lena.bmp");
+     * std::cout<<img.getDomain()<<std::endl;
+     * img = GeometricalTransformation::scale(img,Vec2F32(0.5,2));
+     * img.save("D:/Users/vtariel/Desktop/ANV/Population/doc/image2/Lenascale.png");
+     * \endcode
+     *  the initial domain is (256,,256) and then (128,512)
+     * \image html Lena.bmp
+     * \image html Lenascale.png
+    */
     template<int DIM,  typename PixelType>
     static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
     {

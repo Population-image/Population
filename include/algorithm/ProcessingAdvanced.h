@@ -159,6 +159,7 @@ struct ProcessingAdvanced
     }
 
 
+
     template<int DIM,typename PixelType>
     static MatN<DIM,UI8>  nonMaximumSuppression(const MatN<DIM,PixelType> & img,const MatN<DIM,VecN<DIM,F32> >& grad,const MatN<DIM,F32> &gradnorm)
     {
@@ -2085,5 +2086,7 @@ struct ProcessingAdvanced
         return dilationRegionGrowing(temp,radius,norm);
     }
 };
+
+
 }
 #endif // PROCESSINGADVANCED_H
