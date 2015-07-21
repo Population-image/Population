@@ -532,14 +532,14 @@ struct POP_EXPORTS Representation
             out.resize(x);
         }
         if(DIM==2){
-            for( int i=0;i<size(0);i++){
+            for(int i=0;i<size(0);i++){
                 std::copy(in.begin()+i*in.sizeJ(),in.begin()+(i*in.sizeJ()+size(1)),out.begin()+i*out.sizeJ());
             }
         }else if(DIM==1){
             std::copy(in.begin(),in.begin()+size(0),out.begin());
         }else{
-            for( int k=0;k<size(2);k++){
-                for( int i=0;i<size(0);i++){
+            for(int k=0;k<size(2);k++){
+                for(int i=0;i<size(0);i++){
                     std::copy(in.begin()+i*in.sizeJ()+k*in.sizeI()*in.sizeJ(),in.begin()+(i*in.sizeJ()+size(1))+k*in.sizeI()*in.sizeJ(),out.begin()+i*out.sizeJ()+k*out.sizeI()*out.sizeJ());
                 }
             }
