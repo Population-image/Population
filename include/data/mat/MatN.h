@@ -2275,7 +2275,7 @@ MatN<DIM,PixelType>  MatN<DIM,PixelType>::transpose()const
     const unsigned int sizei= this->sizeI();
     const unsigned int sizej= this->sizeJ();
     MatN<DIM,PixelType> temp(sizej,sizei);
-    for(int i=0;i<sizei;i++){
+    for(unsigned int i=0;i<sizei;i++){
         typename  MatN<DIM,PixelType>::const_iterator this_ptr  =  this->begin() + i*sizej;
         typename  MatN<DIM,PixelType>::const_iterator this_end_ptr  =  this_ptr + sizej;
         typename  MatN<DIM,PixelType>::iterator temp_ptr =     temp.begin() + i;
@@ -2909,7 +2909,7 @@ void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h, 
 }
 
 template<int DIM,typename PixelType,typename FunctorAccumulatorF>
-typename FunctorAccumulatorF::ReturnType forEachFunctorAccumulator(const MatN<DIM,PixelType> & f,  FunctorAccumulatorF & func, typename MatN<DIM,PixelType>::IteratorEDomain &it){
+typename FunctorAccumulatorF::ReturnType forEachFunctorAccumulator(const MatN<DIM,PixelType> & f,  FunctorAccumulatorF & func, typename MatN<DIM,PixelType>::IteratorEDomain &){
     for(unsigned int i=0;i<f.size();i++){
         func( f(i));
     }

@@ -59,6 +59,7 @@ MatNDisplay & MatNDisplay::display(const MatN<2, UI8 > &m){
 
 
 void waitKey(std::string text){
+        (void)text;
 #if defined(HAVE_CIMG)
     Mat2UI8 m(100,350);
     if(text=="")
