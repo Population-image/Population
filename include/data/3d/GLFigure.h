@@ -219,33 +219,30 @@ class POP_EXPORTS Scene3d
       *  \author Tariel Vincent
       *
       * This simple class contains a vector of elementary glfigures. This class does not aim to concurrennce VTK or other top-level OpenGL library. The aim is to have
-      * a simple opengl visualisation for material science. When you close the display, the program exist in Linux thanks to glut.\n
+      * a simple opengl visualisation for material science. When you close the display, the program exist in Linux thanks to glut.     You have many information in these tutorials \ref  pagevisu2d \ref  pagevisu3d.\n
       * For instance, this code produces this following image
       * \code
-    Mat3UI8 img;
-    img.load("../image/rock3d.pgm");
-//    img = img(Vec3I32(0,0,0),Vec3I32(64,64,64));
-
-    Mat3UI8 imgfilter= Processing::median(img,2);
-
-    Mat3UI8 grain= Processing::threshold(imgfilter,155);
-    Mat3UI8 oil = Processing::threshold(imgfilter,70,110);
-    oil = Processing::openingRegionGrowing(oil,2);//To remove the interface artefact
-    Mat3UI8 air = Processing::threshold(imgfilter,0,40);
-    Mat3UI8 seed = Processing::labelMerge(grain,oil);
-    seed = Processing::labelMerge(seed,air);
-
-    Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
-    Mat3UI8 water = Processing::watershed(seed,gradient);
-    grain = Processing::labelFromSingleSeed(water,grain);
-    grain=Mat3F32(grain)*0.75;
-    oil = Processing::labelFromSingleSeed(water,oil);
-    oil = Mat3F32(oil)*0.4;
-    Scene3d scene;
-    Visualization::marchingCube(scene,grain);
-    Visualization::marchingCube(scene,oil);
-    Visualization::lineCube(scene,img);
-    scene.display();
+        Mat3UI8 img;
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/rock3d.pgm").c_str());
+        //img = img(Vec3I32(0,0,0),Vec3I32(64,64,64)); //uncomment these lines for the full core sample
+        Mat3UI8 imgfilter= Processing::median(img,2);
+        Mat3UI8 grain= Processing::threshold(imgfilter,155);
+        Mat3UI8 oil = Processing::threshold(imgfilter,70,110);
+        oil = Processing::openingRegionGrowing(oil,2);//To remove the interface artefact
+        Mat3UI8 air = Processing::threshold(imgfilter,0,40);
+        Mat3UI8 seed = Processing::labelMerge(grain,oil);
+        seed = Processing::labelMerge(seed,air);
+        Mat3UI8 gradient = Processing::gradientMagnitudeDeriche(img,1.5);
+        Mat3UI8 water = Processing::watershed(seed,gradient);
+        grain = Processing::labelFromSingleSeed(water,grain);
+        grain=Mat3F32(grain)*0.75;
+        oil = Processing::labelFromSingleSeed(water,oil);
+        oil = Mat3F32(oil)*0.4;
+        Scene3d scene;
+        Visualization::marchingCube(scene,grain);
+        Visualization::marchingCube(scene,oil);
+        Visualization::lineCube(scene,img);
+        scene.display();
       * \endcode
       * \image html marchingcube.png
       * \sa pop::Visualization

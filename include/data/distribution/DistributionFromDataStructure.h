@@ -122,7 +122,7 @@ private:
     std::string exp = "x*log(x)";
     DistributionExpression d(exp);
     Distribution derivate = Statistics::derivate(d,0.001,10);
-    Distribution::multiDisplay(d,derivate,0.001,2.);
+    DistributionDisplay::display(d,derivate,0.001,2.);
     \endcode
     *
     *

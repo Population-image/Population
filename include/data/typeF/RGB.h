@@ -514,9 +514,9 @@ public:
         _data[2] = pop::ArithmeticsSaturation<ChannelType,F32 >::Range(1.0*y+  2.03211*u+  0*v);
     }
     /*!
-    * \param h luma
-    * \param s chrominance
-    * \param l chrominance
+    * \param hh luma
+    * \param ss chrominance
+    * \param ll chrominance
     *
     * Get Y'UV model defines a RGB space in terms of one luma (Y') and two chrominance (UV) to RGB model for this RGB object
     * \sa http://en.wikipedia.org/wiki/YUV

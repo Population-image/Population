@@ -153,9 +153,9 @@ public:
 
     We have two major categories of iterative loops: through the domain and through the neighborhood.
 
-    \subsection Domain Domain
-    This class provides four ways for the iterative loops on the domain: \f$ \forall x \in \mathcal{D}\f$
-    -  \a for: utilisation of the for statement. For instance, this code generate an matrix with a constant value:
+    \subsection Domain Iterared over all points of the domain
+    This class provides four ways for the iterative loops on the domain: \f$ \forall x \in \mathcal{D}\f$. Each time, we illustrate with a code generating an matrix with a constant value:
+    -  \a for: utilisation of the for statement.
     \code
     Mat2UI8 img(256,256);
     for(int i =0;i<img.sizeI();i++)
@@ -179,7 +179,7 @@ public:
         img(x)=150;
     img.display();
     \endcode
-    - \a  dereferencing: utilisation of the iterator of the STL Vec. For instance, this code:
+    - \a  dereferencing: utilisation of the iterator of the STL vector.
     \code
     void constant (unsigned char & v) {
         v= 150;
@@ -188,10 +188,18 @@ public:
     for_each(img.begin(),img.end(),constant);
     img.display();
     \endcode
-    The first one is the simplest one but less generic than the second one independant of the space. The last one is more optimized but you lost the VecN position that can be required for the subsequent process as in the erosion algorithm.
+    - \a std::vector accesor:  utilisation of the accesor of the STL vector.
+    \code
+    Mat2UI8 img(256,256);
+    for(int i =0;i<img.size();i++)
+        img(i)=150;
+    img.display();
+    \endcode
 
-    \subsection Neighborhood Neighborhood
-    This class provides two ways for the iterative loops on the VecN neighborhood: \f$ \forall x' \in N(x)\f$.
+    The first one is the simplest one but less generic than the second one independant of the space. The last one is more optimized but you lost the point position that can be required for the subsequent process as in the erosion algorithm.
+
+    \subsection Neighborhood Iterared over all points on a neighborhood of a point
+    This class provides two ways for the iterative loops on a point neighborhood: \f$ \forall x' \in N(x)\f$.
     -  \a for: utilisation of the for statement. For instance, the erosion code is:
     \code
     Mat2UI8 img;
@@ -201,12 +209,12 @@ public:
     //Domain loop
     for(int i =0;i<img.sizeI();i++){
         for(int j =0;j<img.sizeJ();j++){
-            Mat2UI8::F v =NumericLimits<UI8>::maximumRange(); //equivalent to unsigned char v=255
+            UI8 v =255; //equivalent to unsigned char v=255
              //Neighborhood loop
             for(int m= i-radius;m<i+radius;m++){
                 for(int n= j-radius;n<j+radius;n++){
                     if(img.isValid(m,n)){//test if (i,j) belongs to the domain of definition of the matrix
-                        v = minimum(img(m,n),v);
+                        v = std::min(img(m,n),v);
                     }
                 }
             }
@@ -226,35 +234,23 @@ public:
     Mat2UI8::IteratorEDomain itdomain(img.getIteratorEDomain());//Domain IteratorE
     Mat2UI8::IteratorENeighborhood itneigh (img.getIteratorENeighborhood(4,2));//Neighborhood IteratorE with the norm euclidean and the radius 4
     while(itdomain.next()){
-        Mat2UI8::F v =NumericLimits<UI8>::maximumRange();
+        UI8 v =255;
         itneigh.init(itdomain.x());
         while(itneigh.next()){
-            v = minimum(v,img(itneigh.x()));
+            v = std::min(v,img(itneigh.x()));
         }
         erosion(itdomain.x())=v;
     }
     erosion.display();
     \endcode
-    -  \a ForEachNeighborhood idiom: implicit iteration defined by a preprocessor directive.. Note we do have to set the type of the point
-    \code
-    Mat2UI8 img;
-    img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
-    Mat2UI8 erosion(img.getDomain());//construct an matrix with the same domain
-    ForEachDomain2D(x,img)
-    {
-        Mat2UI8::F v =NumericLimits<UI8>::maximumRange();
-        ForEachNeighborhood(y,img,x,4,2){
-            v = minimum(v,img(y));
-        }
-        erosion(x)=v;
-    }
-    erosion.display();
-    \endcode
 
 
-    The abstraction with IteratorENeighborhood concept provides an efficient and generic ways to iterate through a neighborhood.
+
+    The abstraction with IteratorENeighborhood concept provides an efficient and generic ways to iterate through a neighborhood (see this tutorial \ref pagetemplateprogramming ).
 
     \section Load Load/Save
+
+    You have many information in this tutorial \ref  pageinout .
 
     The implementation of these methods are Included in the hedader MatNInOut.h. So do not
     forget to Include "#include"data/mat/MatNInOut.h" to avoid a such error message "undefined reference to "'pop::MatN<2, unsigned char>::save(char const*) const'".
@@ -264,6 +260,8 @@ public:
 
 
     \section Display Display
+
+    You have many information in these tutorials \ref  pagevisu2d \ref  pagevisu3d.
 
     In good architectur design, the data and its representation are separeted in two classes. However for conveniency, you provide the member display() in this data class for simple display and
     you provide the MatNDisplay class for extended display.
@@ -447,7 +445,6 @@ public:
     //@{
     //-------------------------------------
     /*!
-    \fn MatN()
     * default constructor
     */
     MatN();
@@ -504,7 +501,6 @@ public:
     */
     explicit MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek);
     /*!
-    \fn MatN(const VecN<Dim,int>& x,const Vec<PixelType>& data)
     \param x domain size of the matrix
     \param data_values value of each pixel/voxel
     *
@@ -528,7 +524,6 @@ public:
     */
     explicit MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values );
     /*!
-    \fn MatN(const VecN<Dim,int> & x,const Type* v_value )
     \param x domain size of the matrix
     \param v_value affection values for the matrix elements
      *
@@ -2915,7 +2910,13 @@ typename FunctorAccumulatorF::ReturnType forEachFunctorAccumulator(const MatN<DI
     }
     return func.getValue();
 }
+template<int DIM,typename PixelType1,typename PixelType2,typename FunctorUnary_F_F>
+void forEachFunctorUnaryF(const MatN<DIM,PixelType1> & f,MatN<DIM,PixelType2> & g,FunctorUnary_F_F & func, typename MatN<DIM,PixelType1>::IteratorEDomain ){
+    for(unsigned int i=0;i<f.size();i++){
+        g(i)=func(f(i));
+    }
 
+}
 
 }
 #endif

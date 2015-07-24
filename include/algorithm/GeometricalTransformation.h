@@ -58,33 +58,33 @@ struct POP_EXPORTS GeometricalTransformation
     //@{
     //-------------------------------------
     /*!
-     * \brief get a 2d matrix from a 3d matrix (e.g. a slice in a core sample)
-     * \param m input 3d matrix
-     * \param index_plane plane index
-     * \param fixed_coordinate coordinate fixed
+     * \brief sub resolution by integer factor
+     * \param m input  matrix
+     * \param sub_resolution_factor sub resolution factor
+     * \return sub resolution matrix
      *
-     * \code
-     * \endcode
-     * \image html Lena.bmp
-     * \image html Lenascale.png
     */
-    template<typename PixelType>
-    static MatN<2,PixelType> subResolution(const MatN<2,PixelType> &m , int sub_resolution_factor)
+    template<int DIM, typename PixelType>
+    static MatN<DIM,PixelType> subResolution(const MatN<DIM,PixelType> &m , int sub_resolution_factor)
     {
-        MatN<2,PixelType> m_sub (m.getDomain()/sub_resolution_factor);
-        typename MatN<2,PixelType>::iterator it_sub=m_sub.begin();
-        typename MatN<2,PixelType>::const_iterator it=m.begin();
-        typename MatN<2,PixelType>::const_iterator it_index_start=m.begin();
-        int step_m_y=sub_resolution_factor;
-        int step_m_x=(sub_resolution_factor)*m.sizeJ();
-        for(unsigned int i=0;i<m_sub.sizeI();i++){
-            for(unsigned int j=0;j<m_sub.sizeJ();j++){
-                *it_sub= *it;
-                it_sub++;
-                it+=step_m_y;
+        MatN<DIM,PixelType> m_sub (m.getDomain()/sub_resolution_factor);
+        if(DIM==2){
+            for(unsigned int index_m_i=0,index_m_sub_i=0;index_m_sub_i<m_sub.sizeI();index_m_i+=sub_resolution_factor,index_m_sub_i++){
+                for(unsigned int index_m_j=0,index_m_sub_j=0;index_m_sub_j<m_sub.sizeJ();index_m_j+=sub_resolution_factor,index_m_sub_j++){
+                    m_sub(index_m_sub_i,index_m_sub_j)=m(index_m_i,index_m_j);
+                }
             }
-            it_index_start+=step_m_x;
-            it=it_index_start;
+        }
+        else if(DIM==3){
+            for(unsigned int index_m_k=0,index_m_sub_k=0;index_m_sub_k<m_sub.sizeK();index_m_k+=sub_resolution_factor,index_m_sub_k++){
+                for(unsigned int index_m_i=0,index_m_sub_i=0;index_m_sub_i<m_sub.sizeI();index_m_i+=sub_resolution_factor,index_m_sub_i++){
+                    for(unsigned int index_m_j=0,index_m_sub_j=0;index_m_sub_j<m_sub.sizeJ();index_m_j+=sub_resolution_factor,index_m_sub_j++){
+                        m_sub(index_m_sub_i,index_m_sub_j,index_m_sub_k)=m(index_m_i,index_m_j,index_m_k);
+                    }
+                }
+            }
+        }else{
+            std::cerr<<"[ERROR][subResolution] only for 2d and 3d image"<<std::endl;
         }
         return m_sub;
     }
@@ -94,10 +94,6 @@ struct POP_EXPORTS GeometricalTransformation
      * \param index_plane plane index
      * \param fixed_coordinate coordinate fixed
      *
-     * \code
-     * \endcode
-     * \image html Lena.bmp
-     * \image html Lenascale.png
     */
     template<typename VoxelType>
     static MatN<2,VoxelType> plane(const MatN<3,VoxelType> &m , int index_plane, int fixed_coordinate=2)
@@ -197,6 +193,7 @@ struct POP_EXPORTS GeometricalTransformation
     \brief rotate the input matrix
     \param f  input function
     \param angle rotation angle
+    \param boundarycondtion boundary condition
     \return rotate function
     *
     * rotate the matrix

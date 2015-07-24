@@ -1219,21 +1219,21 @@ struct ProcessingAdvanced
         MatN<DIM,UI32> map(f.getDomain());
         it.removeCenter();
         int cluster=0;
-        std::queue<VecN<DIM,I32> > v_list;
+        std::vector<VecN<DIM,I32> > v_list;
         while(it_order.next()){
             VecN<DIM,I32> &x=it_order.x();
             if(f(x)>0&&map(x)==0){
                 cluster++;
-                v_list.push(x);
+                v_list.push_back(x);
                 while(v_list.empty()==false){
-                    VecN<DIM,I32>  y = v_list.front();
-                    v_list.pop();
+                    VecN<DIM,I32>  y = *(v_list.rbegin());
+                    v_list.pop_back();
                     if(map(y)==0){
                         map(y)=cluster;
                         it.init(y);
                         while(it.next()){
                             if(f(it.x())>0&&map(it.x())==0){
-                                v_list.push(it.x());
+                                v_list.push_back(it.x());
                             }
                         }
                     }

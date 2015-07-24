@@ -17,12 +17,12 @@ Also, you can include Population as shared library. The first step is to compile
 Then, you create a cmake project with a main.cpp file with this following code in your CMakeLists.txt.    
 \code
 cmake_minimum_required(VERSION 2.6)
-project( t\section qmakesharedlibrary Shared libraryest_main )
-list(APPEND CMAKE_MODULE_PATH "/home/vincent/DEV2/Population/build")#replace this path by yours
+project(test_project)
+list(APPEND CMAKE_MODULE_PATH "/home/tariel/Desktop/DEV2/Population-build")#replace this path by yours
 find_package(Population REQUIRED)
 include_directories(${POPULATION_INCLUDE_DIRS})
 add_executable( test_project main.cpp)
-target_link_libraries(test_error ${POPULATION_LIBRARY})
+target_link_libraries(test_project ${POPULATION_LIBRARY})
 \endcode
 In your main file, for instance this simple code
 \code

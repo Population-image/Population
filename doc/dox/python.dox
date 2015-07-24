@@ -10,7 +10,7 @@ In linux, you need to install python and swig
 \code
 aptitude install swig python-dev
 \endcode
-Normally, in the build the binaries, you have three files : population.py, _population.so and firststep.py. With your favourite IDE (PyDev plugging for eclipse is nice http://www.vogella.com/articles/Python/article.html), you can execute the file firststep.py
+After the compilation, in the build the binaries, you have three files : population.py, _population.so and firststep.py. With your favourite IDE (PyDev plugging for eclipse is nice http://www.vogella.com/articles/Python/article.html), you can execute the file firststep.py
 \include firststep.py
 displaying a grey image and a segmented image.
 

@@ -68,7 +68,7 @@ public:
 
     /*!
     * \brief hough transformation  http://en.wikipedia.org/wiki/Hough_transform
-    * \param img input binary matrix
+    * \param binary input binary matrix
     * \return hough transformation normalized in the range [0-1]
 
     * \code
@@ -124,8 +124,9 @@ public:
     /*!
     * \brief get lines from the hough transformation  http://en.wikipedia.org/wiki/Hough_transform
     * \param hough transformation normalized in the range [0-1]
-    * \param img input binary matrix input binary matrix
+    * \param binary input binary matrix input binary matrix
     * \param threshold the minimum value to be considered as a line in the Hough tranformations
+    * \param radius_maximum_neightborhood radius to find the local minima
     * \code
         Mat2UI8 m;
         m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/barriere.png"));
@@ -433,6 +434,7 @@ public:
     * \param img input matrix
     * \param number_octave number of octaves (-1 means log(I.getDomain()) / log(2.) - 2) )
     * \param number_layers_per_octave number of layers per octave
+    * \param sigma_init initial sigma factor for the gaussian convolution
     * \param sigma  sigma factor
     * \param number_extra_layer_per_octave number of extra layers by octave
     * \brief gaussian pyramid

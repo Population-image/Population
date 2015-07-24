@@ -273,7 +273,7 @@ struct POP_EXPORTS Representation
 
     /*!
          * \param f input matrix with ComplexF32 as pixel/voxel type
-         * \param direction for direction =1 direct FFT, otherwise inverse FFT
+         * \param way for direct  FFT FFT_FORWARD , for  inverse FFT FFT_BACKWARD
          * \return return the fft
         * \brief Apply the FFT on the input matrix
 
@@ -495,9 +495,9 @@ struct POP_EXPORTS Representation
     //! \name Multiple of two
     //@{
     //-------------------------------------
-    /*! \fn static Function truncateMulitple2(const Function & in)
+    /*!
      * \param in input matrix
-     * \return output matrix with a domain multiple of 2 for each coordinate
+     * \param out output matrix with a domain multiple of 2 for each coordinate
      * \brief truncate the matrix in order to have domain multiple of 2 for each coordinate
      *
     */

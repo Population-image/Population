@@ -106,7 +106,7 @@ typedef float F32;
  * \brief float type 64 bits
  * \ingroup BasicType
  *
- * * F32's are mostly used when operations must be done on real numbers
+ * * F64's are mostly used when operations must be done on real numbers for double precisions
  */
 typedef double F64;
 

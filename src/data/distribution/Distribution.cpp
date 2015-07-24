@@ -48,9 +48,18 @@ void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax
     }
 
 
-    MatN<2,unsigned char> img (sizeheight, sizewidth);
+    Mat2RGBUI8 img (sizeheight, sizewidth);
+    Vec<RGBUI8> v_color(v_d.size());
+    DistributionUniformInt d(0,255);
+    int rand1=255,rand2=255,rand3=255;
+    for(unsigned int i=0;i<v_d.size();i++){
+        v_color(i)=RGBUI8(rand1,rand2,rand3);
+        rand1 =(rand1+2555+23)%255;
+        rand2 =(rand2+2522+23)%255;
+        rand3 =(rand3+2511+23)%255;
+    }
     for(unsigned int i=0;i<v_d.size();i++)
-        Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,255-i*40,img);
+        Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,v_color(i),img);
     Draw::axis(img, xmin, xmax, ymin, ymax,255);
 
     MatNDisplay main_disp;
@@ -102,9 +111,9 @@ void DistributionDisplay::display(Vec<const Distribution*> v_d,F32 xmin,F32 xmax
             img.save("snaphot.png");
         }
 
-        img=0;
+        img.fill(RGBUI8(0,0,0));
         for(unsigned int i=0;i<v_d.size();i++)
-            Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,255-i*40,img);
+            Draw::distribution(*v_d(i), xmin, xmax, ymin, ymax,v_color(i),img);
         Draw::axis(img, xmin, xmax, ymin, ymax,255);
         main_disp.display(img).waitTime();
     }

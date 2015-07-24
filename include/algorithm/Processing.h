@@ -1584,7 +1584,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      *  \brief Magnitude of the gaussian gradient
      * \param f input function
      * \param sigma standard deviation
-     * \param multiply each term by this factor
+     * \param factor_mult multyiply each pixel by this factor
      * \return h output function
      *
      *  Magnitude of the gaussian

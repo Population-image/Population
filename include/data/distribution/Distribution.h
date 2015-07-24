@@ -176,8 +176,8 @@ public:
     * \param xmax xmax value
     * \param ymin ymin value
     * \param ymax ymax value
-    * \param sizex resolution in x
-    * \param sizey resolution in y
+    * \param sizewidth resolution in width
+    * \param sizeheight resolution in heigh
     * \return  windows as matrix
     *
     *  Simple multi graph display. With the arrow keys, you can translate the graph and with the + and - keys, you can (un)zoom

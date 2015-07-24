@@ -21,7 +21,7 @@ HAVE_OPENGL{
     ##For linux,  install  glut (ubunto sudo apt-get install freeglut3-dev)
     DEFINES+=HAVE_OPENGL
     DEFINES+=HAVE_THREAD
-    unix:LIBS+=-lglut
+    unix:LIBS+=-lglut -lGL
     QT += opengl
     win32:LIBS += -lAdvapi32 -lgdi32 -luser32 -lshell32 -lopengl32 -lglu32
 }
@@ -49,9 +49,10 @@ HAVE_VLC{
     }
 }
 HAVE_QT {
-    CONFIG*=qt
+    CONFIG *= qt
     DEFINES+= HAVE_QT
 }
+
 HAVE_FFMPEG {
 ##For linux,  install the ffmpeg library as usual (ubuntu  sudo apt-get install ffmpeg)
 ##For windows, link your project with the dev ffmpeg library http://ffmpeg.zeranoe.com/builds/win32/dev/

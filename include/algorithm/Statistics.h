@@ -53,12 +53,14 @@ namespace pop
 Before to start with this class of algorithm, you should read the documentation of the class Distribution since this class
 acts on this data-structure. A classical calculus is the derivate:
 \code
-Distribution f("x^2", "EXPRESSION");//f(x)=x
-for(int i =0;i<4;i++)
-    std::cout<<f(i)<<" ";
-f = pop::Statistics::derivate(f,0,10);//now f(x)=2*x
-for(int i =0;i<4;i++)
-    std::cout<<f(i)<<" ";
+    DistributionExpression f("x^2");//f(x)=x
+    for(int i =0;i<4;i++)
+        std::cout<<f(i)<<" ";
+    std::cout<<std::endl;
+    DistributionRegularStep f_deri = pop::Statistics::derivate(f,0,10);//now f(x)=2*x
+    for(int i =0;i<4;i++)
+        std::cout<<f_deri(i)<<" ";
+    std::cout<<std::endl;
 \endcode
 This code produces this output: \n
 0 1 4 9 \n
@@ -90,10 +92,10 @@ struct POP_EXPORTS Statistics
      * \int_{x_{min}}^x f(x) dx & \mbox{for }x_{min}\leq x \leq x_{max}\\
      * 0 &\mbox{otherwise}  \end{array} \right.\f$ where the integral is computed using the  Riemann sum.
      * \code
-     * Distribution f("abs(x)");
-     * Distribution fint = Statistics::integral(f,-1,1);
-     * std::cout<<fint(1)<<std::endl;//=1
-     * Distribution::multiDisplay(f,fint,-1,1).save("../doc/image2/integral.jpg");
+    DistributionExpression f("abs(x)");
+    DistributionRegularStep fint = Statistics::integral(f,-1,1);
+    std::cout<<fint(1)<<std::endl;//=1
+    DistributionDisplay::display(f,fint,-1,1);
      * \endcode
      * \image html integral.jpg
     */
@@ -111,10 +113,10 @@ struct POP_EXPORTS Statistics
      *  df(x)/dx & \mbox{for }x_{min}\leq x \leq x_{max}\\
      * 0 &\mbox{otherwise}  \end{array} \right.\f$ where the derivate is computed using this discrete approximation (f(x+step)-f(x))/step.
      * \code
-     * Distribution f("atan(x)");
-     * Distribution fd = Statistics::derivate(f,-PI,PI);
-     * std::cout<<fd(1)<<std::endl;//=1
-     * Distribution::multiDisplay(f,fd,-PI,PI).save("../doc/image2/derivate.jpg");
+    DistributionExpression f("atan(x)");
+    DistributionRegularStep fd = Statistics::derivate(f,-PI,PI);
+    std::cout<<fd(1)<<std::endl;//=1
+    DistributionDisplay::display(f,fd,-PI,PI);
      * \endcode
      * \image html derivate.jpg
     */
@@ -134,9 +136,9 @@ struct POP_EXPORTS Statistics
      *  The output distribution is a regular step function with a step equal to minimum  f(i+step)-f(i).
 
      *  \code
-     *  Distribution f("x^2");
-     *  Distribution finverse = Statistics::inverse(f,0,1);
-     *  Distribution::multiDisplay(f,finverse,0,1).save("../doc/image2/inverse.jpg");
+    DistributionExpression f("x^2");
+    DistributionRegularStep finverse = Statistics::inverse(f,0,1);
+    DistributionDisplay::display(f,finverse,0,1);
      *  \endcode
      * \image html inverse.jpg
      */
@@ -153,10 +155,10 @@ struct POP_EXPORTS Statistics
      *
      *  return the argument of the minimum \f$ \arg\min_{x_{min}\leq x \leq x_{max}} f(x)\f$ where the computation is done on the associated regular step function
      *  \code
-     *  Distribution f("(x-0.5)^2");
-     *  F32 value = Statistics::argMin(f,-10,10);
-     *  std::cout<<"ArgMin "<<value<<std::endl;//=0.5
-     *  f.display(-10,10).save("../doc/image2/ArgMin.jpg");//Visual checking
+        DistributionExpression f("(x-0.5)^2");
+        F32 value = Statistics::argMin(f,-10,10);
+        std::cout<<"ArgMin "<<value<<std::endl;//=0.5
+        DistributionDisplay::display(f,-10,10);//Visual checking
      *  \endcode
      * \image html ArgMin.jpg
     */
@@ -169,10 +171,10 @@ struct POP_EXPORTS Statistics
      * \return vector of argument miminum local
      *
      * \code
-     * Distribution f("(x-0.5)^2*(x-1)^2");
-     * Vec<F32> values = Statistics::argMinLocal(f,-10,10);
-     * std::cout<<"ArgMinLocal "<<values<<std::endl;
-     * f.display(0.25,1.25).save("../doc/image2/ArgMinLocal.jpg");
+        DistributionExpression f("(x-0.5)^2*(x-1)^2");
+        Vec<F32> values = Statistics::argMinLocal(f,-10,10);
+        std::cout<<"ArgMinLocal "<<values<<std::endl;
+        DistributionDisplay::display(f,0.25,1.25);//Visual checking
      *  \endcode
      * \image html ArgMinLocal.jpg
      */
@@ -229,10 +231,10 @@ struct POP_EXPORTS Statistics
      *
      *  Convert the input distribution to a probability distribution defined in the range (xmin,xmax)
      *  \code
-     *  Distribution f("x");//this function is not a probability distribution
-     *  Distribution P = Statistics::toProbabilityDistribution(f,0,1);//create a probability distribution
-     *  for(unsigned int i =0;i<100;i++)
-     *      std::cout<<P.randomVariable()<<std::endl;//So generate some random variables following this law P(0<X<1)=2x
+      DistributionExpression f("x");//this function is not a probability distribution
+       DistributionRegularStep P = Statistics::toProbabilityDistribution(f,0,1);//create a probability distribution
+      for(unsigned int i =0;i<100;i++)
+           std::cout<<P.randomVariable()<<std::endl;//So generate some random variables following this law P(0<X<1)=2x
      *  \endcode
     */
     static DistributionRegularStep toProbabilityDistribution( const Distribution &f,F32 xmin, F32 xmax,F32 step=0.01);
@@ -247,9 +249,9 @@ struct POP_EXPORTS Statistics
      *
      *  Convert the input probability distribution to a Cumulative distribution function defined in the range (xmin,xmax)
      *  \code
-     *  DistributionNormal f(0,0.4);
-     *  Distribution fcumul = Statistics::toCumulativeProbabilityDistribution(f,-2,2);
-     *  Distribution::multiDisplay(f,fcumul,-2,2).save("../doc/image2/cumulative.jpg");
+        DistributionNormal f(0,0.4);
+        DistributionRegularStep fcumul = Statistics::toCumulativeProbabilityDistribution(f,-2,2);
+        DistributionDisplay::display(f,fcumul,-2,2);
      *  \endcode
      * \image html cumulative.jpg
     */
@@ -281,9 +283,9 @@ struct POP_EXPORTS Statistics
      *  Compute the moment of the distribution \f$\frac{\int_{x_{min}}^{x_{max}} x^n f(x) dx}{\int_{x_{min}}^{x_{max}} f(x) dx}\f$
      *
      * \code
-     * DistributionNormal f(3,2);// mean=3 and sigma=2
-     * std::cout<<Statistics::moment(f,1,-10,10)<<std::endl;//moment of order 1 (mean)=3
-     * std::cout<<Statistics::moment(f,2,-10,10)-std::pow(Statistics::moment(f,1,-10,10),2)<<std::endl;//E{f^2}-E{f}^2=sigma^2=4
+     DistributionNormal f(3,2);// mean=3 and sigma=2
+     std::cout<<Statistics::moment(f,1,-10,10)<<std::endl;//moment of order 1 (mean)=3
+     std::cout<<Statistics::moment(f,2,-10,10)-std::pow(Statistics::moment(f,1,-10,10),2)<<std::endl;//E{f^2}-E{f}^2=sigma^2=4
      * \endcode
     */
     static F32 moment(const Distribution &f, int moment,F32 xmin, F32 xmax,F32 step=0.01);
@@ -340,37 +342,37 @@ struct POP_EXPORTS Statistics
      *  Estimated the  probability distribution from a collection of realizations with a regular step function
      *
      *  In the following code, we valide this algorithm by comparing a theorical distribution and the statistical one.
-     * \code
-     * Distribution ftheorical(10,5,"NORMAL");
-     * VecF32 realizations;
-     * for(int i=0;i<300000;i++){
-     *   F32 v = ftheorical.randomVariable();
-     *   realizations.push_back(v);
-     * }
-     * Distribution dstatistic = Statistics::computedStaticticsFromRealRealizations(realizations,0.1,-10,30);
-     * Distribution::multiDisplay(ftheorical,dstatistic,-10,30).save("../doc/image2/computedstatistic.jpg");
-     * \endcode
+      \code
+        DistributionNormal ftheorical(10,5);
+        VecF32 realizations;
+        for(int i=0;i<300000;i++){
+            F32 v = ftheorical.randomVariable();
+            realizations.push_back(v);
+        }
+        DistributionRegularStep dstatistic = Statistics::computedStaticticsFromRealRealizations(realizations,0.1,-10,30);
+        DistributionDisplay::display(ftheorical,dstatistic,-10,30);
+      \endcode
      * \image html computedstatistic.jpg
      * In this code, we valide this algorithm by comparing a theorical distribution and the statistical one. We start with a normal distribution \f$f_X(x)\f$. We consider the random variable
      * Y as the multiplication of the random varibale X : Y=X*X such that X is a random variable following the normal distribution. We sample a number of times this variable and we estimate
      * its Probability density function \f$f_Y(y)\f$.  The theorotical one is equal to  \f$f_Y(y) = \left| \frac{d}{dy} (g^{-1}(y)) \right| \cdot f_X(g^{-1}(y)).\f$ with \f$g(x)=x^2\f$
 
      * \code
-     * DistributionNormal d(10,2);
+        DistributionNormal d(10,2);
 
-     * DistributionExpression fpower2("x^2");
-     * DistributionRegularStep finverse= Statistics::inverse(fpower2,1,30,0.1);
-     * DistributionRegularStep frho = d.rho(finverse);
-     * DistributionRegularStep fderivate=Statistics::derivate(finverse,1,300,1);
-     * Distribution ftheorical = fderivate * frho;
+        DistributionExpression fpower2("x^2");
+        DistributionRegularStep finverse= Statistics::inverse(fpower2,1,30,0.1);
+        DistributionArithmeticComposition frho = f_rho_g(d,finverse);
+        DistributionRegularStep fderivate=Statistics::derivate(finverse,1,300,1);
+        DistributionArithmeticMultiplication ftheorical = fderivate *frho;
 
-     * VecF32 realizations;
-     * for(int i=0;i<300000;i++){
-     * F32 v = d.randomVariable();
-     * realizations.push_back(v*v);
-     * }
-     * Distribution dstatistic = Statistics::computedStaticticsFromRealRealizations(realizations,2,1,200);
-     * Distribution::multiDisplay(ftheorical,dstatistic,1,200).save("../doc/image2/computedstatistic2.jpg");
+        VecF32 realizations;
+        for(int i=0;i<300000;i++){
+            F32 v = d.randomVariable();
+            realizations.push_back(v*v);
+        }
+        DistributionRegularStep dstatistic = Statistics::computedStaticticsFromRealRealizations(realizations,2,1,200);
+        DistributionDisplay::display(ftheorical,dstatistic,1,200);
      * \endcode
      * \image html computedstatistic2.jpg
     */
@@ -386,17 +388,17 @@ struct POP_EXPORTS Statistics
      *  Estimated the discrete probability distribution from a collection of integer realizations
      *
      * \code
-     * DistributionPoisson danalytic(100);
-     * VecI32 realizations;
-     * for(int i=0;i<200000;i++){
-     *    realizations.push_back(danalytic.randomVariable());
-     * }
-     * DistributionRegularStep dstat = Statistics::computedStaticticsFromIntegerRealizations(realizations);
-     * F32 mean =    Statistics::moment(dstat,1,0,300);
-     * F32 variance = Statistics::moment(dstat,2,0,300)-mean*mean;
+        DistributionPoisson danalytic(100);
+        VecI32 realizations;
+        for(int i=0;i<200000;i++){
+            realizations.push_back(danalytic.randomVariable());
+        }
+        DistributionRegularStep dstat = Statistics::computedStaticticsFromIntegerRealizations(realizations);
+        F32 mean =    Statistics::moment(dstat,1,0,300);
+        F32 variance = Statistics::moment(dstat,2,0,300)-mean*mean;
 
-     * std::cout<<"mean     "<<mean<<std::endl;//100
-     * std::cout<<"variance "<<variance<<std::endl;//100
+        std::cout<<"mean     "<<mean<<std::endl;//100
+        std::cout<<"variance "<<variance<<std::endl;//100
      * \endcode
      */
     static DistributionRegularStep computedStaticticsFromIntegerRealizations( const VecI32 & v);
@@ -416,9 +418,10 @@ struct POP_EXPORTS Statistics
      * find the maximum value of the integral interval such that \a integralvalue =\f$\int_{min}^{a} f(x)dx \f$ with \a a< \a maxsupremum
      *
      * \code
-     * F32 porosity = 0.6;
-     * Distribution f("1/(2*pi)^(1./2)*exp(-(x^2)/2)");
-     * F32 beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);//beta=0.257
+        F32 porosity = 0.6;
+        DistributionExpression f("1/(2*pi)^(1./2)*exp(-(x^2)/2)");
+        F32 beta= Statistics::maxRangeIntegral(f,porosity,-3,3,0.001);//beta=0.257
+        std::cout<<beta<<std::endl;
      * \endcode
     */
     static F32 maxRangeIntegral(const Distribution & f,F32 integralvalue,F32 min, F32 maxsupremum ,F32 step=0.01 );
@@ -445,13 +448,13 @@ struct POP_EXPORTS Statistics
      *
      *  Compute the moment of the distribution \f$\frac{\int_{x_{min}}^{x_{max}} x^n f(x) dx}{\int_{x_{min}}^{x_{max}} f(x) dx}\f$
      \code
-    DistributionMultiVariate dmulti(DistributionNormal(25,10),2);
-    VecF32 xmin(2),xmax(2);
-    xmin(0)=-25;xmin(1)=-25;
-    xmax(0)=75;xmax(1)=75;
-    VecF32 m(2);
-    m(0)=1;m(1)=1;
-    cout<<Statistics::moment(dmulti,m,xmin,xmax)<<endl;
+        DistributionMultiVariateProduct dmulti(DistributionNormal(25,10),DistributionNormal(25,10));
+        VecF32 xmin(2),xmax(2);
+        xmin(0)=-25;xmin(1)=-25;
+        xmax(0)=75;xmax(1)=75;
+        VecF32 m(2);
+        m(0)=1;m(1)=1;
+        std::cout<<Statistics::moment(dmulti,m,xmin,xmax)<<std::endl;
      \endcode
     */
 
@@ -510,15 +513,15 @@ struct POP_EXPORTS Statistics
      * 0 &\mbox{otherwise}  \end{array} \right.\f$ where the integral is computed using the upper Riemann sum.
 
      * \code
-     * DistributionMultiVariate d("x*y","x,y");
-     * VecF32 xmin(2),xmax(2);
-     * xmin(0)=0;xmin(1)=0;
-     * xmax(0)=1;xmax(1)=1;
-     * DistributionMultiVariate dinter =Statistics::integral(d,xmin,xmax,0.01);//dinter(x,y)=1/4*x^2*y^2
-     * VecF32 x(2);
-     *
-     * x(0)=1;x(1)=1;
-     * cout<<dinter(x)<<endl;
+        DistributionMultiVariateExpression d("x*y","x,y");
+        VecF32 xmin(2),xmax(2);
+        xmin(0)=0;xmin(1)=0;
+        xmax(0)=1;xmax(1)=1;
+        DistributionMultiVariateRegularStep dinter =Statistics::integral(d,xmin,xmax,0.01);//dinter(x,y)=1/4*x^2*y^2
+        VecF32 x(2);
+
+        x(0)=1;x(1)=1;
+        std::cout<<dinter(x)<<std::endl;
      * \endcode
     */
     static DistributionMultiVariateRegularStep  integral(const DistributionMultiVariate &f, VecF32 xmin, VecF32 xmax,F32 step=0.01);
@@ -531,14 +534,13 @@ struct POP_EXPORTS Statistics
      *
      *  Convert the input distribution to a probability distribution defined in the range (xmin,xmax)
      * \code
-     * DistributionMultiVariateExpression dxy;
-     * dxy.fromRegularExpression("x","x","y");
-     * VecF32 xmin(2),xmax(2);
-     * xmin(0)=0;xmin(1)=0;
-     * xmax(0)=1;xmax(1)=1;
-     * DistributionMultiVariateRegularStep dint = Statistics::toProbabilityDistribution(dxy,xmin,xmax,0.01);
-     * for(int i =0;i<100;i++)
-     *    std::cout<<dint.randomVariable()<<std::endl;
+        DistributionMultiVariateExpression dxy("x","x","y");
+        VecF32 xmin(2),xmax(2);
+        xmin(0)=0;xmin(1)=0;
+        xmax(0)=1;xmax(1)=1;
+        DistributionMultiVariateRegularStep dint = Statistics::toProbabilityDistribution(dxy,xmin,xmax,0.01);
+        for(int i =0;i<100;i++)
+            std::cout<<dint.randomVariable()<<std::endl;
      * \endcode
 
     */
