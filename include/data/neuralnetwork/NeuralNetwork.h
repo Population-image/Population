@@ -191,7 +191,7 @@ public:
     virtual NeuralLayer * clone();
     Mat2F32 _W;
     VecF32 _X_biais;
-    Mat2F32 _d_E_W;    
+    Mat2F32 _d_E_W;
 };
 
 class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
@@ -233,28 +233,29 @@ public:
         MinusOneToOne=0,
         ZeroToOne=1
     };
-    NormalizationMatrixInput(Vec2I32 domain);
+
     virtual ~NormalizationMatrixInput();
-    virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix)=0;
-    virtual NormalizationMatrixInput * clone()=0;
-private:
-    Vec2I32 _domain;
+
+    virtual NormalizationMatrixInput *clone()=0;
+    void save(XMLNode & node)const;
+    static NormalizationMatrixInput* load(const XMLNode & node);
+    virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain)=0;
 };
-class NormalizationMatrixInputMass
+class NormalizationMatrixInputMass : public NormalizationMatrixInput
 {
 public:
-    NormalizationMatrixInputMass(Vec2I32 domain,NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne);
-    virtual ~NormalizationMatrixInputMass();
-    virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
-    virtual NormalizationMatrixInput * clone();
+    NormalizationMatrixInputMass(NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne);
+    VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain);
+    NormalizationMatrixInputMass *clone();
+    NormalizationValue _normalization_value;
 };
-class NormalizationMatrixInputCentering
+class NormalizationMatrixInputCentering : public NormalizationMatrixInput
 {
 public:
-    NormalizationMatrixInputCentering(Vec2I32 domain,NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne);
-    virtual ~NormalizationMatrixInputCentering();
-    virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
-    virtual NormalizationMatrixInput * clone();
+    NormalizationMatrixInputCentering(NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne);
+    VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain);
+    NormalizationMatrixInputCentering *clone();
+    NormalizationValue _normalization_value;
 };
 
 
@@ -282,7 +283,7 @@ public:
     MatNReference<2,F32>&  getMatrixOutput(int map_index)const;
 
 
-    void normalizationMatrixInput(NormalizationMatrixInput * input);
+    void setNormalizationMatrixInput(NormalizationMatrixInput * input);
     VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
 
     void backwardCPU(const VecF32 &X_expected);
@@ -302,6 +303,16 @@ private:
     Vec<NeuralLayer*> _v_layer;
     NormalizationMatrixInput * _normalizationmatrixinput;
 };
+
+
+struct MNISTNeuralNetLeCun5{
+    static Mat2UI8 elasticDeformation(const Mat2UI8 &m, F32 sigma,F32 alpha);
+    static Mat2UI8 affineDeformation(const Mat2UI8 &m, F32 max_rotation_angle_random,F32 max_shear_angle_random,F32 max_scale_vertical_random,F32 max_scale_horizontal_random);
+    static NeuralNet createNet(std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,unsigned int nbr_epoch,int lecun_or_simard);
+    static Vec<Vec<Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
+
+};
+
 
 }
 

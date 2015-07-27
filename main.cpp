@@ -1,6 +1,80 @@
 #include"Population.h"
 using namespace pop;//Population namespace
 int main(){
+//    {
+
+
+
+//        Vec<Vec<Mat2UI8> > number_test =  MNISTNeuralNetLeCun5::loadMNIST("/home/tariel/Bureau/t10k-images.idx3-ubyte","/home/tariel/Bureau/t10k-labels.idx1-ubyte");
+
+
+//        Mat2UI8 m_set;
+//        for(unsigned int i=0;i<10;i++){
+//            Mat2UI8 m_n = number_test(i)(2);
+//            //m_n.display("init",false);
+//            pop::Draw::addBorder(m_n,10,0);
+//            m_set= m_n;
+//            m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,5,36);
+//            m_set = pop::Draw::mergeTwoMatrixHorizontal(m_set,m_n);
+//            if(i==1||i==7){
+//                m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,7.5,7.5,15,20);
+//            }else{
+//                m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,15,20);
+//            }
+//            m_set = pop::Draw::mergeTwoMatrixHorizontal(m_set,m_n);
+//            m_set.display();
+//        }
+//        return 1;
+
+//    }
+    {
+
+        Mat2UI8 m_n;
+        m_n.load("/home/tariel/Bureau/_.jpg");
+        MNISTNeuralNetLeCun5::createNet("/home/tariel/Bureau/train-images.idx3-ubyte",
+                                        "/home/tariel/Bureau/train-labels.idx1-ubyte",
+                                        "/home/tariel/Bureau/t10k-images.idx3-ubyte",
+                                        "/home/tariel/Bureau/t10k-labels.idx1-ubyte",20,0);
+
+        NeuralNet net_n,net;
+        net_n.load("/home/tariel/Desktop/DEV2/DEV/CVSA/bin/dictionaries/neuralnetwork.xml");
+
+
+
+
+
+        VecF32 vin= net_n.inputMatrixToInputNeuron(m_n);
+        VecF32 vout;
+        net_n.forwardCPU(vin,vout);
+        std::cout<<vout<<std::endl;
+        return 1;
+
+
+        net.setNormalizationMatrixInput(new NormalizationMatrixInputCentering);
+        net.addLayerMatrixInput(5,5,1);
+        net.addLayerMatrixConvolutionSubScaling(3,1,1);
+        net.addLayerLinearFullyConnected(20);
+        net.addLayerLinearFullyConnected(2);
+
+        Mat2UI8 m(25,25);
+        m( 9,10)=1; m( 9,11)=1;
+        m(10,10)=1; m( 10,11)=1;
+        m(11,10)=1;
+        m(10,10)=1;
+        m(11,10)=1;
+        VecF32 in = net.inputMatrixToInputNeuron(m);
+        VecF32 out;
+        net.forwardCPU(in,out);
+        std::cout<<out<<std::endl;
+        net.save("net.xml");
+        NeuralNet net2;
+        net2.load("net.xml");
+        net2.forwardCPU(in,out);
+        std::cout<<out<<std::endl;
+        return 1;
+
+    }
+
     {
         NeuralNet net;
         net.addLayerLinearInput(2);//2 scalar input

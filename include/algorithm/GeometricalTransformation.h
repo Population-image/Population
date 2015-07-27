@@ -105,7 +105,30 @@ struct POP_EXPORTS GeometricalTransformation
         }
         return plane;
     }
-
+    /*!
+     * \brief get a Vector from a 2d matrix
+     * \param m input 2d matrix
+     * \param xmin starting point
+     * \param xmax end point
+     * \return line
+     *
+    */
+    template<typename VoxelType>
+    static MatN<1,VoxelType> line(const MatN<2,VoxelType> &m , Vec2F32 xmin,Vec2F32 xmax)
+    {
+        MatN<1,VoxelType> line_;
+        Vec2F32 direction =  xmax - xmin;
+        F32 dist = (xmax-xmin).norm(2);
+        direction =direction/dist;
+        Vec2F32 x = xmin;
+        for(unsigned int i=0;i<dist;i++){
+            if(m.isValid(x(0),x(1))){
+                line_.push_back(m.interpolationBilinear(x));
+            }
+            x+=direction;
+        }
+        return line_;
+    }
 
     template<int DIM>
     struct _FunctorScale
@@ -319,12 +342,12 @@ struct POP_EXPORTS GeometricalTransformation
             dist_sum+=distance;
             number++;
         }
-        F32 standard_deviation = std::sqrt(dist_sum/number);
+        //F32 standard_deviation = std::sqrt(dist_sum/number);
 
         it.init();
         while(it.next()){
             for(unsigned int i=0;i<DIM;i++)
-                dist(i)(it.x())*=(alpha/standard_deviation);
+                dist(i)(it.x())*=(alpha);///standard_deviation);
         }
         MatN<DIM,Type> mdist(Img.getDomain());
         it.init();

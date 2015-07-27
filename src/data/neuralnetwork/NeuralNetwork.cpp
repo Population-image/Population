@@ -7,49 +7,241 @@
 #include "algorithm/Arithmetic.h"
 namespace pop {
 
+Mat2UI8 MNISTNeuralNetLeCun5::elasticDeformation(const Mat2UI8 &m, F32 sigma,F32 alpha){
+    return GeometricalTransformation::elasticDeformation(m,sigma,alpha);
+}
 
-//Vec<Vec<Mat2UI8> > TrainingNeuralNetwork::loadMNIST( std::string datapath,  std::string labelpath){
-//    Vec<Vec<Mat2UI8> > dataset(10);
-//    std::ifstream datas(datapath.c_str(),std::ios::binary);
-//    std::ifstream labels(labelpath.c_str(),std::ios::binary);
 
-//    if (!datas.is_open() || !labels.is_open()){
-//        std::cerr<<"binary files could not be loaded" << std::endl;
-//        return dataset;
-//    }
+Mat2UI8 MNISTNeuralNetLeCun5::affineDeformation(const Mat2UI8 &m, F32 max_rotation_angle_random,F32 max_shear_angle_random,F32 max_scale_vertical_random,F32 max_scale_horizontal_random){
 
-//    int magic_number=0; int number_of_images=0;int r; int c;
-//    int n_rows=0; int n_cols=0; unsigned char temp=0;
 
-//    // parse data header
-//    datas.read((char*)&magic_number,sizeof(magic_number));
-//    magic_number=_reverseInt(magic_number);
-//    datas.read((char*)&number_of_images,sizeof(number_of_images));
-//    number_of_images=_reverseInt(number_of_images);
-//    datas.read((char*)&n_rows,sizeof(n_rows));
-//    n_rows=_reverseInt(n_rows);
-//    datas.read((char*)&n_cols,sizeof(n_cols));
-//    n_cols=_reverseInt(n_cols);
+    DistributionUniformReal d_rot(-max_rotation_angle_random*pop::PI/180,max_rotation_angle_random*pop::PI/180);
+    DistributionUniformReal d_shear(-max_shear_angle_random*pop::PI/180,max_shear_angle_random*pop::PI/180);
 
-//    // parse label header - ignore
-//    int dummy;
-//    labels.read((char*)&dummy,sizeof(dummy));
-//    labels.read((char*)&dummy,sizeof(dummy));
 
-//    for(int i=0;i<number_of_images;++i){
-//        pop::Mat2UI8 img(n_rows,n_cols);
+    DistributionUniformReal d_scale_vert(1-max_scale_vertical_random/100.,1+max_scale_vertical_random/100.);
+    DistributionUniformReal d_scale_hor (1-max_scale_horizontal_random/100.,1+max_scale_horizontal_random/100.);
 
-//        for(r=0;r<n_rows;++r){
-//            for(c=0;c<n_cols;++c){
-//                datas.read((char*)&temp,sizeof(temp));
-//                img(r,c) = temp;
+
+    F32 angle = d_rot.randomVariable();
+    F32 shear = d_shear.randomVariable();
+
+    Vec2F32 scale(d_scale_hor.randomVariable(),d_scale_vert.randomVariable());
+
+    Mat2UI8 m_affine(m);
+    Mat2x33F32 maffine  = GeometricalTransformation::translation2DHomogeneousCoordinate(m_affine.getDomain()/2);//go back to the buttom left corner (origin)
+    maffine *=  GeometricalTransformation::scale2DHomogeneousCoordinate(scale);
+    maffine *=  GeometricalTransformation::shear2DHomogeneousCoordinate(shear,0);
+    maffine *=  GeometricalTransformation::rotation2DHomogeneousCoordinate(angle);//rotate
+    maffine *=  GeometricalTransformation::translation2DHomogeneousCoordinate(-m_affine.getDomain()/2);
+    return GeometricalTransformation::transformHomogeneous2D(maffine, m_affine);
+}
+
+
+int reverseInt(int i) {
+    unsigned char c1, c2, c3, c4;
+    c1 = i & 255;
+    c2 = (i >> 8) & 255;
+    c3 = (i >> 16) & 255;
+    c4 = (i >> 24) & 255;
+    return ((int)c1 << 24) + ((int)c2 << 16) + ((int)c3 << 8) + c4;
+}
+
+
+
+Vec<Vec<Mat2UI8> > MNISTNeuralNetLeCun5::loadMNIST( std::string datapath,  std::string labelpath){
+    Vec<Vec<Mat2UI8> > dataset(10);
+    std::ifstream datas(datapath.c_str(),std::ios::binary);
+    std::ifstream labels(labelpath.c_str(),std::ios::binary);
+
+    if (!datas.is_open() || !labels.is_open()){
+        std::cerr<<"binary files could not be loaded" << std::endl;
+        return dataset;
+    }
+
+    int magic_number=0; int number_of_images=0;int r; int c;
+    int n_rows=0; int n_cols=0; unsigned char temp=0;
+
+    // parse data header
+    datas.read((char*)&magic_number,sizeof(magic_number));
+    magic_number=reverseInt(magic_number);
+    datas.read((char*)&number_of_images,sizeof(number_of_images));
+    number_of_images=reverseInt(number_of_images);
+    datas.read((char*)&n_rows,sizeof(n_rows));
+    n_rows=reverseInt(n_rows);
+    datas.read((char*)&n_cols,sizeof(n_cols));
+    n_cols=reverseInt(n_cols);
+
+    // parse label header - ignore
+    int dummy;
+    labels.read((char*)&dummy,sizeof(dummy));
+    labels.read((char*)&dummy,sizeof(dummy));
+
+    for(int i=0;i<number_of_images;++i){
+        pop::Mat2UI8 img(n_rows,n_cols);
+
+        for(r=0;r<n_rows;++r){
+            for(c=0;c<n_cols;++c){
+                datas.read((char*)&temp,sizeof(temp));
+                img(r,c) = temp;
+            }
+        }
+        labels.read((char*)&temp,sizeof(temp));
+        dataset[(int)temp].push_back(img);
+    }
+    return dataset;
+}
+NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,unsigned int nbr_epoch, int lecun_or_simard)
+{
+
+    Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
+    Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
+    NeuralNet net;
+
+
+    if(lecun_or_simard==0){
+        std::cout<<"LECUN"<<std::endl;
+
+        net.addLayerMatrixInput(32,32,1);
+        net.addLayerMatrixConvolutionSubScaling(6,1,2);
+        net.addLayerMatrixMaxPool(2);
+        net.addLayerMatrixConvolutionSubScaling(16,1,2);
+        net.addLayerMatrixMaxPool(2);
+        net.addLayerLinearFullyConnected(120);
+        net.addLayerLinearFullyConnected(84);
+    }else if(lecun_or_simard==1){
+        std::cout<<"SIMARD"<<std::endl;
+        //Simard network
+        net.addLayerMatrixInput(29,29,1);
+        net.addLayerMatrixConvolutionSubScaling(6,2,2);
+        net.addLayerMatrixConvolutionSubScaling(50,2,2);
+        net.addLayerLinearFullyConnected(120);
+        net.addLayerLinearFullyConnected(84);
+    }
+    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
+
+    Vec<std::string> label_digit;
+    for(int i=0;i<10;i++)
+        label_digit.push_back(BasicUtility::Any2String(i));
+    net.label2String() = label_digit;
+
+
+
+    Vec<VecF32> vtraining_in;
+    Vec<VecF32> vtraining_out;
+
+    //create the training set
+    unsigned int nbr_deformation=5;
+    for(unsigned int i=0;i<number_training.size();i++){
+        std::cout<<"deformation "<<i<<std::endl;
+        for(unsigned int j=0;j<number_training(i).size();j++){
+            Mat2UI8 binary = number_training(i)(j);
+            bool hit=false;
+            Mat2UI8 ref(binary);
+            pop::Draw::addBorder(ref,3,0);
+            for(unsigned int k=0;k<nbr_deformation;k++){
+                //std::cout<<k<<std::endl;
+                Mat2UI8 m_n = binary;
+                pop::Draw::addBorder(m_n,3,0);
+                m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,5,36);
+                if(i==1||i==7){
+                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,7.5,7.5,15,20);
+                }else{
+                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,15,20);
+                }
+
+                Vec<UI8> line1 = GeometricalTransformation::line(m_n,Vec2F32(0,0),Vec2F32(0,m_n.getDomain()(1)-1));
+                Vec<UI8> line2 = GeometricalTransformation::line(m_n,Vec2F32(Vec2F32(0,m_n.getDomain()(1)-1)),Vec2F32(m_n.getDomain()(0)-1,m_n.getDomain()(1)-1));
+                Vec<UI8> line3 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,m_n.getDomain()(1)-1),Vec2F32(m_n.getDomain()(0)-1,0));
+                Vec<UI8> line4 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,0),Vec2F32(0,0));
+                bool hit2=false;
+                for(unsigned int i=0;i<line1.size();i++){
+                    if(line1(i)>=125||line2(i)>=125||line3(i)>=125||line4(i)>=125){
+                        hit=true;
+                        hit2=true;
+                        // m_n.display();
+                    }
+                }
+                if(hit2==false){
+                    VecF32 vin = net.inputMatrixToInputNeuron(m_n);
+                    vtraining_in.push_back(vin);
+                    if(hit==true)
+                        ref = Draw::mergeTwoMatrixHorizontal(ref,m_n);
+                }
+            }
+//            if(hit==true){
+//                Processing::threshold(ref,125).display();
+//                binary.display();
 //            }
-//        }
-//        labels.read((char*)&temp,sizeof(temp));
-//        dataset[(int)temp].push_back(img);
-//    }
-//    return dataset;
-//}
+            VecF32 vin = net.inputMatrixToInputNeuron(binary);
+            vtraining_in.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_training.size()),-1);
+            v_out(i)=1;
+            vtraining_out.push_back(v_out);
+
+        }
+    }
+    Vec<VecF32> vtest_in;
+    Vec<VecF32> vtest_out;
+    for(unsigned int i=0;i<number_test.size();i++){
+        for(unsigned int j=0;j<number_test(i).size();j++){
+            Mat2UI8 binary = number_test(i)(j);
+            VecF32 vin = net.inputMatrixToInputNeuron(binary);
+            vtest_in.push_back(vin);
+            VecF32 v_out(static_cast<int>(number_test.size()),-1);
+            v_out(i)=1;
+            vtest_out.push_back(v_out);
+        }
+    }
+
+
+    //use the backprogation algorithm with first order method
+    F32 eta =0.01f;
+    net.setTrainable(true);
+    net.setLearnableParameter(eta);
+
+
+
+    //random vector to shuffle the trraining set
+    std::vector<int> v_global_rand(vtraining_in.size());
+    for(unsigned int i=0;i<v_global_rand.size();i++)
+        v_global_rand[i]=i;
+
+
+    std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
+
+    for(unsigned int i=0;i<nbr_epoch;i++){
+        std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
+        int error_training=0,error_test=0;
+        for(unsigned int j=0;j<v_global_rand.size();j++){
+            VecF32 vout;
+            net.forwardCPU(vtraining_in(v_global_rand[j]),vout);
+            net.backwardCPU(vtraining_out(v_global_rand[j]));
+            net.learn();
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(vtraining_out(v_global_rand[j]).begin(),std::max_element(vtraining_out(v_global_rand[j]).begin(),vtraining_out(v_global_rand[j]).end()));
+            if(label1!=label2)
+                error_training++;
+        }
+        //        std::cout<<testins.size()<<std::endl;
+
+        for(unsigned int j=0;j<vtest_in.size();j++){
+            VecF32 vout;
+            net.forwardCPU(vtest_in(j),vout);
+            int label1 = std::distance(vout.begin(),std::max_element(vout.begin(),vout.end()));
+            int label2 = std::distance(vtest_out(j).begin(),std::max_element(vtest_out(j).begin(),vtest_out(j).end()));
+            if(label1!=label2)
+                error_test++;
+        }
+
+
+        std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1.0/vtest_in.size() <<"\t"<<eta<<std::endl;
+        eta *=0.9f;
+        eta = std::max(eta,0.001f);
+        net.setLearnableParameter(eta);
+    }
+    return net;
+}
 
 //Vec<pop::Mat2UI8> TrainingNeuralNetwork::geometricalTransformationDataBaseMatrix( Vec<pop::Mat2UI8>  number_training,
 //                                                                                  unsigned int number,
@@ -112,23 +304,7 @@ namespace pop {
 //    }
 //    return v_out_i;
 //}
-//void TrainingNeuralNetwork::convertMatrixToInputValueNeuron(Vec<VecF32> &v_neuron_in, Vec<VecF32> &v_neuron_out,const Vec<Vec<pop::Mat2UI8> >& number_training,Vec2I32 domain ,NNLayerMatrix::CenteringMethod method,NNLayerMatrix::NormalizationValue normalization_value){
 
-
-
-//    for(unsigned int i=0;i<number_training.size();i++){
-//        for(unsigned int j=0;j<number_training(i).size();j++){
-//            Mat2UI8 binary = number_training(i)(j);
-
-//            VecF32 vin = NNLayerMatrix::inputMatrixToInputNeuron(binary,domain,method,normalization_value);
-//            v_neuron_in.push_back(vin);
-//            VecF32 v_out(static_cast<int>(number_training.size()),-1);
-//            v_out(i)=1;
-//            v_neuron_out.push_back(v_out);
-
-//        }
-//    }
-//}
 
 void NeuralLayer::setLearnableParameter(F32 mu){
     _mu = mu;
@@ -486,6 +662,7 @@ NeuralLayer * NeuralLayerMatrixInput::clone(){
 }
 
 NeuralNet::NeuralNet()
+    :_normalizationmatrixinput(new NormalizationMatrixInputMass())
 {}
 
 NeuralNet::NeuralNet(const NeuralNet & neural){
@@ -496,6 +673,7 @@ NeuralNet::NeuralNet(const NeuralNet & neural){
     for(unsigned int i=0;i<neural._v_layer.size();i++){
         this->_v_layer.push_back(neural._v_layer(i)->clone());
     }
+    _normalizationmatrixinput = neural._normalizationmatrixinput->clone();
 }
 
 NeuralNet & NeuralNet::operator =(const NeuralNet & neural){
@@ -504,10 +682,15 @@ NeuralNet & NeuralNet::operator =(const NeuralNet & neural){
     for(unsigned int i=0;i<neural._v_layer.size();i++){
         this->_v_layer.push_back(neural._v_layer(i)->clone());
     }
+    if(_normalizationmatrixinput!=NULL)
+        delete _normalizationmatrixinput;
+    _normalizationmatrixinput = neural._normalizationmatrixinput->clone();
     return *this;
 }
 
 NeuralNet::~NeuralNet(){
+    if(_normalizationmatrixinput!=NULL)
+        delete _normalizationmatrixinput;
     clear();
 }
 
@@ -628,10 +811,18 @@ void NeuralNet::load(XMLDocument &doc)
             if(tool.hasAttribute("method")&&tool.hasAttribute("normalization")){
                 int method;
                 BasicUtility::String2Any(tool.getAttribute("method"),method);
-                _method = static_cast<NNLayerMatrix::CenteringMethod>(method) ;
                 int method_norm;
                 BasicUtility::String2Any(tool.getAttribute("normalization"),method_norm);
-                _normalization_value= static_cast<NNLayerMatrix::NormalizationValue>(method_norm) ;
+                if(method==0){
+                    NormalizationMatrixInputMass *mass = new NormalizationMatrixInputMass(static_cast<NormalizationMatrixInput::NormalizationValue>(method_norm));
+                    this->setNormalizationMatrixInput(mass);
+                }else{
+                    NormalizationMatrixInputCentering *centering= new NormalizationMatrixInputCentering(static_cast<NormalizationMatrixInput::NormalizationValue>(method_norm));
+                    this->setNormalizationMatrixInput(centering);
+                }
+            }else{
+                NormalizationMatrixInput * norm = NormalizationMatrixInput::load(tool);
+                this->setNormalizationMatrixInput(norm);
             }
             this->addLayerMatrixInput(domain(0),domain(1),nbr_map);
         }else if(type=="NNLayer::INPUTLINEAR"){
@@ -713,16 +904,18 @@ void NeuralNet::save(const char * file)const
             nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
             nodechild.addAttribute("size",BasicUtility::Any2String(layer_matrix->X_map()(0).getDomain()));
             nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_matrix->X_map().size()));
-            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
-            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+
+            this->_normalizationmatrixinput->save(nodechild);
+            //            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
+            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
         }
         else if(const NeuralLayerLinearInput *layer_linear = dynamic_cast<const NeuralLayerLinearInput *>(layer)){
-
             XMLNode nodechild = node.addChild("layer");
             nodechild.addAttribute("type","NNLayer::INPUTLINEAR");
             nodechild.addAttribute("size",BasicUtility::Any2String(layer_linear->X().size()));
-            nodechild.addAttribute("method",BasicUtility::Any2String((_method)));
-            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+            this->_normalizationmatrixinput->save(nodechild);
+            //            nodechild.addAttribute("method",BasicUtility::Any2String((_method)));
+            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
         }else if(const NeuralLayerMatrixConvolutionSubScaling *layer_conv = dynamic_cast<const NeuralLayerMatrixConvolutionSubScaling *>(layer)){
             XMLNode nodechild = node.addChild("layer");
             nodechild.addAttribute("type","NNLayer::MATRIXCONVOLUTIONNAL");
@@ -763,6 +956,38 @@ void NeuralNet::save(const char * file)const
     }
     doc.save(file);
 }
+void NeuralNet::setNormalizationMatrixInput(NormalizationMatrixInput * input){
+    if(_normalizationmatrixinput!=NULL)
+        delete _normalizationmatrixinput;
+    _normalizationmatrixinput = input;
+}
+
+NormalizationMatrixInput::~NormalizationMatrixInput(){
+
+}
+
+void NormalizationMatrixInput::save(XMLNode & node)const{
+    if(const NormalizationMatrixInputMass * mass= dynamic_cast<const NormalizationMatrixInputMass *>(this)){
+        node.addAttribute("type_norm_matrix","MASS");
+        node.addAttribute("normalization",BasicUtility::Any2String(mass->_normalization_value));
+    }  else if(const NormalizationMatrixInputCentering * centering= dynamic_cast<const NormalizationMatrixInputCentering *>(this)){
+        node.addAttribute("type_norm_matrix","CENTERING");
+        node.addAttribute("normalization",BasicUtility::Any2String(centering->_normalization_value));
+    }
+}
+NormalizationMatrixInput* NormalizationMatrixInput::load(const XMLNode & node){
+    std::string type = node.getAttribute("type_norm_matrix");
+    int method_norm;
+
+    BasicUtility::String2Any(node.getAttribute("normalization"),method_norm);
+    NormalizationMatrixInput::NormalizationValue method_norm_enum= static_cast<NormalizationMatrixInput::NormalizationValue>(method_norm) ;
+    if(type=="MASS"){
+        return new NormalizationMatrixInputMass(method_norm_enum);
+    }else{
+        return new NormalizationMatrixInputCentering(method_norm_enum);
+    }
+}
+
 const Vec<std::string>& NeuralNet::label2String()const{
     return _label2string;
 }
@@ -777,8 +1002,7 @@ Vec<NeuralLayer*>& NeuralNet::layers(){
 }
 VecF32 NeuralNet::inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix){
     if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(this->_v_layer(0))){
-        Vec2I32 domain = layer_matrix->X_map()(0).getDomain();
-        return NNLayerMatrix::inputMatrixToInputNeuron(matrix,domain,this->_method,this->_normalization_value);
+        return this->_normalizationmatrixinput->inputMatrixToInputNeuron(matrix,layer_matrix->_X_reference(0).getDomain());
     }else{
         std::cerr<<"No matrixlayer  for neural network"<<std::endl;
         return VecF32();
@@ -809,16 +1033,141 @@ MatNReference<2,F32>& NeuralNet::getMatrixOutput(int map_index)const{
     }
 }
 
-//NormalizationMatrixInputMass::NormalizationMatrixInputMass(Vec2I32 domain,NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne){
+NormalizationMatrixInputMass::NormalizationMatrixInputMass(NormalizationMatrixInput::NormalizationValue normalization)
+    :_normalization_value(normalization)
+{
 
-//}
+}
 
-//virtual ~NormalizationMatrixInputMass();
-//virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
-//virtual NormalizationMatrixInput * clone();
-//NormalizationMatrixInput::NormalizationMatrixInput(Vec2I32 domain)
-//    :_domain(domain){
-//}
-//NormalizationMatrixInput::~NormalizationMatrixInput(){
-//}
+VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & img2,Vec2I32 domain){
+    //center of gravity
+    Mat2UI8 img = Processing::threshold(img2,125);
+
+    pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
+
+    pop::Vec2F32 center_gravity(0,0);
+    F32 weight_sum=0;
+    ForEachDomain2D(x,img){
+        center_gravity += static_cast<F32>(img(x))*pop::Vec2F32(x);
+        weight_sum +=img(x);
+        if(img(x)!=0){
+            xmin=minimum(xmin,x);
+            xmax=maximum(xmax,x);
+        }
+    }
+    center_gravity = center_gravity/weight_sum;
+
+    F32 max_i= (std::max)(xmax(0)-center_gravity(0),center_gravity(0)-xmin(0))*2;
+    F32 max_j= (std::max)(xmax(1)-center_gravity(1),center_gravity(1)-xmin(1))*2;
+
+    F32 homo = (std::max)(max_i/domain(0),max_j/domain(1));
+
+    //    ForEachDomain2D(xx,mr){
+
+    //         mrf(xx+trans)=mr(xx);
+    F32 maxi=pop::NumericLimits<F32>::minimumRange();
+    F32 mini=pop::NumericLimits<F32>::maximumRange();
+
+    Mat2F32 mrf(domain);
+    ForEachDomain2D(xx,mrf){
+        pop::Vec2F32 xxx(xx);
+        xxx = (xxx-Vec2F32(domain)/2.)*homo + center_gravity;
+        mrf(xx)=img.interpolationBilinear(xxx);
+        maxi=(std::max)(maxi,mrf(xx));
+        mini=(std::min)(mini,mrf(xx));
+    }
+    if(maxi-mini==0){
+        throw(std::string("[ERROR] in conversion matrix to neuron values"));
+    }
+    if(_normalization_value==0){
+        F32 diff = (maxi-mini)/2.f;
+        ForEachDomain2D(xxx,mrf){
+            mrf(xxx) = (mrf(xxx)-mini)/diff-1;
+        }
+    }else{
+        F32 diff = (maxi-mini);
+        ForEachDomain2D(xxx,mrf){
+            mrf(xxx) = (mrf(xxx)-mini)/diff;
+        }
+    }
+    //        mrf.display();
+    return VecF32(mrf);
+}
+NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
+    return new NormalizationMatrixInputMass(_normalization_value);
+}
+
+NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(NormalizationMatrixInput::NormalizationValue normalization)
+    :_normalization_value(normalization)
+{
+
+}
+
+VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8  & img,Vec2I32 domain){
+    //center of gravity
+
+    //cropping
+    pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
+    for(unsigned int i=0;i<img.size();i++){
+
+    }
+
+    ForEachDomain2D(x,img){
+        if(img(x)!=0){
+            xmin=minimum(xmin,x);
+            xmax=maximum(xmax,x);
+        }
+    }
+    Mat2F32 m = img(xmin,xmax+1);
+    //downsampling the input matrix
+    int index;
+    F32 scale_factor;
+    if(F32(domain(0))/m.getDomain()(0)<F32(domain(1))/m.getDomain()(1)){
+        index = 0;
+        scale_factor = F32(domain(0))/m.getDomain()(0);
+    }
+    else{
+        index = 1;
+        scale_factor = F32(domain(1))/m.getDomain()(1);
+    }
+
+    Mat2F32 mr = GeometricalTransformation::scale(m,Vec2F32(scale_factor,scale_factor),MATN_INTERPOLATION_BILINEAR);
+    Mat2F32 mrf(domain);
+    Vec2I32 trans(0,0);
+    if(index==0){
+        trans(0)=0;
+        trans(1)=(domain(1)-mr.getDomain()(1))/2;
+    }else{
+        trans(0)=(domain(0)-mr.getDomain()(0))/2;
+        trans(1)=0;
+    }
+
+
+    F32 maxi=pop::NumericLimits<F32>::minimumRange();
+    F32 mini=pop::NumericLimits<F32>::maximumRange();
+
+    ForEachDomain2D(xx,mr){
+        maxi=(std::max)(maxi,mr(xx));
+        mini=(std::min)(mini,mr(xx));
+        mrf(xx+trans)=mr(xx);
+    }
+    if(maxi-mini==0){
+        throw(std::string("[ERROR] in conversion matrix to neuron values"));
+    }
+    if(_normalization_value==0){
+        F32 diff = (maxi-mini)/2.f;
+        ForEachDomain2D(xxx,mrf){
+            mrf(xxx) = (mrf(xxx)-mini)/diff-1;
+        }
+    }else{
+        F32 diff = (maxi-mini);
+        ForEachDomain2D(xxx,mrf){
+            mrf(xxx) = (mrf(xxx)-mini)/diff;
+        }
+    }
+    return VecF32(mrf);
+}
+NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
+    return new NormalizationMatrixInputCentering(_normalization_value);
+}
 }
