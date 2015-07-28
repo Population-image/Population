@@ -13,13 +13,14 @@ namespace pop
 
 Conversion: vectoriel image (vector field, color image,complex image) <-> list of scalar images
 \code
-Mat2RGBUI8 img;//2d grey-level image object
-img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());//replace this path by those on your computer
-Mat2UI8 r,g,b;
-Convertor::toRGB(img,r,g,b);
-r.display();
-g.display();
-b.display();
+        Mat2RGBUI8 img;//2d grey-level image object
+        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
+        Mat2UI8 r,g,b;
+        Convertor::toRGB(img,r,g,b);
+        r.display("red channel",false);
+        g.display("green channel",false);
+        b.display("blue channel");
+
 \endcode
 \image html lenared.jpg "red channel"
 \image html lenagreen.jpg "green channel"

@@ -615,7 +615,7 @@ public:
     *  construct the matrix from an matrix file
     *
     \code
-    Mat2UI8 img("lena.bmp");
+    Mat2UI8 img((POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp")).c_str());
     img.display();
     \endcode
     */

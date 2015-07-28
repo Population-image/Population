@@ -291,9 +291,9 @@ struct POP_EXPORTS Draw
      * Vec2I32 x1(10,40);
      * Vec2I32 x2(152,200);
      * Draw::line(lena,x1,x2,255,1);
-     * img.display();
+     * lena.display();
      * \endcode
-     * \image html lenatext.jpg
+     * \image html lenaline.jpg
     */
     template<int DIM,typename PixelType>
     static void line(MatN<DIM,PixelType> &img,typename MatN<DIM,PixelType>::E x1, typename MatN<DIM,PixelType>::E x2,typename MatN<DIM,PixelType>::F value,int width=1)

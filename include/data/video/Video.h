@@ -3,7 +3,6 @@
 
 #include"data/mat/MatN.h"
 #include"data/mat/Mat2x.h"
-/// @cond DEV
 namespace pop
 {
 
@@ -26,25 +25,24 @@ public:
     /*!
   \class pop::Video
   \ingroup Video
-  \brief simple class to deal with video
+  \brief simple class to read  video (rtsp stream, avi file ...)
   \author Tariel Vincent
 
-   The implementation uses the ffmpeg library or vlc library. In qtcreator, you uncomment this line  CONFIG += vlc or this one CONFIG += ffmpeg. For visual studio,
-   you download QT 5.0 and the Visual Studio Add-in 1.2.0 for Qt5 http://qt-project.org/downloads . Then, you can open the project population.pro with the uncommented line.
+   The implementation uses the ffmpeg library or vlc library. In qtcreator, you uncomment this line  CONFIG += HAVE_VLC in populationconfig.pri. For CMake, in CMakeList.txt, you set WITH_VLC at ON.
 
 \code
-    Video video;
-//    video.open( "rtsp://192.168.30.142/channel1");
-    video.open( "/home/vtariel/Bureau/IPCameraRecord.avi");
-    MatNDisplay disp;
-    while(video.grabMatrixGrey()){
-        disp.display(video.retrieveMatrixGrey());
-    }
-    video.open( "/home/vtariel/Bureau/IPCameraRecord.avi");
-    MatNDisplay disp;
-    while(video.grabMatrixRGB()){
-        disp.display(video.retrieveMatrixRGB());
-    }
+        Video * video =Video::create(Video::VLC);
+        video->open( "/home/tariel/flame.avi");//http://www.engr.colostate.edu/me/facil/dynamics/avis.htm
+        MatNDisplay disp;
+        MatNDisplay disp2;
+        while(video->grabMatrixGrey()){
+            Mat2UI8 m = video->retrieveMatrixGrey();
+            int value;
+            Mat2UI8 m_threshold = Processing::thresholdOtsuMethod(m,value);
+            disp.display(m);
+            disp2.display(m_threshold);
+        }
+        return 1;
 
 \endcode
   */
@@ -89,5 +87,4 @@ public:
     virtual Mat2RGBUI8 &retrieveMatrixRGB()=0;
 };
 }
-/// @endcond
 #endif // VIDEO_H

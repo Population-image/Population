@@ -91,11 +91,15 @@ Vec<Vec<Mat2UI8> > MNISTNeuralNetLeCun5::loadMNIST( std::string datapath,  std::
     }
     return dataset;
 }
-NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,unsigned int nbr_epoch, int lecun_or_simard)
+NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch, UI32 lecun_or_simard,UI32 nbr_deformation)
 {
 
     Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
     Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
+//    number_training.resize(2);
+//    number_test.resize(2);
+
+
     NeuralNet net;
 
 
@@ -118,7 +122,7 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
         net.addLayerLinearFullyConnected(120);
         net.addLayerLinearFullyConnected(84);
     }
-    net.addLayerLinearFullyConnected(static_cast<unsigned int>(number_training.size()));
+    net.addLayerLinearFullyConnected(static_cast<UI32>(number_training.size()));
 
     Vec<std::string> label_digit;
     for(int i=0;i<10;i++)
@@ -131,10 +135,9 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
     Vec<VecF32> vtraining_out;
 
     //create the training set
-    unsigned int nbr_deformation=5;
-    for(unsigned int i=0;i<number_training.size();i++){
-        std::cout<<"deformation "<<i<<std::endl;
-        for(unsigned int j=0;j<number_training(i).size();j++){
+    std::cout<<"deformation "<<nbr_deformation<<std::endl;
+    for(UI32 i=0;i<number_training.size();i++){
+        for(UI32 j=0;j<number_training(i).size();j++){
             Mat2UI8 binary = number_training(i)(j);
             bool hit=false;
             Mat2UI8 ref(binary);
@@ -143,7 +146,7 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
                 //std::cout<<k<<std::endl;
                 Mat2UI8 m_n = binary;
                 pop::Draw::addBorder(m_n,3,0);
-                m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,5,36);
+                //m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,5,36);
                 if(i==1||i==7){
                     m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,7.5,7.5,15,20);
                 }else{
@@ -155,8 +158,8 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
                 Vec<UI8> line3 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,m_n.getDomain()(1)-1),Vec2F32(m_n.getDomain()(0)-1,0));
                 Vec<UI8> line4 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,0),Vec2F32(0,0));
                 bool hit2=false;
-                for(unsigned int i=0;i<line1.size();i++){
-                    if(line1(i)>=125||line2(i)>=125||line3(i)>=125||line4(i)>=125){
+                for(unsigned int index=0;index<line1.size();index++){
+                    if(line1(index)>=125||line2(index)>=125||line3(index)>=125||line4(index)>=125){
                         hit=true;
                         hit2=true;
                         // m_n.display();
@@ -165,6 +168,9 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
                 if(hit2==false){
                     VecF32 vin = net.inputMatrixToInputNeuron(m_n);
                     vtraining_in.push_back(vin);
+                    VecF32 v_out(static_cast<int>(number_training.size()),-1);
+                    v_out(i)=1;
+                    vtraining_out.push_back(v_out);
                     if(hit==true)
                         ref = Draw::mergeTwoMatrixHorizontal(ref,m_n);
                 }
@@ -181,6 +187,8 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
 
         }
     }
+//    vtraining_in.save("toto.txt");
+//    vtraining_out.save("toto2.txt");
     Vec<VecF32> vtest_in;
     Vec<VecF32> vtest_out;
     for(unsigned int i=0;i<number_test.size();i++){
@@ -406,10 +414,10 @@ void NeuralLayerLinearFullyConnected::backwardCPU(NeuralLayer& layer_previous){
         }
     }
 }
-void NeuralLayerLinearFullyConnected::learn(F32 lambda_regulation){
+void NeuralLayerLinearFullyConnected::learn(){
     for(unsigned int i=0;i<this->_W.sizeI();i++){
         for(unsigned int j=0;j<this->_W.sizeJ();j++){
-            this->_W(i,j)= lambda_regulation*this->_W(i,j) -  this->_mu*this->_d_E_W(i,j);
+            this->_W(i,j)= this->_W(i,j) -  this->_mu*this->_d_E_W(i,j);
         }
     }
 }
@@ -606,14 +614,14 @@ void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_prev
 
     }
 }
-void NeuralLayerMatrixConvolutionSubScaling::learn(F32 lambda_regulation){
+void NeuralLayerMatrixConvolutionSubScaling::learn(){
     for(unsigned int i=0;i<this->_d_E_W_kernels.size();i++){
         for(unsigned int j=0;j<this->_d_E_W_kernels(i).size();j++){
-            this->_W_kernels(i)(j)=lambda_regulation*this->_W_kernels(i)(j)-_mu*this->_d_E_W_kernels(i)(j);
+            this->_W_kernels(i)(j)=this->_W_kernels(i)(j)-_mu*this->_d_E_W_kernels(i)(j);
         }
     }
     for(unsigned int i=0;i<this->_d_E_W_biais.size();i++){
-        this->_W_biais(i)=lambda_regulation*this->_W_biais(i)-_mu*this->_d_E_W_biais(i);
+        this->_W_biais(i)=this->_W_biais(i)-_mu*this->_d_E_W_biais(i);
     }
 
     for(unsigned int i=0;i<this->_d_E_W_kernels.size();i++){
@@ -730,9 +738,9 @@ void NeuralNet::setTrainable(bool istrainable){
         _v_layer(i)->setTrainable(istrainable);
     }
 }
-void NeuralNet::learn(F32 lambda_regulation){
+void NeuralNet::learn(){
     for(unsigned int i=0;i<_v_layer.size();i++){
-        _v_layer(i)->learn(lambda_regulation);
+        _v_layer(i)->learn();
     }
 }
 void NeuralNet::forwardCPU(const VecF32& X_in, VecF32& X_out){
@@ -1008,30 +1016,30 @@ VecF32 NeuralNet::inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix){
         return VecF32();
     }
 }
-std::pair<Vec2I32,int> NeuralNet::getDomainMatrixInput()const{
-    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.begin()))){
-        return std::make_pair(layer_matrix->X_map()(0).getDomain(),layer_matrix->X_map().size());
-    }else{
-        std::cerr<<"No matrixlayer  for neural network"<<std::endl;
-        return std::make_pair(Vec2I32(0),0);
-    }
-}
-std::pair<Vec2I32,int> NeuralNet::getDomainMatrixOutput()const{
-    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.rbegin()))){
-        return std::make_pair(layer_matrix->X_map()(0).getDomain(),layer_matrix->X_map().size());
-    }else{
-        std::cerr<<"No matrixlayer  for neural network"<<std::endl;
-        return std::make_pair(Vec2I32(0),0);
-    }
-}
-MatNReference<2,F32>& NeuralNet::getMatrixOutput(int map_index)const{
-    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.rbegin()))){
-        return layer_matrix->X_map()(map_index);
-    }else{
-        std::cerr<<"No matrix layer  for neural network"<<std::endl;
-        return layer_matrix->X_map()(0);
-    }
-}
+//std::pair<Vec2I32,int> NeuralNet::getDomainMatrixInput()const{
+//    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.begin()))){
+//        return std::make_pair(layer_matrix->X_map()(0).getDomain(),layer_matrix->X_map().size());
+//    }else{
+//        std::cerr<<"No matrixlayer  for neural network"<<std::endl;
+//        return std::make_pair(Vec2I32(0),0);
+//    }
+//}
+//std::pair<Vec2I32,int> NeuralNet::getDomainMatrixOutput()const{
+//    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.rbegin()))){
+//        return std::make_pair(layer_matrix->X_map()(0).getDomain(),layer_matrix->X_map().size());
+//    }else{
+//        std::cerr<<"No matrixlayer  for neural network"<<std::endl;
+//        return std::make_pair(Vec2I32(0),0);
+//    }
+//}
+//MatNReference<2,F32>& NeuralNet::getMatrixOutput(int map_index)const{
+//    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.rbegin()))){
+//        return layer_matrix->X_map()(map_index);
+//    }else{
+//        std::cerr<<"No matrix layer  for neural network"<<std::endl;
+//        return layer_matrix->X_map()(0);
+//    }
+//}
 
 NormalizationMatrixInputMass::NormalizationMatrixInputMass(NormalizationMatrixInput::NormalizationValue normalization)
     :_normalization_value(normalization)
@@ -1039,9 +1047,9 @@ NormalizationMatrixInputMass::NormalizationMatrixInputMass(NormalizationMatrixIn
 
 }
 
-VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & img2,Vec2I32 domain){
+VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & img,Vec2I32 domain){
     //center of gravity
-    Mat2UI8 img = Processing::threshold(img2,125);
+    //Mat2UI8 img = Processing::threshold(img2,125);
 
     pop::Vec2I32 xmin(NumericLimits<int>::maximumRange(),NumericLimits<int>::maximumRange()),xmax(0,0);
 

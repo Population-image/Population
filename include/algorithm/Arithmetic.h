@@ -52,7 +52,7 @@ struct POP_EXPORTS Arithmetic
     /*!
      * \class pop::Arithmetic
      * \ingroup Arithmetic
-     * \brief Arithmetic
+     * \brief some basic arithmetic calculation
      *
     */
 

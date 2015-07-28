@@ -28,34 +28,34 @@ private:
     /*!
         \class pop::Feature
         \ingroup Feature
-        \brief Feature detection for 2D/3D matrix (work in progress so beta version)
+        \brief Feature detection for 2D/3D matrix
         \author Tariel Vincent
      *
-     * Since I am new in Vision (Population was dedicated to image processing in material science), this collection of algorithms are in beta version. Here, it
-     * is an application :
+     *  For feature extraction, OpenCV is the best library with platform optimization. But due to some constraints in industrial applications, I create some algorithms in population. For instance,
      * \code
-        Mat2UI8 img;
-        img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
-        F32 sigma = 1.6;
-        Pyramid<2,F32> pyramid1 = Feature::pyramidGaussian(img,sigma);
+        std::string path= std::string(POP_PROJECT_SOURCE_DIR)+"/image/";
+
+        Mat2UI8 img1;
+        img1.load(path+"Image1.jpg");
+        //sift descriptor
+        Pyramid<2,F32> pyramid1 = Feature::pyramidGaussian(img1);
         Vec<KeyPointPyramid<2> > keypoint1 = Feature::keyPointSIFT(pyramid1);
-        std::cout<<keypoint1.size()<<std::endl;
+        Vec<Descriptor<KeyPointPyramid<2> > > descriptors1 = Feature::descriptorPyramidPieChart(pyramid1,keypoint1);
 
-        Vec<Descriptor<KeyPointPyramid<2> > > descriptors1 = Feature::descriptorPyramidPieChart(pyramid1,keypoint1,sigma);
-
-        //Apply geometrical transformation
-        MatN<2,UI8> imgt(img);
-        imgt = GeometricalTransformation::scale(imgt,Vec2F32(0.5));
-        imgt = GeometricalTransformation::rotate(imgt,PI/6);
-        Pyramid<2,F32> pyramid2 = Feature::pyramidGaussian(imgt,sigma);
+        Mat2UI8 img2;
+        img2.load(path+"Image2.jpg");
+        //sift descriptor
+        Pyramid<2,F32> pyramid2 = Feature::pyramidGaussian(img2);
         Vec<KeyPointPyramid<2> > keypoint2 = Feature::keyPointSIFT(pyramid2);
-        Vec<Descriptor<KeyPointPyramid<2> > > descriptors2 = Feature::descriptorPyramidPieChart(pyramid2,keypoint2,sigma);
+        Vec<Descriptor<KeyPointPyramid<2> > > descriptors2 = Feature::descriptorPyramidPieChart(pyramid2,keypoint2);
 
-
+        //match VP tree
         Vec<DescriptorMatch<Descriptor<KeyPointPyramid<2> > >   > match = Feature::descriptorMatchVPTree(descriptors1,descriptors2);
+
+        //keep the best
         int nbr_math_draw = std::min((int)match.size(),30);
         match.erase(match.begin()+nbr_math_draw,match.end());
-        Feature::drawDescriptorMatch(img,imgt,match,1).display();
+        Feature::drawDescriptorMatch(img1,img2,match,1).save("SIFT.png");
      * \endcode
      * \image html SIFT.png
      */

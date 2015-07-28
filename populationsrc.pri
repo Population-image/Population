@@ -1,6 +1,7 @@
 HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/PopulationConfig.h \
            $${PWD}/include/algorithm/Analysis.h \
+           $${PWD}/include/algorithm/Arithmetic.h \
            $${PWD}/include/algorithm/AnalysisAdvanced.h \
            $${PWD}/include/algorithm/Application.h \
            $${PWD}/include/algorithm/Convertor.h \

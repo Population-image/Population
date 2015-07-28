@@ -90,7 +90,6 @@ struct POP_EXPORTS Processing
 {
 
     /*!
-     * \class  Processing
      * \ingroup Processing
      * \brief process on  Matrices
      * \author Tariel Vincent
@@ -389,7 +388,7 @@ struct POP_EXPORTS Processing
         }
         return label;
     }
-
+//    \cond HIDDEN_SYMBOLS
     struct __FunctorNiblackMethod
     {
         const Mat2UI32* _integral;
@@ -426,7 +425,7 @@ struct POP_EXPORTS Processing
                 return  0;
         }
     };
-
+//\endcond
     /*!
      *  \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
      * \param f input function
@@ -1490,7 +1489,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     Mat2F32 kernel(Vec2I32(3,3),d);
     kernel = kernel/normValue(kernel,1);
     Mat2RGBUI8 lena;
-    lena.load(POP_PROJECT_SOURCE_DIR+std::string("/image/lena.bmp"));
+    lena.load(POP_PROJECT_SOURCE_DIR+std::string("/image/Lena.bmp"));
     for(int i =0;i<10;i++)
        lena = Processing::convolution(lena,kernel,MatNBoundaryConditionMirror());
     lena.display();

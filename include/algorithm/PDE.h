@@ -82,7 +82,6 @@ for(unsigned int index_time=0;index_time<300;index_time++){
         img_timet_plus_one(x) = img_timet(x) + D*laplacien(img_timet,x);
     }
     img_timet = img_timet_plus_one;//timet<-timet_plus_one
-    img_timet.save
     disp.display(img_timet);//display the current image
 }
 \endcode

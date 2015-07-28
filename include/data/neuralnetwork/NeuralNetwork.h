@@ -13,10 +13,6 @@
 #include"algorithm/GeometricalTransformation.h"
 #include"data/utility/XML.h"
 
-#if defined(HAVE_OPENMP)
-#define CACHE_LINE_SIZE 64
-#endif
-
 namespace pop {
 
 /*! \defgroup NeuralNetwork NeuralNetwork
@@ -24,18 +20,11 @@ namespace pop {
  *  \brief Layer neural network with backpropagation training
  *
  * For an introduction of neural network, you can read this <a href="http://www.dkriesel.com/en/science/neural_networks">book</a> .\n
- * My code is inspired by this <a href="http://www.codeproject.com/Articles/16650/Neural-Network-for-Recognition-of-Handwritten-Digi">this one</a>. But, mine is
- *   - simple: removing the multi-threading aspect,
- *   - optimized: including the derivates in the neuron and weight classes allows to avoid their iterative construction/destruction in the training part,
- *   - complete: some facitily for building a neural network,
- *   - normalisation: implementation of theses <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf">recommendations</a> allowing fast convergence (few epochs)
+ * The neural network is a  multi-layer neural network. The code is quite simple and gives nice result in character recognition. It is not deep learning since
+ * GPU optimization is available (work in progress).
  *
  *
- * The neural network described here is a  multi-layer neural network framework.
- *
- *
- *
- * In the following example, we train a neural network to reproduce a XOR gate. The neural network has one hidden fully connected layer with 3 neurons.
+ * In the following example, we train a neural network to reproduce a XOR gate. The neural network has one hidden fully connected layer with 5 neurons.
  * \code
         NeuralNet net;
         net.addLayerLinearInput(2);//2 scalar input
@@ -91,6 +80,8 @@ namespace pop {
             std::cout<<vout(0)<<std::endl;// we obtain the expected value -1 , 1 , 1 , -1
         }
  * \endcode
+ *
+ *  In MNISTNeuralNetLeCun5
 */
 
 
@@ -262,38 +253,174 @@ public:
 class POP_EXPORTS NeuralNet
 {
 public:
+    /*!
+     * \class pop::NeuralNet
+     * \ingroup NeuralNetwork
+     * \brief neural network organised in feedforward topology
+     * \author Tariel Vincent
+     *
+     *  The neurons are grouped in the following layers: One input layer, n-hidden processing layers and one output layer. Each neuron in one layer has only directed connections
+     *  to the neurons of the next layer.
+     */
+
+    /*!
+     * default constructor
+     */
     NeuralNet();
+    /*!
+     * copy constructor
+     */
     NeuralNet(const NeuralNet & neural);
     NeuralNet & operator =(const NeuralNet & neural);
-
+    /*!
+     * destructor
+     */
     virtual ~NeuralNet();
+    /*!
+     * \brief add linear input layer
+     * \param number of input neurons
+     *
+     */
     void addLayerLinearInput(unsigned int nbr_neurons);
+    /*!
+     * \brief add matrix input layer (multiple maps)
+     * \param size_i number of rows
+     * \param size_j number of columns
+     * \param nbr_map number of input maps
+     *
+     *
+     * add input layer with a matrix of neurons (the number of neuron is equal to height*width*nbr_map). You must use this input layer if you add convolutional layers after.
+     *
+     */
+
     void addLayerMatrixInput(unsigned int size_i,unsigned int size_j,unsigned int nbr_map);
+    /*!
+     * \brief  add a fully connected layer
+     * \param nbr_neurons number of neurons
+     *
+     */
     void addLayerLinearFullyConnected(unsigned int nbr_neurons);
-    void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel);
-    void addLayerMatrixMaxPool(unsigned int sub_scaling_factor);
+
+    /*!
+     * \brief  add a convolutionnal layer
+     * \param nbr_map number of maps (matrices)
+     * \param radius_kernel radius of the convolutionnal kernel (1=3*3 kernel size
+     * \param sub_scale_sampling sub scaling factor for Simard network (
+     *
+     *
+     * add a convolutionnal layer with Feature maps and a sub scaling
+     *
+     */
+    void addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor=1,unsigned int radius_kernel=1);
+    /*!
+     * \brief add max pool layer
+     * \param sub_scale_sampling sub scaling factor
+     *
+     */
+    void addLayerMatrixMaxPool(unsigned int sub_scaling_factor=2);
+
+    /*!
+     * \brief set learnable paramater for the Newton's method
+     * \param mu sub mu parameter
+     *
+     */
     void setLearnableParameter(F32 mu);
-
+    /*!
+     * \brief set trainable at true to create the data-structures (error) associated to the learning process
+     * \param mu sub mu parameter
+     *
+     */
     void setTrainable(bool istrainable);
-    void learn(F32 lambda_regulation=1);
+
+    /*!
+     * \brief propagate front (feed-froward neural network)
+     * \param  X_in input values
+     * \param  X_out output values
+     *
+     * The outputs of the neurons of the input layer are updated with the input values \sa X_in,
+     * then the propagation and activation of the neurons of layer-by-layer until the output layer. We set the
+     * the output values \sa X_out with the outputs of the neurons of the output layer.
+     *
+     */
     void forwardCPU(const VecF32& X_in,VecF32 & X_out);
+    /*!
+     * \brief
+     * \param  X_expected desired output value
+     *
+     *  In supervised learning algorithm, we want to find a function that best maps a set of inputs to its correct output.
+     *  As explained by LeCun, in neural network, to find this function,
+     *  we iterate a training procedure based of the back propagation of the error function. First we propagate one input generating a given output
+     * \code
+     * n.forwardCPU(vin,vout);
+     * \endcode
+     * Then, in this method, we compare this given output with a desired output to define a mean square error for this output function following by the back propagation of this error
+     *  function layer-by-layer until the input layer.
+     * \sa learn
+     *
+     *
+     */
+    void backwardCPU(const VecF32 &X_expected);
+    /*!
+     * \brief learn after the accumumation of the error for the weight
+     *
+     */
+    void learn();
 
-    std::pair<Vec2I32,int> getDomainMatrixInput()const;
-    std::pair<Vec2I32,int> getDomainMatrixOutput()const;
-    MatNReference<2,F32>&  getMatrixOutput(int map_index)const;
+//    std::pair<Vec2I32,int> getDomainMatrixInput()const;
+//    std::pair<Vec2I32,int> getDomainMatrixOutput()const;
+//    MatNReference<2,F32>&  getMatrixOutput(int map_index)const;
 
-
+    /*!
+     * \brief set the normalization algorithm for the generation of the input values from a matrix
+     *
+     */
     void setNormalizationMatrixInput(NormalizationMatrixInput * input);
+
+    /*!
+     * \brief get the input values for a matrix
+     *
+     */
     VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
 
-    void backwardCPU(const VecF32 &X_expected);
+    /*!
+     * \brief clear the network
+     *
+     */
     void clear();
+
+    /*!
+    * \brief load xml file
+    * \param file input file
+    *
+    * The loader attempts to read the neural network in the given file.
+    */
     void load(const char * file);
+    /*!
+    * \brief load byte arrray
+    * \param file input file
+    *
+    */
     void loadByteArray(const char *  file);
 
     void load(XMLDocument &doc);
+    /*!
+    * \brief save xml file
+    * \param file output file
+    *
+    */
     void save(const char * file)const;
+
+    /*!
+    * \brief access information related to each output neuron (for instance "A","B","C","D",... for Latin script)
+    * \return vector of strings
+    *
+    */
     const Vec<std::string>& label2String()const;
+    /*!
+    * \brief access information related to each output neuron (for instance "A","B","C","D",... for Latin script)
+    * \return vector of strings
+    *
+    */
     Vec<std::string>& label2String();
     const Vec<NeuralLayer*>& layers()const;
     Vec<NeuralLayer*>& layers();
@@ -308,7 +435,7 @@ private:
 struct MNISTNeuralNetLeCun5{
     static Mat2UI8 elasticDeformation(const Mat2UI8 &m, F32 sigma,F32 alpha);
     static Mat2UI8 affineDeformation(const Mat2UI8 &m, F32 max_rotation_angle_random,F32 max_shear_angle_random,F32 max_scale_vertical_random,F32 max_scale_horizontal_random);
-    static NeuralNet createNet(std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,unsigned int nbr_epoch,int lecun_or_simard);
+    static NeuralNet createNet(std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch=10,UI32 lecun_or_simard=0,UI32 nbr_deformation=0);
     static Vec<Vec<Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
 
 };

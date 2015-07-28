@@ -78,9 +78,9 @@ ModelGermGrain2 grain = RandomGeometry::poissonPointProcess(domain,lambda);//gen
 RandomGeometry::sphere(grain,dnormal);//Dress these germs with sphere
 Mat2UI8 lattice = RandomGeometry::continuousToDiscrete(grain);//Convert the continuous model to the lattice
 lattice.display();
-lattice.save("../doc/image2/boolean.jpg");
 Mat2F32 mhisto=  Analysis::histogram(lattice);
-std::cout<<"Realization porosity"<<mhisto(0,1)<<std::endl;
+std::cout<<"Expected    porosity="<<porosity<<std::endl;
+std::cout<<"Realization porosity="<<mhisto(0,1)<<std::endl;
 \endcode
 \image html  boolean.jpg
 */
