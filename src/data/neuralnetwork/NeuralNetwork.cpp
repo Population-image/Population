@@ -498,7 +498,7 @@ void NeuralLayerMatrixMaxPool::backwardCPU(NeuralLayer& layer_previous){
     }
 }
 
-void NeuralLayerMatrixMaxPool::learn(F32 ){
+void NeuralLayerMatrixMaxPool::learn( ){
 
 }
 NeuralLayer * NeuralLayerMatrixMaxPool::clone(){
@@ -653,7 +653,7 @@ NeuralLayerLinearInput::NeuralLayerLinearInput(unsigned int nbr_neurons)
     :NeuralLayerLinear(nbr_neurons){}
 void NeuralLayerLinearInput::forwardCPU(const NeuralLayer& ) {}
 void NeuralLayerLinearInput::backwardCPU(NeuralLayer& ) {}
-void NeuralLayerLinearInput::learn(F32 ){}
+void NeuralLayerLinearInput::learn( ){}
 void NeuralLayerLinearInput::setTrainable(bool istrainable){NeuralLayerLinear::setTrainable(istrainable);}
 NeuralLayer * NeuralLayerLinearInput::clone(){
     return new NeuralLayerLinearInput(*this);
@@ -662,7 +662,7 @@ NeuralLayerMatrixInput::NeuralLayerMatrixInput(unsigned int sizei,unsigned int s
     :NeuralLayerMatrix(sizei,  sizej,  nbr_map){}
 void NeuralLayerMatrixInput::forwardCPU(const NeuralLayer& ) {}
 void NeuralLayerMatrixInput::backwardCPU(NeuralLayer& ) {}
-void NeuralLayerMatrixInput::learn(F32 ){}
+void NeuralLayerMatrixInput::learn( ){}
 void NeuralLayerMatrixInput::setTrainable(bool istrainable){NeuralLayerMatrix::setTrainable(istrainable);}
 NeuralLayer * NeuralLayerMatrixInput::clone(){
     NeuralLayerMatrixInput * layer = new NeuralLayerMatrixInput(this->X_map()(0).sizeI(),this->X_map()(0).sizeJ(),this->X_map().size());

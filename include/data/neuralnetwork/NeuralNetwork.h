@@ -93,7 +93,7 @@ public:
     virtual void forwardCPU(const NeuralLayer& layer_previous) = 0;
     /** @brief Using the CPU device, compute the error of the output values of the layer prrevious. */
     virtual void backwardCPU(NeuralLayer& layer_previous) = 0;
-    virtual void learn(F32 lambda_regulation=1)=0;
+    virtual void learn()=0;
     /** @brief get output value */
     virtual const VecF32& X()const=0;
     virtual VecF32& X()=0;
@@ -154,7 +154,7 @@ public:
     NeuralLayerLinearInput(unsigned int nbr_neurons);
     void forwardCPU(const NeuralLayer& );
     void backwardCPU(NeuralLayer& ) ;
-    void learn(F32 lambda_regulation=1);
+    void learn();
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
@@ -166,7 +166,7 @@ public:
     NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
     void forwardCPU(const NeuralLayer& ) ;
     void backwardCPU(NeuralLayer& ) ;
-    void learn(F32 lambda_regulation=1);
+    void learn();
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
 };
@@ -178,7 +178,7 @@ public:
     void setTrainable(bool istrainable);
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn(F32 lambda_regulation=1);
+    void learn();
     virtual NeuralLayer * clone();
     Mat2F32 _W;
     VecF32 _X_biais;
@@ -193,7 +193,7 @@ public:
 
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn(F32 lambda_regulation=1);
+    void learn();
     virtual NeuralLayer * clone();
     Vec<Mat2F32> _W_kernels;
     Vec<F32> _W_biais;
@@ -210,7 +210,7 @@ public:
 
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    void learn(F32 lambda_regulation=1);
+    void learn();
     virtual NeuralLayer * clone();
     unsigned int _sub_resolution_factor;
     bool _istrainable;

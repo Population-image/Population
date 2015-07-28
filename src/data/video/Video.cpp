@@ -11,7 +11,7 @@ Video * Video::create(VideoImpl impl){
 #if defined(HAVE_VLC)
         return new VideoVLC();
 #else
-        std::cerr<<"[ERROR][Video::create] VLV library is not included. For qtcreator, in populationconfig.pri, you uncomment this line  CONFIG += HAVE_VLC . For CMake, in CMakeList.txt, you set WITH_VLC at ON."
+        std::cerr<<"[ERROR][Video::create] VLV library is not included. For qtcreator, in populationconfig.pri, you uncomment this line  CONFIG += HAVE_VLC . For CMake, in CMakeList.txt, you set WITH_VLC at ON.";
         return NULL;
 #endif
     } else if(impl==Video::VLCDEPRECATED){
