@@ -37,7 +37,7 @@ MatN<DIM,UI32> poreDecompositionMixedMethod(MatN<DIM,UI8> m,F32 alpha=1 ){
     m_dist_int = m_dist_int.opposite();
 
     //filter the over-seeding with vertical filter
-    m_dist_int = Processing::dynamic(m_dist_int,10,0);
+    m_dist_int = Processing::dynamic(m_dist_int,20,0);
 
     //regional minima with with the norm-0 (the norm is here important with norm-1 ->over-partition)
     MatN<DIM,UI32> m_seed = Processing::minimaRegional(m_dist_int,0);
@@ -53,7 +53,7 @@ MatN<DIM,UI32> poreDecompositionGrainBoundarySharpVariationGreyLevel(MatN<DIM,UI
     m = m.opposite();
     //horizontal filter
     MatN<DIM,UI8> filter = Processing::smoothDeriche(m,1);
-    filter = Processing::dynamic(filter,10);
+    filter = Processing::dynamic(filter,12);
     MatN<DIM,UI32> markers_inside_grains = Processing::minimaRegional(filter,0);
     MatN<DIM,UI32> marker_outside_grains =  Processing::watershedBoundary(markers_inside_grains,filter,0);
     marker_outside_grains = Processing::threshold(marker_outside_grains,0,0);
@@ -90,26 +90,32 @@ MatN<DIM,UI32> poreDecompositionGrainContactNarrowContact(MatN<DIM,UI8> m ){
 
 int main(){
     Mat3UI8 m;
-#if Pop_OS==2
-    std::string dir = "C:/Users/tariel/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
-#else
-    std::string dir = "/home/vincent/Dropbox/MyArticle/GranularSegmentation/image/SableHostun_png/";
-#endif
-    m.loadFromDirectory(dir.c_str());
-//    m.display();
-    m = GeometricalTransformation::scale(m,Vec3F32(2,2,2));
-    m.display();
-    {
 
-        Mat2UI8 plane = GeometricalTransformation::plane(m,120);
+    m.load(POP_PROJECT_SOURCE_DIR+std::string("/image/sand.pgm"));
 
-        m = m(Vec3I32(0,0,0),Vec3I32(50,50,50));
-        //               Mat3UI32 grain3d = poreDecompositionGrainBoundarySharpVariationGreyLevel(m);
-        Mat3UI32 grain3d = poreDecompositionGrainContactNarrowContact(m);
-        //            Mat3UI32 grain3d = poreDecompositionMixedMethod(m,2);
 
-        Visualization::labelForegroundBoundary(grain3d,m,2).display();
-        return 1;
-    }
+    m = m(Vec3I32(0,0,0),Vec3I32(128,128,128));
+
+
+//## select a method by uncommented
+//## FIRST METHOD
+    //Mat3UI32 grain3d = poreDecompositionGrainBoundarySharpVariationGreyLevel(m);
+//## SECOND METHOD
+    //Mat3UI32 grain3d = poreDecompositionGrainContactNarrowContact(m);
+//## THIRD METHOD
+    Mat3UI32 grain3d = poreDecompositionMixedMethod(m,2);
+
+
+
+    //Visualization::labelForegroundBoundary(grain3d,m,1).display();
+    //grain_color.display();
+    //3d
+    Mat3RGBUI8 grain_color=  Visualization::labelToRandomRGB(grain3d);
+    Scene3d scene;
+    Visualization::marchingCubeSmooth(scene,grain3d,5,grain_color);//add the marching cube of the grain to the scene
+    Visualization::lineCube(scene,grain_color);//add the border red lines to the scene to the scene
+    Visualization::axis(scene);
+    scene.display();
+    return 1;
 
 }

@@ -2,7 +2,7 @@
 
 \section Architecture Program =  Data  + Algorithm
 
-In Image Processing, the pipeline process is a combination of algorithms, for instance, a practitioner can say   “I apply the median filter following by the Otsu’s threshold, then I merge the previous seeds and so one”. Therefore the verb (the action) is important. The modern paradigm is object-oriented programming. Verb seems to be old school for C language and not for C++. But, in Population library, programming mix object- and verb-oriented programming redesigning an old assertion “Program =  Data  + Algorithm” in a fashion way (see my book for further explanations). Data, as pop::MatN, pop::VecN,  are object-oriented programming with class organisation. Algorithm organised in module classes as pop::Processing, pop::Analysis are verb-oriented programming. 
+In Image Processing, the pipeline process is a combination of algorithms. For instance, a practitioner can say   “I apply the median filter following by the Otsu’s threshold, then I merge the previous seeds and so one”. Therefore the verb (the action) is important. The modern paradigm is object-oriented programming. Verb seems to be old school for C language and not for C++. But, Population library mix object- and verb-oriented programming redesigning an old assertion “Program =  Data  + Algorithm” in a fashion way (see my book for further explanations). Data, as pop::MatN, pop::VecN,  are object-oriented programming with class organisation. Algorithm organised in module classes as pop::Processing, pop::Analysis are verb-oriented programming. 
 
 So the code seems like that:
 \code

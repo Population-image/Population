@@ -435,7 +435,7 @@ private:
 struct MNISTNeuralNetLeCun5{
     static Mat2UI8 elasticDeformation(const Mat2UI8 &m, F32 sigma,F32 alpha);
     static Mat2UI8 affineDeformation(const Mat2UI8 &m, F32 max_rotation_angle_random,F32 max_shear_angle_random,F32 max_scale_vertical_random,F32 max_scale_horizontal_random);
-    static NeuralNet createNet(std::string train_datapath,  std::string train_labelpath,std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch=10,UI32 lecun_or_simard=0,UI32 nbr_deformation=0);
+    static NeuralNet createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath, UI32 nbr_epoch=10, UI32 lecun_or_simard=0, UI32 nbr_deformation=3, bool iselastic=false);
     static Vec<Vec<Mat2UI8> > loadMNIST( std::string datapath,  std::string labelpath);
 
 };

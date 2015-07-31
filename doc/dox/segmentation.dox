@@ -1,18 +1,12 @@
 /*! \page pagesegmentation  Threshold segmentation
 
-A prerequisite of a quantitative analysis is the phase partition (segmentation)
-that is the transformation of the level matrix to the labelled matrix where
-each label corresponds to a phase of the material. The error of the
-quantitative analysis depends on the match between the segmented structure and
-the real structure. Before segmentation, \ref Filtering increases the signal to noise ratio without removing some
- structural features like the presence of cracks. The library includes the
- classical morphological filters and also the efficient non-linear anisotropic
- diffusion. Then the segmenetation operator convert the grey-level matrix to a labelled matrix. When the
- contrast-to-noise ratio between the phases of the material are enough good,
- the classical threshold segmentation can be used. But, in many cases, the
- matrix is hampered by an low signal-to-noise ratio, this library includes a
- methodology based on a growing process starting from seeds on the topographic
- surface.
+A prerequisite of a quantitative matrix analysis is the phase partition (segmentation) that is the transformation of the level matrix to the labelled matrix where each label corresponds to a phase of the material. The error of the quantitative analysis depends on the match between the segmented structure and the real structure. Basically, segmentation is decomposed in two parts:
+
+    filtering: to increase the signal to noise ratio without removing some structural features like the presence of cracks. The library includes the classical morphological filters and also the efficient non-linear anisotropic diffusion.
+    segmentation: to convert the grey-level matrix to a labelled matrix. When the contrast-to-noise ratio between the phases of the material are enough good, the classical threshold segmentation can be used. But, in many cases, the matrix is hampered by an low signal-to-noise ratio, this library includes a methodology based on a growing process starting from seeds on the topographic surface.
+
+ When the contrast-to-noise ratio between the phases of the material are enough good,
+ the classical threshold segmentation can be used. 
 
 To illustrate the threshold segmentation, we will show you an example with a 3D matrix.\n
 First, you load the 3d matrix:

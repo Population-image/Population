@@ -423,14 +423,14 @@ void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool aut
         MatN<2, PixelType> plane(d);
         typename MatN<2, PixelType>::IteratorEDomain it(plane.getIteratorEDomain());
         VecN<DIM,int> x;
-        x(2)=0;
+        x(2)=d(2)/2;
         while(it.next()){
             x(0) = it.x()(0);
             x(1) = it.x()(1);
             plane(it.x())=img(x);
         }
 
-        int index =0;
+        int index = x(2);
         std::string t =title;
 
 

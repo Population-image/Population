@@ -11,11 +11,6 @@ int main()
     threshold.save("iexthreshold.pgm");
     Mat2RGBUI8 color = Visualization::labelForeground(threshold,img);//Visual validation
     color.display();
-
-    DistributionUniformInt d(0,10);
-    std::cout<<d.randomVariable()<<std::endl;
-    OCRNeuralNetwork ocr;
-    ocr.setDictionnary("/home/vincent/DEV2/DEV/LAPI-ACCES/usr/bin/dictionaries/neuralnetwork.xml");
     return 0;
 }
 

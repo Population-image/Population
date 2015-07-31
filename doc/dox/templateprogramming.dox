@@ -146,7 +146,7 @@ In the previous application, we instantiate the global iterator and the local it
 
 \section Level4 Level-4 free the function structure such that the matrix is a special case 
 
-At this level, programming becomes mathematics. In Populaton, I do quite the same job that the containers in the std library for the function concept (see \ref pageimagebasic). A matrix is just special case of function. A graph's structure is very useful for solving many types of problems in computer science. Here I define an algorithm working for matrix, graph and so one (see the chapter 2 of Population book for further information). In this case, the erosion algorithm is not very useful for graph but, for instance, I use the Processing::clusterToLabel to decompose my graph in term of connected components.
+At this level, programming becomes mathematics. In Populaton, I do quite the same job that the containers in the std library for the function concept (see \ref pageimagebasic). A matrix is just special case of function. We have also a graph structure. Here I define an algorithm working for matrix, graph and so one (see the chapter 2 of Population book for further information). 
 \code
 template<typename Function,typename IteratorEGlobal,typename IteratorELocal>
 Function erosion_Level_4(const Function& m,IteratorEGlobal it_global,IteratorELocal  it_local )
@@ -229,6 +229,9 @@ int main(){
 }
 \endcode
 \image html lena_template_5.jpg "dilation algorithm"
-I do not find more useful abstraction. So it is the last step for me. But perhaps, you have nice ideas. So do not hesitate to contact me ;)
+You can go further but I think it is enough for this tutorial ;)
+
+
+
 \include template_programming.cpp
 */

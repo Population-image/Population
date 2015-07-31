@@ -808,7 +808,7 @@ struct POP_EXPORTS Visualization
     }
 
     template<typename LabelType>
-    static inline void marchingCubeSmooth(Scene3d& scene, MatN<3,LabelType> m_label,int smooth_factor=5, Mat3UI8 m_color= Mat3UI8())
+    static inline void marchingCubeSmooth(Scene3d& scene, MatN<3,LabelType> m_label,int smooth_factor=5, Mat3RGBUI8 m_color= Mat3UI8())
     {
         typename MatN<3,LabelType>::IteratorEDomain it = m_label.getIteratorEDomain();
         m_label = ProcessingAdvanced::greylevelRemoveEmptyValue(m_label,it);

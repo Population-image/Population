@@ -425,6 +425,32 @@ struct POP_EXPORTS Processing
                 return  0;
         }
     };
+    struct __FunctorMean
+    {
+        const Mat2UI32* _integral;
+        F32 area_minus1;
+        int _radius;
+        F32 _offset_value;
+        __FunctorMean(const Mat2UI32 & integral,F32 _area_minus1,int radius,F32 offset_value)
+            :_integral(&integral),area_minus1(_area_minus1),_radius(radius),_offset_value(offset_value){
+
+        }
+
+        template<typename PixelType>
+        UI8 operator()(const MatN<2,PixelType > & f,const  typename MatN<2,PixelType>::E & x){
+            Vec2I32 xadd1=x+Vec2I32(_radius);
+            Vec2I32 xadd2=x+Vec2I32(-_radius);
+            Vec2I32 xsub1=x-Vec2I32(_radius,-_radius);
+            Vec2I32 xsub2=x-Vec2I32(-_radius,_radius);
+            F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
+            mean*=area_minus1;
+
+            if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean)-_offset_value)
+                return 255;
+            else
+                return  0;
+        }
+    };
 //\endcond
     /*!
      *  \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
@@ -460,6 +486,20 @@ struct POP_EXPORTS Processing
         forEachFunctorBinaryFunctionE(f,fborder,func,it);
         return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
     }
+    template<typename PixelType>
+    static MatN<2,UI8>  thresholdMean(const MatN<2,PixelType> & f,int radius=5,F32 offset_value=0  ){
+        MatN<2,PixelType> fborder(f);
+        Draw::addBorder(fborder,radius,typename MatN<2,PixelType>::F(0),MATN_BOUNDARY_CONDITION_MIRROR);
+        MatN<2,UI32> f_F32(fborder);
+        MatN<2,UI32> integral = Processing::integral(f_F32);
+        typename MatN<2,UI32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
+
+        F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
+        __FunctorMean func(integral,area_minus1, radius, offset_value);
+        forEachFunctorBinaryFunctionE(f,fborder,func,it);
+        return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
+    }
+
     /*!
      *  \brief automatic multi-threshold with the ranges defined by the valleys of the histogram
      * \param f input function

@@ -342,12 +342,12 @@ struct POP_EXPORTS GeometricalTransformation
             dist_sum+=distance;
             number++;
         }
-        //F32 standard_deviation = std::sqrt(dist_sum/number);
+        F32 standard_deviation = std::sqrt(dist_sum/number);
 
         it.init();
         while(it.next()){
             for(unsigned int i=0;i<DIM;i++)
-                dist(i)(it.x())*=(alpha);///standard_deviation);
+                dist(i)(it.x())*=(alpha/standard_deviation);
         }
         MatN<DIM,Type> mdist(Img.getDomain());
         it.init();
