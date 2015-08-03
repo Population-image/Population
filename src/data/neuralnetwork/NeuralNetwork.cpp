@@ -91,7 +91,7 @@ Vec<Vec<Mat2UI8> > MNISTNeuralNetLeCun5::loadMNIST( std::string datapath,  std::
     }
     return dataset;
 }
-NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch, UI32 lecun_or_simard,UI32 nbr_deformation)
+NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch, UI32 lecun_or_simard,UI32 nbr_deformation, bool iselastic)
 {
 
     Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);

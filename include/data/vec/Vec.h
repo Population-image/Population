@@ -541,7 +541,6 @@ void Vec<CoordinateType>::save(std::string file)const {
     }
     else
     {
-
         out<<*this;
     }
 }
