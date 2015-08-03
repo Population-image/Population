@@ -245,7 +245,7 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
 
         std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1.0/vtest_in.size() <<"\t"<<eta<<std::endl;
         eta *=0.9f;
-        eta = std::max(eta,0.001f);
+        eta = (std::max)(eta,0.001f);
         net.setLearnableParameter(eta);
     }
     return net;
@@ -449,7 +449,7 @@ void NeuralLayerMatrixMaxPool::forwardCPU(const NeuralLayer& layer_previous){
                         F32 value =-2;
                         for(unsigned i_r=0;i_r<_sub_resolution_factor;i_r++){
                             for(unsigned j_r=0;j_r<_sub_resolution_factor;j_r++){
-                                value = std::max(value,map_layer_previous(i*_sub_resolution_factor+i_r,j*_sub_resolution_factor+j_r));
+                                value = (std::max)(value,map_layer_previous(i*_sub_resolution_factor+i_r,j*_sub_resolution_factor+j_r));
                             }
                         }
                         map_layer(i,j)=value;

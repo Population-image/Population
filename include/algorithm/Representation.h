@@ -288,7 +288,7 @@ struct POP_EXPORTS Representation
             ComplexF32 *line = data.data()+i*data.sizeJ();
             fft.apply(line->data(),data.sizeJ(),way);
         }
-        ComplexF32 t[data.sizeI()];
+        ComplexF32* t = new ComplexF32[data.sizeI()];
         for(unsigned int j=0;j<data.sizeJ();j++){
             unsigned int position =j;
             for(unsigned int i=0;i<data.sizeI();i++){
@@ -302,6 +302,7 @@ struct POP_EXPORTS Representation
                 position+=data.sizeJ();
             }
         }
+		delete[] t;
         return data;
     }
     static inline Mat3ComplexF32 FFT(const Mat3ComplexF32 & f,FFT_WAY way=FFT_FORWARD) {
@@ -314,7 +315,7 @@ struct POP_EXPORTS Representation
                 fft.apply(line->data(),data.sizeJ(),way);
             }
         }
-        ComplexF32 t[data.sizeI()];
+		ComplexF32* t = new ComplexF32[data.sizeI()];
         for(unsigned int j=0;j<data.sizeJ();j++){
             for(unsigned int k=0;k<data.sizeK();k++){
                 unsigned int position =j+k*data.sizeJ()*data.sizeI();
@@ -330,7 +331,8 @@ struct POP_EXPORTS Representation
                 }
             }
         }
-        ComplexF32 t2[data.sizeI()];
+		delete[] t;
+		ComplexF32* t2 = new ComplexF32[data.sizeI()];
         for(unsigned int i=0;i<data.sizeI();i++){
             for(unsigned int j=0;j<data.sizeJ();j++){
                 unsigned int position =j+i*data.sizeI();
@@ -346,6 +348,7 @@ struct POP_EXPORTS Representation
                 }
             }
         }
+		delete[] t2;
         return data;
     }
     static inline MatN<1,ComplexF32> FFT(MatN<1,ComplexF32> & f ,FFT_WAY way=FFT_FORWARD)
