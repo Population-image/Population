@@ -91,21 +91,12 @@ Vec<Vec<Mat2UI8> > MNISTNeuralNetLeCun5::loadMNIST( std::string datapath,  std::
     }
     return dataset;
 }
-NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch, UI32 lecun_or_simard,UI32 nbr_deformation)
+NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::string train_labelpath, std::string test_datapath,  std::string test_labelpath,UI32 nbr_epoch, UI32 lecun_or_simard,UI32 nbr_deformation,bool iselastic)
 {
-
-    Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
-    Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
-//    number_training.resize(2);
-//    number_test.resize(2);
-
-
+    //create the neural set
     NeuralNet net;
-
-
     if(lecun_or_simard==0){
         std::cout<<"LECUN"<<std::endl;
-
         net.addLayerMatrixInput(32,32,1);
         net.addLayerMatrixConvolutionSubScaling(6,1,2);
         net.addLayerMatrixMaxPool(2);
@@ -115,14 +106,13 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
         net.addLayerLinearFullyConnected(84);
     }else if(lecun_or_simard==1){
         std::cout<<"SIMARD"<<std::endl;
-        //Simard network
         net.addLayerMatrixInput(29,29,1);
         net.addLayerMatrixConvolutionSubScaling(6,2,2);
         net.addLayerMatrixConvolutionSubScaling(50,2,2);
         net.addLayerLinearFullyConnected(120);
         net.addLayerLinearFullyConnected(84);
     }
-    net.addLayerLinearFullyConnected(static_cast<UI32>(number_training.size()));
+    net.addLayerLinearFullyConnected(10);
 
     Vec<std::string> label_digit;
     for(int i=0;i<10;i++)
@@ -130,55 +120,37 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
     net.label2String() = label_digit;
 
 
+    //create the training set
+    Vec<Vec<Mat2UI8> > number_training =  loadMNIST(train_datapath,train_labelpath);
+    Vec<Vec<Mat2UI8> > number_test =  loadMNIST(test_datapath,test_labelpath);
 
     Vec<VecF32> vtraining_in;
     Vec<VecF32> vtraining_out;
 
-    //create the training set
-    std::cout<<"deformation "<<nbr_deformation<<std::endl;
+    std::cout<<"Nbr deformation "<<nbr_deformation <<std::endl;
+    if(iselastic==true)
+        std::cout<<"Elastic deformation"<<std::endl;
     for(UI32 i=0;i<number_training.size();i++){
         for(UI32 j=0;j<number_training(i).size();j++){
             Mat2UI8 binary = number_training(i)(j);
-            bool hit=false;
-            Mat2UI8 ref(binary);
-            pop::Draw::addBorder(ref,3,0);
+
             for(unsigned int k=0;k<nbr_deformation;k++){
-                //std::cout<<k<<std::endl;
+
                 Mat2UI8 m_n = binary;
                 pop::Draw::addBorder(m_n,3,0);
-                //m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,5,36);
+                if(iselastic==true)
+                m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,3,2);
                 if(i==1||i==7){
-                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,7.5,7.5,15,20);
+                   m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,25,30);
                 }else{
-                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,15,20);
+                   m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,30,30,25,30);
                 }
-
-                Vec<UI8> line1 = GeometricalTransformation::line(m_n,Vec2F32(0,0),Vec2F32(0,m_n.getDomain()(1)-1));
-                Vec<UI8> line2 = GeometricalTransformation::line(m_n,Vec2F32(Vec2F32(0,m_n.getDomain()(1)-1)),Vec2F32(m_n.getDomain()(0)-1,m_n.getDomain()(1)-1));
-                Vec<UI8> line3 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,m_n.getDomain()(1)-1),Vec2F32(m_n.getDomain()(0)-1,0));
-                Vec<UI8> line4 = GeometricalTransformation::line(m_n,Vec2F32(m_n.getDomain()(0)-1,0),Vec2F32(0,0));
-                bool hit2=false;
-                for(unsigned int index=0;index<line1.size();index++){
-                    if(line1(index)>=125||line2(index)>=125||line3(index)>=125||line4(index)>=125){
-                        hit=true;
-                        hit2=true;
-                        // m_n.display();
-                    }
-                }
-                if(hit2==false){
-                    VecF32 vin = net.inputMatrixToInputNeuron(m_n);
-                    vtraining_in.push_back(vin);
-                    VecF32 v_out(static_cast<int>(number_training.size()),-1);
-                    v_out(i)=1;
-                    vtraining_out.push_back(v_out);
-                    if(hit==true)
-                        ref = Draw::mergeTwoMatrixHorizontal(ref,m_n);
-                }
+                VecF32 vin = net.inputMatrixToInputNeuron(m_n);
+                vtraining_in.push_back(vin);
+                VecF32 v_out(static_cast<int>(number_training.size()),-1);
+                v_out(i)=1;
+                vtraining_out.push_back(v_out);
             }
-//            if(hit==true){
-//                Processing::threshold(ref,125).display();
-//                binary.display();
-//            }
             VecF32 vin = net.inputMatrixToInputNeuron(binary);
             vtraining_in.push_back(vin);
             VecF32 v_out(static_cast<int>(number_training.size()),-1);
@@ -187,8 +159,7 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
 
         }
     }
-//    vtraining_in.save("toto.txt");
-//    vtraining_out.save("toto2.txt");
+
     Vec<VecF32> vtest_in;
     Vec<VecF32> vtest_out;
     for(unsigned int i=0;i<number_test.size();i++){
@@ -202,22 +173,17 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
         }
     }
 
-
     //use the backprogation algorithm with first order method
     F32 eta =0.01f;
     net.setTrainable(true);
     net.setLearnableParameter(eta);
-
-
 
     //random vector to shuffle the trraining set
     std::vector<int> v_global_rand(vtraining_in.size());
     for(unsigned int i=0;i<v_global_rand.size();i++)
         v_global_rand[i]=i;
 
-
     std::cout<<"iter_epoch\t error_train\t error_test\t learning rate"<<std::endl;
-
     for(unsigned int i=0;i<nbr_epoch;i++){
         std::random_shuffle ( v_global_rand.begin(), v_global_rand.end() ,Distribution::irand());
         int error_training=0,error_test=0;
@@ -231,7 +197,6 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
             if(label1!=label2)
                 error_training++;
         }
-        //        std::cout<<testins.size()<<std::endl;
 
         for(unsigned int j=0;j<vtest_in.size();j++){
             VecF32 vout;
@@ -241,8 +206,6 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
             if(label1!=label2)
                 error_test++;
         }
-
-
         std::cout<<i<<"\t"<<error_training*1./vtraining_in.size()<<"\t"<<error_test*1.0/vtest_in.size() <<"\t"<<eta<<std::endl;
         eta *=0.9f;
         eta = std::max(eta,0.001f);

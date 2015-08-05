@@ -1242,6 +1242,45 @@ struct ProcessingAdvanced
         }
         return map;
     }
+    //fast implementation for 2d case with radius=1
+    static inline Mat2UI32 clusterToLabel2D(const Mat2UI8 & f,int norm=0)
+    {
+        Mat2UI32 map(f.getDomain());
+        int cluster=0;
+        std::vector<int > v_list_i;
+        std::vector<int > v_list_j;
+        for(unsigned int j =0;j<f.sizeJ();j++){
+            for(unsigned int i =0;i<f.sizeI();i++){
+
+
+                if(f(i,j)>0&&map(i,j)==0){
+                    cluster++;
+                    v_list_i.push_back(i);v_list_j.push_back(j);
+                    while(v_list_i.empty()==false){
+                        unsigned int i_next = *(v_list_i.rbegin());
+                        v_list_i.pop_back();
+                        unsigned int j_next = *(v_list_j.rbegin());
+                        v_list_j.pop_back();
+                        if(map(i_next,j_next)==0){
+                            map(i_next,j_next)=cluster;
+                            if(i_next>0          &&f(i_next-1,j_next)>0){v_list_i.push_back(i_next-1);v_list_j.push_back(j_next);}
+                            if(i_next+1<f.sizeI()&&f(i_next+1,j_next)>0){v_list_i.push_back(i_next+1);v_list_j.push_back(j_next);}
+                            if(j_next>0          &&f(i_next,j_next-1)>0){v_list_i.push_back(i_next);v_list_j.push_back(j_next-1);}
+                            if(j_next+1<f.sizeJ()&&f(i_next,j_next+1)>0){v_list_i.push_back(i_next);v_list_j.push_back(j_next+1);}
+                            if(norm==0){
+                                if(i_next>0          &&j_next>0          &&f(i_next-1,j_next-1)>0){v_list_i.push_back(i_next-1);v_list_j.push_back(j_next-1);}
+                                if(i_next+1<f.sizeI()&&j_next>0          &&f(i_next+1,j_next-1)>0){v_list_i.push_back(i_next+1);v_list_j.push_back(j_next-1);}
+                                if(i_next>0          &&j_next+1<f.sizeJ()&&f(i_next-1,j_next+1)>0){v_list_i.push_back(i_next-1);v_list_j.push_back(j_next+1);}
+                                if(i_next+1<f.sizeI()&&j_next+1<f.sizeJ()&&f(i_next+1,j_next+1)>0){v_list_i.push_back(i_next+1);v_list_j.push_back(j_next+1);}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
 
     /*! \fn FunctionBinary clusterMax(const FunctionBinary & bin, typename FunctionBinary::IteratorENeighborhood  itneigh)
      * \param bin input binary matrix

@@ -2845,7 +2845,7 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
 #endif
         for(i=0;i<i_max;i++){
             for(j=0;j<j_max;j++){
-                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
+                h(i,j)=func( f, Vec2I32(i,j));
             }
         }
     }

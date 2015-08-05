@@ -336,7 +336,7 @@ struct POP_EXPORTS FunctorMatN
     //! \name Recursive algorithms
     //@{
     //-------------------------------------
-    /*! \fn static Function1    recursive(const Function1 & f,FunctorRecursive & func,int direction=0, int way=1)
+    /*!
      *
       * \brief recursive filter
       * \param f input function
@@ -351,10 +351,10 @@ struct POP_EXPORTS FunctorMatN
       * \f$g(n)=\alpha f(n)+ (1-\alpha)g(n-1)\f$.\n The code of this filter is
       * \sa FunctorMatN::smoothDeriche
         */
-    template< typename Function1, typename FunctorRecursive>
-    static Function1  recursive(const Function1 & f,FunctorRecursive & func,int direction=0, int way=1)
+    template< int DIM, typename PixelType, typename FunctorRecursive>
+    static MatN<DIM,PixelType>  recursive(const MatN<DIM,PixelType> & f,FunctorRecursive & func,int direction=0, int way=1)
     {
-        typename Function1::IteratorEOrder itorder (f.getIteratorEOrder());
+        typename MatN<DIM,PixelType>::IteratorEOrder itorder (f.getIteratorEOrder());
         itorder.setLastLoop(direction);
         itorder.setDirection(way);
         return recursive(f,itorder,func);
@@ -371,19 +371,20 @@ struct POP_EXPORTS FunctorMatN
       */
 
 
-    template<typename Function1,typename FunctorCausal, typename FunctorAntiCausal>
-    static Function1 recursiveAllDirections(const Function1 & f, FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal )
+    template<int DIM, typename PixelType,typename FunctorCausal, typename FunctorAntiCausal>
+    static MatN<DIM,PixelType> recursiveAllDirections(const MatN<DIM,PixelType> & f, FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal )
     {
-        typename Function1::IteratorEOrder itorder (f.getIteratorEOrder());
-        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result TypeF32;
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fprevious(f);
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fcausal(f.getDomain());
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fanticausal(f.getDomain());
+
+        typename MatN<DIM,PixelType>::IteratorEOrder itorder (f.getIteratorEOrder());
+        typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
+        MatN<DIM,PixelTypeF32> fprevious(f);
+        MatN<DIM,PixelTypeF32> fcausal(f.getDomain());
+        MatN<DIM,PixelTypeF32> fanticausal(f.getDomain());
         fprevious = f;
-        for(I32 i=0;i <Function1::DIM;i++)
+        for(I32 i=0;i < DIM;i++)
         {
             itorder.setLastLoop(i);
-            typename Function1::E dir;
+            VecN<DIM,I32> dir;
             dir = 1;
             itorder.setDirection(dir);
             itorder.init();
@@ -395,7 +396,7 @@ struct POP_EXPORTS FunctorMatN
 
             fprevious = fcausal + fanticausal;
         }
-        Function1 h(fprevious);
+        MatN<DIM,PixelType> h(fprevious);
         return h;
     }
     /*! \fn Function1 recursiveAllDirections(const Function1 & f, I32 direction,FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal ,FunctorCausalDirection & funccausaldirection, FunctorAntiCausalDirection & funcanticausaldirection)
@@ -411,18 +412,18 @@ struct POP_EXPORTS FunctorMatN
       * We apply successively the recursive though all directions such that \f$f_i = causal(f_{i-1})+ anticausal(f_{i-1})\f$ for \f$i\neq\f$direction,  \f$f_i = causaldirection(f_{i-1})+ anticausaldirection(f_{i-1})\f$ otherwise.
       * \sa FunctorMatN::smoothDeriche
       */
-    template<typename Function1,typename FunctorCausal, typename FunctorAntiCausal,typename FunctorCausalDirection, typename FunctorAntiCausalDirection >
-    static Function1 recursiveAllDirections(const Function1 & f, I32 direction,FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal ,FunctorCausalDirection & funccausaldirection, FunctorAntiCausalDirection & funcanticausaldirection)
+    template<int DIM, typename PixelType,typename FunctorCausal, typename FunctorAntiCausal,typename FunctorCausalDirection, typename FunctorAntiCausalDirection >
+    static MatN<DIM,PixelType> recursiveAllDirections(const MatN<DIM,PixelType> & f, I32 direction,FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal ,FunctorCausalDirection & funccausaldirection, FunctorAntiCausalDirection & funcanticausaldirection)
     {
-        typename Function1::IteratorEOrder itorder (f.getIteratorEOrder());
-        typedef typename  FunctionTypeTraitsSubstituteF<typename Function1::F,F32>::Result TypeF32;
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fprevious(f);
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fcausal(f.getDomain());
-        typename FunctionTypeTraitsSubstituteF<Function1,TypeF32>::Result fanticausal(f.getDomain());
-        for(I32 i=0;i <Function1::DIM;i++)
+        typename MatN<DIM,PixelType>::IteratorEOrder itorder (f.getIteratorEOrder());
+        typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
+        MatN<DIM,PixelTypeF32> fprevious(f);
+        MatN<DIM,PixelTypeF32> fcausal(f.getDomain());
+        MatN<DIM,PixelTypeF32> fanticausal(f.getDomain());
+        for(I32 i=0;i <DIM;i++)
         {
             itorder.setLastLoop(i);
-            typename Function1::E dir;
+            VecN<DIM,I32> dir;
             dir = 1;
             itorder.setDirection(dir);
             itorder.init();
@@ -439,7 +440,7 @@ struct POP_EXPORTS FunctorMatN
                 fanticausal = recursive(fprevious,itorder,funcanticausal);
             fprevious = (fcausal  + fanticausal);
         }
-        Function1 h(fprevious);
+        MatN<DIM,PixelType> h(fprevious);
         return h;
     }
 
@@ -453,10 +454,10 @@ struct POP_EXPORTS FunctorMatN
       * \return h output function
       *
       */
-    template< typename Function1, typename IteratorEOrder, typename FunctorRecursive>
-    static Function1    recursive(const Function1 & f,IteratorEOrder & it, FunctorRecursive & func)
+    template< int DIM, typename PixelType, typename IteratorEOrder, typename FunctorRecursive>
+    static MatN<DIM,PixelType>    recursive(const MatN<DIM,PixelType> & f,IteratorEOrder & it, FunctorRecursive & func)
     {
-        Function1 h(f.getDomain());
+        MatN<DIM,PixelType> h(f.getDomain());
         while(it.next()){
             h(it.x())=func(f,h,it.x(),it.getBordeLenghtLastLoop(),it.getIndexLastLoop(),it.getWayLastLoop());
         }
@@ -512,7 +513,6 @@ struct POP_EXPORTS FunctorMatN
      * \brief recursive functor
      * \author Tariel Vincent
      *
-     * I am not happy with this implementation because the iterator and this function are strongly coupled.. But since its utilisation is limited to the recursive algorithm, I do not want to spend time to find a better implementation.
      *
      *
     */
@@ -538,17 +538,13 @@ struct POP_EXPORTS FunctorMatN
               _a0border1(a0border1),_a1border1(a1border1),_b1border1(b1border1)
         {}
 
-        template<
-                typename Function1,
-                typename Function2
-                >
-        typename    Function2::F   operator()(const Function1 & f,const Function2 & g, typename Function1::E & x, int lenghtborder, typename Identity<typename Function1::E>::Result::E
-                                              indice, typename Identity<typename Function1::E>::Result::E direction)
+        template<int DIM, typename PixelType>
+        PixelType   operator()(const MatN<DIM,PixelType> & f,const MatN<DIM,PixelType> & g, VecN<DIM,int> & x, int lenghtborder, int indice, int direction)
         {
             if(lenghtborder==0)return f(x)*_a0border0 ;
             else if(lenghtborder==1)
             {
-                typename Function2::F value =  f(x)*_a0border1;
+                PixelType value =  f(x)*_a0border1;
                 x(indice)-=direction;
                 value+= f(x)*_a1border1+ g(x)*_b1border1;
                 x(indice)+=direction;
@@ -556,7 +552,7 @@ struct POP_EXPORTS FunctorMatN
             }
             else
             {
-                typename Function2::F value =  f(x)*_a0;
+                PixelType value =  f(x)*_a0;
                 x(indice)-=direction;
                 value+=f(x)*_a1 +g(x)*_b1;
                 x(indice)-=direction;
@@ -565,6 +561,29 @@ struct POP_EXPORTS FunctorMatN
                 return value;
             }
         }
+        template<int DIM, typename PixelType>
+        PixelType   border0(const MatN<DIM,PixelType> & f,VecN<DIM,int> & x ){
+            return f(x)*_a0border0 ;
+        }
+        template<int DIM, typename PixelType>
+        PixelType   border1(const MatN<DIM,PixelType> & f,const MatN<DIM,PixelType> & g,VecN<DIM,int> & x,int coordinate, int direction){
+            PixelType value =  f(x)*_a0border1;
+            x(coordinate)-=direction;
+            value+= f(x)*_a1border1+ g(x)*_b1border1;
+            x(coordinate)+=direction;
+            return  value;
+        }
+        template<int DIM, typename PixelType>
+        PixelType   border2(const MatN<DIM,PixelType> & f,const MatN<DIM,PixelType> & g,VecN<DIM,int> & x,int coordinate, int direction){
+            PixelType value =  f(x)*_a0;
+            x(coordinate)-=direction;
+            value+=f(x)*_a1 +g(x)*_b1;
+            x(coordinate)-=direction;
+            value+=f(x)*_a2 +g(x)*_b2 ;
+            x(coordinate)+=2*direction;
+            return value;
+        }
+
 
     };
     //@}
@@ -587,8 +606,8 @@ struct POP_EXPORTS FunctorMatN
      * img.display();
      * \endcode
      */
-    template<typename Function1>
-    static Function1 smoothDeriche(const Function1 & f, F32 alpha=1)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,PixelType> smoothDeriche(const MatN<DIM,PixelType> & f, F32 alpha=1)
     {
         F32 e_a = std::exp(- alpha);
         F32 e_2a = std::exp(- 2.f * alpha);
@@ -630,7 +649,7 @@ struct POP_EXPORTS FunctorMatN
         return FunctorMatN::recursiveAllDirections(f,funccausal,funcanticausal);
     }
 
-    /*! \fn Function1 gradientDeriche(const Function1 & f, F32 alpha,I32 direction)
+    /*!
      * \brief Deriche's smooth filter
      * \param f input matrix used float type as pixel/voxel type
      * \param alpha inverse scale parameter
@@ -648,12 +667,11 @@ struct POP_EXPORTS FunctorMatN
      * \endcode
      * \image html LenaGradDeriche.jpg
      */
-    template<typename Function1>
-    static typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32 >::Result >::Result  gradientDeriche(const Function1 & f, I32 direction, F32 alpha=1)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,typename FunctionTypeTraitsSubstituteF<PixelType,F32 >::Result > gradientDeriche(const MatN<DIM,PixelType> & f, I32 direction, F32 alpha=1)
     {
-        if(NumericLimits<typename Function1::F>::is_integer==true){
-            typedef typename FunctionTypeTraitsSubstituteF<Function1,typename FunctionTypeTraitsSubstituteF<typename Function1::F,F32 >::Result >::Result FunctionFloat;
-            FunctionFloat ffloat(f);
+        if(NumericLimits<PixelType>::is_integer==true){
+            MatN<DIM,typename FunctionTypeTraitsSubstituteF<PixelType,F32 >::Result > ffloat(f);
             return gradientDeriche(ffloat, direction,alpha);
         }
         F32 e_a = std::exp(- alpha);
@@ -735,20 +753,19 @@ struct POP_EXPORTS FunctorMatN
      * \code
     Mat2UI8 img;
     img.load("/usr/share/doc/opencv-doc/examples/c/lena.jpg");
-    Mat2Vec2F32 gradx = Processing::gradientVecDeriche(img);
-    Visualization::vectorField2DToArrows(gradx,RGBUI8(0,0,255),RGBUI8(255,0,0),8).display();
+    Mat2Vec2F32 grad = Processing::gradientVecDeriche(img);
+    Visualization::vectorField2DToArrows(grad,RGBUI8(0,0,255),RGBUI8(255,0,0),8).display();
      *  \endcode
     */
-    template<class Function1>
-    static typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result gradientVecDeriche(const Function1  & f,F32 alpha=1)
+    template<int DIM,typename PixelType>
+    static MatN<DIM,VecN<DIM,F32> > gradientVecDeriche(const  MatN<DIM,PixelType>  & f,F32 alpha=1)
     {
-        typedef typename FunctionTypeTraitsSubstituteF<Function1,F32 >::Result  FunctionFloat;
-        VecN<Function1::DIM,FunctionFloat> v_der;
-        for(int i =0;i<Function1::DIM;i++){
+        VecN<DIM,MatN<DIM,F32> > v_der;
+        for(int i =0;i<DIM;i++){
             v_der[i]= gradientDeriche(f,i,alpha);
 
         }
-        typename FunctionTypeTraitsSubstituteF<Function1,VecN<Function1::DIM,F32> >::Result f_grad(f.getDomain());
+        MatN<DIM,VecN<DIM,F32> > f_grad(f.getDomain());
         Convertor::fromVecN(v_der,f_grad);
         return f_grad;
     }
