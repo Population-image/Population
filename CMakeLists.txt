@@ -12,6 +12,7 @@ set(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "Configs" FORCE)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
+
 # ----------------------------------------------------------------------------
 # Population cmake options
 # ----------------------------------------------------------------------------
