@@ -278,6 +278,18 @@ std::string BasicUtility::getPathSeparator() {
     return "???";
 #endif
 }
+
+void BasicUtility::sleep_ms(int ms) {
+#if Pop_OS==1
+    ; //LINUX TODO
+#elif Pop_OS==2
+    ; //WIN TODO
+#else
+#error Unknown OS for sleep_ms
+#endif
+
+}
+
 UI8 maximum(UI8 v1,UI8 v2){return (std::max)(v1,v2);}
 UI16 maximum(UI16 v1,UI16 v2){return (std::max)(v1,v2);}
 UI32 maximum(UI32 v1,UI32 v2){return (std::max)(v1,v2);}

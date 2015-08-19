@@ -182,11 +182,7 @@ bool VideoVLC::open(const std::string & path){
     isplaying = true;
     my_index = 0;
 
-#if Pop_OS==2
-    Sleep(100);
-#elif Pop_OS==1
-    usleep(100000);
-#endif
+    pop::BasicUtility::sleep_ms(100);
     return (!context->encoutered_error);
 }
 
@@ -194,11 +190,7 @@ bool VideoVLC::grabMatrixGrey(){
     bool ret = false;
 
     while (!context->playing_started && !context->encoutered_error) {
-#if Pop_OS==2
-        Sleep(10);
-#elif Pop_OS==1
-        usleep(10000);
-#endif
+        pop::BasicUtility::sleep_ms(10);
     }
 
     if (context->encoutered_error) {
@@ -213,12 +205,7 @@ bool VideoVLC::grabMatrixGrey(){
                 //std::cout << "VIDEO STOPPED PLAYING!!!" << std::endl;
                 return false;
             } else if(!_isfile){
-#if Pop_OS==2
-                Sleep(10);
-#endif
-#if Pop_OS==1
-                usleep(10000);
-#endif
+                pop::BasicUtility::sleep_ms(10);
             }
         }
 
