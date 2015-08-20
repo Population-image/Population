@@ -22,6 +22,10 @@
 #include <dirent.h>
 #endif
 
+#if Pop_OS==1
+#include <unistd.h> // usleep
+#endif
+
 namespace pop
 {
 bool BasicUtility::String2Any(std::string s,  bool & Dest ){
