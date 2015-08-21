@@ -1,4 +1,3 @@
-
 #include<cmath>
 #include"PopulationConfig.h"
 
@@ -24,7 +23,12 @@
 
 #if Pop_OS==1
 #include <unistd.h> // usleep
+#elif Pop_OS==2
+#include <windows.h>
+#else
+#error Unknown OS for sleep_ms
 #endif
+
 
 namespace pop
 {
