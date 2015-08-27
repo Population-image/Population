@@ -153,7 +153,8 @@ bool VideoFFMPEG::grabMatrixGrey(){
                 if(try_read>100)
                     check=1;
             }
-        }while((check==0||result<0)&&try_read<=100);
+        }while((check==0&&result<0));
+
         rgb =false;
         if(try_read>100)
             return false;
@@ -203,7 +204,7 @@ bool VideoFFMPEG::grabMatrixRGB(){
                 if(try_read>100)
                     check=1;
             }
-        }while(check==0||result<0);
+        }while(check==0&&result<0);
         rgb =true;
         if(try_read>100)
             return false;

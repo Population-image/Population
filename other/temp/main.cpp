@@ -1,7 +1,7 @@
 #include"Population.h"//Single header
 
 using namespace pop;//Population namespace
-
+#include"chrono"
 //void neuralNetworkForRecognitionForHandwrittenDigits()
 //{
 //    std::string path1="/home/olivia/workspace/MNIST/train-images-idx3-ubyte";
@@ -127,7 +127,7 @@ void fill_vtin_vtout(Vec<VecF32> &v_in,Vec<VecF32> &v_out,std::string root_dir,N
             img.load(path);
             int value;
             img= Processing::thresholdOtsuMethod(img,value);
-            net._method = NNLayerMatrix::Mass;
+            //net._method = NNLayerMatrix::Mass;
             try
             {
                 VecF32 vin = net.inputMatrixToInputNeuron(img);
@@ -230,13 +230,65 @@ Vec<Mat2UI8> createrandom(Mat2UI8 m,F32 fluctuation, int size,int number){
 }
 
 
-
-
+template<int DIM, typename PixelType>
+static MatN<DIM,PixelType> smoothAlpha(const MatN<DIM,PixelType> & f, F32 alpha=0.7){
+    typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
+    FunctorMatN::FunctorRecursiveOrder1 funccausal(alpha,0,1-alpha,1);
+    return FunctorMatN::recursiveAllDirections(MatN<DIM,PixelTypeF32>(f),funccausal,funccausal)/(2*DIM);
+}
 
 
 int main()
 {
+    Mat2UI8 lena;
+    lena.load("/home/tariel/Bureau/IMG_00002970.jpg");
+    lena = lena.opposite();
+    F32 alpha_deriche = 0.15*1200/lena.sizeJ();
+    Processing::smoothDeriche(lena,alpha_deriche).display("deriche",false);
+    Processing::thresholdAdaptativeDeriche(lena,alpha_deriche,-15).display("threshold",false);
+    smoothAlpha(lena,0.1).display();
+    Mat2F32 m(2000,2000);
+    m(0,0)=1;
+    m(2,2)=1;
+    m(4,2)=1;
+    m(4,3)=1;
+    F32 alpha=0.9;
 
+    auto start_global = std::chrono::high_resolution_clock::now();
+    Mat2F32 m_causal(m.getDomain());
+    Mat2F32 m_anti_causal(m.getDomain());
+    for(unsigned int j=0;j<m.sizeJ();j++){
+
+        m_causal(0,j)=m(0,j);
+        for(unsigned int i=1;i<m.sizeI();i++){
+            //std::cout<<i<<std::endl;
+            m_causal(i,j)=alpha*m(i,j)+(1-alpha)*m_causal(i-1,j);
+        }
+        m_anti_causal(m_causal.sizeI()-1,j)=m(m_causal.sizeI()-1,j);
+        for(int i=m_causal.sizeI()-2;i>=0;i--){
+            //std::cout<<i<<std::endl;
+            m_anti_causal(i,j)=alpha*m(i,j)+(1-alpha)*m_anti_causal(i+1,j);
+        }
+    }
+    m= m_causal+m_anti_causal;
+    auto end_global = std::chrono::high_resolution_clock::now();
+    std::cout << "cluster is: " << std::chrono::duration<double, std::milli>(end_global-start_global).count() << "ms" << std::endl;
+
+
+    FunctorMatN::FunctorRecursiveOrder1 funccausal(alpha,0,1-alpha,1);
+
+     start_global = std::chrono::high_resolution_clock::now();
+    FunctorMatN::recursiveAllDirections(m,funccausal,funccausal);
+     end_global = std::chrono::high_resolution_clock::now();
+    std::cout << "cluster is: " << std::chrono::duration<double, std::milli>(end_global-start_global).count() << "ms" << std::endl;
+
+
+     start_global = std::chrono::high_resolution_clock::now();
+    Processing::smoothDeriche(m,1);
+     end_global = std::chrono::high_resolution_clock::now();
+    std::cout << "cluster is: " << std::chrono::duration<double, std::milli>(end_global-start_global).count() << "ms" << std::endl;
+
+    return 0;
 
     Mat2UI8 mm;
 

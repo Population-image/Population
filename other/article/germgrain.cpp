@@ -594,25 +594,19 @@ void SectionIII_Model_Correlation(){
 
     Mat2F32 correlation_exprerimental_matrix = correlation_exprerimental.deleteCol(1);//remove the pore-pore correlation function in the first column
 
-    Mat3F32 m_gaussian_field;
-    Mat3UI8 m_model_gaussian_field =RandomGeometry::gaussianThesholdedRandomField(correlation_exprerimental_matrix,256,m_gaussian_field);
+    //Mat3F32 m_gaussian_field;
+    //Mat3UI8 m_model_gaussian_field =RandomGeometry::gaussianThesholdedRandomField(correlation_exprerimental_matrix,256,m_gaussian_field);
 
     Mat2F32 volume_fraction = Analysis::histogram(plane);
     Vec3I32 domain(256,256,256);
     Mat3UI8 m_model_annealing_field = RandomGeometry::randomStructure(domain,volume_fraction);
-    RandomGeometry::annealingSimutated(m_model_annealing_field,plane,8,100);
-
-
-   // Mat2F32 dist(2,100);
-    //img.display();
-
-
+    RandomGeometry::annealingSimutated(m_model_annealing_field,plane,10);
+    //Processing::greylevelRange(m_model_annealing_field,0,255).display();
+    m_model_annealing_field.save("annealing_rock.pgm");
 }
 
 int main()
 {
-
-
     SectionIII_Model_Correlation();
     //##UNCOMMENT EACH SECTION BY EACH SECTION BECAUSE THE PROGRAM STOP WHEN YOU CLOSE THE OPENGL WINDOW
 
