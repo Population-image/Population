@@ -113,12 +113,7 @@ bool VideoVLCDeprecated::open(const std::string & path){
             }
             numbertest++;
             if(find==false){
-#if Pop_OS==2
-                Sleep(2000);
-#endif
-#if Pop_OS==1
-                sleep(2);
-#endif
+                pop::BasicUtility::sleep_ms(2000);
             }
         }while(find==false&&numbertest<10);
         if(numbertest<10){
@@ -147,12 +142,7 @@ bool VideoVLCDeprecated::open(const std::string & path){
             libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
             *(context->index) =0;
 //                std::cout<<"return true"<<std::endl;
-#if Pop_OS==2
-                Sleep(1000);
-#endif
-#if Pop_OS==1
-                sleep(1);
-#endif
+            pop::BasicUtility::sleep_ms(1000);
             return true;
         }else{
             libvlc_media_player_stop(mediaPlayer);
@@ -192,12 +182,8 @@ bool VideoVLCDeprecated::tryOpen(const std::string & path){
         libvlc_media_player_play(mediaPlayer);
         libvlc_video_set_callbacks(mediaPlayer, lock_vlc, unlock_vlc, display_vlc, context);
         libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
-#if Pop_OS==2
-        Sleep(2000);
-#endif
-#if Pop_OS==1
-        sleep(2);
-#endif
+
+        pop::BasicUtility::sleep_ms(2000);
         if(libvlc_media_player_is_playing(mediaPlayer)){
             libvlc_media_player_stop(mediaPlayer);
             libvlc_media_player_release(mediaPlayer);
@@ -225,12 +211,7 @@ bool VideoVLCDeprecated::grabMatrixGrey(){
         }
 
         if(!_isfile) {
-#if Pop_OS==2
-            Sleep(10);
-#endif
-#if Pop_OS==1
-            usleep(10000);
-#endif
+            pop::BasicUtility::sleep_ms(10000);
         }
     }
     my_index=*context->index;
@@ -258,12 +239,7 @@ bool VideoVLCDeprecated::grabMatrixRGB(){
         }
 
         if(!_isfile) {
-#if Pop_OS==2
-            Sleep(10);
-#endif
-#if Pop_OS==1
-            usleep(10000);
-#endif
+            pop::BasicUtility::sleep_ms(10000);
         }
     }
     my_index=*context->index;

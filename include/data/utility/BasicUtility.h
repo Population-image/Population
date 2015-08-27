@@ -295,6 +295,8 @@ public:
     static  std::string replaceSlashByAntiSlash(std::string filepath);
     //edit-Distance
     static int editDistance(std::string s1,std::string s2);
+
+    static void sleep_ms(int ms);
 };
 
 template<typename T>
