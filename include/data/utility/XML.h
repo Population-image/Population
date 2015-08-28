@@ -25,20 +25,22 @@ public:
     /*!
     \code
     XMLDocument doc;
-    doc.load("/home/vtariel/Bureau/database.xml");
-
-    XMLNode node = doc.getChild("elements");
+    doc.load("/home/tariel/Bureau/camera.xml");
+    XMLNode node = doc.getChild("CAMERA");
     for (XMLNode tool = node.firstChild(); tool; tool = tool.nextSibling())
     {
-        std::cout << "Tool:";
-        cout<<tool.getAttribute("pathimage")<<endl;
+        std::cout << "IP:";
+        std::cout<<tool.getAttribute("IP")<<std::endl;
         std::cout << std::endl;
     }
     \endcode
-        \code
-<?xml version="1.0"?>
-<camera IP="rtsp://193.2225/channel1" frame_rate="0" channel="0" name="toto" type="0" />
-<camera IP="" frame_rate="0" channel="0" name="toto2" type="0" />
+    The file camera.xml is:
+    \code
+<?xml version="1.0" encoding="UTF-8"?>
+<CAMERA>
+  <camera IP="rtsp://193.222.150.5/channel1" frame_rate="100" channel="0" name="camera entree" type="0" />
+  <camera IP="rtsp://193.222.150.105/channel1" frame_rate="200" channel="1" name="camera sortie" type="0" />
+</CAMERA>
      \endcode
     */
     operator bool() const ;
