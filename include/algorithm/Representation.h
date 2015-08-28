@@ -508,7 +508,7 @@ struct POP_EXPORTS Representation
     static void truncatePower2(const MatN<DIM,PixelType>& in, MatN<DIM,PixelType>& out){
         VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
-            x(i) = (1<<(int)std::floor(std::log(in.getDomain()(i))/std::log(2)));
+            x(i) = (1<<(int)std::floor(std::log(static_cast<float>(in.getDomain()(i)))/std::log(static_cast<float>(2))));
         }
         __resize(in,out,x,x);
     }
@@ -516,7 +516,7 @@ struct POP_EXPORTS Representation
     static void upPower2(const MatN1& in,MatN<DIM,PixelType> &out){
         VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
-            x(i) = 1<<(int)(std::floor(std::log(in.getDomain()(i))/std::log(2))+1);
+            x(i) = 1<<(int)(std::floor(std::log(static_cast<float>(in.getDomain()(i)))/std::log(static_cast<float>(2)))+1);
         }
         __resize(in,out,x,in.getDomain());
     }
