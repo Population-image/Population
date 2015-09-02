@@ -30,7 +30,7 @@ private:
     pop::Mat2RGBUI8 imgcolor;
         bool _isfile;
 public:
-    VideoVLC();
+    VideoVLC(bool vlc_debug=false);
     VideoVLC(const VideoVLC& vlc);
     virtual ~VideoVLC();
     bool open(const std::string &filename);

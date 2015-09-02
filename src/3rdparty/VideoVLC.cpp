@@ -83,16 +83,20 @@ static void on_event_vlc(const libvlc_event_t* event, void* data) {
     }
 }
 
-VideoVLC::VideoVLC()
+VideoVLC::VideoVLC(bool vlc_debug)
 {
     char const *vlc_argv[] =
     {
         "--no-audio", /* skip any audio track */
         "--no-xlib", /* tell VLC to not use Xlib */
-        "--verbose=2",
+        /* Logging things must be at the end of the array */
+        "--verbose=3",
         "--extraintf=logger",
     };
     int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
+    if (!vlc_debug) {
+        vlc_argc -= 2;
+    }
 
     if ((instance = libvlc_new(vlc_argc, vlc_argv)) == NULL) {
         std::cerr << "[VideoVLC::new] libvlc_new() error" << std::endl;
