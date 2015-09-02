@@ -90,6 +90,7 @@ VideoVLC::VideoVLC()
         "--no-audio", /* skip any audio track */
         "--no-xlib", /* tell VLC to not use Xlib */
         "--verbose=2",
+        "--extraintf=logger",
     };
     int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
 

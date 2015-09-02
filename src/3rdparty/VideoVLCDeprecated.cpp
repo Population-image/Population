@@ -40,6 +40,7 @@ VideoVLCDeprecated::VideoVLCDeprecated()
     char const *vlc_argv[] =
     {
         "--verbose=2",
+        "--extraintf=logger",
     };
     int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
     instance = libvlc_new(vlc_argc, vlc_argv);
