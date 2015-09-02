@@ -37,7 +37,12 @@ static void unlock_vlc(void *data, void *id, void *const *){
 //libvlc_instance_t* OldVideoVLC::impl::instance = libvlc_new(0,NULL);
 VideoVLCDeprecated::VideoVLCDeprecated()
 {
-    instance = libvlc_new(0,NULL);
+    char const *vlc_argv[] =
+    {
+        "--verbose=2",
+    };
+    int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
+    instance = libvlc_new(vlc_argc, vlc_argv);
     mediaPlayer = NULL;
     context = new  ctx;
     context->pmutex = new tthread::mutex();
