@@ -1,0 +1,14 @@
+/*! \page pagegrainsegmentation Grain partition
+
+
+You do as in this page CMake (cross-platform) but this time you quote the BUILD_ARTICLE before to generate it with cmake_gui.
+
+In this article, we explore three technics of grain segmentations.
+
+
+
+C++ code
+\include elementarydecomposition.cpp 
+
+
+*/

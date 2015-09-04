@@ -388,46 +388,9 @@ struct POP_EXPORTS Processing
         }
         return label;
     }
-//    \cond HIDDEN_SYMBOLS
-    struct __FunctorNiblackMethod
-    {
-        const Mat2UI32* _integral;
-        const Mat2UI32* _integral_power_2;
-        F32 area_minus1;
-        F32 _k;
-        int _radius;
-        F32 _offset_value;
-        __FunctorNiblackMethod(const Mat2UI32 & integral,const Mat2UI32& integral_power_2,F32 _area_minus1,F32 k,int radius,F32 offset_value)
-            :_integral(&integral),_integral_power_2(&integral_power_2),area_minus1(_area_minus1),_k(k),_radius(radius),_offset_value(offset_value){
 
-        }
-
-        template<typename PixelType>
-        UI8 operator()(const MatN<2,PixelType > & f,const  typename MatN<2,PixelType>::E & x){
-            Vec2I32 xadd1=x+Vec2I32(_radius);
-            Vec2I32 xadd2=x+Vec2I32(-_radius);
-            Vec2I32 xsub1=x-Vec2I32(_radius,-_radius);
-            Vec2I32 xsub2=x-Vec2I32(-_radius,_radius);
-            F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
-            mean*=area_minus1;
-
-            F32 standartdeviation = static_cast<F32>((*_integral_power_2)(xadd1)+(*_integral_power_2)(xadd2)-(*_integral_power_2)(xsub1)-(*_integral_power_2)(xsub2));
-            standartdeviation*=area_minus1;
-            standartdeviation =standartdeviation-mean*mean;
-
-            if(standartdeviation>0)
-                standartdeviation = std::sqrt( standartdeviation);
-            else
-                return  0;
-            if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+_k*standartdeviation)-_offset_value)
-                return 255;
-            else
-                return  0;
-        }
-    };
-//\endcond
     /*!
-     *  \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
+     * \brief Niblack threshold (1986), An introduction to Digital Image Processing, Prentice-Hall
      * \param f input function
      * \param k multiplicative factor of the standard deviation
      * \param radius neighbordhood radius
@@ -436,11 +399,11 @@ struct POP_EXPORTS Processing
      *
      * pixel = ( pixel >  mean + k * standard_deviation - offset_value) ? object : background
      * \code
-    std::string path_linux ="../../../vitrine.jpg";
-    Mat2UI8 img(path_linux.c_str());
-    img = Processing::thresholdNiblackMethod(img,0.6);
-    img.display();
-    img.save("../doc/image2/vitrinethresholdNiblack.jpg");
+     * std::string path_linux ="../../../vitrine.jpg";
+     * Mat2UI8 img(path_linux.c_str());
+     * img = Processing::thresholdNiblackMethod(img,0.6);
+     * img.display();
+     * img.save("../doc/image2/vitrinethresholdNiblack.jpg");
      * \endcode
      * \image html vitrine.jpg
      * \image html vitrinethresholdNiblack.jpg
@@ -459,6 +422,50 @@ struct POP_EXPORTS Processing
         __FunctorNiblackMethod func(integral,integralpower2,area_minus1,k, radius, offset_value);
         forEachFunctorBinaryFunctionE(f,fborder,func,it);
         return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
+    }
+    /*!
+     * \brief adaptative mean
+     * \param f input function
+     * \param radius neighbordhood radius
+     * \param offset_value offset value
+     * \return output function noted h
+     *
+     * pixel = ( pixel >  mean - offset_value) ? object : background
+    */
+    template<typename PixelType>
+    static MatN<2,UI8>  thresholdAdaptativeMean(const MatN<2,PixelType> & f,int radius=5,F32 offset_value=0  ){
+        MatN<2,PixelType> fborder(f);
+        Draw::addBorder(fborder,radius,typename MatN<2,PixelType>::F(0),MATN_BOUNDARY_CONDITION_MIRROR);
+        MatN<2,UI32> f_F32(fborder);
+        MatN<2,UI32> integral = Processing::integral(f_F32);
+        typename MatN<2,UI32>::IteratorERectangle it(fborder.getIteratorERectangle(Vec2I32(radius),f_F32.getDomain()-1-Vec2I32(radius)));
+
+        F32 area_minus1 = 1.f/((2*radius+1)*(2*radius+1));
+        __FunctorMean func(integral,area_minus1, radius, offset_value);
+        forEachFunctorBinaryFunctionE(f,fborder,func,it);
+        return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
+    }
+    /*!
+     * \brief adaptative mean
+     * \param f input function
+     * \param sigma Deriche's smooth parameter
+     * \param offset_value offset value
+     * \return output function noted h
+     *
+     * pixel = ( pixel >  pixel_deriche - offset_value) ? object : background with pixel_deriche is the value of the smooth deriche image
+    */
+    template<typename PixelType>
+    static MatN<2,UI8>  thresholdAdaptativeDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
+        MatN<2,PixelType> smooth = Processing::smoothDeriche(f,sigma);
+        Mat2UI8 thresold(smooth.getDomain());
+        for(unsigned int i=0;i<smooth.size();i++){
+            if(f(i)>smooth(i)-offset_value){
+                thresold(i)=255;
+            }else{
+                thresold(i)=0;
+            }
+        }
+        return thresold;
     }
     /*!
      *  \brief automatic multi-threshold with the ranges defined by the valleys of the histogram
@@ -2060,6 +2067,11 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     {
         return ProcessingAdvanced::clusterToLabel(cluster, cluster.getIteratorENeighborhood(1,norm),cluster.getIteratorEDomain());
     }
+
+    static MatN<2,UI32>  clusterToLabel(const MatN<2,UI8> & cluster,int norm=1)
+    {
+        return ProcessingAdvanced::clusterToLabel2D(cluster, norm);
+    }
     /*!
      * \brief extract the connected component with size
      * \param cluster input binary matrix
@@ -2677,6 +2689,70 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         return thresholdOtsuMethod(f,thresholdvalue);
     }
 #endif
+    //    \cond HIDDEN_SYMBOLS
+        struct __FunctorNiblackMethod
+        {
+            const Mat2UI32* _integral;
+            const Mat2UI32* _integral_power_2;
+            F32 area_minus1;
+            F32 _k;
+            int _radius;
+            F32 _offset_value;
+            __FunctorNiblackMethod(const Mat2UI32 & integral,const Mat2UI32& integral_power_2,F32 _area_minus1,F32 k,int radius,F32 offset_value)
+                :_integral(&integral),_integral_power_2(&integral_power_2),area_minus1(_area_minus1),_k(k),_radius(radius),_offset_value(offset_value){
+
+            }
+
+            template<typename PixelType>
+            UI8 operator()(const MatN<2,PixelType > & f,const  typename MatN<2,PixelType>::E & x){
+                Vec2I32 xadd1=x+Vec2I32(_radius);
+                Vec2I32 xadd2=x+Vec2I32(-_radius);
+                Vec2I32 xsub1=x-Vec2I32(_radius,-_radius);
+                Vec2I32 xsub2=x-Vec2I32(-_radius,_radius);
+                F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
+                mean*=area_minus1;
+
+                F32 standartdeviation = static_cast<F32>((*_integral_power_2)(xadd1)+(*_integral_power_2)(xadd2)-(*_integral_power_2)(xsub1)-(*_integral_power_2)(xsub2));
+                standartdeviation*=area_minus1;
+                standartdeviation =standartdeviation-mean*mean;
+
+                if(standartdeviation>0)
+                    standartdeviation = std::sqrt( standartdeviation);
+                else
+                    return  0;
+                if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean+_k*standartdeviation)-_offset_value)
+                    return 255;
+                else
+                    return  0;
+            }
+        };
+        struct __FunctorMean
+        {
+            const Mat2UI32* _integral;
+            F32 area_minus1;
+            int _radius;
+            F32 _offset_value;
+            __FunctorMean(const Mat2UI32 & integral,F32 _area_minus1,int radius,F32 offset_value)
+                :_integral(&integral),area_minus1(_area_minus1),_radius(radius),_offset_value(offset_value){
+
+            }
+
+            template<typename PixelType>
+            UI8 operator()(const MatN<2,PixelType > & f,const  typename MatN<2,PixelType>::E & x){
+                Vec2I32 xadd1=x+Vec2I32(_radius);
+                Vec2I32 xadd2=x+Vec2I32(-_radius);
+                Vec2I32 xsub1=x-Vec2I32(_radius,-_radius);
+                Vec2I32 xsub2=x-Vec2I32(-_radius,_radius);
+                F32 mean =(F32) (*_integral)(xadd1)+(*_integral)(xadd2)-(*_integral)(xsub1)-(*_integral)(xsub2);
+                mean*=area_minus1;
+
+                if(f(x-_radius)>ArithmeticsSaturation<PixelType,F32>::Range( mean)-_offset_value)
+                    return 255;
+                else
+                    return  0;
+            }
+        };
+    //\endcond
 };
 /** @}*/
 template<typename Function>

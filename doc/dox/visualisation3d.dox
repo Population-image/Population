@@ -1,18 +1,18 @@
 /*! \page pagevisu3d  3d visualization
 
-In Image processing, a visual checking is essential to prototype and calibrate your process. Population library gives only some basic tools to visualize a 3d matrix. For more extended tools, use dedicated library for this purpose, as VTK/ITK or amira.
+In Image processing, a visual checking is essential to prototype and calibrate your process. Population library gives you only some basic tools to visualize a 3d matrix. For more extended tools, use dedicated library for this purpose, as VTK/ITK or amira.
 
 In this following code, I give many methods to visualization a 3d matrix : 
 \include visualization3d.cpp
 
-- 2d slice by slice"/image/
-- 3d volume    
+- visu2DSlice(): slice by slice
+- visu3DCube(): volume    
 \image html cubeExtruded.png
-- 3d volume restricted by a mask
+- visu3DCubeExtrudedWithAxis(): volume restricted by a mask
 \image html  cubeExtruded2.png
-- some planes
+- visu3DSlice(): 2d slices in 3d
 \image html planegl.png
-- marching cube
+- visu3DMarchingCube(): marching cube
 \image html marchingcube.png
 
 In python code, we have:

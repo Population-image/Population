@@ -8,12 +8,13 @@ using namespace pop;//Population namespace
 void SectionI_GaussianField(){
     Mat2UI8 img;//2d grey-level image object
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/CTG.pgm"));//replace this path by those on your computer
+
     img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
     int value;
-    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);
+    Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//segmentation
     threshold.display("initial",false);
-    threshold = Processing::greylevelRemoveEmptyValue(threshold);
-    Mat2F32 m_field_field_correlation_experimental =Analysis::correlation(threshold,200);
+    threshold = Processing::greylevelRemoveEmptyValue(threshold);//pixel value of the pore space = 0 and  pixel value of the matrix space = 1
+    Mat2F32 m_field_field_correlation_experimental =Analysis::correlation(threshold,200);//2-point correlation function
     m_field_field_correlation_experimental = m_field_field_correlation_experimental.deleteCol(1);//remove the pore-pore correlation function in the first column
     m_field_field_correlation_experimental.saveAscii("CTG_field_field_correlation_experimental.m");
     Mat3F32 m_gaussian_field;
@@ -28,7 +29,6 @@ void SectionI_GaussianField(){
     }
 
     Scene3d scene;
-
     Visualization::marchingCubeSmooth(scene,m_U_bin);
     Visualization::lineCube(scene,m_U_bin);
     scene.display();
@@ -36,31 +36,32 @@ void SectionI_GaussianField(){
 
 void SectionI_Annealing(){
     Mat2UI8 threshold;//2d grey-level image object
-    threshold.load(POP_PROJECT_SOURCE_DIR+std::string("/image/meb_A_675_7j.png"));//replace this path by those on your computer
-    threshold = GeometricalTransformation::subResolution(threshold,4);
+    threshold.load(POP_PROJECT_SOURCE_DIR+std::string("/image/meb_A_675_7j.png"));
+    threshold = GeometricalTransformation::subResolution(threshold,2);
     threshold = Processing::greylevelRemoveEmptyValue(threshold);
-    Visualization::labelToRandomRGB(threshold).display();
+    Visualization::labelToRandomRGB(threshold).display("initial",false,false);
     Mat2F32 volume_fraction = Analysis::histogram(threshold);
     //2D case
     {
 
-        Vec2I32 v(256,256);
-        Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-        RandomGeometry::annealingSimutated(random,threshold);
-        Visualization::labelToRandomRGB(random).display();
+        //Vec2I32 v(256,256);
+        //Mat2UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
+        //RandomGeometry::annealingSimutated(random,threshold);
+        //Visualization::labelToRandomRGB(random).display("2d reconstruction",false,false);
     }
     //3D case (expensive process)
     {
-        Vec3I32 v(256,256,256);
+        std::cout<<"Long computation time around 2 hours"<<std::endl;
+        Vec3I32 v(128,128,128);
         Mat3UI8 random = RandomGeometry::randomStructure(v,volume_fraction);
-        RandomGeometry::annealingSimutated(random,threshold,10);
-        Mat2F32 m_field_field_annealing_model = Analysis::correlation(random,200);
+        RandomGeometry::annealingSimutated(random,threshold,8,60);
+        Mat2F32 m_field_field_annealing_model = Analysis::correlation(random,60);
         m_field_field_annealing_model = m_field_field_annealing_model.deleteCol(1);//remove the pore-pore correlation function in the first column
         m_field_field_annealing_model.saveAscii("CTG_field_field_annealing_model.m");
 
         random.save("annealing.pgm");
         Scene3d scene;
-        Visualization::marchingCubeSmooth(scene,random);
+        Visualization::cubeExtruded(scene,random);
         Visualization::lineCube(scene,random);
         scene.display();
     }
@@ -481,18 +482,18 @@ void SectionII_Model_ShotNoise(){
     // aborigenart.save("/home/vincent/Desktop/Population/doc/image/AborigenLena.bmp");
 }
 void SectionII_Model_LatticeToContinious(){
-    F32 porosity=0.5;
-    F32 radiusmin=5;
-    F32 radiusmax=10;
+    F32 porosity=0.6;
+    F32 radiusmin=10;
+    F32 radiusmax=20;
     DistributionUniformReal duniform_radius(radiusmin,radiusmax);
 
-    F32 angle=10*PI/180;//10 degre
+    F32 angle=15*PI/180;
     DistributionDirac ddirar_angle(angle);
 
     F32 moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
     //8*E^3(R)/E^3(std::cos(theta))
     F32 volume_expectation = moment_order3*8./(std::pow(std::cos(angle),3.0));
-    Vec3F32 domain(1024);//3d field domain
+    Vec3F32 domain(256);//3d field domain
     F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
     ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
 
@@ -502,39 +503,132 @@ void SectionII_Model_LatticeToContinious(){
     std::cout<<"time execution "<<time(NULL)-time1 <<std::endl;
     lattice.save("big_size.pgm");
 
-//    Mat2F32 m=  Analysis::histogram(lattice);
-//    std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
+    Mat2F32 m=  Analysis::histogram(lattice);
+    std::cout<<"Realization porosity"<<m(0,1)<<std::endl;
 
-//    Scene3d scene;
-//    Visualization::marchingCube(scene,lattice);
-//     scene.setColorAllGeometricalFigure(RGBUI8(100,100,100));
-//    Visualization::lineCube(scene,lattice);
-//    scene.display();
+    Scene3d scene;
+    Visualization::marchingCube(scene,lattice);
+    scene.setColorAllGeometricalFigure(RGBUI8(100,100,100));
+    Visualization::lineCube(scene,lattice);
+    scene.display();
 }
-int main()
+
+
+struct GenerateMicrostructure
 {
 
-            //    SectionI_GaussianField();
-            //    SectionI_Annealing();
+    Mat2F32 correlationToNormalizedCorrelation(Mat2F32 correlation){
+        Mat2F32 correlation_normalized(correlation);
+        F32 phi = correlation(0,1);
+        for(unsigned int i=0;i<correlation.sizeI();i++){
+            correlation_normalized(i,1)=(correlation(i,1)-phi*phi)/(phi-phi*phi);
+        }
+        return correlation_normalized;
+
+    }
+    Mat3UI8 generateRealization(F32 porosity,Distribution & d){
+
+        F32 moment_order_3= pop::Statistics::moment(d,3,0,50);
+        F32 angle=15*PI/180.;//15 degre
 
 
-            //    SectionII_PoissonPointProcess();
-            //    SectionII_MaternFilter();
-            //    SectionII_MinOverlap();
-            //    SectionII_Voronoi();
-            //    SectionII_EulerAngle();
-            //    SectionII_ProbabilityDistributionDirection_Fix();
-            //    SectionII_ProbabilityDistributionDirection_Random();
-            //    SectionII_ProbabilityDistribution_Normal();
-            //    SectionII_ProbabilityDistribution_Power();
+        //8*E^3(R)/E^3(std::cos(theta))
+        F32 volume_expectation = moment_order_3*8./(std::pow(std::cos(angle),3.0));
+        Vec3F32 domain(128,128,128);//2d field domain
+        F32 lambda=-std::log(porosity)/std::log(2.718)/volume_expectation;
 
-            //    SectionII_Sphere();
-            //   SectionII_Ellipse();
-            //    SectionII_Cylinder();
-            //    SectionII_Box();
-            //    SectionII_Rhombohedra();
-            //    SectionII_RegularTetrahedron();
-            SectionII_Model_LatticeToContinious();
+        ModelGermGrain3 grain = RandomGeometry::poissonPointProcess(domain,lambda);//generate the 2d Poisson point process
+        DistributionDirac dirar_angle(angle);
+        RandomGeometry::rhombohedron(grain,d,dirar_angle);
+        return RandomGeometry::continuousToDiscrete(grain);
+    }
+
+    F32 distanceCorrelation(Mat2F32 correlation_realization_normalized, Mat2F32 correlation_expected_normalized ){
+        F32 sum=0;
+        for(unsigned int j=0;j<std::min(correlation_realization_normalized.sizeI(),correlation_expected_normalized.sizeI());j++){
+            sum+=std::abs(correlation_realization_normalized(j,1)-correlation_expected_normalized(j,1));
+        }
+        return sum;
+    }
+
+    Mat3UI8 generateMicrosturcture(Mat2F32 correlation_experimental){
+
+        Mat2F32 correlation_experimental_normalized = correlationToNormalizedCorrelation(correlation_experimental);
+        int radius_min;
+        F32 dist_max=std::numeric_limits<F32>::max();
+        for(unsigned int radius=5;radius<50;radius++){
+            DistributionDirac d(radius);
+            Mat3UI8 realization = generateRealization(correlation_experimental(0,1),d);
+            realization = Processing::greylevelRemoveEmptyValue(realization);
+            Mat2F32 correlation_realization = Analysis::correlation(realization);
+            Mat2F32 correlation_realization_normalized = correlationToNormalizedCorrelation(correlation_realization);
+            F32 dist_temp = distanceCorrelation(correlation_experimental_normalized,correlation_realization_normalized);
+            if(dist_temp<dist_max){
+                radius_min=radius;
+                dist_max = dist_temp;
+            }
+            std::cout<<"for radius="<<radius<<", the distance = "<<dist_temp<<std::endl;
+        }
+        std::cout<<"radius min"<<std::endl;
+        DistributionDirac d(radius_min);
+        return generateRealization(correlation_experimental(0,1),d);
+    }
+};
+
+void SectionIII_Model_Correlation(){
+
+    Mat3UI8 m;
+    m.load("/media/tariel/5ee29f74-2a42-4cd5-8562-be01b51ee876/home/vincent/Desktop/WorkSegmentation/RockANU/SLB13/SLB_AU13.pgm");
+    Mat2UI8 plane = GeometricalTransformation::plane(m,10);
+    plane = PDE::nonLinearAnisotropicDiffusion(plane);
+    int value;
+    plane = Processing::thresholdOtsuMethod(plane,value);
+
+    plane = Processing::greylevelRemoveEmptyValue(plane);
+    Mat2F32 correlation_exprerimental= Analysis::correlation(plane);
+
+    GenerateMicrostructure generate;
+    //Mat3UI8 m_model_boolean = generate.generateMicrosturcture(correlation_exprerimental);
+
+
+
+    Mat2F32 correlation_exprerimental_matrix = correlation_exprerimental.deleteCol(1);//remove the pore-pore correlation function in the first column
+
+    //Mat3F32 m_gaussian_field;
+    //Mat3UI8 m_model_gaussian_field =RandomGeometry::gaussianThesholdedRandomField(correlation_exprerimental_matrix,256,m_gaussian_field);
+
+    Mat2F32 volume_fraction = Analysis::histogram(plane);
+    Vec3I32 domain(256,256,256);
+    Mat3UI8 m_model_annealing_field = RandomGeometry::randomStructure(domain,volume_fraction);
+    RandomGeometry::annealingSimutated(m_model_annealing_field,plane,10);
+    //Processing::greylevelRange(m_model_annealing_field,0,255).display();
+    m_model_annealing_field.save("annealing_rock.pgm");
+}
+
+int main()
+{
+    SectionIII_Model_Correlation();
+    //##UNCOMMENT EACH SECTION BY EACH SECTION BECAUSE THE PROGRAM STOP WHEN YOU CLOSE THE OPENGL WINDOW
+
+    //SectionI_GaussianField();
+    //SectionI_Annealing();
+    //SectionII_PoissonPointProcess();
+    //    SectionII_MaternFilter();
+    //    SectionII_MinOverlap();
+    //    SectionII_Voronoi();
+    //    SectionII_EulerAngle();
+    //    SectionII_ProbabilityDistributionDirection_Fix();
+    //    SectionII_ProbabilityDistributionDirection_Random();
+    //    SectionII_ProbabilityDistribution_Normal();
+    //    SectionII_ProbabilityDistribution_Power();
+
+    //    SectionII_Sphere();
+    //   SectionII_Ellipse();
+    //    SectionII_Cylinder();
+    //    SectionII_Box();
+    //    SectionII_Rhombohedra();
+    //    SectionII_RegularTetrahedron();
+    //        SectionII_Model_LatticeToContinious();
     //    SectionII_Model_DeadLeave();
 
     //   SectionII_Model_Transparency();

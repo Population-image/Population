@@ -24,11 +24,11 @@ public:
 
 
     virtual bool intersectionPoint(const VecN<DIM,F32> &    )  {
-        std::cout<<"you are in the master class for the method intersction VecN"<<std::endl;
+        std::cout<<"No intersection with point"<<std::endl;
         return true;
     }
     virtual F32 getRadiusBallNorm0IncludingGrain(){
-        std::cout<<"you are in the master class radius"<<std::endl;
+        std::cout<<"No intersection with point"<<std::endl;
         return true;
     }
     virtual Germ<DIM> * clone()const{

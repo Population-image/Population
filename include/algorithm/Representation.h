@@ -288,7 +288,7 @@ struct POP_EXPORTS Representation
             ComplexF32 *line = data.data()+i*data.sizeJ();
             fft.apply(line->data(),data.sizeJ(),way);
         }
-        ComplexF32 t[data.sizeI()];
+        ComplexF32* t = new ComplexF32[data.sizeI()];
         for(unsigned int j=0;j<data.sizeJ();j++){
             unsigned int position =j;
             for(unsigned int i=0;i<data.sizeI();i++){
@@ -302,6 +302,7 @@ struct POP_EXPORTS Representation
                 position+=data.sizeJ();
             }
         }
+		delete[] t;
         return data;
     }
     static inline Mat3ComplexF32 FFT(const Mat3ComplexF32 & f,FFT_WAY way=FFT_FORWARD) {
@@ -314,7 +315,7 @@ struct POP_EXPORTS Representation
                 fft.apply(line->data(),data.sizeJ(),way);
             }
         }
-        ComplexF32 t[data.sizeI()];
+		ComplexF32* t = new ComplexF32[data.sizeI()];
         for(unsigned int j=0;j<data.sizeJ();j++){
             for(unsigned int k=0;k<data.sizeK();k++){
                 unsigned int position =j+k*data.sizeJ()*data.sizeI();
@@ -330,7 +331,8 @@ struct POP_EXPORTS Representation
                 }
             }
         }
-        ComplexF32 t2[data.sizeI()];
+		delete[] t;
+		ComplexF32* t2 = new ComplexF32[data.sizeI()];
         for(unsigned int i=0;i<data.sizeI();i++){
             for(unsigned int j=0;j<data.sizeJ();j++){
                 unsigned int position =j+i*data.sizeI();
@@ -346,6 +348,7 @@ struct POP_EXPORTS Representation
                 }
             }
         }
+		delete[] t2;
         return data;
     }
     static inline MatN<1,ComplexF32> FFT(MatN<1,ComplexF32> & f ,FFT_WAY way=FFT_FORWARD)
@@ -505,7 +508,7 @@ struct POP_EXPORTS Representation
     static void truncatePower2(const MatN<DIM,PixelType>& in, MatN<DIM,PixelType>& out){
         VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
-            x(i) = (1<<(int)std::floor(std::log(in.getDomain()(i))/std::log(2)));
+            x(i) = (1<<(int)std::floor(std::log(static_cast<float>(in.getDomain()(i)))/std::log(static_cast<float>(2))));
         }
         __resize(in,out,x,x);
     }
@@ -513,7 +516,7 @@ struct POP_EXPORTS Representation
     static void upPower2(const MatN1& in,MatN<DIM,PixelType> &out){
         VecN<DIM,I32> x;
         for(int i=0;i<DIM;i++){
-            x(i) = 1<<(int)(std::floor(std::log(in.getDomain()(i))/std::log(2))+1);
+            x(i) = 1<<(int)(std::floor(std::log(static_cast<float>(in.getDomain()(i)))/std::log(static_cast<float>(2)))+1);
         }
         __resize(in,out,x,in.getDomain());
     }

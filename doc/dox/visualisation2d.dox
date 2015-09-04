@@ -50,7 +50,7 @@ field = Processing::voronoiTesselationEuclidean(field);//#voronoi tesselation wi
 Mat2RGBUI8 voronoi = Visualization::labelToRandomRGB(field);
 voronoi.display();
 \endcode
-
+\image html voronoi2eucl.png
 C++ code
 \include visualization2d.cpp
 Pyton code

@@ -1,10 +1,10 @@
 /*! \page pagefirststep First step
 
-This first step explains how to write your first program. This program
-- loads a image,
+This first step explains how to write your first program:
+- load a image,
 - filter the noise,
-- segments the granular phase,
-- displays and save the result.
+- segment the granular phase,
+- display and save the result.
 
 <!--In this presentation, you use the C++ language and you find the python, Java translation at the end of the page.  -->
 

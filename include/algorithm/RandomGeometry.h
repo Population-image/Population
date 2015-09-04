@@ -492,7 +492,7 @@ public:
     F32 radiusmax=30;
     DistributionUniformReal duniform_radius(radiusmin,radiusmax);
 
-    F32 angle=10*PI/180;//10 degre
+    F32 angle=15*PI/180.;//15 degre
     DistributionDirac ddirar_angle(angle);
 
     F32 moment_order3 = pop::Statistics::moment(duniform_radius,3,0,40);
@@ -517,7 +517,7 @@ public:
     * \endcode
     * \image html rhombohedron.png
     */
-    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution& distradius,const Distribution& distangle, const DistributionMultiVariate& distorientation=DistributionMultiVariateProduct(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI)) );
+    static void  rhombohedron( pop::ModelGermGrain3 & grain,const Distribution& distradius,const Distribution& distangle=DistributionDirac(15*PI/180), const DistributionMultiVariate& distorientation=DistributionMultiVariateProduct(DistributionUniformReal(0,PI),DistributionUniformReal(0,PI),DistributionUniformReal(0,PI)) );
 
     /*!
     * \brief dress the germs with cylinder
@@ -904,9 +904,6 @@ private:
         {
             F32 v1 = rand()*1.f/RAND_MAX;
             F32 v2 = std::exp((energycurrent-energynext)*temperature_inverse);
-//            F32 v3 = std::exp((energycurrent-energynext)*2*temperature_inverse);
-//            std::cout<<v2<<std::endl;
-//            std::cout<<v3<<std::endl;
             if(v1<v2)
                 return true;
             else
@@ -1389,12 +1386,11 @@ ModelGermGrain<DIM>  RandomGeometry::poissonPointProcess(VecN<DIM,F32> domain,F3
 {
 
     DistributionPoisson d(lambda*domain.multCoordinate());
-    int nbr_VecNs = d.randomVariable();
-    std::cout<<"Poisson Point process number of germs "<< nbr_VecNs<<std::endl;
+    int nbr_germs = d.randomVariable();
     ModelGermGrain<DIM> grain;
     grain.setDomain(domain);
     DistributionUniformReal rx(0,1);
-    for(int i =0;i<nbr_VecNs;i++)
+    for(int i =0;i<nbr_germs;i++)
     {
         Germ<DIM> * g = new Germ<DIM>();
         VecN<DIM,F32> x;
@@ -1755,8 +1751,6 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
         }
     }
     F32 init_temp= temperature_inverse;
-    std::cout<<"Correlation lenght "<<lengthcorrelation<<std::endl;
-    std::cout<<"Inverse temperature "<<temperature_inverse<<std::endl;
     MatN<DIM2,UI8> ref= Processing::greylevelRemoveEmptyValue(img_reference);
     model= Processing::greylevelRemoveEmptyValue(model);
     Mat2F32 m = Analysis::histogram(ref);
@@ -1764,22 +1758,21 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
 
 
 
-
+    std::cout<<"tables of correlation"<<std::endl;
     Vec<Vec< Vec<int> > > vref = RandomGeometry::autoCorrelation(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodel = RandomGeometry::autoCorrelation(model,lengthcorrelation,nbrphase);
-
     Vec<Vec< Vec<int> > > vref_diag = RandomGeometry::autoCorrelationDiago(ref,lengthcorrelation,nbrphase);
     Vec<Vec< Vec<int> > > vmodel_diag = RandomGeometry::autoCorrelationDiago(model,lengthcorrelation,nbrphase);
-
-    Vec<Vec< Vec<int> > > vrefcross = RandomGeometry::autoCorrelationCross(ref,lengthcorrelation,nbrphase);
-    Vec<Vec< Vec<int> > > vmodelcross = RandomGeometry::autoCorrelationCross(model,lengthcorrelation,nbrphase);
-
+    Vec<Vec< Vec<int> > > vrefcross,vmodelcross;
+    if(nbrphase>2){
+        vrefcross = RandomGeometry::autoCorrelationCross(ref,lengthcorrelation,nbrphase);
+       vmodelcross = RandomGeometry::autoCorrelationCross(model,lengthcorrelation,nbrphase);
+    }
     int count=0;
     F32 energy_current =10000;
 
     MatNDisplay d;
-
-
+    std::cout<<"Anneling simulation starts. For 3D case, we display a slice of the 3d simulation"<<std::endl;
     typename MatN<DIM1,UI8>::IteratorENeighborhood it(model.getIteratorENeighborhood(1,0));
     while(nbr_permutation_by_pixel>count*1.0/model.getDomain().multCoordinate()){
         typename MatN<DIM1,UI8>::E p1,p2;
@@ -1816,34 +1809,44 @@ void RandomGeometry::annealingSimutated(MatN<DIM1,UI8> & model,const MatN<DIM2,U
 
         RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p1,state2);
         RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p1,state2);
-        RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state2);
+        if(nbrphase>2){
+            RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state2);
+        }
         model(p1)=state2;
 
         RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p2,state1);
         RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p2,state1);
-        RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state1);
+        if(nbrphase>2){
+            RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state1);
+        }
         model(p2)=state1;
         F32 energytemp=0;
         energytemp+= RandomGeometry::energy(vref,vmodel);
-        energytemp+= RandomGeometry::energy(vrefcross,vmodelcross);
         energytemp+= RandomGeometry::energy(vref_diag,vmodel_diag);
+        if(nbrphase>2){
+            energytemp+= RandomGeometry::energy(vrefcross,vmodelcross);
+        }
         temperature_inverse+=init_temp;
-       if(annealingSimutatedLaw(energytemp, energy_current,temperature_inverse)==false){
-       // if(energytemp>= energy_current){
+        if(annealingSimutatedLaw(energytemp, energy_current,temperature_inverse)==false){
+            // if(energytemp>= energy_current){
 
             RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p1,state1);
             RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p1,state1);
-            RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state1);
+            if(nbrphase>2){
+                RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p1,state1);
+            }
             model(p1)=state1;
             RandomGeometry::switch_state_pixel(vmodel,model,lengthcorrelation,p2,state2);
             RandomGeometry::switch_state_pixel_diago(vmodel_diag,model,lengthcorrelation,p2,state2);
-            RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state2);
+            if(nbrphase>2){
+                RandomGeometry::switch_state_pixel_cross(vmodelcross,model,lengthcorrelation,p2,state2);
+            }
             model(p2)=state2;
         }else{
             energy_current = energytemp;
         }
 
-        if(count%(model.getDomain().multCoordinate()/10)==0){
+        if(count%(model.getDomain().multCoordinate()/100)==0){
             std::cout<<"annealingSimutated E="<<energy_current<<" and nbr permutation per pixel(voxel)="<<count*1.0/model.getDomain().multCoordinate()<<std::endl;
             d.display(Visualization::labelToRandomRGB(model));
         }

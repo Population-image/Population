@@ -49,8 +49,9 @@ public:
 
     /*!
      \brief generic constructor of the different implementations of Video, e.g., VideoVLC if impl==VLC or VideoFFMPEG if imple==FFMPEG.
+     \param debug: if true, then use vlc logger (verbose mode 3) or ffmpeg logger
     */
-    static Video* create(VideoImpl impl);
+    static Video* create(VideoImpl impl, bool debug=false);
 
     /*!
     \brief destructor

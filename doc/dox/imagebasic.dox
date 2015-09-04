@@ -1,44 +1,40 @@
 /*! \page pageimagebasic  Some basic definitions
 
 
-\section SomeDefinition Formal definitions
 
-\subsection FormalDefinition Definition of a function
-The idea of a function, \f$f\f$, as a matrix, is that the input quantity completely determines the output quantity. The input quantity belongs to a space \f$E\f$ and the output to the space \f$F\f$: \f[ \begin{matrix}  f\colon   \mathcal{D}\subset E & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
+\section FormalDefinition Function definition
+The idea of a function, \f$f\f$, as a matrix, is that the input quantity completely determines the output quantity. The input quantity belongs to a space \f$E\f$ and the output to a space \f$F\f$: \f[ \begin{matrix}  f\colon   \mathcal{D}\subset E & \to& F \\ x & \mapsto& y = f(x) \end{matrix} \f]
 with \f$\mathcal{D}\f$ a subset of \f$E\f$ that is the domain of definition of the function.
 
-\subsection MatrixDefinition Definition of a Matrix as a special case of a function
-For the special case of a matrix, the definition is 
+\section MatrixDefinition Matrix definition
+A matrix (e.g. an image) is a special case of a Function: 
 - \f$\mathcal{D}\subset E \f$ : a  matrix is a regular tessellation of a domain of the n-dimensional euclidean space where each cell is a n-square (a square in 2-dimension called pixel, a cube in 3-dimension called  voxel). A cell is located with n integers. In 2d, we have 2 integers \f$(i,j)\in\mathbb{Z}^2\f$ representing the i-th row and the j-th column in the matrix convention (so \f$E=\mathbb{Z}^2\f$). In 3d, 3 integers \f$(i,j,k)\f$ representing the i-th row,  the j-th column, and the k-th depth. The domain of definition is the number of rows and columns of a matrix. 
 
-- \f$F\f$ : To access the pixel value, we call the function f(i,j). For a gray-level matrix, this value is a grey-level. This grey-level is usually coded in one byte representing the range (0, 28 −1) = (0, 255) where the value 0 represents the black colour, 255 the white colour, and any value between (0, 255) a
+- \f$F\f$ : To access the pixel value, we call the function f(i,j). For a grey-level matrix, this value is a grey-level. This grey-level is usually coded in one byte representing the range (0, 28 −1) = (0, 255) where the value 0 represents the black colour, 255 the white colour, and any value between (0, 255) a
  fraction between both colours.
-
-In Population library, an image is a matrix.  
 
 \image html grid3.png Left: 2D  matrix with 6 rows and 5 columns with a pixel type coded in one byte, right: grey-level representation
 
 
-\section StartCoding MatN
-\subsection MatrixStructure Matrix structure
+\section MatrixStructure MatN data-structure
 
-The matrix class, MatN<Dim,PixelType>, (see \ref MatN)  is written in generic programming with template parameters. The first one is the dimension, the second one the pixel/voxel type. For a
+The templated matrix class, MatN<Dim,PixelType>, (see \ref MatN)  is written in generic programming with template parameters. The first one is the dimension, the second one the pixel/voxel type. For a
 ready-to-use utilisation, we use some typedef declarations to define the usual types to allow coding in C-style as these ones:
     - Mat2UI8: a 2d matrix with a pixel type coded in 1 byte for an unsigned integer between 0 and 255,  (Mat2UI8=MatN<2,UI8>)
     - Mat2RGBUI8: a 2d matrix with a pixel type coded with a \ref RGB color with 1 byte per channel, (Mat2UI8=MatN<2,RGBUI8>)
-    - Mat2F64: a 2d matrix with a pixel type coded in float type,
-    - Mat2UI32: a 2d matrix with a pixel type coded in unsigned integer in 4 bytes,
+    - Mat2F32: a 2d matrix with a pixel type coded in float type,
+    - Mat2UI16: a 2d matrix with a pixel type coded in unsigned integer in 2 bytes,
     - Mat3UI8: a 3d matrix with a pixel type coded in 1 byte for an unsigned integer between 0 and 255.
 
-\subsection AccessingPixel Accessing pixel intensity values
+\section AccessingPixel Accessing pixel intensity values
 
-In order to get pixel intensity value, you have to know the pixel-type of an matrix. Here is an example for a grey-image image (type Mat2UI8) and pixel coordinates i and j:
+The pixel intensity value is defined by its type. For instance a grey-image image (type Mat2UI8) we can the  pixel coordinates i and j as follows:
 \code
     Mat2UI8 m(10,10);//create a 2d matrix with 10-row and the 10-columns and with UI8 pixel type (0,1,2...,255)
     int i=4;
     int j=6;
-    UI8 intensity = 200;//set the intensity at 200
-    m(i,j) = intensity;//set the pixel value at 200
+    UI8 intensity = 200;//set a value at 200
+    m(i,j) = intensity;//set a pixel value at 200
     intensity = m(i,j);//access the pixel value at 4-row and the 6-column
     std::cout<<m<<std::endl;
 \endcode
@@ -49,7 +45,7 @@ Alternatively, you can use the following notation with a 2-d vector (see \ref Ve
     m(x) = 2.45;//set the pixel value at 2.45
     std::cout<<m<<std::endl;
 \endcode
-Now let us consider a 3 channel image with RGB color ordering:
+Now let us consider a color image with RGB color ordering:
 \code
     Mat2RGBUI8 m(10,8);//create a 2d matrix with rgb pixel type
     Vec2I32 x(4,6);

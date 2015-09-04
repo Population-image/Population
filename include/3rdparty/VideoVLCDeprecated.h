@@ -28,7 +28,7 @@ private:
     pop::Mat2RGBUI8 imgcolor;
         bool _isfile;
 public:
-    VideoVLCDeprecated();
+    VideoVLCDeprecated(bool vlc_debug=false);
     VideoVLCDeprecated(const VideoVLCDeprecated& vlc);
     virtual ~VideoVLCDeprecated();
     bool open(const std::string & filename);

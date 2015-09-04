@@ -52,24 +52,7 @@ MatN<DIM,PixelType> erosion1(const MatN<DIM,PixelType> & m, double radius, int n
     return m_ero;
 }
 \endcode
-In the previous code, the global iteration is done on the domain of the matrix and the local iteration is done on a ball.  We will extend this code to call this algorithm whatever the global iteration or the local iteration. Therefore, they become template parameters.
-\code  
-template<int DIM,typename PixelType,typename IteratorEGlobal,typename IteratorELocal>
-MatN<DIM,PixelType> erosion2(const MatN<DIM,PixelType> & m, IteratorEGlobal it_global, IteratorELocal it_local){
-    MatN<DIM,PixelType> m_ero(m);
-   //Global scan
-    while(it_global.next()){
-        PixelType value = pop::NumericLimits<PixelType>::maximumRange();
-        it_local.init(it_global.x());
-        //local scan
-        while(it_local.next()){
-            value = pop::minimum(value,m(it_local.x()));
-        }
-        m_ero(it_global.x())=value;
-    }
-    return m_ero;
-}
-\endcode
+
 C++ code:
 \include iterator_matrix.cpp
 */

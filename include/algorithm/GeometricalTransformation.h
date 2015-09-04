@@ -129,25 +129,46 @@ struct POP_EXPORTS GeometricalTransformation
         }
         return line_;
     }
-
-    template<int DIM>
-    struct _FunctorScale
+    template<  typename PixelType,typename Interpolation>
+    static MatN<2,PixelType> _scale(const MatN<2,PixelType> & f,const VecN<2,F32> & scale,Interpolation )
     {
-        VecN<DIM,F32> _alpha;
-        MatNInterpolation _interpolation;
-        _FunctorScale(VecN<DIM,F32> alpha,MatNInterpolation interpolation)
-            :_alpha(alpha),_interpolation(interpolation){}
-        template<typename PixelType>
-        PixelType operator()(const MatN<DIM,PixelType> & f , const typename MatN<DIM,PixelType>::E itx){
-            VecN<DIM,F32> x;
-            x=(VecN<DIM,F32>(itx)-0.5)*_alpha;
-            if(_interpolation.isValid(f.getDomain(),x)){
-                return _interpolation.apply(f,x);
-            }else{
-                return PixelType();
+
+        Vec2I32 domain (scale*VecN<2,F32>(f.getDomain()));
+        MatN<2,PixelType> temp(domain);
+        Vec2F32 alpha = Vec2F32(1.f,1.f)/scale;
+        Vec2I32 x (0,0);
+        Vec2F32 x_f (-0.4999f,-0.4999f);
+
+        for(x(0)=0;x(0)<(int)temp.sizeI();x(0)++,x_f(0)+=alpha(0)){
+            x_f(1)=-0.4999f;
+            for(x(1)=0;x(1)<(int)temp.sizeJ();x(1)++,x_f(1)+=alpha(1)){
+                temp(x)= Interpolation::apply(f,x_f);
             }
         }
-    };
+        return temp;
+    }
+    template<  typename PixelType,typename Interpolation>
+    static MatN<3,PixelType> _scale(const MatN<3,PixelType> & f,const VecN<3,F32> & scale,Interpolation )
+    {
+
+        Vec3I32 domain (scale*VecN<2,F32>(f.getDomain()));
+        MatN<3,PixelType> temp(domain);
+        Vec3F32 alpha = Vec2F32(1.f,1.f)/scale;
+        Vec3I32 x (0,0,0);
+        Vec3F32 x_f (-0.4999f,-0.4999f,-0.4999f);
+
+        for(x(0)=0;x(0)<(int)temp.sizeI();x(0)++,x_f(0)+=alpha(0)){
+            x_f(1)=-0.4999f;
+            for(x(1)=0;x(1)<(int)temp.sizeJ();x(1)++,x_f(1)+=alpha(1)){
+                x_f(2)=-0.4999f;
+                for(x(2)=0;x(2)<(int)temp.sizeK();x(2)++,x_f(2)+=alpha(2)){
+                    temp(x)= Interpolation::apply(f,x_f);
+                }
+            }
+        }
+        return temp;
+    }
+
     /*!
      * \brief scale the image
      * \param scale vector of scale factor
@@ -167,18 +188,18 @@ struct POP_EXPORTS GeometricalTransformation
      * \image html Lenascale.png
     */
     template<int DIM,  typename PixelType>
-    static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolation interpolation=MATN_INTERPOLATION_BILINEAR)
-    {
-
-        typename MatN<DIM,PixelType>::Domain domain (scale*VecN<DIM,F32>(f.getDomain()));
-        MatN<DIM,PixelType> temp(domain);
-        VecN<DIM,F32> alpha = VecN<DIM,F32>(1.f)/scale;
-        _FunctorScale<DIM> func(alpha,interpolation);
-        typename MatN<DIM,PixelType>::IteratorEDomain it = temp.getIteratorEDomain();
-        forEachFunctorBinaryFunctionE(f,temp,func,it);
-
-        return temp;
+    static MatN<DIM,PixelType> scale(const MatN<DIM,PixelType> & f,const VecN<DIM,F32> & scale,MatNInterpolationType interpolation=MATN_INTERPOLATION_NEAREST ){
+        if(interpolation==MATN_INTERPOLATION_NEAREST){
+            return _scale(f,scale,MatNInterpolationNearest());
+        }else{
+            return _scale(f,scale,MatNInterpolationBiliniear());
+        }
     }
+
+
+
+
+
     /*!
     \brief rotate the input matrix with an angle plus or minus PI/2
     \param f  input function
@@ -342,12 +363,12 @@ struct POP_EXPORTS GeometricalTransformation
             dist_sum+=distance;
             number++;
         }
-        //F32 standard_deviation = std::sqrt(dist_sum/number);
+        F32 standard_deviation = std::sqrt(dist_sum/number);
 
         it.init();
         while(it.next()){
             for(unsigned int i=0;i<DIM;i++)
-                dist(i)(it.x())*=(alpha);///standard_deviation);
+                dist(i)(it.x())*=(alpha/standard_deviation);
         }
         MatN<DIM,Type> mdist(Img.getDomain());
         it.init();

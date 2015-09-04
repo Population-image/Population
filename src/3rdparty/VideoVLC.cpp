@@ -83,14 +83,20 @@ static void on_event_vlc(const libvlc_event_t* event, void* data) {
     }
 }
 
-VideoVLC::VideoVLC()
+VideoVLC::VideoVLC(bool vlc_debug)
 {
     char const *vlc_argv[] =
     {
         "--no-audio", /* skip any audio track */
         "--no-xlib", /* tell VLC to not use Xlib */
+        /* Logging things must be at the end of the array */
+        "--verbose=3",
+        "--extraintf=logger",
     };
     int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
+    if (!vlc_debug) {
+        vlc_argc -= 2;
+    }
 
     if ((instance = libvlc_new(vlc_argc, vlc_argv)) == NULL) {
         std::cerr << "[VideoVLC::new] libvlc_new() error" << std::endl;
@@ -182,11 +188,7 @@ bool VideoVLC::open(const std::string & path){
     isplaying = true;
     my_index = 0;
 
-#if Pop_OS==2
-    Sleep(100);
-#elif Pop_OS==1
-    usleep(100000);
-#endif
+    pop::BasicUtility::sleep_ms(100);
     return (!context->encoutered_error);
 }
 
@@ -194,11 +196,7 @@ bool VideoVLC::grabMatrixGrey(){
     bool ret = false;
 
     while (!context->playing_started && !context->encoutered_error) {
-#if Pop_OS==2
-        Sleep(10);
-#elif Pop_OS==1
-        usleep(10000);
-#endif
+        pop::BasicUtility::sleep_ms(10);
     }
 
     if (context->encoutered_error) {
@@ -213,12 +211,7 @@ bool VideoVLC::grabMatrixGrey(){
                 //std::cout << "VIDEO STOPPED PLAYING!!!" << std::endl;
                 return false;
             } else if(!_isfile){
-#if Pop_OS==2
-                Sleep(10);
-#endif
-#if Pop_OS==1
-                usleep(10000);
-#endif
+                pop::BasicUtility::sleep_ms(10);
             }
         }
 

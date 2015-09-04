@@ -69,7 +69,7 @@ struct POP_EXPORTS Arithmetic
      * \endcode
      */
     static inline F32 exposant(F32 value, int base=2){
-        return std::log(value)/std::log(base);
+        return std::log(static_cast<float>(value))/std::log(static_cast<float>(base));
     }
     /*!
      * \brief find q and r for a = b*q + r  with 0<=r<b

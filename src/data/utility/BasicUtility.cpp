@@ -1,4 +1,3 @@
-
 #include<cmath>
 #include"PopulationConfig.h"
 
@@ -21,6 +20,15 @@
 #else
 #include <dirent.h>
 #endif
+
+#if Pop_OS==1
+#include <unistd.h> // usleep
+#elif Pop_OS==2
+#include <windows.h>
+#else
+#error Unknown OS for sleep_ms
+#endif
+
 
 namespace pop
 {
@@ -278,6 +286,17 @@ std::string BasicUtility::getPathSeparator() {
     return "???";
 #endif
 }
+
+void BasicUtility::sleep_ms(int ms) {
+#if Pop_OS==1
+    usleep(ms*1000);
+#elif Pop_OS==2
+    Sleep(ms);
+#else
+#error Unknown OS for sleep_ms
+#endif
+}
+
 UI8 maximum(UI8 v1,UI8 v2){return (std::max)(v1,v2);}
 UI16 maximum(UI16 v1,UI16 v2){return (std::max)(v1,v2);}
 UI32 maximum(UI32 v1,UI32 v2){return (std::max)(v1,v2);}

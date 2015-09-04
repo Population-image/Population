@@ -32,10 +32,9 @@ If something wrong occurs or if you wan to join the community whatever your skil
  
 \section Download Download
 
-The zip with sourceforge https://sourceforge.net/projects/population/ .
-The Git repository:
+The project is hosted in GitHub https://github.com/Population-image/Population . You can download a zip file (buttom right buttom on the github page) or clone the repository:
 \code
-git clone git://69007hpv111117.ikoula.com/Population.git
+git clone git@github.com:Population-image/Population.git
 \endcode
 
 In linux, for opengl visualization, you need glut (for ubuntu distribution sudo apt-get install freeglut3-dev libx11-dev libxmu-dev libxi-dev)
@@ -76,6 +75,12 @@ The more important tutorial is this one  \ref pagefirststep to start coding. The
 \section Theory  Theoritical aspects
 
 A book is freely available <a href="http://www.population-image.fr/PopulationLibrary.pdf">here</a> under a creative Commons license.
+
+
+\section Article
+
+The first one deals with the problem of \ref pagegrainsegmentation   
+
   
 **/
 
