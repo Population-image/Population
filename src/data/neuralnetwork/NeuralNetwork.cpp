@@ -19,8 +19,8 @@ Mat2UI8 MNISTNeuralNetLeCun5::affineDeformation(const Mat2UI8 &m, F32 max_rotati
     DistributionUniformReal d_shear(-max_shear_angle_random*pop::PI/180,max_shear_angle_random*pop::PI/180);
 
 
-    DistributionUniformReal d_scale_vert(1-max_scale_vertical_random/100.,1+max_scale_vertical_random/100.);
-    DistributionUniformReal d_scale_hor (1-max_scale_horizontal_random/100.,1+max_scale_horizontal_random/100.);
+    DistributionUniformReal d_scale_vert(1-max_scale_vertical_random/100.f,1+max_scale_vertical_random/100.f);
+    DistributionUniformReal d_scale_hor (1-max_scale_horizontal_random/100.f,1+max_scale_horizontal_random/100.f);
 
 
     F32 angle = d_rot.randomVariable();
@@ -391,7 +391,9 @@ NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
 }
 
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
-    :NeuralLayerMatrix(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor)),std::floor ( sizej_map_previous/(1.f*sub_scaling_factor)),nbr_map_previous),
+    :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor))),
+                       static_cast<unsigned int>(std::floor ( sizej_map_previous/(1.f*sub_scaling_factor))),
+                       nbr_map_previous),
       _sub_resolution_factor (sub_scaling_factor),
       _istrainable(false)
 {
@@ -432,7 +434,7 @@ void NeuralLayerMatrixMaxPool::forwardCPU(const NeuralLayer& layer_previous){
                             for(unsigned j_r=0;j_r<_sub_resolution_factor;j_r++){
                                 if(value<map_layer_previous(i*_sub_resolution_factor+i_r,j*_sub_resolution_factor+j_r)){
                                     value = map_layer_previous(i*_sub_resolution_factor+i_r,j*_sub_resolution_factor+j_r);
-                                    this->_Y_reference(index_map)(i,j)=i_r*_sub_resolution_factor+j_r;
+                                    this->_Y_reference(index_map)(i,j)=static_cast<F32>(i_r*_sub_resolution_factor+j_r);
                                 }
                             }
                         }
@@ -452,7 +454,7 @@ void NeuralLayerMatrixMaxPool::backwardCPU(NeuralLayer& layer_previous){
             map_layer_previous.fill(0);
             for(unsigned int i=0;i<map_layer.sizeI();i++){
                 for(unsigned int j=0;j<map_layer.sizeJ();j++){
-                    int index =  this->_Y_reference(index_map)(i,j);
+                    int index = static_cast<int>( this->_Y_reference(index_map)(i,j));
                     int i_r,j_r;
                     pop::Arithmetic::euclideanDivision(index,(int)_sub_resolution_factor,i_r,j_r);
                     map_layer_previous(i*_sub_resolution_factor+i_r,j*_sub_resolution_factor+j_r)= map_layer(i,j);
@@ -473,7 +475,9 @@ NeuralLayer * NeuralLayerMatrixMaxPool::clone(){
 
 
 NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
-    :NeuralLayerMatrix(std::floor (  (sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,std::floor (  (sizej_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1,nbr_map),
+    :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  (sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1),
+                       static_cast<unsigned int>(std::floor (  (sizej_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor))+1)
+                       ,nbr_map),
       _W_kernels(nbr_map*nbr_map_previous,Mat2F32(radius_kernel*2+1,radius_kernel*2+1)),
       _W_biais(nbr_map*nbr_map_previous),
       _sub_resolution_factor (sub_scaling_factor),
@@ -481,7 +485,7 @@ NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(u
 {
     //std::cout<<(sizei_map_previous-1-2*radius_kernel)/(1.*sub_scaling_factor)+1<<std::endl;
     //normalize tbe number inverse square root of the connection feeding into the nodes)
-    DistributionNormal n(0,0.001*1.f/((radius_kernel*2+1)*std::sqrt(nbr_map_previous*1.)));
+    DistributionNormal n(0,1.f/((radius_kernel*2+1)*std::sqrt(nbr_map_previous*1.f)));
     for(unsigned int i = 0;i<_W_kernels.size();i++){
         for(unsigned int j = 0;j<_W_kernels(i).size();j++){
             _W_kernels(i)(j)=n.randomVariable();

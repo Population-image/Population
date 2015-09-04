@@ -1510,7 +1510,7 @@ struct POP_EXPORTS Analysis
     }
 
     template<int DIM>
-    static MatN<DIM,UI8>  thinningAtConstantTopologyWire( const MatN<DIM,UI8> & bin,F32 ratio_filter=0.5,int length_edge=3)
+    static MatN<DIM,UI8>  thinningAtConstantTopologyWire( const MatN<DIM,UI8> & bin,F32 ratio_filter=0.5,int length_edge=3,std::string path_euler="/file/topo24.dat")
     {
         MatN<DIM,UI8>  img(bin);
         img = img.opposite();
@@ -1558,7 +1558,8 @@ struct POP_EXPORTS Analysis
                 }
             }
         }
-        pop::Private::Topology<DIM> topo(POP_PROJECT_SOURCE_DIR+std::string("/file/topo24.dat"));
+
+        pop::Private::Topology<DIM> topo(path_euler);
         itg.init();
         while(itg.next()){
             if(label_edge(itg.x())!=0&&v_neight_edge[label_edge(itg.x())]>0&&v_length(label_edge(itg.x()))<length_edge){

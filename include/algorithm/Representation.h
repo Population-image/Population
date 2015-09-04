@@ -116,11 +116,11 @@ struct FFTDanielsonLanczos :public FFTAbtract<T>{
 
         T wtemp,tempr,tempi,wr,wi,wpr,wpi;
         wtemp = sin(pop::PI/N);
-        wpr = -2.0*wtemp*wtemp;
+        wpr = -2.f*wtemp*wtemp;
         wpi = -way*sin(2*pop::PI/N);
 
-        wr = 1.0;
-        wi = 0.0;
+        wr = 1.f;
+        wi = 0.f;
         for (unsigned i=0; i<N; i+=2) {
             tempr = data[i+N]*wr - data[i+N+1]*wi;
             tempi = data[i+N]*wi + data[i+N+1]*wr;
