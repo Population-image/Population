@@ -1,6 +1,6 @@
 import sys
 import os
-PathPop= ""
+PathPop= "D:/Users/vtariel/Desktop/ANV/Population-build/"
 if os.path.isfile(PathPop+"population.py")==0:
     print "set the variable PathPop to the path where you compile population, for instance D:\Users/vtariel/Desktop/ANV/Population-build/. This folder must contain population.py"
     sys.exit(-1)
