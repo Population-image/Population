@@ -87,6 +87,10 @@ Mat2UI8 labelling(Mat2UI8 img,NeuralNet & net, int radius){
    // (Processing::threshold(Processing::distance(m,Processing::threshold(img,125)),1,2)+m).display("seg",true,false);
 }
 
+
+
+
+
 int main()
 {
     int radius= 16;

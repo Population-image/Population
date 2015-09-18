@@ -222,7 +222,7 @@ struct POP_EXPORTS Draw
      * \image html lenarec.jpg
     */
     template<int DIM,typename PixelType>
-    static void rectangle(MatN<DIM,PixelType> &img,const typename  MatN<DIM,PixelType>::E & center,const typename  MatN<DIM,PixelType>::E & size,PixelType value,int widthline=1,F32 angle_radian=0 )
+    static void rectangle(MatN<DIM,PixelType> &img, typename MatN<DIM,PixelType>::E  center, typename  MatN<DIM,PixelType>::E  size,typename MatN<DIM,PixelType>::F value,int widthline=1,F32 angle_radian=0 )
     {
         pop::Mat2F32 mrot = GeometricalTransformation::rotation2D(-angle_radian);
 
