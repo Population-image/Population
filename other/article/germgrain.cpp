@@ -580,6 +580,10 @@ void SectionIII_Model_Correlation(){
     Mat3UI8 m;
     m.load("/media/tariel/5ee29f74-2a42-4cd5-8562-be01b51ee876/home/vincent/Desktop/WorkSegmentation/RockANU/SLB13/SLB_AU13.pgm");
     Mat2UI8 plane = GeometricalTransformation::plane(m,10);
+
+    //for a representative elementary volume inferior to 256 pixels, we scale the image
+    plane = GeometricalTransformation::scale(plane,Vec2F32(0.5,0.5));
+
     plane = PDE::nonLinearAnisotropicDiffusion(plane);
     int value;
     plane = Processing::thresholdOtsuMethod(plane,value);
@@ -599,14 +603,19 @@ void SectionIII_Model_Correlation(){
 
     Mat2F32 volume_fraction = Analysis::histogram(plane);
     Vec3I32 domain(256,256,256);
+
     Mat3UI8 m_model_annealing_field = RandomGeometry::randomStructure(domain,volume_fraction);
-    RandomGeometry::annealingSimutated(m_model_annealing_field,plane,10);
-    //Processing::greylevelRange(m_model_annealing_field,0,255).display();
+    RandomGeometry::annealingSimutated(m_model_annealing_field,plane,8);
+
+
     m_model_annealing_field.save("annealing_rock.pgm");
 }
 
 int main()
 {
+    Mat3UI8 m("annealing_rock.pgm");
+    Processing::greylevelRange(m).display();
+
     SectionIII_Model_Correlation();
     //##UNCOMMENT EACH SECTION BY EACH SECTION BECAUSE THE PROGRAM STOP WHEN YOU CLOSE THE OPENGL WINDOW
 

@@ -199,7 +199,6 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
             if(label1!=label2)
                 error_training++;
         }
-
         for(unsigned int j=0;j<vtest_in.size();j++){
             VecF32 vout;
             net.forwardCPU(vtest_in(j),vout);
