@@ -71,11 +71,14 @@ static void on_event_vlc(const libvlc_event_t* event, void* data) {
     switch (event->type) {
     case libvlc_MediaPlayerPlaying:
         context->playing_started = true;
+        std::cout << "media player is playing" << std::endl;
         break;
     case libvlc_MediaPlayerEndReached:
+        std::cout << "media player end reached" << std::endl;
         context->end_reached = true;
         break;
     case libvlc_MediaPlayerEncounteredError:
+        std::cout << "media player encountered error" << std::endl;
         context->encoutered_error = true;
         break;
     default:
@@ -206,12 +209,10 @@ bool VideoVLC::grabMatrixGrey(){
 
     if (isplaying) {
         while(context->index <= 0 || my_index == context->index){
-            if(_isfile && !isPlaying()){
+            if(!isPlaying()){
                 isplaying = false;
                 //std::cout << "VIDEO STOPPED PLAYING!!!" << std::endl;
                 return false;
-            } else if(!_isfile){
-                pop::BasicUtility::sleep_ms(10);
             }
         }
 
