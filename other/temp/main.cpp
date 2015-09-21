@@ -82,9 +82,6 @@ Mat2UI8 labelling(Mat2UI8 img,NeuralNet & net, int radius){
         }
     }
     return m;
-   // m.save("test");
-   // m.display("seg",false,false);
-   // (Processing::threshold(Processing::distance(m,Processing::threshold(img,125)),1,2)+m).display("seg",true,false);
 }
 
 
@@ -109,66 +106,16 @@ int main()
 //            return 1;
 //        }
 
-
-
 //    {
-//        Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{00D98AE8-CF6E-4B43-8DE3-6E9710C9C862_page_3.png");///media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A69D037-661A-488D-89AD-99A2417EF933_page_2.png");
-//        m.display("init",false,false);
-//        m = m.opposite();
-//        Draw::addBorder(m,radius,0);
-//        NeuralNet net2;
-//        net2.load("neural_net.xml");
-//        Mat2UI8 m_end = labelling(m,net2,radius);
-//        m_end.display();
-//        m_end.save("/media/tariel/54D5-559B/database_normalized_cropped_new/file_{0A2DC36E-9DCB-48D8-9755-AB8EF06DC8B6_page_2_OCR.png");
+        Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{0A8E6972-BBC9-4101-BCB5-2AA998ADEC4E_page_2.png");///media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A69D037-661A-488D-89AD-99A2417EF933_page_2.png");
+        m.display("init",false,false);
+        m = m.opposite();
+        Draw::addBorder(m,radius,0);
+        NeuralNet net2;
+        net2.load("neural_net.xml");
+        Mat2UI8 m_end = labelling(m,net2,radius);
+        m_end.display();
 //    }
-    //Mat2UI8 m("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A0F810F-D9C5-4312-B35E-EDFA7CDD997B_page_4.png");
-
-    //    Vec<Mat2UI8> v_0,v_1;
-    //    Mat2UI8 m("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A0D8240-DE32-4F2F-B6AD-25CB22761970_page_3.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    Mat2UI8 m_label("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A0D8240-DE32-4F2F-B6AD-25CB22761970_page_3_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
-    //    m.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A0EC104-FFA5-4390-8E68-BE6722E35B1C_page_4.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    m_label.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A0EC104-FFA5-4390-8E68-BE6722E35B1C_page_4_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
-    //    m.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A2A6071-DA51-43E9-A85D-4B62E1393200_page_4.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    m_label.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A2A6071-DA51-43E9-A85D-4B62E1393200_page_4_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
-    //    m.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A61B6C7-53B1-4D35-B472-5631C1758058_page_3.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    m_label.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A61B6C7-53B1-4D35-B472-5631C1758058_page_3_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
-
-    //    m.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A6E79A1-E851-4904-BC7D-D0185635EB00_page_2.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    m_label.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A6E79A1-E851-4904-BC7D-D0185635EB00_page_2_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
-
-    //    m.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A3E5FBD-4406-44BB-9A02-C87550FE8A31_page_2.png");
-    //    m = m.opposite();
-    //    Draw::addBorder(m,radius,0);
-    //    m_label.load("/media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A3E5FBD-4406-44BB-9A02-C87550FE8A31_page_2_mask.png");
-    //    Draw::addBorder(m_label,radius,0);
-    //    createPatternFrom(m,m_label,3000,radius,v_0,v_1);
-
     std::string dir ="/home/tariel/Bureau/database_normalized_cropped_new/";
     std::vector<std::string> v_list = BasicUtility::getFilesInDirectory(dir);
     Vec<Mat2UI8> v_0,v_1;
