@@ -204,8 +204,9 @@ public:
     template<typename T>
     static bool String2Any(std::string s,  T & Dest )
     {
-        std::istringstream iss(s );
-        return iss >> Dest != 0;
+        std::istringstream iss(s);
+        iss >> Dest;
+        return true;
     }
     static bool String2Any(std::string s,  bool & Dest );
     static bool String2Float(std::string s,  F32 & Dest);
@@ -228,7 +229,8 @@ public:
     {
         std::stringstream ss;
         ss << std::hex << s;
-        return ss >> Dest != 0;
+        ss >> Dest;
+        return true;
     }
     /*!
     \brief convert any type to a string
