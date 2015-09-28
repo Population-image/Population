@@ -2787,38 +2787,24 @@ pop::MatN<2,T1>  productTensoriel(const pop::Vec<T1>& v1,const pop::Vec<T1>& v2)
 
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<2,Type1> & f, MatN<2,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<2,Type1>::IteratorEDomain ){
-    int i,j;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,it_local)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
-                it_local.init(Vec2I32(i,j));
-                h(i,j)=forEachFunctorAccumulator(f,facc,it_local);
-            }
+
+    Vec2I32 x;
+    for(x(0)=0;x(0)<f.sizeI();x(0)++){
+        for(x(1)=0;x(1)<f.sizeJ();x(1)++){
+            it_local.init(x);
+            h(x)=forEachFunctorAccumulator(f,facc,it_local);
         }
     }
+
 }
 template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
 void forEachGlobalToLocal(const MatN<3,Type1> & f, MatN<3,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatN<3,Type1>::IteratorEDomain ){
-    int i,j,k;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,it_local)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
-                for(k=0;k<f.sizeK();k++){
-                    it_local.init(Vec3I32(i,j,k));
-                    h(i,j,k)=forEachFunctorAccumulator(f,facc,it_local);
-                }
+    Vec3I32 x;
+    for(x(0)=0;x(0)<f.sizeI();x(0)++){
+        for(x(1)=0;x(1)<f.sizeJ();x(1)++){
+            for(x(2)=0;x(2)<f.sizeK();x(2)++){
+                it_local.init(x);
+                h(x)=forEachFunctorAccumulator(f,facc,it_local);
             }
         }
     }
@@ -2835,18 +2821,10 @@ void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h, 
         j_max= h.sizeJ();
     }
 
-    int i,j;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(func,i_max,j_max)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<i_max;i++){
-            for(j=0;j<j_max;j++){
-                h(i,j)=func( f, Vec2I32(i,j));
-            }
+    Vec2I32 x;
+    for(x(0)=0;x(0)<i_max;x(0)++){
+        for(x(1)=0;x(1)<j_max;x(1)++){
+            h(x)=func( f, x);
         }
     }
 }
@@ -2854,18 +2832,10 @@ template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
 void forEachFunctorBinaryFunctionE(const MatN<2,Type1> & f, MatN<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatN<2,Type1>::IteratorERectangle it)
 {
 
-    int i,j;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=it.xMin()(0);i<it.xMax()(0);i++){
-            for(j=it.xMin()(1);j<it.xMax()(1);j++){
-                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
-            }
+    Vec2I32 x;
+    for(x(0)=it.xMin()(0);x(0)<it.xMax()(0);x(0)++){
+        for(x(1)=it.xMin()(1);x(1)<it.xMax()(1);x(1)++){
+            h(x)=func( f, x);
         }
     }
 }
@@ -2885,19 +2855,11 @@ void forEachFunctorBinaryFunctionE(const MatN<3,Type1> & f, MatN<3,Type2> &  h, 
         j_max= h.sizeJ();
         k_max= h.sizeK();
     }
-    int i,j,k;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func,i_max,j_max,k_max)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<i_max;i++){
-            for(j=0;j<j_max;j++){
-                for(k=0;k<k_max;k++){
-                    h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
-                }
+    Vec3I32 x;
+    for(x(0)=0;x(0)<i_max;x(0)++){
+        for(x(1)=0;x(1)<j_max;x(1)++){
+            for(x(2)=0;x(2)<k_max;x(2)++){
+                h(x)=func( f, x);
             }
         }
     }

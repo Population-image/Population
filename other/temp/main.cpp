@@ -1,6 +1,6 @@
 #include"Population.h"//Single header
 using namespace pop;//Population namespace
-
+#include<data/notstable/CharacteristicCluster.h>
 
 
 
@@ -83,39 +83,180 @@ Mat2UI8 labelling(Mat2UI8 img,NeuralNet & net, int radius){
     }
     return m;
 }
+struct Characteristic3 :  CharacteristicMass, CharacteristicBoundingBox<Vec2I32>
+{
+    void addPoint(const Vec2I32 & x){
+        CharacteristicMass::addPoint(x);
+        CharacteristicBoundingBox<Vec2I32 >::addPoint(x);
+    }
+};
+template<typename TypeCharacteristic >
+struct DistanceCharacteristicWidthInterval2 : public DistanceCharacteristic<TypeCharacteristic>{
+    F32 operator ()(const TypeCharacteristic& a,const TypeCharacteristic& b){
+        return static_cast<F32>(std::abs(a.getCenter()(1)-b.getCenter()(1)))/ (std::max)(a.getSize()(1),b.getSize()(1));
+    }
+};
+
+void graph2Segmentation(Mat2UI32 label ){
+
+
+
+    Vec<Characteristic3 > v_cluster;
+    ForEachDomain2D(x,label){
+        if(label(x)>0){
+            if(label(x)>=static_cast<unsigned int>(v_cluster.size())){
+                v_cluster.resize(label(x)+1);
+            }
+            v_cluster(label(x)).addPoint(x);
+        }
+    }
+
+    //appariement to create the graph
+    pop::GraphAdjencyList<int> g;
+    for(unsigned int i=0;i<v_cluster.size();i++){
+        //std::cout<<v_cluster(i).getMass()<<std::endl;
+        g.addVertex();
+        g.vertex(i)=0;
+    }
+
+    //appariement to create the graph
+    DistanceCharacteristicHeigh<Characteristic3 >  dist_height;
+    DistanceCharacteristicHeightInterval<Characteristic3 >  dist_height_interval;
+    DistanceCharacteristicWidthInterval2<Characteristic3 >  dist_width_interval;
+    for(unsigned int i=0;i<v_cluster.size();i++){
+        if(v_cluster(i).getMass()>0){
+            for(unsigned int j=i+1;j<v_cluster.size();j++){
+                if(v_cluster(j).getMass()>0){
+                    pop::F32 sum =0;
+
+                    sum =   1*dist_height(v_cluster(i),v_cluster(j)) + 5*dist_height_interval(v_cluster(i),v_cluster(j)) + 1*dist_width_interval(v_cluster(i),v_cluster(j));
+                    if(sum<3){
+                        int edge = g.addEdge();
+                        g.vertex(i)=1;
+                        g.vertex(j)=1;
+                        g.connection(edge,i,j);
+                    }
+                }
+            }
+        }
+    }
+    pop::GraphAdjencyList<UI32> g_cluster = ProcessingAdvanced::clusterToLabel(g, g.getIteratorENeighborhood(1,1),g.getIteratorEDomain());
+    VecI32 area =  AnalysisAdvanced::areaByLabel(g_cluster,g_cluster.getIteratorEDomain());
 
 
 
 
+    Mat2RGBUI8 m_graph = Visualization::labelToRandomRGB(label);
+    for(unsigned int j=0;j<g.links().size();j++){
+
+
+
+        int label1 = g.getLink(j).first;
+        int label2 = g.getLink(j).second;
+        Vec2I32 center1  = v_cluster(label1).getCenter();
+        Vec2I32 center2  = v_cluster(label2).getCenter();
+        Draw::line(m_graph,center1,center2,RGBUI8(255,255,255),1);
+        Draw::circle(m_graph,center1,15,RGBUI8(255,255,255),3);
+        Draw::circle(m_graph,center2,15,RGBUI8(255,255,255),3);
+    }
+
+    m_graph.display();
+
+
+}
+
+
+Mat2UI32 filterTreillis(pop::Mat2UI32 label){
+
+    Vec<CharacteristicMass > v_cluster;
+
+    ForEachDomain2D(x,label){
+        if(label(x)>0){
+            if(label(x)>=v_cluster.size()){
+                v_cluster.resize(label(x)+1);
+            }
+            v_cluster(label(x)).addPoint(x);
+        }
+    }
+
+    pop::F32 mass_min = 60;
+    Vec<int > v_hit_filter_size(static_cast<int>(v_cluster.size()),0);
+    for(unsigned int i=0;i<static_cast<unsigned int>(v_cluster.size());i++){
+        pop::F32 mass = v_cluster(i).getMass();
+        if(  mass>mass_min){
+            v_hit_filter_size(i)=1;
+        }
+    }
+
+    //filter label
+    for(unsigned int i=0;i<label.size();i++){
+        if(label(i)>0&&v_hit_filter_size(label(i))==0){
+            label(i)=0;
+        }
+    }
+    return Processing::greylevelRemoveEmptyValue(label);
+}
+void seg(){
+    int radius= 16;
+    //Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{00A8407A-2161-484F-82B7-0A4A3AFACEF2_page_2.png");///media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A69D037-661A-488D-89AD-99A2417EF933_page_2.png");
+    //Mat2UI8 m_seg("_file_{00A8407A-2161-484F-82B7-0A4A3AFACEF2_page_2.png");
+
+    //Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{0A7A5704-1D1E-4E11-9A98-8FC0AF9236AD_page_3.png");
+    m.display();
+    //Mat2UI8 m_seg("_file_{0A7A5704-1D1E-4E11-9A98-8FC0AF9236AD_page_3.pgm");
+    m = Processing::threshold(m.opposite(),125);
+    Draw::addBorder(m,radius,0);
+    //m.display();
+
+    //m_seg.display();
+    //m_seg = pop::minimum(pop::Processing::closing(m_seg,1),m);
+    m_seg = pop::minimum(pop::Processing::closing(m_seg,3),m);
+    //m_seg = pop::minimum(pop::Processing::opening(m_seg,1,0),m);
+    // m_seg.display();
+
+    Mat2UI32 label = Processing::clusterToLabel(m_seg,0);
+    label = filterTreillis(label);
+    graph2Segmentation(label);
+
+
+
+    // Processing::cl
+    //m_seg.display();
+}
 
 int main()
 {
+
+    seg();
+    return 1;
     int radius= 16;
-//        {
-//            std::string dir ="/home/tariel/Bureau/database_normalized_cropped_new/";
-//            std::vector<std::string> v_list = BasicUtility::getFilesInDirectory(dir);
-//            Vec<Mat2UI8> v_0,v_1;
-//            for(unsigned int i=0;i<v_list.size();i++){
-//                std::string file_path = v_list[i];
-//                if(BasicUtility::getExtension(file_path)==".xcf"){
-//                    //std::cout<<dir+file_path<<std::endl;
-//                    createImage(dir+file_path,radius,v_0,v_1);
-//                }
-//            }
+    //        {
+    //            std::string dir ="/home/tariel/Bureau/database_normalized_cropped_new/";
+    //            std::vector<std::string> v_list = BasicUtility::getFilesInDirectory(dir);
+    //            Vec<Mat2UI8> v_0,v_1;
+    //            for(unsigned int i=0;i<v_list.size();i++){
+    //                std::string file_path = v_list[i];
+    //                if(BasicUtility::getExtension(file_path)==".xcf"){
+    //                    //std::cout<<dir+file_path<<std::endl;
+    //                    createImage(dir+file_path,radius,v_0,v_1);
+    //                }
+    //            }
 
-//            return 1;
-//        }
+    //            return 1;
+    //        }
 
-//    {
-        Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{0A8E6972-BBC9-4101-BCB5-2AA998ADEC4E_page_2.png");///media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A69D037-661A-488D-89AD-99A2417EF933_page_2.png");
-        m.display("init",false,false);
-        m = m.opposite();
-        Draw::addBorder(m,radius,0);
-        NeuralNet net2;
-        net2.load("neural_net.xml");
-        Mat2UI8 m_end = labelling(m,net2,radius);
-        m_end.display();
-//    }
+    //    {
+    //Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{0A8E6972-BBC9-4101-BCB5-2AA998ADEC4E_page_2.png");///media/tariel/54D5-559B/database_segmentation_case_adresse/file_{0A69D037-661A-488D-89AD-99A2417EF933_page_2.png");
+    Mat2UI8 m("/home/tariel/Bureau/database_normalized_cropped_new/file_{00A8407A-2161-484F-82B7-0A4A3AFACEF2_page_2.png");
+    m.display("init",false,false);
+    m = m.opposite();
+    Draw::addBorder(m,radius,0);
+    NeuralNet net2;
+    net2.load("neural_net.xml");
+    Mat2UI8 m_end = labelling(m,net2,radius);
+    m_end.save("_file_{00A8407A-2161-484F-82B7-0A4A3AFACEF2_page_2.png");
+    m_end.display();
+    //    }
     std::string dir ="/home/tariel/Bureau/database_normalized_cropped_new/";
     std::vector<std::string> v_list = BasicUtility::getFilesInDirectory(dir);
     Vec<Mat2UI8> v_0,v_1;

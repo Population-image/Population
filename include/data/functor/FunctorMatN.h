@@ -95,33 +95,23 @@ struct POP_EXPORTS FunctorMatN
         MatN<2,PixelType1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<PixelType1,F32>::Result Type_F32;
         typedef typename FunctionTypeTraitsSubstituteF<PixelType2,F32>::Result Type2_F32;
-        int radius;
-        int i,j,k;
-        int dir;
-        Type_F32 value;
+
+        int radius = static_cast<int>((kernel.size()-1)/2);
         Vec2I32 x;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(h) private(i,j,k,dir,value,x,radius)
-#endif
-        {
-            radius = static_cast<int>((kernel.size()-1)/2);
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-            for(i=0;i<static_cast<int>(f.sizeI());i++){
-                for(j=0;j<static_cast<int>(f.sizeJ());j++){
-                    x(0)=i;x(1)=j;
-                    dir = x(direction);
-                    value=0;
-                    for(k=0;k<static_cast<int>(kernel.size());k++){
-                        x(direction)= dir+(radius-k);
-                        if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
-                            BoundaryCondition::apply(f.getDomain(),x,direction);
-                            value+=Type_F32(f(x))*Type2_F32(kernel(k));
-                        }
+        for(x(0)=0;x(0)<static_cast<int>(f.sizeI());x(0)++){
+            for(x(1)=0;x(1)<static_cast<int>(f.sizeJ());x(1)++){
+                int dir = x(direction);
+                Type_F32 value=0;
+                int temp = x(direction);
+                for(unsigned k=0;k<kernel.size();k++){
+                    x(direction)= dir+(radius-k);
+                    if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
+                        BoundaryCondition::apply(f.getDomain(),x,direction);
+                        value+=Type_F32(f(x))*Type2_F32(kernel(k));
                     }
-                    h(i,j)=ArithmeticsSaturation<PixelType1,Type_F32>::Range (value);
                 }
+                x(direction)=temp;
+                h(x)=ArithmeticsSaturation<PixelType1,Type_F32>::Range (value);
             }
         }
         return h;
@@ -133,33 +123,23 @@ struct POP_EXPORTS FunctorMatN
         MatN<3,PixelType1> h(f.getDomain());
         typedef typename FunctionTypeTraitsSubstituteF<PixelType1,F32>::Result Type_F32;
         typedef typename FunctionTypeTraitsSubstituteF<PixelType2,F32>::Result Type2_F32;
-        int radius;
-        int i,j,z,k,dir;
-        Type_F32 value;
+        int radius = static_cast<int>((kernel.size()-1)/2);
         Vec3I32 x;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,z,k,dir,value,x,radius)
-#endif
-        {
-            radius = (kernel.size()-1)/2;
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-            for(i=0;i<static_cast<int>(f.sizeI());i++){
-                for(j=0;j<static_cast<int>(f.sizeJ());j++){
-                    for(z=0;z<static_cast<int>(f.sizeK());z++){
-                        x(0)=i;x(1)=j;x(2)=z;
-                        dir = x(direction);
-                        value=0;
-                        for(k=0;k<static_cast<int>(kernel.size());k++){
-                            x(direction)= dir+(radius-k);
-                            if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
-                                BoundaryCondition::apply(f.getDomain(),x,direction);
-                                value+=Type_F32(f(x))*Type2_F32(kernel(k));
-                            }
+        for(x(0)=0;x(0)<static_cast<int>(f.sizeI());x(0)++){
+            for(x(1)=0;x(1)<static_cast<int>(f.sizeJ());x(1)++){
+                for(x(2)=0;x(2)<static_cast<int>(f.sizeK());x(2)++){
+                    int dir = x(direction);
+                    Type_F32 value=0;
+                    int temp = x(direction);
+                    for(unsigned k=0;k<kernel.size();k++){
+                        x(direction)= dir+(radius-k);
+                        if(BoundaryCondition::isValid(f.getDomain(),x,direction)){
+                            BoundaryCondition::apply(f.getDomain(),x,direction);
+                            value+=Type_F32(f(x))*Type2_F32(kernel(k));
                         }
-                        h(i,j,z)=ArithmeticsSaturation<PixelType1,Type_F32>::Range (value);
                     }
+                     x(direction)=temp;
+                    h(x)=ArithmeticsSaturation<PixelType1,Type_F32>::Range (value);
                 }
             }
         }

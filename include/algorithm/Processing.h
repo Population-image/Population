@@ -2068,7 +2068,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         return ProcessingAdvanced::clusterToLabel(cluster, cluster.getIteratorENeighborhood(1,norm),cluster.getIteratorEDomain());
     }
 
-    static MatN<2,UI32>  clusterToLabel(const MatN<2,UI8> & cluster,int norm=1)
+    static Mat2UI32  clusterToLabel(const Mat2UI8 & cluster,int norm=1)
     {
         return ProcessingAdvanced::clusterToLabel2D(cluster, norm);
     }
