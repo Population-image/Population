@@ -62,6 +62,7 @@ HAVE_FFMPEG {
     win32:LIBS*=-lAdvapi32 -lgdi32 -luser32 -lshell32
     win32:FFMPEGPATH+=../../ffmpeg-20151004-git-84b4998-win32-dev/  #replace by yours
     win32:INCLUDEPATH+=$${FFMPEGPATH}/include
+    win32:LIBS+=-L$${FFMPEGPATH}/lib
     win32:LIBS+=-L"../../ffmpeg-20151004-git-84b4998-win32-shared/bin"
     LIBS += -lavcodec
     LIBS += -lavformat
