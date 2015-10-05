@@ -22,9 +22,9 @@ Video * Video::create(VideoImpl impl, bool debug) {
 #endif
     } else if (impl==Video::FFMPEG){
 #if defined(HAVE_FFMPEG)
-        std::cerr<<"[ERROR][Video::create] VLC library is not included. For qtcreator, in populationconfig.pri, you uncomment this line  CONFIG += HAVE_FFMPEG . For CMake, in CMakeList.txt, you set WITH_FFMPEG at ON."<<std::endl;
         return new VideoFFMPEG();
 #else
+        std::cerr<<"[ERROR][Video::create] FFMPEG library is not included. For qtcreator, in populationconfig.pri, you uncomment this line  CONFIG += HAVE_FFMPEG . For CMake, in CMakeList.txt, you set WITH_FFMPEG at ON."<<std::endl;
         return NULL;
 #endif
     } else {
