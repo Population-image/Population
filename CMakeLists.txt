@@ -78,6 +78,13 @@ if(CMAKE_VERBOSE)
   set(CMAKE_VERBOSE_MAKEFILE 1)
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+  message(STATUS "BUILD RELEASE")
+else()
+  message(STATUS "BUILD DEBUG")
+  set(WITH_DEBUG OFF)
+endif()
+
 # ----------------------------------------------------------------------------
 # In case of Makefiles if the user does not setup CMAKE_BUILD_TYPE, assume it's Release:
 if(CMAKE_GENERATOR MATCHES "Makefiles|Ninja" AND "${CMAKE_BUILD_TYPE}" STREQUAL "")

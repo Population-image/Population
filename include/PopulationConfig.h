@@ -45,14 +45,14 @@ namespace pop{
     #define POP_EXPORTS
 #endif
 
-#ifdef Debug
+#ifdef HAVE_DEBUG
 #define POP_DbgAssert(expr) assert(expr)
 #else
 #define POP_DbgAssert(expr)
 #endif
 
 
-#ifdef Debug
+#ifdef HAVE_DEBUG
 #   define POP_DbgAssertMessage(condition, message) \
     do { \
         if (! (condition)) { \

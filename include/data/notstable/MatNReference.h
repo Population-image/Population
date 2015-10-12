@@ -41,19 +41,19 @@ template<typename PixelType, int SIZEI, int SIZEJ>
 class  Mat2x;
 
 
-template<int Dim, typename PixelType>
+template<int Dim, typename PixelType,typename DataReference>
 class POP_EXPORTS MatNReference
 {
 protected:
    VecN<Dim,int> _domain;
-   PixelType* _data;
+   DataReference _data;
 public:
     typedef PixelType F;
     enum {DIM=Dim};
     typedef VecN<Dim,I32> E;
     typedef VecN<Dim,int> Domain;
     typedef MatNIteratorEDomain<E>  IteratorEDomain;
-    typedef MatNIteratorEROI<MatNReference<Dim, PixelType> >  IteratorEROI;
+    typedef MatNIteratorEROI<MatNReference<Dim, PixelType,DataReference> >  IteratorEROI;
     typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionBounded> IteratorENeighborhood;// neighborhood iteration with bounded condition
     typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionMirror> IteratorENeighborhoodMirror;// neighborhood iteration with mirror condition
     typedef MatNIteratorENeighborhood<E,MatNBoundaryConditionPeriodic> IteratorENeighborhoodPeriodic;// neighborhood iteration with periodic condition
@@ -74,10 +74,9 @@ public:
     typedef typename Vec<PixelType>::difference_type				 difference_type;
     typedef typename Vec<PixelType>::allocator_type                        		 allocator_type;
 
-	MatNReference()
-	:_domain(0),_data(NULL){}
 
-    MatNReference(const VecN<Dim,int>& domain,PixelType *v);
+
+    MatNReference(const VecN<Dim,int>& domain, DataReference v);
     MatN<Dim,PixelType> toMatN()const;
 
     //@}
@@ -432,14 +431,14 @@ public:
     *
     * Basic assignement of all pixel/voxel values by \a value
     */
-    MatNReference<Dim, PixelType>&  operator=(PixelType value);
+    MatNReference<Dim, PixelType,DataReference>&  operator=(PixelType value);
     /*!
     * \param value value
     * \return this matrix
     *
     * Basic assignement of all pixel/voxel values by \a value
     */
-    MatNReference<Dim, PixelType>&  fill(PixelType value);
+    MatNReference<Dim, PixelType,DataReference>&  fill(PixelType value);
     /*!
     * \param mode mode by default 0
     * \return opposite matrix
@@ -454,35 +453,35 @@ public:
     *
     * Equal operator true for all x in E f(x)=(*this)(x), false otherwise
     */
-    bool operator==(const MatNReference<Dim, PixelType>& f)const;
+    bool operator==(const MatNReference<Dim, PixelType,DataReference>& f)const;
     /*!
     \param f input matrix
     \return boolean
     *
     * Difference operator true for at least on x in E f(x)!=(*this)(x), false otherwise
     */
-    bool operator!=(const MatNReference<Dim, PixelType>& f)const;
+    bool operator!=(const MatNReference<Dim, PixelType,DataReference>& f)const;
     /*!
     \param f input matrix
     \return object reference
     *
     * Addition assignment h(x)+=f(x)
     */
-    MatNReference<Dim, PixelType>&  operator+=(const MatNReference<Dim, PixelType>& f);
+    MatNReference<Dim, PixelType,DataReference>&  operator+=(const MatNReference<Dim, PixelType,DataReference>& f);
     /*!
     * \param f input matrix
     * \return object
     *
     *  Addition h(x)= (*this)(x)+f(x)
     */
-    MatN<Dim, PixelType>  operator+(const MatNReference<Dim, PixelType>& f)const;
+    MatN<Dim, PixelType>  operator+(const MatNReference<Dim, PixelType,DataReference>& f)const;
     /*!
     * \param value input value
     * \return object reference
     *
     * Addition assignment h(x)+=value
     */
-    MatNReference<Dim, PixelType>& operator+=(PixelType value);
+    MatNReference<Dim, PixelType,DataReference>& operator+=(PixelType value);
     /*!
     \param value input value
     \return object
@@ -496,21 +495,21 @@ public:
     *
     * Subtraction assignment h(x)-=f(x)
     */
-    MatNReference<Dim, PixelType>&  operator-=(const MatNReference<Dim, PixelType>& f);
+    MatNReference<Dim, PixelType,DataReference>&  operator-=(const MatNReference<Dim, PixelType,DataReference>& f);
     /*!
     \param value input value
     \return object reference
     *
     * Subtraction assignment h(x)-=value
     */
-    MatNReference<Dim, PixelType>&  operator-=(PixelType value);
+    MatNReference<Dim, PixelType,DataReference>&  operator-=(PixelType value);
     /*!
     * \param f input matrix
     * \return output matrix
     *
     *  Subtraction h(x)= (*this)(x)-f(x)
     */
-    MatN<Dim, PixelType>  operator-(const MatNReference<Dim, PixelType>& f)const;
+    MatN<Dim, PixelType>  operator-(const MatNReference<Dim, PixelType,DataReference>& f)const;
     /*!
     * \return output matrix
     *
@@ -573,7 +572,7 @@ public:
     *
     * Multiplication assignment h(x)*=value
     */
-    MatNReference<Dim, PixelType>&  operator*=(PixelType  value);
+    MatNReference<Dim, PixelType,DataReference>&  operator*=(PixelType  value);
     /*!
     \param value input value
     \return object
@@ -594,7 +593,7 @@ public:
     *
     * Division assignment h(x)/=value
     */
-    MatNReference<Dim, PixelType>&  operator/=(PixelType value);
+    MatNReference<Dim, PixelType,DataReference>&  operator/=(PixelType value);
     /*!
     \param value input value
     \return object
@@ -741,18 +740,7 @@ public:
     //@}
 
 
-    PixelType * begin(){
-        return _data;
-    }
-    const PixelType * begin()const{
-        return _data;
-    }
-    PixelType * end(){
-        return _data+_domain.multCoordinate();
-    }
-    const PixelType * end()const{
-        return _data+_domain.multCoordinate();
-    }
+
 
 };
 
@@ -760,152 +748,152 @@ public:
 
 
 
-template<int Dim, typename PixelType>
-MatNReference<Dim,PixelType>::MatNReference(const VecN<Dim,int>& domain,PixelType* v)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>::MatNReference(const VecN<Dim,int>& domain, DataReference v)
     :_domain(domain),_data(v)
 {
 }
-template<int Dim, typename PixelType>
-MatN<Dim,PixelType> MatNReference<Dim,PixelType>::toMatN()const
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim,PixelType> MatNReference<Dim,PixelType,DataReference>::toMatN()const
 {
     return MatN<Dim,PixelType>(this->getDomain(),this->_data);
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::Domain  MatNReference<Dim,PixelType>::getDomain()
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::Domain  MatNReference<Dim,PixelType,DataReference>::getDomain()
 const
 {
     return _domain;
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::size()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::size()const{
     return this->getDomain().multCoordinate();
 }
 
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::sizeI()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::sizeI()const{
     return this->getDomain()[0];
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::rows()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::rows()const{
     return this->getDomain()[0];
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::sizeJ()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::sizeJ()const{
     return this->getDomain()[1];
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::columns()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::columns()const{
     return this->getDomain()[1];
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::sizeK()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::sizeK()const{
     POP_DbgAssert(Dim==3);
     return this->getDomain()[2];
 }
-template<int Dim, typename PixelType>
-unsigned int MatNReference<Dim,PixelType>::depth()const{
+template<int Dim, typename PixelType,typename DataReference>
+unsigned int MatNReference<Dim,PixelType,DataReference>::depth()const{
     POP_DbgAssert(Dim==3);
     return this->getDomain()[2];
 }
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::isValid(const E & x)const{
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::isValid(const E & x)const{
     if(x.allSuperiorEqual(E(0)) && x.allInferior(this->getDomain()))
         return true;
     else
         return false;
 }
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::isValid(int i,int j)const{
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::isValid(int i,int j)const{
     if(i>=0&&j>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ()))
         return true;
     else
         return false;
 }
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::isValid(int i,int j,int k)const{
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::isValid(int i,int j,int k)const{
     if(i>=0&&j>=0&&k>=0 && i<static_cast<int>(sizeI())&& j<static_cast<int>(sizeJ())&&k<static_cast<int>(sizeK()))
         return true;
     else
         return false;
 }
 
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::isEmpty()const{
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::isEmpty()const{
     if(_domain.multCoordinate()==0)
         return true;
     else
         return false;
 }
-template<int Dim, typename PixelType>
-void MatNReference<Dim,PixelType>::clear(){
+template<int Dim, typename PixelType,typename DataReference>
+void MatNReference<Dim,PixelType,DataReference>::clear(){
     _domain=0;
     Vec<PixelType>::clear();
 }
-//template<int Dim, typename PixelType>
-//PixelType & MatNReference<Dim,PixelType>::operator ()(int i)
+//template<int Dim, typename PixelType,typename DataReference>
+//PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(int i)
 //{
 //    return  this->_data[i];
 //}
-//template<int Dim, typename PixelType>
-//const PixelType & MatNReference<Dim,PixelType>::operator ()(int i)const
+//template<int Dim, typename PixelType,typename DataReference>
+//const PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(int i)const
 //{
 //    return  this->_data[i];
 //}
-template<int Dim, typename PixelType>
-PixelType & MatNReference<Dim,PixelType>::operator ()(const VecN<Dim,int> & x)
+template<int Dim, typename PixelType,typename DataReference>
+PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(const VecN<Dim,int> & x)
 {
     POP_DbgAssert( x.allSuperiorEqual( E(0))&&x.allInferior(getDomain()));
     return  this->_data[VecNIndice<Dim>::VecN2Indice(_domain,x)];
 }
 
-template<int Dim, typename PixelType>
-const PixelType & MatNReference<Dim,PixelType>::operator ()( const VecN<Dim,int>& x)
+template<int Dim, typename PixelType,typename DataReference>
+const PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()( const VecN<Dim,int>& x)
 const
 {
     POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(getDomain()));
     return  this->_data[VecNIndice<Dim>::VecN2Indice(_domain,x)];
 }
-template<int Dim, typename PixelType>
-PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)
+template<int Dim, typename PixelType,typename DataReference>
+PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int i,unsigned int j)
+{
+    POP_DbgAssert(i>=0&& j>=0&& i<(sizeI())&&j<(sizeJ()));
+    return  this->_data[j+i*_domain(1)];
+}
+template<int Dim, typename PixelType,typename DataReference>
+const PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int i,unsigned int j)const
 {
     POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
     return  this->_data[j+i*_domain(1)];
 }
-template<int Dim, typename PixelType>
-const PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)const
-{
-    POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
-    return  this->_data[j+i*_domain(1)];
-}
-template<int Dim, typename PixelType>
-PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)
+template<int Dim, typename PixelType,typename DataReference>
+PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int i,unsigned int j,unsigned int k)
 {
     POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
     return  this->_data[j+i*_domain(1)+k*_domain(0)*_domain(1)];
 }
 
-template<int Dim, typename PixelType>
-const PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)const
+template<int Dim, typename PixelType,typename DataReference>
+const PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int i,unsigned int j,unsigned int k)const
 {
     POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
     return  this->_data[j+i*_domain(1)+k*_domain(0)*_domain(1)];
 }
 
 
-template<int Dim, typename PixelType>
-PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int index)
+template<int Dim, typename PixelType,typename DataReference>
+PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int index)
 {
     POP_DbgAssert( index<this->size());
     return this->_data[index];
 }
-template<int Dim, typename PixelType>
-const PixelType & MatNReference<Dim,PixelType>::operator ()(unsigned int index)const
+template<int Dim, typename PixelType,typename DataReference>
+const PixelType & MatNReference<Dim,PixelType,DataReference>::operator ()(unsigned int index)const
 {
     POP_DbgAssert( index<this->size());
     return this->_data[index];
 }
-template<int Dim, typename PixelType>
-PixelType MatNReference<Dim,PixelType>::interpolationBilinear(const VecN<DIM,F32> xf)const
+template<int Dim, typename PixelType,typename DataReference>
+PixelType MatNReference<Dim,PixelType,DataReference>::interpolationBilinear(const VecN<DIM,F32> xf)const
 {
     VecN<PowerGP<2,Dim>::value,std::pair<F32,VecN<Dim,I32> > > v_out =MatNInterpolationBiliniear::getWeightPosition(this->getDomain(),xf);
     typedef typename FunctionTypeTraitsSubstituteF<PixelType,F32>::Result  PixelTypeFloat;
@@ -916,40 +904,30 @@ PixelType MatNReference<Dim,PixelType>::interpolationBilinear(const VecN<DIM,F32
     return ArithmeticsSaturation<PixelType,PixelTypeFloat>::Range(value);
 
 }
-template<int Dim, typename PixelType>
-PixelType *  MatNReference<Dim,PixelType>::data()
-{
-    return this->_data;
-}
-template<int Dim, typename PixelType>
-const PixelType *  MatNReference<Dim,PixelType>::data()
-const
-{
-    return this->_data;
-}
 
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorEDomain MatNReference<Dim,PixelType>::getIteratorEDomain()const
+
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorEDomain MatNReference<Dim,PixelType,DataReference>::getIteratorEDomain()const
 {
     return IteratorEDomain(getDomain());
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorEROI MatNReference<Dim,PixelType>::getIteratorEROI()const
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorEROI MatNReference<Dim,PixelType,DataReference>::getIteratorEROI()const
 {
     return IteratorEROI(*this);
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorENeighborhood MatNReference<Dim,PixelType>::getIteratorENeighborhood(F32 radius ,int norm )const
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorENeighborhood MatNReference<Dim,PixelType,DataReference>::getIteratorENeighborhood(F32 radius ,int norm )const
 {
     return IteratorENeighborhood(getDomain(),radius , norm);
 }
-template<int Dim, typename PixelType>
+template<int Dim, typename PixelType,typename DataReference>
 template<typename Type1>
-typename MatNReference<Dim,PixelType>::IteratorENeighborhood MatNReference<Dim,PixelType>::getIteratorENeighborhood(const MatN<Dim,Type1> & structural_element,int dilate )const
+typename MatNReference<Dim,PixelType,DataReference>::IteratorENeighborhood MatNReference<Dim,PixelType,DataReference>::getIteratorENeighborhood(const MatN<Dim,Type1> & structural_element,int dilate )const
 {
     Vec<E> _tab;
-    typename MatNReference<Dim,Type1>::IteratorEDomain it(structural_element.getDomain());
-    typename MatNReference<Dim,Type1>::E center = VecN<Dim,F32>(structural_element.getDomain()-1)*0.5;
+    typename MatNReference<Dim,Type1,DataReference>::IteratorEDomain it(structural_element.getDomain());
+    typename MatNReference<Dim,Type1,DataReference>::E center = VecN<Dim,F32>(structural_element.getDomain()-1)*0.5;
     while(it.next()){
         if(normValue(structural_element(it.x()))!=0){
             _tab.push_back(it.x()-center);
@@ -966,37 +944,37 @@ typename MatNReference<Dim,PixelType>::IteratorENeighborhood MatNReference<Dim,P
         return IteratorENeighborhood(ititerative.getDomain());
     }
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorEOrder MatNReference<Dim,PixelType>::getIteratorEOrder(int coordinatelastloop,int direction)const
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorEOrder MatNReference<Dim,PixelType,DataReference>::getIteratorEOrder(int coordinatelastloop,int direction)const
 {
     return IteratorEOrder(getDomain(),coordinatelastloop,direction);
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorERectangle MatNReference<Dim,PixelType>::getIteratorERectangle(const E & xmin,const E & xmax )const
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorERectangle MatNReference<Dim,PixelType,DataReference>::getIteratorERectangle(const E & xmin,const E & xmax )const
 {
     return IteratorERectangle(std::make_pair(xmin,xmax));
 }
-template<int Dim, typename PixelType>
-typename MatNReference<Dim,PixelType>::IteratorENeighborhoodAmoebas MatNReference<Dim,PixelType>::getIteratorENeighborhoodAmoebas(F32 distance_max,F32 lambda_param )const
+template<int Dim, typename PixelType,typename DataReference>
+typename MatNReference<Dim,PixelType,DataReference>::IteratorENeighborhoodAmoebas MatNReference<Dim,PixelType,DataReference>::getIteratorENeighborhoodAmoebas(F32 distance_max,F32 lambda_param )const
 {
     return IteratorENeighborhoodAmoebas(*this,distance_max,lambda_param );
 }
 
 
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator=(PixelType value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator=(PixelType value)
 {
    std::fill (this->_data,this->_data+_domain.multCoordinate(),value);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::fill(PixelType value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::fill(PixelType value)
 {
     std::fill (this->_data,this->_data+_domain.multCoordinate(),value);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::opposite(int mode)const
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::opposite(int mode)const
 {
     MatN<Dim, PixelType> temp;
     PixelType maxi;
@@ -1011,20 +989,20 @@ MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::opposite(int mode)const
     return temp;
 }
 
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::operator==(const MatNReference<Dim, PixelType>& f)const
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::operator==(const MatNReference<Dim, PixelType,DataReference>& f)const
 {
     FunctionAssert(f,*this,"In MatNReference::operator==");
     return std::equal (f.begin(), f.end(), this->begin());
 }
-template<int Dim, typename PixelType>
-bool MatNReference<Dim,PixelType>::operator!=(const MatNReference<Dim, PixelType>& f)const
+template<int Dim, typename PixelType,typename DataReference>
+bool MatNReference<Dim,PixelType,DataReference>::operator!=(const MatNReference<Dim, PixelType,DataReference>& f)const
 {
     FunctionAssert(f,*this,"In MatNReference::operator==");
     return !std::equal (f.begin(), f.end(), this->begin());
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator+=(const MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator+=(const MatNReference<Dim, PixelType,DataReference>& f)
 {
 
     FunctionAssert(f,*this,"In MatNReference::operator+=");
@@ -1032,66 +1010,66 @@ MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator+=(const M
     std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator+(const MatNReference<Dim, PixelType>& f)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator+(const MatNReference<Dim, PixelType,DataReference>& f)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h +=f;
     return h;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>& MatNReference<Dim,PixelType>::operator+=(PixelType value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>& MatNReference<Dim,PixelType,DataReference>::operator+=(PixelType value)
 {
     FunctorF::FunctorArithmeticConstantValueAfter<PixelType,PixelType,PixelType,FunctorF::FunctorAdditionF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (this->begin(), this->end(), this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator+(PixelType value)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator+(PixelType value)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h +=value;
     return h;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator-=(const MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator-=(const MatNReference<Dim, PixelType,DataReference>& f)
 {
     FunctionAssert(f,*this,"In MatNReference::operator-=");
     FunctorF::FunctorSubtractionF2<PixelType,PixelType,PixelType> op;
     std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator-=(PixelType value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator-=(PixelType value)
 {
     FunctorF::FunctorArithmeticConstantValueAfter<PixelType,PixelType,PixelType,FunctorF::FunctorSubtractionF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (this->begin(), this->end(), this->begin(),  op);
     return *this;
 }
 
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator-(const MatNReference<Dim, PixelType>& f)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator-(const MatNReference<Dim, PixelType,DataReference>& f)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h -=f;
     return h;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator-()const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator-()const{
     MatN<Dim, PixelType> h(this->getDomain(),PixelType(0));
     h -=*this;
     return h;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator-(PixelType value)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator-(PixelType value)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h -=value;
     return h;
 }
 
-template<int Dim, typename PixelType>
-MatNReference<Dim,PixelType>  MatNReference<Dim,PixelType>::operator*(const MatNReference<Dim,PixelType> &m)const
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::operator*(const MatNReference<Dim,PixelType,DataReference> &m)const
 {
     POP_DbgAssertMessage(DIM==2&&this->sizeJ()==m.sizeI() ,"In Matrix::operator*, Not compatible size for the operator * of the class Matrix (A_{n,k}*B_{k,p})");
-    MatNReference<Dim,PixelType> mtrans = m.transpose();
-    MatNReference<Dim,PixelType> mout(this->sizeI(),m.sizeJ());
+    MatNReference<Dim,PixelType,DataReference> mtrans = m.transpose();
+    MatNReference<Dim,PixelType,DataReference> mout(this->sizeI(),m.sizeJ());
     PixelType sum = 0;
     int i,j;
     typename MatNReference::const_iterator this_it,mtrans_it;
@@ -1121,14 +1099,14 @@ MatNReference<Dim,PixelType>  MatNReference<Dim,PixelType>::operator*(const MatN
 
 
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim,PixelType> & MatNReference<Dim,PixelType>::operator*=(const MatNReference<Dim,PixelType> &m)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference> & MatNReference<Dim,PixelType,DataReference>::operator*=(const MatNReference<Dim,PixelType,DataReference> &m)
 {
     *this = this->operator *(m);
     return *this;
 }
-template<int Dim, typename PixelType>
-Vec<PixelType>  MatNReference<Dim,PixelType>::operator*(const Vec<PixelType> & v)const{
+template<int Dim, typename PixelType,typename DataReference>
+Vec<PixelType>  MatNReference<Dim,PixelType,DataReference>::operator*(const Vec<PixelType> & v)const{
     POP_DbgAssertMessage(DIM==2&&this->sizeJ()==v.size() ,"In Matrix::operator*, Not compatible size for the operator *=(Vec) of the class Matrix (A_{n,k}*v_{k})");
     Vec<PixelType> temp(this->sizeI());
     for(unsigned int i=0;i<this->sizeI();i++){
@@ -1143,43 +1121,43 @@ Vec<PixelType>  MatNReference<Dim,PixelType>::operator*(const Vec<PixelType> & v
     return temp;
 }
 
-template<int Dim, typename PixelType>
-MatNReference<Dim,PixelType>  MatNReference<Dim,PixelType>::multTermByTerm(const MatNReference& f)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::multTermByTerm(const MatNReference& f)const{
     FunctionAssert(f,*this,"In MatNReference::operator*=");
     FunctorF::FunctorMultiplicationF2<PixelType,PixelType,PixelType> op;
-    MatNReference<Dim,PixelType> out(*this);
+    MatNReference<Dim,PixelType,DataReference> out(*this);
     std::transform (out.begin(), out.end(), f.begin(),out.begin(),  op);
     return out;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator*=(PixelType  value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator*=(PixelType  value)
 {
     FunctorF::FunctorArithmeticConstantValueAfter<PixelType,PixelType,PixelType,FunctorF::FunctorMultiplicationF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (this->begin(), this->end(), this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator*(PixelType value)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator*(PixelType value)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h *=value;
     return h;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::divTermByTerm(const MatNReference& f){
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::divTermByTerm(const MatNReference& f){
     FunctionAssert(f,*this,"In MatNReference::divTermByTerm");
     FunctorF::FunctorDivisionF2<PixelType,PixelType,PixelType> op;
     std::transform (this->begin(), this->end(), f.begin(),this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>&  MatNReference<Dim,PixelType>::operator/=(PixelType value)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>&  MatNReference<Dim,PixelType,DataReference>::operator/=(PixelType value)
 {
     FunctorF::FunctorArithmeticConstantValueAfter<PixelType,PixelType,PixelType,FunctorF::FunctorDivisionF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (this->begin(), this->end(), this->begin(),  op);
     return *this;
 }
-template<int Dim, typename PixelType>
-MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator/(PixelType value)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatN<Dim, PixelType>  MatNReference<Dim,PixelType,DataReference>::operator/(PixelType value)const{
     MatN<Dim, PixelType> h=this->toMatN();
     h /=value;
     return h;
@@ -1187,18 +1165,18 @@ MatN<Dim, PixelType>  MatNReference<Dim,PixelType>::operator/(PixelType value)co
 
 
 
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::deleteRow(unsigned int i)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::deleteRow(unsigned int i)const{
     POP_DbgAssert(i<sizeI());
-    MatNReference<DIM,PixelType> temp(*this);
+    MatNReference<Dim,PixelType,DataReference> temp(*this);
     temp._domain(0)--;
     temp.erase( temp.begin()+i*temp._domain(1), temp.begin()+(i+1)*temp._domain(1)  );
     return temp;
 }
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::deleteCol(unsigned int j)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::deleteCol(unsigned int j)const{
     POP_DbgAssert(j<sizeJ());
-    MatNReference<DIM,PixelType> temp(this->sizeI(),this->sizeJ()-1);
+    MatNReference<Dim,PixelType,DataReference> temp(this->sizeI(),this->sizeJ()-1);
 
     for(unsigned int i=0;i<temp.sizeI();i++)
         for(unsigned int j1=0;j1<temp.sizeJ();j1++)
@@ -1211,61 +1189,61 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::deleteCol(unsigned i
     return temp;
 }
 
-template<int DIM, typename PixelType>
-Vec<PixelType>  MatNReference<DIM,PixelType>::getRow(unsigned int i)const{
+template<int Dim, typename PixelType,typename DataReference>
+Vec<PixelType>  MatNReference<Dim,PixelType,DataReference>::getRow(unsigned int i)const{
     Vec<PixelType> v(this->sizeJ());
     std::copy(this->begin()+i*this->_domain(1), this->begin()+(i+1)*this->_domain(1),v.begin());
     return v;
 }
-template<int DIM, typename PixelType>
-Vec<PixelType>  MatNReference<DIM,PixelType>::getCol(unsigned int j)const{
+template<int Dim, typename PixelType,typename DataReference>
+Vec<PixelType>  MatNReference<Dim,PixelType,DataReference>::getCol(unsigned int j)const{
     Vec<PixelType> v(this->sizeI());
     for(unsigned int i=0;i<this->sizeI();i++){
         v(i)=this->operator ()(i,j);
     }
     return v;
 }
-template<int DIM, typename PixelType>
-void  MatNReference<DIM,PixelType>::setRow(unsigned int i,const Vec<PixelType> &v){
+template<int Dim, typename PixelType,typename DataReference>
+void  MatNReference<Dim,PixelType,DataReference>::setRow(unsigned int i,const Vec<PixelType> &v){
 
     POP_DbgAssertMessage(v.size()==this->sizeJ(),"In Matrix::setRow, incompatible size");
     std::copy(v.begin(),v.end(),this->begin()+i*this->_domain(1));
 }
-template<int DIM, typename PixelType>
-void  MatNReference<DIM,PixelType>::setCol(unsigned int j,const Vec<PixelType>& v){
+template<int Dim, typename PixelType,typename DataReference>
+void  MatNReference<Dim,PixelType,DataReference>::setCol(unsigned int j,const Vec<PixelType>& v){
     POP_DbgAssertMessage(v.size()==this->sizeI(),"In Matrix::setCol, Incompatible size");
     for(unsigned int i=0;i<this->sizeI();i++){
         this->operator ()(i,j)=v(i);
     }
 }
-template<int DIM, typename PixelType>
-void  MatNReference<DIM,PixelType>::swapRow(unsigned int i_0,unsigned int i_1){
+template<int Dim, typename PixelType,typename DataReference>
+void  MatNReference<Dim,PixelType,DataReference>::swapRow(unsigned int i_0,unsigned int i_1){
     POP_DbgAssertMessage( (i_0<this->sizeI()&&i_1<this->sizeI()),"In Matrix::swapRow, Over Range in swapRow");
     std::swap_ranges(this->begin()+i_0*this->sizeJ(), this->begin()+(i_0+1)*this->sizeJ(), this->begin()+i_1*this->sizeJ());
 
 }
-template<int DIM, typename PixelType>
-void  MatNReference<DIM,PixelType>::swapCol(unsigned int j_0,unsigned int j_1){
+template<int Dim, typename PixelType,typename DataReference>
+void  MatNReference<Dim,PixelType,DataReference>::swapCol(unsigned int j_0,unsigned int j_1){
     POP_DbgAssertMessage( (j_0<this->sizeJ()&&j_1<this->sizeJ()),"In Matrix::swapCol, Over Range in swapCol");
     for(unsigned int i=0;i<this->sizeI();i++){
         std::swap(this->operator ()(i,j_0) ,this->operator ()(i,j_1));
     }
 }
-template<int DIM, typename PixelType>
-PixelType MatNReference<DIM,PixelType>::minorDet(unsigned int i,unsigned int j)const{
+template<int Dim, typename PixelType,typename DataReference>
+PixelType MatNReference<Dim,PixelType,DataReference>::minorDet(unsigned int i,unsigned int j)const{
 
     return this->deleteRow(i).deleteCol(j).determinant();
 }
-template<int DIM, typename PixelType>
-PixelType MatNReference<DIM,PixelType>::cofactor(unsigned int i,unsigned int j)const{
+template<int Dim, typename PixelType,typename DataReference>
+PixelType MatNReference<Dim,PixelType,DataReference>::cofactor(unsigned int i,unsigned int j)const{
     if( (i+j)%2==0)
         return this->minorDet(i,j);
     else
         return -this->minorDet(i,j);
 }
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::cofactor()const{
-    MatNReference<DIM,PixelType> temp(this->getDomain());
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::cofactor()const{
+    MatNReference<Dim,PixelType,DataReference> temp(this->getDomain());
     for(unsigned int i=0;i<this->sizeI();i++)
         for(unsigned int j=0;j<this->sizeJ();j++)
         {
@@ -1273,16 +1251,16 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::cofactor()const{
         }
     return temp;
 }
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::transpose()const
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::transpose()const
 {
     const unsigned int sizei= this->sizeI();
     const unsigned int sizej= this->sizeJ();
-    MatNReference<DIM,PixelType> temp(sizej,sizei);
+    MatNReference<Dim,PixelType,DataReference> temp(sizej,sizei);
     for(unsigned int i=0;i<sizei;i++){
-        typename  MatNReference<DIM,PixelType>::const_iterator this_ptr  =  this->begin() + i*sizej;
-        typename  MatNReference<DIM,PixelType>::const_iterator this_end_ptr  =  this_ptr + sizej;
-        typename  MatNReference<DIM,PixelType>::iterator temp_ptr =     temp.begin() + i;
+        typename  MatNReference<Dim,PixelType,DataReference>::const_iterator this_ptr  =  this->begin() + i*sizej;
+        typename  MatNReference<Dim,PixelType,DataReference>::const_iterator this_end_ptr  =  this_ptr + sizej;
+        typename  MatNReference<Dim,PixelType,DataReference>::iterator temp_ptr =     temp.begin() + i;
         while(this_ptr!=this_end_ptr){
             * temp_ptr =  * this_ptr;
             temp_ptr   +=  sizei;
@@ -1291,8 +1269,8 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::transpose()const
     }
     return temp;
 }
-template<int DIM, typename PixelType>
-PixelType MatNReference<DIM,PixelType>::determinant() const{
+template<int Dim, typename PixelType,typename DataReference>
+PixelType MatNReference<Dim,PixelType,DataReference>::determinant() const{
     if(this->sizeI()==1)
         return this->operator ()(0,0);
     else
@@ -1306,10 +1284,10 @@ PixelType MatNReference<DIM,PixelType>::determinant() const{
     }
 
 }
-template<int DIM, typename PixelType>
-PixelType MatNReference<DIM,PixelType>::trace() const
+template<int Dim, typename PixelType,typename DataReference>
+PixelType MatNReference<Dim,PixelType,DataReference>::trace() const
 {
-    POP_DbgAssertMessage(this->sizeI()==this->sizeJ(),"In  MatNReference<DIM,PixelType>::trace, Input  MatNReference<DIM,PixelType> must be square");
+    POP_DbgAssertMessage(this->sizeI()==this->sizeJ(),"In  MatNReference<Dim,PixelType,DataReference>::trace, Input  MatNReference<Dim,PixelType,DataReference> must be square");
 
     F t=0;
     for(unsigned int i=0;i<this->sizeI();i++)
@@ -1320,21 +1298,21 @@ PixelType MatNReference<DIM,PixelType>::trace() const
 
 
 }
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::identity(int size_mat)const{
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::identity(int size_mat)const{
     if(size_mat==0)
         size_mat=this->sizeI();
-    MatNReference<DIM,PixelType> I(size_mat,size_mat);
+    MatNReference<Dim,PixelType,DataReference> I(size_mat,size_mat);
     for(unsigned int i=0;i<I.sizeI();i++){
         I(i,i)=1;
     }
     return I;
 }
 
-template<int DIM, typename PixelType>
-MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::inverse()const{
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim,PixelType,DataReference>  MatNReference<Dim,PixelType,DataReference>::inverse()const{
     if(sizeI()==2&&sizeJ()==2){
-        MatNReference<DIM,PixelType> temp(*this);
+        MatNReference<Dim,PixelType,DataReference> temp(*this);
         const PixelType det= PixelType(1)/ (temp.operator[](0) * temp.operator[](3) - temp.operator[](1) * temp.operator[](2)) ;
                 std::swap(temp.operator[](0),temp.operator[](3));
                 temp.operator[](1)=-temp.operator[](1)*det;
@@ -1343,7 +1321,7 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::inverse()const{
         temp.operator[](3)*=det;
         return temp;
     }else if(sizeI()==3&&sizeJ()==3){
-        MatNReference<DIM,PixelType > temp(*this);
+        MatNReference<Dim,PixelType,DataReference> temp(*this);
         const PixelType det= PixelType(1)/(temp.operator[](0) * (temp.operator[](4)*temp.operator[](8) - temp.operator[](7) * temp.operator[](5))-temp.operator[](1) * (temp.operator[](3)*temp.operator[](8) - temp.operator[](6) * temp.operator[](5)) +temp.operator[](2) * (temp.operator[](3)*temp.operator[](7) - temp.operator[](4) * temp.operator[](6)));
                                                                                                                                                                         const PixelType t0=  temp.operator[](4)*temp.operator[](8)-temp.operator[](7)*temp.operator[](5);
                                                                  const PixelType t1=-(temp.operator[](3)*temp.operator[](8)-temp.operator[](6)*temp.operator[](5));
@@ -1377,7 +1355,7 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::inverse()const{
     }
     else
     {
-        MatNReference<DIM,PixelType> temp;
+        MatNReference<Dim,PixelType,DataReference> temp;
         PixelType det = this->determinant();
         temp = this->cofactor();
         temp = temp.transpose();
@@ -1386,67 +1364,37 @@ MatNReference<DIM,PixelType>  MatNReference<DIM,PixelType>::inverse()const{
     }
 }
 
-template<int Dim1,int Dim2, typename PixelType>
-MatNReference<Dim1+Dim2, PixelType>  productTensoriel(const MatNReference<Dim1, PixelType>&f,const MatNReference<Dim2, PixelType>& g)
-{
-    typename MatNReference<Dim1+Dim2, PixelType>::E domain;
-    for(int i=0;i<Dim1;i++)
-    {
-        domain(i)=f.getDomain()(i);
-    }
-    for(int i=0;i<Dim2;i++)
-    {
-        domain(i+Dim1)=g.getDomain()(i);
-    }
-    MatNReference<Dim1+Dim2, PixelType> h(domain);
-    typename MatNReference<Dim1+Dim2, PixelType>::IteratorEDomain it(h.getDomain());
 
-    typename MatNReference<Dim1, PixelType>::E x1;
-    typename MatNReference<Dim2, PixelType>::E x2;
-    while(it.next())
-    {
-        for(int i=0;i<Dim1;i++)
-        {
-            x1(i)=it.x()(i);
-        }
-        for(int i=0;i<Dim2;i++)
-        {
-            x2(i)=it.x()(Dim1+i);
-        }
-        h(it.x())=f(x1)*g(x2);
-    }
-    return h;
-}
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>  operator*(PixelType value, const MatNReference<Dim, PixelType>&f)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>  operator*(PixelType value, const MatNReference<Dim, PixelType,DataReference>&f)
 {
     return f*value;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>  operator-(PixelType value, const MatNReference<Dim, PixelType>&f)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>  operator-(PixelType value, const MatNReference<Dim, PixelType,DataReference>&f)
 {
     MatN<Dim, PixelType> h(f);
     FunctorF::FunctorArithmeticConstantValueBefore<PixelType,PixelType,PixelType,FunctorF::FunctorSubtractionF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (h.begin(), h.end(), h.begin(),  op);
     return h;
 }
-template<int Dim, typename PixelType>
-MatNReference<Dim, PixelType>  operator+(PixelType value, const MatNReference<Dim, PixelType>&f)
+template<int Dim, typename PixelType,typename DataReference>
+MatNReference<Dim, PixelType,DataReference>  operator+(PixelType value, const MatNReference<Dim, PixelType,DataReference>&f)
 {
     MatN<Dim, PixelType> h(f);
     FunctorF::FunctorArithmeticConstantValueBefore<PixelType,PixelType,PixelType,FunctorF::FunctorAdditionF2<PixelType,PixelType,PixelType> > op(value);
     std::transform (h.begin(), h.end(), h.begin(),  op);
     return h;
 }
-template<int D,typename F1, typename F2>
-struct FunctionTypeTraitsSubstituteF<MatNReference<D,F1>,F2 >
+template<int D,typename F1, typename F2,typename DataReference>
+struct FunctionTypeTraitsSubstituteF<MatNReference<D,F1,DataReference>,F2 >
 {
-    typedef MatNReference<D,F2> Result;
+    typedef MatNReference<D,F2,DataReference> Result;
 };
-template<int D1,typename F1, int D2>
-struct FunctionTypeTraitsSubstituteDIM<MatNReference<D1,F1>,D2 >
+template<int D1,typename F1, int D2,typename DataReference>
+struct FunctionTypeTraitsSubstituteDIM<MatNReference<D1,F1,DataReference>,D2 >
 {
-    typedef MatNReference<D2,F1> Result;
+    typedef MatNReference<D2,F1,DataReference> Result;
 };
 
 
@@ -1466,14 +1414,9 @@ struct FunctionTypeTraitsSubstituteDIM<MatNReference<D1,F1>,D2 >
 
 
 
-template<int D1,int D2,typename F1, typename F2>
-void FunctionAssert(const MatNReference<D1,F1> & f,const MatNReference<D2,F2> & g ,std::string message)
-{
-    POP_DbgAssertMessage(D1==D2,"matrixs must have the same Dim\n"+message);
-    POP_DbgAssertMessage(f.getDomain()==g.getDomain(),"matrixs must have the same domain\n"+message);
-}
-template<int DIM,typename PixelType>
-struct NumericLimits< MatNReference<DIM,PixelType> >
+
+template<int DIM,typename PixelType,typename DataReference>
+struct NumericLimits< MatNReference<DIM,PixelType,DataReference> >
 {
     static F32 minimumRange() throw()
     { return -NumericLimits<PixelType>::maximumRange();}
@@ -1489,64 +1432,64 @@ struct NumericLimits< MatNReference<DIM,PixelType> >
 * \return output  matrix
 *
 */
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  minimum(const pop::MatNReference<Dim, PixelType>& f,const pop::MatNReference<Dim, PixelType>& g)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  minimum(const pop::MatNReference<Dim, PixelType,DataReference>& f,const pop::MatNReference<Dim, PixelType,DataReference>& g)
 {
     pop::FunctionAssert(f,g,"In min");
-    pop::MatNReference<Dim, PixelType> h(f);
+    pop::MatNReference<Dim, PixelType,DataReference> h(f);
     pop::FunctorF::FunctorMinF2<PixelType,PixelType> op;
 
     std::transform (h.begin(), h.end(), g.begin(),h.begin(), op );
     return h;
 }
-template<int Dim, typename PixelType>
-pop::MatNReference<Dim, PixelType>  maximum(const pop::MatNReference<Dim, PixelType>& f,const pop::MatNReference<Dim, PixelType>& g)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatNReference<Dim, PixelType,DataReference>  maximum(const pop::MatNReference<Dim, PixelType,DataReference>& f,const pop::MatNReference<Dim, PixelType,DataReference>& g)
 {
     pop::FunctionAssert(f,g,"In max");
-    pop::MatNReference<Dim, PixelType> h(f);
+    pop::MatNReference<Dim, PixelType,DataReference> h(f);
     pop::FunctorF::FunctorMaxF2<PixelType,PixelType> op;
     std::transform (h.begin(), h.end(), g.begin(),h.begin(), op );
     return h;
 }
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  absolute(const pop::MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  absolute(const pop::MatNReference<Dim, PixelType,DataReference>& f)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     std::transform (f.begin(), f.end(), h.begin(),(PixelType(*)(PixelType)) abs );
     return h;
 }
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  squareRoot(const pop::MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  squareRoot(const pop::MatNReference<Dim, PixelType,DataReference>& f)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     std::transform (f.begin(), f.end(), h.begin(), (PixelType(*)(PixelType)) sqrt );
     return h;
 }
 
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  log(const pop::MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  log(const pop::MatNReference<Dim, PixelType,DataReference>& f)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     std::transform (f.begin(), f.end(), h.begin(), (PixelType(*)(PixelType)) std::log );
     return h;
 }
 
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  log10(const pop::MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  log10(const pop::MatNReference<Dim, PixelType,DataReference>& f)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     std::transform (f.begin(), f.end(), h.begin(), (PixelType(*)(PixelType)) std::log10 );
     return h;
 }
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  exp(const pop::MatNReference<Dim, PixelType>& f)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  exp(const pop::MatNReference<Dim, PixelType,DataReference>& f)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     std::transform (f.begin(), f.end(), h.begin(), (PixelType(*)(PixelType)) std::exp );
     return h;
 }
-template<int Dim, typename PixelType>
-pop::MatN<Dim, PixelType>  pow(const pop::MatNReference<Dim, PixelType>& f,F32 exponant)
+template<int Dim, typename PixelType,typename DataReference>
+pop::MatN<Dim, PixelType>  pow(const pop::MatNReference<Dim, PixelType,DataReference>& f,F32 exponant)
 {
     pop::MatN<Dim, PixelType> h =f.toMatN();
     pop::Private::PowF<PixelType> op(exponant);
@@ -1555,8 +1498,8 @@ pop::MatN<Dim, PixelType>  pow(const pop::MatNReference<Dim, PixelType>& f,F32 e
 }
 
 
-template<int Dim, typename PixelType>
-F32  normValue(const pop::MatNReference<Dim, PixelType>& A,int p=2)
+template<int Dim, typename PixelType,typename DataReference>
+F32  normValue(const pop::MatNReference<Dim, PixelType,DataReference>& A,int p=2)
 {
     pop::Private::sumNorm<PixelType> op(p);
     if(p!=0)
@@ -1565,23 +1508,23 @@ F32  normValue(const pop::MatNReference<Dim, PixelType>& A,int p=2)
         return std::accumulate(A.begin(),A.end(),0.,op);
 
 }
-template<int Dim, typename PixelType>
-F32 distance(const pop::MatNReference<Dim, PixelType>& A, const pop::MatNReference<Dim, PixelType>& B,int p=2)
+template<int Dim, typename PixelType,typename DataReference>
+F32 distance(const pop::MatNReference<Dim, PixelType,DataReference>& A, const pop::MatNReference<Dim, PixelType,DataReference>& B,int p=2)
 {
     return normValue(A-B,p);
 }
 
 
-template<int Dim, typename PixelType>
-F32  normPowerValue(const pop::MatNReference<Dim, PixelType>& f,int p=2)
+template<int Dim, typename PixelType,typename DataReference>
+F32  normPowerValue(const pop::MatNReference<Dim, PixelType,DataReference>& f,int p=2)
 {
     pop::Private::sumNorm<PixelType> op(p);
     return std::accumulate(f.begin(),f.end(),0.,op);
 }
 
 
-template <class PixelType>
-std::ostream& operator << (std::ostream& out, const pop::MatNReference<2,PixelType>& in)
+template <class PixelType,typename DataReference>
+std::ostream& operator << (std::ostream& out, const pop::MatNReference<2,PixelType,DataReference>& in)
 {
     Private::ConsoleOutputPixel<2,PixelType> output;
     for( int i =0;i<in.getDomain()(0);i++){
@@ -1592,95 +1535,6 @@ std::ostream& operator << (std::ostream& out, const pop::MatNReference<2,PixelTy
         out<<std::endl;
     }
     return out;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
-void forEachGlobalToLocal(const MatNReference<2,Type1> & f, MatNReference<2,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatNReference<2,Type1>::IteratorEDomain ){
-    int i,j;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(facc,it_local)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
-                it_local.init(Vec2I32(i,j));
-                h(i,j)=forEachFunctorAccumulator(f,facc,it_local);
-            }
-        }
-    }
-}
-template<typename Type1,typename Type2,typename FunctorAccumulatorF,typename IteratorEGlobal,typename IteratorELocal>
-void forEachGlobalToLocal(const MatNReference<3,Type1> & f, MatNReference<3,Type2> &  h, FunctorAccumulatorF facc,IteratorELocal  it_local,typename MatNReference<3,Type1>::IteratorEDomain ){
-    int i,j,k;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(facc,it_local)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<f.sizeI();i++){
-            for(j=0;j<f.sizeJ();j++){
-                for(k=0;k<f.sizeK();k++){
-                    it_local.init(Vec3I32(i,j,k));
-                    h(i,j,k)=forEachFunctorAccumulator(f,facc,it_local);
-                }
-            }
-        }
-    }
-}
-template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
-void forEachFunctorBinaryFunctionE(const MatNReference<2,Type1> & f, MatNReference<2,Type2> &  h,  FunctorBinaryFunctionE func, typename MatNReference<2,Type1>::IteratorEDomain)
-{
-    int i,j;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j) firstprivate(func)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<static_cast<int>(f.sizeI());i++){
-            for(j=0;j<static_cast<int>(f.sizeJ());j++){
-                h(Vec2I32(i,j))=func( f, Vec2I32(i,j));
-            }
-        }
-    }
-}
-template<typename Type1,typename Type2,typename FunctorBinaryFunctionE>
-void forEachFunctorBinaryFunctionE(const MatNReference<3,Type1> & f, MatNReference<3,Type2> &  h,  FunctorBinaryFunctionE func, typename MatNReference<3,Type1>::IteratorEDomain)
-{
-    int i,j,k;
-#if defined(HAVE_OPENMP)
-#pragma omp parallel shared(f,h) private(i,j,k) firstprivate(func)
-#endif
-    {
-#if defined(HAVE_OPENMP)
-#pragma omp for schedule (static)
-#endif
-        for(i=0;i<static_cast<int>(f.sizeI());i++){
-            for(j=0;j<static_cast<int>(f.sizeJ());j++){
-                for(k=0;k<static_cast<int>(f.sizeK());k++){
-                    h(Vec3I32(i,j,k))=func( f, Vec3I32(i,j,k));
-                }
-            }
-        }
-    }
 }
 
 

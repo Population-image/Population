@@ -1863,20 +1863,20 @@ PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)
 template<int Dim, typename PixelType>
 const PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)const
 {
-    POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
+    POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ()));
     return  this->operator[](j+i*_domain(1));
 }
 template<int Dim, typename PixelType>
 PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)
 {
-    POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
+    POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
     return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
 }
 
 template<int Dim, typename PixelType>
 const PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)const
 {
-    POP_DbgAssert(  i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
+    POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
     return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
 }
 
