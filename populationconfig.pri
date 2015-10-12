@@ -7,7 +7,7 @@ CONFIG += HAVE_CIMG    #CIMG to display 2d image in windows
 #CONFIG += HAVE_OPENMP #openmp optimization working for many algorithms (a must have for 3d images or real time)
 #CONFIG += HAVE_QT     #convert QImage to pop::Mat2UI8 or pop::Mat2RGBUI8
 #CONFIG += HAVE_VLC    #VideoVLC to load stream video as rtsp  stream or avi file
-#CONFIG += HAVE_FFMPEG #VideoVLC to load stream video (as rtsp)  or file video (sudo apt-get install libavcodec-ffmpeg-dev  libavformat-ffmpeg-dev  libswscale-ffmpeg-dev )
+#CONFIG += HAVE_FFMPEG  #FFMPEG to load stream video (as rtsp)  or file video (sudo apt-get install libavcodec-ffmpeg-dev  libavformat-ffmpeg-dev  libswscale-ffmpeg-dev )
 #CONFIG += HAVE_OPENCV #convert cv::Mat to pop::Mat2UI8 or pop::Mat2RGBUI8
 
 DEFINES += 'POP_PROJECT_SOURCE_DIR=\'\"$${PWD}\"\''#path to the population library
@@ -60,9 +60,10 @@ HAVE_FFMPEG {
     DEFINES*=HAVE_THREAD
     unix:LIBS*=-lX11 -lpthread
     win32:LIBS*=-lAdvapi32 -lgdi32 -luser32 -lshell32
-    win32:FFMPEGPATH+=D:/Users/vtariel/DEV/ffmpeg-20150106-git-a79ac73-win32-dev/  #replace by yours
-    win32:INCLUDEPATH+=$${POPULATIONPATH}/include
-    win32:LIBS+=-L$${POPULATIONPATH}/lib
+    win32:FFMPEGPATH+=../../ffmpeg-20151004-git-84b4998-win32-dev/  #replace by yours
+    win32:INCLUDEPATH+=$${FFMPEGPATH}/include
+    win32:LIBS+=-L$${FFMPEGPATH}/lib
+    win32:LIBS+=-L"../../ffmpeg-20151004-git-84b4998-win32-shared/bin"
     LIBS += -lavcodec
     LIBS += -lavformat
     LIBS += -lavutil
