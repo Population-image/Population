@@ -155,7 +155,7 @@ bool VideoVLCDeprecated::open(const std::string & path){
             libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
             *(context->index) =0;
             //                std::cout<<"return true"<<std::endl;
-            pop::BasicUtility::sleep_ms(1000);
+            //pop::BasicUtility::sleep_ms(1000);
             return true;
         }else{
             libvlc_media_player_stop(mediaPlayer);
@@ -224,7 +224,7 @@ bool VideoVLCDeprecated::grabMatrixGrey(){
         }
 
         if(!_isfile) {
-            pop::BasicUtility::sleep_ms(10000);
+            pop::BasicUtility::sleep_ms(100);
         }
     }
     my_index=*context->index;
@@ -252,7 +252,7 @@ bool VideoVLCDeprecated::grabMatrixRGB(){
         }
 
         if(!_isfile) {
-            pop::BasicUtility::sleep_ms(10000);
+            pop::BasicUtility::sleep_ms(100);
         }
     }
     my_index=*context->index;

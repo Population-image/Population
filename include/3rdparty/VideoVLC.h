@@ -41,6 +41,9 @@ public:
     bool isFile()const;
     bool isPlaying() const;
 
+
+
+
 private:
     void release();
 };

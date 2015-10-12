@@ -56,7 +56,7 @@ HAVE_QT {
 HAVE_FFMPEG {
 ##For linux,  install the ffmpeg library as usual (ubuntu  sudo apt-get install ffmpeg)
 ##For windows, link your project with the dev ffmpeg library http://ffmpeg.zeranoe.com/builds/win32/dev/
-    DEFINES+= HAVE_FFMPEG
+    DEFINES+=HAVE_FFMPEG
     DEFINES*=HAVE_THREAD
     unix:LIBS*=-lX11 -lpthread
     win32:LIBS*=-lAdvapi32 -lgdi32 -luser32 -lshell32

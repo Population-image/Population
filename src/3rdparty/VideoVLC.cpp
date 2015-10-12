@@ -214,7 +214,7 @@ bool VideoVLC::grabMatrixGrey(){
                 //std::cout << "VIDEO STOPPED PLAYING!!!" << std::endl;
                 return false;
             }
-            pop::BasicUtility::sleep_ms(5);
+            pop::BasicUtility::sleep_ms(10);
         }
 
         my_index = context->index;

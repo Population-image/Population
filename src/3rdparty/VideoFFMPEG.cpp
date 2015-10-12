@@ -195,11 +195,9 @@ bool VideoFFMPEG::grabMatrixRGB(){
                     packet->stream_index = stream->id;
                     result=avcodec_decode_video2(ccontext, picture, &check, packet);
                 }
-                //                std::cout << "Bytes decoded " << result << " check " << check << std::endl;
-                //                std::cout << "Line size "<<picture->linesize[0]<<std::endl;
-                //                std::cout << "ccontext->width "<<ccontext->width*ccontext->height<<std::endl;
             }
             else{
+                pop::BasicUtility::sleep_ms(10);
                 try_read++;
                 if(try_read>100)
                     check=1;
