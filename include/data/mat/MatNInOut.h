@@ -466,7 +466,7 @@ template<I32 D,typename T>
 void MatNInOut::saveRaw(const MatN<D,T> &in ,const char * file){
     std::ofstream  out(file);
     if (out.fail())
-        std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
+        std::cerr<<"In MatN::save, cannot open file: "+std::string(file) << std::endl;
     else
         MatNInOutPgm::writeRawData(in ,out);
 }
@@ -478,7 +478,7 @@ void MatNInOut::save(const MatN<D,T> &in ,const char * file){
         if(in.getDomain().multCoordinate()<20){
             std::ofstream  out(file);
             if (out.fail()){
-                std::cerr<<"In MatN::save, cannot open file: "+std::string(file);
+                std::cerr<<"In MatN::save, cannot open file: "+std::string(file) << std::endl;
             }
             else{
                 MatNInOutPgm::writeAscii(in,out);
@@ -488,7 +488,7 @@ void MatNInOut::save(const MatN<D,T> &in ,const char * file){
         else{
             std::ofstream  out(file,std::ios::binary);
             if (out.fail()){
-                std::cerr<<"In MatN::save, Cannot open file: "+std::string(file);
+                std::cerr<<"In MatN::save, Cannot open file: "+std::string(file) << std::endl;
             }
             else{
                 MatNInOutPgm::writeRaw(in,out);
@@ -513,7 +513,7 @@ bool MatNInOut::loadRaw(MatN<DIM,Result> &in, const char * file  ){
 
     std::ifstream  is(file,std::iostream::binary);
     if (is.fail()){
-        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file) << std::endl;
         return false;
     }
     else{
@@ -536,7 +536,7 @@ bool MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
     std::ifstream  is2(file,std::iostream::binary);
     if (is2.fail())
     {
-        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+        std::cerr<<"In MatN::load, Cannot open file: "+std::string(file) << std::endl;
         return false;
     }
     is2.close();
@@ -547,7 +547,7 @@ bool MatNInOut::load(MatN<DIM,Result> &in,const char * file  )
         std::ifstream  is(file,std::iostream::binary);
         if (is.fail())
         {
-            std::cerr<<"In MatN::load, Cannot open file: "+std::string(file);
+            std::cerr<<"In MatN::load, Cannot open file: "+std::string(file) << std::endl;
             return false;
         }
         else

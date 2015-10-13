@@ -44,6 +44,10 @@ void Cryptography::xor_encryptOrDecryptBinary(char* d, const size_t len,
 char* Cryptography::xor_decryptFile(const std::string filename, size_t *len, const char* key,
 		const size_t key_len) {
 	std::ifstream infile(filename.c_str(), std::ios::binary);
+    if (!infile) {
+        *len = 0;
+        return NULL;
+    }
 	infile.seekg(0, infile.end);
     *len = (size_t)infile.tellg();
 

@@ -229,7 +229,7 @@ bool  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)
     std::vector<unsigned char> byte_array;
     if(lodepng::decode(byte_array, width, height, filename,LCT_RGB,8)==0){
         if(byte_array.size()==0){
-            std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
+            std::cerr<<"In MatN::load, cannot open file: "+std::string(filename) << std::endl;
             return false;
         }
         img.resize(height,width);
@@ -253,7 +253,7 @@ bool  MatNInOut::_loadBMP( MatN<2, UI8 > &img, const char * filename){
     BIPMAP::CBitmap bimg;
     bimg.Load(filename);
     if(bimg.GetWidth()==0||bimg.GetHeight()==0){
-        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename) << std::endl;
         return false;
     }
     img.resize(bimg.GetHeight(),bimg.GetWidth());
@@ -269,7 +269,7 @@ bool  MatNInOut::_loadBMP( MatN<2, RGBUI8 > &img, const char * filename){
     BIPMAP::CBitmap bimg;
     bimg.Load(filename);
     if(bimg.GetWidth()==0||bimg.GetHeight()==0){
-        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename) << std::endl;
         return false;
     }
     img.resize(bimg.GetHeight(),bimg.GetWidth());
@@ -331,7 +331,7 @@ bool  MatNInOut::_loadJPG( MatN<2, UI8 > &img, const char * filename){
     int actual_comps;
     unsigned char * dat = jpgd::decompress_jpeg_image_from_file(filename, &width, &height, &actual_comps, 1);
     if(dat==0){
-        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename) << std::endl;
         return false;
     }
     img.resize(height,width);
@@ -347,7 +347,7 @@ bool  MatNInOut::_loadJPG( MatN<2, RGBUI8 > &img, const char * filename){
     int actual_comps;
     unsigned char * dat = jpgd::decompress_jpeg_image_from_file(filename, &width, &height, &actual_comps, 3);
     if(dat==0){
-        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename);
+        std::cerr<<"In MatN::load, cannot open file: "+std::string(filename) << std::endl;
         return false;
     }
     img.resize(height,width);

@@ -236,7 +236,7 @@ void Mat2x< PixelType, SIZEI, SIZEJ>::load(const char *file)
     std::ifstream  in(file);
     if (in.fail())
     {
-        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
@@ -248,7 +248,7 @@ void Mat2x< PixelType, SIZEI, SIZEJ>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
@@ -812,7 +812,7 @@ void Mat2x<PixelType,2,2>::load(const char *file)
     std::ifstream  in(file);
     if (in.fail())
     {
-        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
@@ -824,7 +824,7 @@ void Mat2x<PixelType,2,2>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
@@ -1424,7 +1424,7 @@ void Mat2x<PixelType,3,3>::load(const char *file)
     std::ifstream  in(file);
     if (in.fail())
     {
-        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::load, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
@@ -1436,7 +1436,7 @@ void Mat2x<PixelType,3,3>::save(const char * file)const {
     std::ofstream  out(file);
     if (out.fail())
     {
-        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file);
+        std::cerr<<"In Matrix::save, cannot open file: "+std::string(file) << std::endl;
     }
     else
     {
