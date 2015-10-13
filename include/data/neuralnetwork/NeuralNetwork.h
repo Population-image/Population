@@ -118,6 +118,8 @@ struct NeuronSigmoid
 struct NeuralLayerLinear : public NeuralLayer
 {
     NeuralLayerLinear(unsigned int nbr_neurons);
+    NeuralLayerLinear(const NeuralLayerLinear & net);
+    NeuralLayerLinear&  operator=(const NeuralLayerLinear & net);
     VecF32& X();
     const VecF32& X()const;
     VecF32& d_E_X();
@@ -133,16 +135,18 @@ class NeuralLayerMatrix : public NeuralLayerLinear
 {
 public:
     NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
-    const Vec<MatNReference<2,F32> > & X_map()const;
-    Vec<MatNReference<2,F32> >& X_map();
-    const Vec<MatNReference<2,F32> > & d_E_X_map()const;
-    Vec<MatNReference<2,F32> >& d_E_X_map();
+    NeuralLayerMatrix(const NeuralLayerMatrix & net);
+    NeuralLayerMatrix&  operator=(const NeuralLayerMatrix & net);
+    const Vec<MatNReference<2,F32,VecF32::iterator> > & X_map()const;
+    Vec<MatNReference<2,F32,VecF32::iterator> >& X_map();
+    const Vec<MatNReference<2,F32,VecF32::iterator> > & d_E_X_map()const;
+    Vec<MatNReference<2,F32,VecF32::iterator> >& d_E_X_map();
     virtual void setTrainable(bool istrainable);
 
-    Vec<MatNReference<2,F32> > _X_reference;
-    Vec<MatNReference<2,F32> > _Y_reference;
-    Vec<MatNReference<2,F32> > _d_E_X_reference;
-    Vec<MatNReference<2,F32> > _d_E_Y_reference;
+    Vec<MatNReference<2,F32,VecF32::iterator> > _X_reference;
+    Vec<MatNReference<2,F32,VecF32::iterator> > _Y_reference;
+    Vec<MatNReference<2,F32,VecF32::iterator> > _d_E_X_reference;
+    Vec<MatNReference<2,F32,VecF32::iterator> > _d_E_Y_reference;
 
 
 };
@@ -366,9 +370,7 @@ public:
      */
     void learn();
 
-//    std::pair<Vec2I32,int> getDomainMatrixInput()const;
-//    std::pair<Vec2I32,int> getDomainMatrixOutput()const;
-//    MatNReference<2,F32>&  getMatrixOutput(int map_index)const;
+
 
     /*!
      * \brief set the normalization algorithm for the generation of the input values from a matrix

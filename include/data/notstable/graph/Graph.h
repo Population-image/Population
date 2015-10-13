@@ -148,6 +148,8 @@ public:
     GraphAdjencyList(){
 
     }
+    GraphAdjencyList(unsigned int nbr_vertex)
+        :_v_vertex(nbr_vertex),_v_adjency_list(nbr_vertex){}
     GraphAdjencyList(unsigned int nbr_vertex, VertexType v)
         :_v_vertex(nbr_vertex,v),_v_adjency_list(nbr_vertex){}
 

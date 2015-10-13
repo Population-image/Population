@@ -28,6 +28,8 @@
 /* cuda library */
 #cmakedefine HAVE_CUDA
 
+/* debug mode */
+#cmakedefine HAVE_DEBUG
 
 #define POP_PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}"
 

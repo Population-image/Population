@@ -66,7 +66,8 @@ public:
     {}
 
     void addPoint(const VecN<DIM,I32> & x){
-        POP_DbgAssertMessage(_m==NULL,"Set an sMatrix to the CharacteristicGreyLevelMean");
+        POP_DbgAssertMessage(_m!=NULL,"Set an sMatrix to the CharacteristicGreyLevelMean");
+
         _mean= (_mean *_nbr_point +_m->operator ()(x))/(_nbr_point+1);
         _variance = (_mean *_nbr_point + (_m->operator ()(x)-_mean)*(_m->operator ()(x)-_mean) )/(_nbr_point+1);
         _nbr_point++;

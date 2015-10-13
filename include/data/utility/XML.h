@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include "PopulationConfig.h"
+#include "3rdparty/pugixml.hpp"
 namespace pop
 {
 
@@ -53,9 +54,9 @@ public:
     void setAttribute(std::string name,std::string  value);
     void addAttribute(std::string name,std::string  value);
     bool rmAttribute(std::string name);
-    struct Impl;
-    Impl *_impl;
-
+//    struct Impl;
+//    Impl *_impl;
+    pugi::xml_node _node;
 };
 
 
