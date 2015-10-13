@@ -203,7 +203,11 @@ inline std::string NowTime() {
     time(&rawtime);
     struct tm * timeinfo = localtime(&rawtime);
     std::string s = asctime(timeinfo);
-    s.erase(s.length()-1);
+    try {
+        s.erase(s.length()-1);
+    } catch (...) {
+        std::cerr << "pb getting time: " << s << ", " << s.length() << std::endl;
+    }
     return s;
 }
 
