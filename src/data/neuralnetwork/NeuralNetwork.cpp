@@ -141,11 +141,11 @@ NeuralNet MNISTNeuralNetLeCun5::createNet(std::string train_datapath,  std::stri
                 Mat2UI8 m_n = binary;
                 pop::Draw::addBorder(m_n,3,0);
                 if(iselastic==true)
-                m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,3,2);
+                    m_n = pop::MNISTNeuralNetLeCun5::elasticDeformation(m_n,3,2);
                 if(i==1||i==7){
-                   m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,25,30);
+                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,15,15,25,30);
                 }else{
-                   m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,30,30,25,30);
+                    m_n = pop::MNISTNeuralNetLeCun5::affineDeformation(m_n,30,30,25,30);
                 }
                 VecF32 vin = net.inputMatrixToInputNeuron(m_n);
                 vtraining_in.push_back(vin);
@@ -286,11 +286,11 @@ NeuralLayerLinear::NeuralLayerLinear(unsigned int nbr_neurons)
 {
 }
 NeuralLayerLinear::NeuralLayerLinear(const NeuralLayerLinear & net){
-   __Y=net.__Y;
-   __X=net.__X;
+    __Y=net.__Y;
+    __X=net.__X;
 
-   _d_E_Y=net._d_E_Y;
-   _d_E_X=net._d_E_X;
+    _d_E_Y=net._d_E_Y;
+    _d_E_X=net._d_E_X;
 
 }
 
@@ -342,7 +342,7 @@ NeuralLayerMatrix&  NeuralLayerMatrix::operator=(const NeuralLayerMatrix & net){
         _Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._Y_reference(i).sizeI(), net._Y_reference(i).sizeJ()),this->__Y.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
         _X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
     }
-        return *this;
+    return *this;
 }
 
 
@@ -1091,21 +1091,22 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
         mini=(std::min)(mini,mrf(xx));
     }
     if(maxi-mini==0){
-        throw(std::string("[ERROR] in conversion matrix to neuron values"));
-    }
-    if(_normalization_value==0){
-        F32 diff = (maxi-mini)/2.f;
-        ForEachDomain2D(xxx,mrf){
-            mrf(xxx) = (mrf(xxx)-mini)/diff-1;
-        }
+        mrf.fill(1);
+        return VecF32(mrf);
     }else{
-        F32 diff = (maxi-mini);
-        ForEachDomain2D(xxx,mrf){
-            mrf(xxx) = (mrf(xxx)-mini)/diff;
+        if(_normalization_value==0){
+            F32 diff = (maxi-mini)/2.f;
+            ForEachDomain2D(xxx,mrf){
+                mrf(xxx) = (mrf(xxx)-mini)/diff-1;
+            }
+        }else{
+            F32 diff = (maxi-mini);
+            ForEachDomain2D(xxx,mrf){
+                mrf(xxx) = (mrf(xxx)-mini)/diff;
+            }
         }
+        return VecF32(mrf);
     }
-    //        mrf.display();
-    return VecF32(mrf);
 }
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
@@ -1156,7 +1157,6 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
         trans(1)=0;
     }
 
-
     F32 maxi=pop::NumericLimits<F32>::minimumRange();
     F32 mini=pop::NumericLimits<F32>::maximumRange();
 
@@ -1166,20 +1166,22 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
         mrf(xx+trans)=mr(xx);
     }
     if(maxi-mini==0){
-        throw(std::string("[ERROR] in conversion matrix to neuron values"));
-    }
-    if(_normalization_value==0){
-        F32 diff = (maxi-mini)/2.f;
-        ForEachDomain2D(xxx,mrf){
-            mrf(xxx) = (mrf(xxx)-mini)/diff-1;
-        }
+        mrf.fill(1);
+        return VecF32(mrf);
     }else{
-        F32 diff = (maxi-mini);
-        ForEachDomain2D(xxx,mrf){
-            mrf(xxx) = (mrf(xxx)-mini)/diff;
+        if(_normalization_value==0){
+            F32 diff = (maxi-mini)/2.f;
+            ForEachDomain2D(xxx,mrf){
+                mrf(xxx) = (mrf(xxx)-mini)/diff-1;
+            }
+        }else{
+            F32 diff = (maxi-mini);
+            ForEachDomain2D(xxx,mrf){
+                mrf(xxx) = (mrf(xxx)-mini)/diff;
+            }
         }
+        return VecF32(mrf);
     }
-    return VecF32(mrf);
 }
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);
