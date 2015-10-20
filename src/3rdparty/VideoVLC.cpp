@@ -1,9 +1,6 @@
 #include "3rdparty/VideoVLC.h"
-
 #if defined(HAVE_VLC)
-
 #include <string.h>
-
 #include"3rdparty/tinythread.h"
 
 namespace pop
@@ -250,7 +247,16 @@ Mat2RGBUI8& VideoVLC::retrieveMatrixRGB(){
     //the vlc cleanup callback deletes context->image_RV32 once the end of the stream is reached
     if (context->image_RV32) {
         imgcolor.resize(context->image_RV32->getDomain());
-        std::transform(context->image_RV32->begin(),context->image_RV32->end(),imgcolor.begin(),ConvertRV32ToRGBUI8::lumi);
+        pop::MatN<2,pop::VecN<4,UI8> >::iterator it =  context->image_RV32->begin();
+        pop::MatN<2,pop::VecN<4,UI8> >::iterator it_end =  context->image_RV32->end();
+        Mat2RGBUI8::iterator it_out = imgcolor.begin();
+        while(it!=it_end){
+            it_out->r()=it->operator [](2);
+            it_out->g()=it->operator [](1);
+            it_out->b()=it->operator [](0);
+            it++;
+            it_out++;
+        }
     }
     context->pmutex->unlock();
     return imgcolor;
