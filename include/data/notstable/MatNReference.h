@@ -75,7 +75,7 @@ public:
     typedef typename Vec<PixelType>::allocator_type                        		 allocator_type;
 
 
-
+	MatNReference(){}
     MatNReference(const VecN<Dim,int>& domain, DataReference v);
     MatN<Dim,PixelType> toMatN()const;
 
