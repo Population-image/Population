@@ -153,7 +153,7 @@ std::vector<std::string> BasicUtility::getFilesInDirectory(std::string dir)
     DIR *dp;
     struct dirent *dirp;
     if((dp  = opendir(dir.c_str())) == NULL) {
-        std::cerr<<"BasicUtility::getFilesInDirectory, Cannot open this directory"+std::string(dir);
+        std::cerr<<"BasicUtility::getFilesInDirectory, Cannot open this directory "+std::string(dir) << std::endl;
         return std::vector<std::string>();
     }
     std::vector<std::string> files;
