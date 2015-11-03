@@ -525,7 +525,7 @@ void Vec<CoordinateType>::load(std::string file){
     std::ifstream  in(file.c_str());
     if (in.fail())
     {
-        std::cerr<<"In Matrix::load, Matrix: cannot open file: "+file;
+        std::cerr<<"In Matrix::load, Matrix: cannot open file: "+file << std::endl;
     }
     else
     {
@@ -537,7 +537,7 @@ void Vec<CoordinateType>::save(std::string file)const {
     std::ofstream  out(file.c_str());
     if (out.fail())
     {
-        std::cerr<<"In Matrix::save, cannot open file: "+file;
+        std::cerr<<"In Matrix::save, cannot open file: "+file << std::endl;
     }
     else
     {
