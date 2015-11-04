@@ -390,19 +390,22 @@ void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool aut
     VecN<DIM,pop::F32> scale;
     scale =1;
     if(automaticresize ==true&&Dim==2){
+        //std::cout << __FILE__ << "::" << __LINE__ << std::endl;
         scale = scale*(600.f/img.getDomain()(0));
         img= GeometricalTransformation::scale(img,scale);
     }
-
+    //std::cout << __FILE__ << "::" << __LINE__ << std::endl;
     if(Dim==2){
 
-
+        //std::cout << __FILE__ << "::" << __LINE__ << std::endl;
         Private::Display< Dim, PixelType>::v_display.push_back(MatNDisplay());
 
         Private::Display< Dim, PixelType>::v_display.rbegin()->display(img);
         Private::Display< Dim, PixelType>::v_display.rbegin()->set_title(title);
+        //std::cout << __FILE__ << "::" << __LINE__ << std::endl;
         if(stop_process==true){
             while (!Private::Display< Dim, PixelType>::v_display.rbegin()->is_closed()) {
+                //std::cout << __FILE__ << "::" << __LINE__ << std::endl;
                 Private::Display< Dim, PixelType>::v_display.rbegin()->waitTime();
                 int iimg =(int)1.*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_y()/Private::Display< Dim, PixelType>::v_display.rbegin()->height()*img.getDomain()(0);
                 int jimg =(int)1.*Private::Display< Dim, PixelType>::v_display.rbegin()->mouse_x()/Private::Display< Dim, PixelType>::v_display.rbegin()->width()*img.getDomain()(1);
@@ -417,6 +420,7 @@ void MatN<Dim,PixelType>::display(const char * title,bool stop_process, bool aut
             }
         }
     }else if(DIM==3){
+        std::cout << __FILE__ << "::" << __LINE__ << std::endl;
         Vec2I32 d;
         d(0)=img.getDomain()(0);
         d(1)=img.getDomain()(1);

@@ -1397,13 +1397,10 @@ struct FunctionTypeTraitsSubstituteDIM<MatNReference<D1,F1,DataReference>,D2 >
     typedef MatNReference<D2,F1,DataReference> Result;
 };
 
-
 #define ForEachDomain2D(x,img) \
     pop::Vec2I32 x; \
     for( x(0)=0;x(0)<img.getDomain()(0);x(0)++)\
     for( x(1)=0;x(1)<img.getDomain()(1);x(1)++)
-
-
 
 #define ForEachDomain3D(x,img) \
     pop::Vec3I32 x; \

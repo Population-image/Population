@@ -11,7 +11,8 @@ CONFIG += MAKE_EXE #comment this line to generate the shared library
 MAKE_EXE{
     CONFIG += executable
     TEMPLATE = app
-    SOURCES +=  $${PWD}/main.cpp
+#    SOURCES +=  $${PWD}/main.cpp
+    SOURCES += $${PWD}/main1.cpp
 }else{
     CONFIG+=plugin
     TEMPLATE = lib
