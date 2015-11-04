@@ -31,7 +31,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/3rdparty/jpgd.h \
            $${PWD}/include/3rdparty/jpge.h \
            $${PWD}/include/3rdparty/lodepng.h \
-           $${PWD}/include/3rdparty/log.h \
+           $${PWD}/include/3rdparty/easylogging++.h \
            $${PWD}/include/3rdparty/MatNDisplayCImg.h \
            $${PWD}/include/3rdparty/MTRand.h \
            $${PWD}/include/3rdparty/pugiconfig.hpp \
