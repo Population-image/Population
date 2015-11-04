@@ -315,6 +315,10 @@ void NeuralLayerLinear::setTrainable(bool istrainable){
         this->_d_E_X.clear();
     }
 }
+void NeuralLayerLinear::print(){
+    std::cout<<"Number neuron="<<this->__X.size()<<std::endl;
+}
+
 NeuralLayerMatrix::NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
@@ -343,6 +347,9 @@ NeuralLayerMatrix&  NeuralLayerMatrix::operator=(const NeuralLayerMatrix & net){
         _X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
     }
     return *this;
+}
+void NeuralLayerMatrix::print(){
+    std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
 }
 
 
@@ -427,7 +434,11 @@ void NeuralLayerLinearFullyConnected::learn(){
 NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
     return new   NeuralLayerLinearFullyConnected(*this);
 }
-
+void NeuralLayerLinearFullyConnected::print(){
+    std::cout<<"Fully connected layer"<<std::endl;
+    std::cout<<"Weight Size i="<<this->_W.sizeI()<<" j="<<this->_W.sizeJ()<<std::endl;
+    NeuralLayerLinear::print();
+}
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
     :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor))),
                        static_cast<unsigned int>(std::floor ( sizej_map_previous/(1.f*sub_scaling_factor))),
@@ -437,7 +448,11 @@ NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_fact
 {
 
 }
-
+void NeuralLayerMatrixMaxPool::print(){
+    std::cout<<"Max pool layer"<<std::endl;
+    std::cout<<"sub_resolution_factor size="<<_sub_resolution_factor<<std::endl;
+    NeuralLayerMatrix::print();
+}
 void NeuralLayerMatrixMaxPool::setTrainable(bool istrainable){
     NeuralLayerMatrix::setTrainable(istrainable);
     _istrainable = istrainable;
@@ -531,6 +546,15 @@ NeuralLayerMatrixConvolutionSubScaling::NeuralLayerMatrixConvolutionSubScaling(u
         _W_biais(i)=n.randomVariable();
     }
 }
+void NeuralLayerMatrixConvolutionSubScaling::print(){
+    std::cout<<"Convolution layer"<<std::endl;
+    std::cout<<"Kernel number="<<_W_kernels.size()<<" size i="<<_W_kernels(0).sizeI()<<" size j="<<_W_kernels(0).sizeJ()<<std::endl ;
+    std::cout<<"subscaling factor="<<_sub_resolution_factor <<std::endl;
+    NeuralLayerMatrix::print();
+}
+
+
+
 void NeuralLayerMatrixConvolutionSubScaling::setTrainable(bool istrainable){
     NeuralLayerMatrix::setTrainable(istrainable);
     if(istrainable==true){
@@ -655,7 +679,6 @@ NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
 
 
 
-
 NeuralLayerLinearInput::NeuralLayerLinearInput(unsigned int nbr_neurons)
     :NeuralLayerLinear(nbr_neurons){}
 void NeuralLayerLinearInput::forwardCPU(const NeuralLayer& ) {}
@@ -665,6 +688,11 @@ void NeuralLayerLinearInput::setTrainable(bool istrainable){NeuralLayerLinear::s
 NeuralLayer * NeuralLayerLinearInput::clone(){
     return new NeuralLayerLinearInput(*this);
 }
+void NeuralLayerLinearInput::print(){
+    std::cout<<"Linear input layer"<<std::endl;
+    NeuralLayerLinear::print();
+}
+
 NeuralLayerMatrixInput::NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerMatrix(sizei,  sizej,  nbr_map){}
 void NeuralLayerMatrixInput::forwardCPU(const NeuralLayer& ) {}
@@ -675,6 +703,10 @@ NeuralLayer * NeuralLayerMatrixInput::clone(){
     NeuralLayerMatrixInput * layer = new NeuralLayerMatrixInput(this->X_map()(0).sizeI(),this->X_map()(0).sizeJ(),this->X_map().size());
     return layer;
 }
+void NeuralLayerMatrixInput::print(){
+    std::cout<<"Matrix input layer"<<std::endl;
+    NeuralLayerMatrix::print();}
+
 
 NeuralNet::NeuralNet()
     :_normalizationmatrixinput(new NormalizationMatrixInputMass())
@@ -1111,7 +1143,9 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
-
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
+}
 NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(NormalizationMatrixInput::NormalizationValue normalization)
     :_normalization_value(normalization)
 {
@@ -1185,5 +1219,21 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
 }
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);
+}
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
+}
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
 }
 }

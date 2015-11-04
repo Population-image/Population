@@ -97,14 +97,13 @@ public:
     /** @brief get output value */
     virtual const VecF32& X()const=0;
     virtual VecF32& X()=0;
-    /** @brief get output value */
+    /** @brief get the error output value */
     virtual VecF32& d_E_X()=0;
     /** @brief set the layer to be trainable */
     virtual void setTrainable(bool istrainable)=0;
     void setLearnableParameter(F32 mu);
     virtual NeuralLayer * clone()=0;
-    //XXX TODO: need a destructor in order to avoid an undefined behaviour
-    //virtual ~NeuralLayer()=0;
+    virtual void print()=0;
     F32 _mu;
 };
 
@@ -124,7 +123,7 @@ struct NeuralLayerLinear : public NeuralLayer
     const VecF32& X()const;
     VecF32& d_E_X();
     virtual void setTrainable(bool istrainable);
-
+        virtual void print();
     VecF32 __Y;
     VecF32 __X;
     VecF32 _d_E_Y;
@@ -142,7 +141,7 @@ public:
     const Vec<MatNReference<2,F32,VecF32::iterator> > & d_E_X_map()const;
     Vec<MatNReference<2,F32,VecF32::iterator> >& d_E_X_map();
     virtual void setTrainable(bool istrainable);
-
+    virtual void print();
     Vec<MatNReference<2,F32,VecF32::iterator> > _X_reference;
     Vec<MatNReference<2,F32,VecF32::iterator> > _Y_reference;
     Vec<MatNReference<2,F32,VecF32::iterator> > _d_E_X_reference;
@@ -161,6 +160,7 @@ public:
     void learn();
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
+    virtual void print();
 };
 
 class NeuralLayerMatrixInput : public NeuralLayerMatrix
@@ -173,6 +173,7 @@ public:
     void learn();
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
+    virtual void print();
 };
 
 class NeuralLayerLinearFullyConnected : public NeuronSigmoid,public NeuralLayerLinear
@@ -184,6 +185,7 @@ public:
     virtual void backwardCPU(NeuralLayer& layer_previous);
     void learn();
     virtual NeuralLayer * clone();
+    virtual void print();
     Mat2F32 _W;
     VecF32 _X_biais;
     Mat2F32 _d_E_W;
@@ -199,6 +201,7 @@ public:
     virtual void backwardCPU(NeuralLayer& layer_previous);
     void learn();
     virtual NeuralLayer * clone();
+    virtual void print();
     Vec<Mat2F32> _W_kernels;
     Vec<F32> _W_biais;
     Vec<Mat2F32> _d_E_W_kernels;
@@ -211,7 +214,7 @@ class NeuralLayerMatrixMaxPool : public NeuronSigmoid,public NeuralLayerMatrix
 public:
     NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous);
     void setTrainable(bool istrainable);
-
+    virtual void print();
     virtual void forwardCPU(const NeuralLayer& layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
     void learn();
@@ -235,6 +238,7 @@ public:
     void save(XMLNode & node)const;
     static NormalizationMatrixInput* load(const XMLNode & node);
     virtual VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain)=0;
+    virtual void print()=0;
 };
 class NormalizationMatrixInputMass : public NormalizationMatrixInput
 {
@@ -242,6 +246,7 @@ public:
     NormalizationMatrixInputMass(NormalizationMatrixInput::NormalizationValue normalization=NormalizationMatrixInput::MinusOneToOne);
     VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain);
     NormalizationMatrixInputMass *clone();
+    virtual void print();
     NormalizationValue _normalization_value;
 };
 class NormalizationMatrixInputCentering : public NormalizationMatrixInput
@@ -251,6 +256,7 @@ public:
     VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix,Vec2I32 domain);
     NormalizationMatrixInputCentering *clone();
     NormalizationValue _normalization_value;
+    virtual void print();
 };
 
 
@@ -369,9 +375,6 @@ public:
      *
      */
     void learn();
-
-
-
     /*!
      * \brief set the normalization algorithm for the generation of the input values from a matrix
      *
@@ -379,7 +382,7 @@ public:
     void setNormalizationMatrixInput(NormalizationMatrixInput * input);
 
     /*!
-     * \brief get the input values for a matrix
+     * \brief get the input values from a matrix
      *
      */
     VecF32 inputMatrixToInputNeuron(const Mat2UI8  & matrix);
@@ -426,6 +429,10 @@ public:
     Vec<std::string>& label2String();
     const Vec<NeuralLayer*>& layers()const;
     Vec<NeuralLayer*>& layers();
+    /*!
+    * \brief print the network structure on the standart output
+    */
+    virtual void print();
 
 private:
     Vec<std::string> _label2string;
