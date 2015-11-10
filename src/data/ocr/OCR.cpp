@@ -6,7 +6,7 @@
 #include "algorithm/Processing.h"
 #include"data/notstable/CharacteristicCluster.h"
 #include"data/mat/MatNDisplay.h"
-#include "3rdparty/log.h"
+
 namespace pop
 {
 OCR::~OCR()
@@ -66,8 +66,7 @@ int OCRNeuralNetwork::characterConfidence(){
 }
 
 bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
-    FILE_LOG(logINFO, *this, FUNCTION_SIG) << "load neural network from : " << xmlfile << std::endl;
-//    std::cout << "xmlfile : " << xmlfile << std::endl;
+   std::cout << "xmlfile : " << xmlfile << std::endl;
     if(BasicUtility::isFile(xmlfile)){
         _n.load(xmlfile.c_str());
         return true;
