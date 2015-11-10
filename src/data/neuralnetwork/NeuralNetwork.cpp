@@ -349,6 +349,9 @@ NeuralLayerMatrix&  NeuralLayerMatrix::operator=(const NeuralLayerMatrix & net){
     }
     return *this;
 }
+void NeuralLayerMatrix::print(){
+    std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
+}
 
 void NeuralLayerMatrix::print(){
     std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
@@ -442,7 +445,11 @@ void NeuralLayerLinearFullyConnected::print(){
 NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
     return new   NeuralLayerLinearFullyConnected(*this);
 }
-
+void NeuralLayerLinearFullyConnected::print(){
+    std::cout<<"Fully connected layer"<<std::endl;
+    std::cout<<"Weight Size i="<<this->_W.sizeI()<<" j="<<this->_W.sizeJ()<<std::endl;
+    NeuralLayerLinear::print();
+}
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
     :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor))),
                        static_cast<unsigned int>(std::floor ( sizej_map_previous/(1.f*sub_scaling_factor))),
@@ -684,7 +691,6 @@ NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
 
 
 
-
 NeuralLayerLinearInput::NeuralLayerLinearInput(unsigned int nbr_neurons)
     :NeuralLayerLinear(nbr_neurons){}
 void NeuralLayerLinearInput::forwardCPU(const NeuralLayer& ) {}
@@ -710,6 +716,7 @@ NeuralLayer * NeuralLayerMatrixInput::clone(){
     NeuralLayerMatrixInput * layer = new NeuralLayerMatrixInput(this->X_map()(0).sizeI(),this->X_map()(0).sizeJ(),this->X_map().size());
     return layer;
 }
+
 void NeuralLayerMatrixInput::print() {
     std::cout<<"Matrix input layer"<<std::endl;
     NeuralLayerMatrix::print();
@@ -794,7 +801,6 @@ void NeuralNet::forwardCPU(const VecF32& X_in, VecF32& X_out){
         X_out.resize((*(_v_layer.rbegin()))->X().size());
     }
     std::copy((*(_v_layer.rbegin()))->X().begin(),(*(_v_layer.rbegin()))->X().end(),X_out.begin());
-    //    std::cout << "NeuralNet::forwardCPU X_out : " << X_out << std::endl;
 }
 
 void NeuralNet::backwardCPU(const VecF32& X_expected){
@@ -1156,7 +1162,9 @@ void NormalizationMatrixInputMass::print(){
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
-
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
+}
 NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(NormalizationMatrixInput::NormalizationValue normalization)
     :_normalization_value(normalization)
 {
@@ -1249,5 +1257,21 @@ void NeuralNet::print(){
 
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);
+}
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
+}
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
 }
 }
