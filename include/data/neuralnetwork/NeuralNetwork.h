@@ -114,6 +114,10 @@ struct NeuronSigmoid
 
 };
 
+struct Softmax {
+    void softmax(Vec<F32>& x);
+};
+
 struct NeuralLayerLinear : public NeuralLayer
 {
     NeuralLayerLinear(unsigned int nbr_neurons);
@@ -189,6 +193,19 @@ public:
     Mat2F32 _W;
     VecF32 _X_biais;
     Mat2F32 _d_E_W;
+};
+
+class NeuralLayerLinearFullyConnectedSoftmax : public NeuralLayerLinearFullyConnected
+{
+public:
+    NeuralLayerLinearFullyConnectedSoftmax(unsigned int nbr_neurons_previous,unsigned int nbr_neurons);
+    //void setTrainable(bool istrainable);
+    virtual void forwardCPU(const NeuralLayer &layer_previous);
+    virtual void backwardCPU(NeuralLayer& layer_previous);
+    //void learn();
+    //virtual NeuralLayer * clone();
+    virtual void print();
+    Softmax _sm;
 };
 
 class NeuralLayerMatrixConvolutionSubScaling : public NeuronSigmoid,public NeuralLayerMatrix
@@ -310,6 +327,13 @@ public:
      *
      */
     void addLayerLinearFullyConnected(unsigned int nbr_neurons);
+
+    /*!
+     * \brief  add an output fully connected layer with softmax
+     * \param nbr_neurons number of neurons
+     *
+     */
+    void addLayerLinearFullyConnectedSoftmax(unsigned int nbr_neurons);
 
     /*!
      * \brief  add a convolutionnal layer
