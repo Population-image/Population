@@ -6,6 +6,7 @@
 #include "algorithm/Processing.h"
 #include"data/notstable/CharacteristicCluster.h"
 #include"data/mat/MatNDisplay.h"
+
 namespace pop
 {
 OCR::~OCR()
@@ -41,16 +42,19 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
         VecF32 vin= _n.inputMatrixToInputNeuron(m);
         VecF32 vout;
         _n.forwardCPU(vin,vout);
+        //std::cout << "vout of neural network : " << vout << std::endl;
         //                _n.propagateFront(vin,vout);
         VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
         int label_max = std::distance(vout.begin(),itt);
         F32 value_max = *itt;
+//        std::cout << "value_max : " << value_max << std::endl;
         if(value_max<0)
             _isrecognized=false;
         else
             _isrecognized=true;
         _confidence = (std::min)(100,static_cast<int>(value_max*100));
         std::string c= _n.label2String()[label_max];
+//        std::cout << "label2String of NN : " << _n.label2String() << std::endl;
         return c[0];
 
     }
@@ -62,6 +66,7 @@ int OCRNeuralNetwork::characterConfidence(){
 }
 
 bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
+   std::cout << "xmlfile : " << xmlfile << std::endl;
     if(BasicUtility::isFile(xmlfile)){
         _n.load(xmlfile.c_str());
         return true;

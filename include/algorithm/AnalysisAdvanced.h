@@ -138,6 +138,8 @@ struct AnalysisAdvanced
         return v;
 
     }
+
+    // commenter temporairement
     template<int DIM,typename PixelType,typename Iterator>
     static pop::Vec<MatN<DIM,UI8>  > labelToMatrices(const MatN<DIM,PixelType> & label,  pop::Vec<typename MatN<DIM,PixelType>::E> & v_xmin,pop::Vec<typename MatN<DIM,PixelType>::E>&  v_xmax, Iterator & it)
     {
@@ -174,6 +176,46 @@ struct AnalysisAdvanced
         return v;
 
     }
+
+
+//    template<int DIM,typename PixelType,typename Iterator>
+//    static pop::Vec<MatN<DIM,UI8>  > labelToMatrices(const MatN<DIM,PixelType> & label,  pop::Vec<typename MatN<DIM,PixelType>::E> & v_xmin,pop::Vec<typename MatN<DIM,PixelType>::E>&  v_xmax, Iterator & it)
+//    {
+
+//        v_xmin.clear();
+//        v_xmax.clear();
+//        while(it.next()){
+//            if(static_cast<unsigned int>(label(it.x()))>v_xmin.size()){
+//                typename MatN<DIM,PixelType>::E ymin(+NumericLimits<int>::maximumRange());
+//                typename MatN<DIM,PixelType>::E ymax(-NumericLimits<int>::maximumRange());
+//                v_xmin.resize(label(it.y()),ymin);
+//                v_xmax.resize(label(it.y()),ymax);
+//            }
+//            if(label(it.y())>0){
+//                v_xmin[label(it.y())-1]= minimum(it.y(),v_xmin[label(it.y())-1]);
+//                v_xmax[label(it.y())-1]= maximum(it.y(),v_xmax[label(it.y())-1]) ;
+//            }
+//        }
+//        pop::Vec<MatN<DIM,UI8> > v(static_cast<int>(v_xmin.size()));
+//        for(int i =0;i<static_cast<int>(v_xmin.size());i++){
+//            if(v_xmin[i][0]!=NumericLimits<int>::maximumRange()){
+//                typename MatN<DIM,PixelType>::E size = (v_xmax[i]-v_xmin[i])+1;
+//                v[i] = MatN<DIM,UI8>(size);
+//            }
+//        }
+//        it.init();
+//        while(it.next()){
+//            if(label(it.y())>0){
+//                int index = label(it.y())-1;
+//                typename MatN<DIM,PixelType>::E pos = it.y()-v_xmin[label(it.y())-1];
+//                v(index)(pos)=255;
+//            }
+//        }
+//        return v;
+
+//    }
+
+
     template<typename Function,typename Iterator>
     static typename Function::F maxValue(const Function & f,  Iterator & it)
     {
