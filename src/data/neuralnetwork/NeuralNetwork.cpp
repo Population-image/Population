@@ -5,7 +5,6 @@
 #include "data/mat/MatNDisplay.h"
 #include "PopulationConfig.h"
 #include "algorithm/Arithmetic.h"
-#include <cmath>
 namespace pop {
 
 Mat2UI8 MNISTNeuralNetLeCun5::elasticDeformation(const Mat2UI8 &m, F32 sigma,F32 alpha){
@@ -354,6 +353,10 @@ void NeuralLayerMatrix::print(){
     std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
 }
 
+void NeuralLayerMatrix::print(){
+    std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
+}
+
 const Vec<MatNReference<2,F32,VecF32::iterator> > & NeuralLayerMatrix::X_map()const{return _X_reference;}
 Vec<MatNReference<2,F32,VecF32::iterator> >& NeuralLayerMatrix::X_map(){return _X_reference;}
 
@@ -384,13 +387,6 @@ NeuralLayerLinearFullyConnected::NeuralLayerLinearFullyConnected(unsigned int nb
         _W(i)=n.randomVariable();
     }
 }
-
-NeuralLayerLinearFullyConnectedSoftmax::NeuralLayerLinearFullyConnectedSoftmax(unsigned int nbr_neurons_previous, unsigned int nbr_neurons)
-    : NeuralLayerLinearFullyConnected(nbr_neurons_previous, nbr_neurons)
-{
-
-}
-
 void NeuralLayerLinearFullyConnected::setTrainable(bool istrainable){
     NeuralLayerLinear::setTrainable(istrainable);
     if(istrainable==true){
@@ -408,23 +404,14 @@ void NeuralLayerLinearFullyConnected::forwardCPU(const NeuralLayer& layer_previo
     }
 
 }
-
-void NeuralLayerLinearFullyConnectedSoftmax::forwardCPU(const NeuralLayer &layer_previous) {
-    std::copy(layer_previous.X().begin(),layer_previous.X().end(),this->_X_biais.begin());
-    this->__Y = this->_W * this->_X_biais;
-    for(unsigned int i=0;i<__Y.size();i++){
-        //this->__X(i) = NeuronSigmoid::activation(this->__Y(i));
-        // ignore non-linearity
-        this->__X(i) = this->__Y(i);
-    }
-    // softmax
-    _sm.softmax(this->__X);
-}
-
 void NeuralLayerLinearFullyConnected::backwardCPU(NeuralLayer& layer_previous){
 
     VecF32& d_E_X_previous= layer_previous.d_E_X();
     for(unsigned int i=0;i<this->__Y.size();i++){
+        //        if(NeuronSigmoid::derivedActivation(this->__X(i))>1.3){
+        //            std::cerr<<"error "<<std::endl;
+        //        }
+
         this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->__X(i));
     }
 
@@ -441,29 +428,6 @@ void NeuralLayerLinearFullyConnected::backwardCPU(NeuralLayer& layer_previous){
         }
     }
 }
-
-void NeuralLayerLinearFullyConnectedSoftmax::backwardCPU(NeuralLayer &layer_previous) {
-    VecF32& d_E_X_previous= layer_previous.d_E_X();
-    for(unsigned int i=0;i<this->__Y.size();i++){
-        //this->_d_E_Y(i) = this->_d_E_X(i)*NeuronSigmoid::derivedActivation(this->__X(i));
-        // ignore the non-linearity
-        this->_d_E_Y(i) = this->_d_E_X(i);
-    }
-
-    //TODO ADD THE ERROR
-    for(unsigned int i=0;i<this->_W.sizeI();i++){
-        for(unsigned int j=0;j<this->_W.sizeJ();j++){
-            this->_d_E_W(i,j)=this->_X_biais(j)*this->_d_E_Y(i);
-        }
-    }
-    for(unsigned int j=0;j<d_E_X_previous.size();j++){
-        d_E_X_previous(j)=0;
-        for(unsigned int i=0;i<this->_W.sizeI();i++){
-            d_E_X_previous(j)+=this->_d_E_Y(i)*this->_W(i,j);
-        }
-    }
-}
-
 void NeuralLayerLinearFullyConnected::learn(){
     for(unsigned int i=0;i<this->_W.sizeI();i++){
         for(unsigned int j=0;j<this->_W.sizeJ();j++){
@@ -478,22 +442,14 @@ void NeuralLayerLinearFullyConnected::print(){
     NeuralLayerLinear::print();
 }
 
-<<<<<<< HEAD
 NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
     return new   NeuralLayerLinearFullyConnected(*this);
 }
-=======
-void NeuralLayerLinearFullyConnectedSoftmax::print() {
-    std::cout<<"Softmax fully connected layer"<<std::endl;
+void NeuralLayerLinearFullyConnected::print(){
+    std::cout<<"Fully connected layer"<<std::endl;
     std::cout<<"Weight Size i="<<this->_W.sizeI()<<" j="<<this->_W.sizeJ()<<std::endl;
     NeuralLayerLinear::print();
 }
-
-NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
-    return new   NeuralLayerLinearFullyConnected(*this);
-}
-
->>>>>>> 5b6cb36db9472419667b8dac3fc834f5886d0693
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
     :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor))),
                        static_cast<unsigned int>(std::floor ( sizej_map_previous/(1.f*sub_scaling_factor))),
@@ -808,14 +764,6 @@ void NeuralNet::addLayerLinearFullyConnected(unsigned int nbr_neurons){
         this->_v_layer.push_back(new NeuralLayerLinearFullyConnected((*(_v_layer.rbegin()))-> X().size(),nbr_neurons));
     }
 }
-void NeuralNet::addLayerLinearFullyConnectedSoftmax(unsigned int nbr_neurons) {
-    if(_v_layer.size()==0){
-        this->_v_layer.push_back(new NeuralLayerLinearFullyConnectedSoftmax(0,nbr_neurons));
-    }else{
-        this->_v_layer.push_back(new NeuralLayerLinearFullyConnectedSoftmax((*(_v_layer.rbegin()))-> X().size(),nbr_neurons));
-    }
-}
-
 void NeuralNet::addLayerMatrixConvolutionSubScaling(unsigned int nbr_map,unsigned int sub_scaling_factor,unsigned int radius_kernel){
     if(NeuralLayerMatrix * neural_matrix = dynamic_cast<NeuralLayerMatrix *>(*(_v_layer.rbegin()))){
         this->_v_layer.push_back(new NeuralLayerMatrixConvolutionSubScaling( nbr_map, sub_scaling_factor,  radius_kernel,neural_matrix->X_map()(0).sizeI(),neural_matrix->X_map()(0).sizeJ(),neural_matrix->X_map().size()));
@@ -859,21 +807,9 @@ void NeuralNet::backwardCPU(const VecF32& X_expected){
 
     //first output layer
     NeuralLayer* layer_last = _v_layer[_v_layer.size()-1];
-    if (NeuralLayerLinearFullyConnectedSoftmax* layer_last_sm = dynamic_cast<NeuralLayerLinearFullyConnectedSoftmax*>(layer_last)) {
-        // the error function of softmax is different from square error
-        for(unsigned int j=0;j<X_expected.size();j++){
-            layer_last_sm->d_E_X()(j) = layer_last->X()(j);
-            if (X_expected(j) == 1) {
-                layer_last_sm->d_E_X()(j) -= 1;
-            }
-        }
-    } else {
-        for(unsigned int j=0;j<X_expected.size();j++){
-            layer_last->d_E_X()(j) = ( layer_last->X()(j)-X_expected(j));
-        }
+    for(unsigned int j=0;j<X_expected.size();j++){
+        layer_last->d_E_X()(j) = ( layer_last->X()(j)-X_expected(j));
     }
-    //std::cout << "X after forwardCPU : " << layer_last->X() << std::endl;
-    //std::cout << "d_E_X after backwardCPU : " << layer_last->d_E_X() << std::endl;
 
     for( int index_layer=_v_layer.size()-1;index_layer>0;index_layer--){
         NeuralLayer* layer = _v_layer[index_layer];
@@ -1005,26 +941,13 @@ void NeuralNet::load(XMLDocument &doc)
                     neural_linear->_W[index_weight] = weight;
                 }
             }
-        } else if (type == "NNLayer::FULLYCONNECTEDSOFTMAX") {
-            std::string str = tool.getAttribute("size");
-            int size;
-            BasicUtility::String2Any(str,size);
-            this->addLayerLinearFullyConnectedSoftmax(size);
-            str = tool.getAttribute("weight");
-            if(NeuralLayerLinearFullyConnectedSoftmax * neural_linear = dynamic_cast<NeuralLayerLinearFullyConnectedSoftmax *>(*(_v_layer.rbegin()))){
-                std::istringstream stream(str);
-                for(unsigned int index_weight=0;index_weight<neural_linear->_W.size();index_weight++){
-                    F32 weight ;
-                    str = pop::BasicUtility::getline( stream, ";" );
-                    (use_optimized_string2float ? pop::BasicUtility::String2Float(str, weight) : pop::BasicUtility::String2Any(str, weight));
-                    neural_linear->_W[index_weight] = weight;
-                }
-            }
-        } else if(type=="NNLayer::MAXPOOL"){
+        }
+        else if(type=="NNLayer::MAXPOOL"){
             std::string str = tool.getAttribute("sub_scaling");
             int sub_resolution;
             BasicUtility::String2Any(str,sub_resolution);
             this->addLayerMatrixMaxPool(sub_resolution);
+
         }
     }
 }
@@ -1083,16 +1006,6 @@ void NeuralNet::save(const char * file)const
             std::string weight_str;
             for(unsigned int index_w=0;index_w<layer_fully->_W.size();index_w++){
                 weight_str+=BasicUtility::Any2String(layer_fully->_W[index_w])+";";
-            }
-            nodechild.addAttribute("weight",weight_str);
-        } else if (const NeuralLayerLinearFullyConnectedSoftmax* layer_fully_softmax = dynamic_cast<const NeuralLayerLinearFullyConnectedSoftmax*>(layer)) {
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::FULLYCONNECTEDSOFTMAX");
-            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully_softmax->X().size()));
-
-            std::string weight_str;
-            for(unsigned int index_w=0;index_w<layer_fully_softmax->_W.size();index_w++){
-                weight_str+=BasicUtility::Any2String(layer_fully_softmax->_W[index_w])+";";
             }
             nodechild.addAttribute("weight",weight_str);
         }else if(const NeuralLayerMatrixMaxPool *layer_max_pool= dynamic_cast<const NeuralLayerMatrixMaxPool *>(layer)){
@@ -1242,10 +1155,16 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     }
 }
 
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
+}
+
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
-
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
+}
 NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(NormalizationMatrixInput::NormalizationValue normalization)
     :_normalization_value(normalization)
 {
@@ -1318,21 +1237,41 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     }
 }
 
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
+}
 
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
+}
 
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);
 }
-
-void Softmax::softmax(Vec<F32>& x) {
-    F32 sum = 0;
-    for (Vec<F32>::iterator it = x.begin() ; it != x.end() ; it ++) {
-        *it = std::exp(*it);
-        sum += *it;
-    }
-    for (Vec<F32>::iterator it = x.begin() ; it != x.end() ; it ++) {
-        *it /= sum;
-    }
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
 }
-
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
+}
 }
