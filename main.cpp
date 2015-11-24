@@ -3,6 +3,9 @@ using namespace pop;//Population namespace
 int main(){
     Mat2UI8 img;//2d grey-level image object
     img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
+
+    img = Processing::thresholdAdaptativeSmoothFast(img,0.01);
+    img.display();
     img = PDE::nonLinearAnisotropicDiffusion(img);//filtering
     int value;
     Mat2UI8 threshold = Processing::thresholdOtsuMethod(img,value);//threshold segmentation

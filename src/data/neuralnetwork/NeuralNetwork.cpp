@@ -353,10 +353,6 @@ void NeuralLayerMatrix::print(){
     std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
 }
 
-void NeuralLayerMatrix::print(){
-    std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
-}
-
 const Vec<MatNReference<2,F32,VecF32::iterator> > & NeuralLayerMatrix::X_map()const{return _X_reference;}
 Vec<MatNReference<2,F32,VecF32::iterator> >& NeuralLayerMatrix::X_map(){return _X_reference;}
 
@@ -444,11 +440,6 @@ void NeuralLayerLinearFullyConnected::print(){
 
 NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
     return new   NeuralLayerLinearFullyConnected(*this);
-}
-void NeuralLayerLinearFullyConnected::print(){
-    std::cout<<"Fully connected layer"<<std::endl;
-    std::cout<<"Weight Size i="<<this->_W.sizeI()<<" j="<<this->_W.sizeJ()<<std::endl;
-    NeuralLayerLinear::print();
 }
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
     :NeuralLayerMatrix(static_cast<unsigned int>(std::floor (  sizei_map_previous/(1.f*sub_scaling_factor))),
@@ -1155,10 +1146,6 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     }
 }
 
-void NormalizationMatrixInputMass::print(){
-    std::cout<<"Mass"<<std::endl;
-}
-
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
@@ -1237,23 +1224,7 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     }
 }
 
-void NormalizationMatrixInputCentering::print(){
-    std::cout<<"bounding box"<<std::endl;
-}
 
-void NeuralNet::print(){
-    std::cout<<"NET STRUCTURE"<<std::endl;
-    for(unsigned int i =0;i<this->_v_layer.size();i++){
-        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
-        _v_layer[i]->print();
-    }
-    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
-    for(unsigned int i=0;i<this->_label2string.size();i++)
-        std::cout<<this->_label2string(i)<<" ";
-    std::cout<<std::endl;
-    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
-    this->_normalizationmatrixinput->print();
-}
 
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);
