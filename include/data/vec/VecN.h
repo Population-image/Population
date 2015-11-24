@@ -1377,10 +1377,13 @@ struct VecNIndice<3>
 template<int DIM>
 struct VecN2IndiceByTable
 {
-        Vec< int> _table;
-    VecN2IndiceByTable(const VecN<DIM,int>  & =VecN<DIM,int> (0))
-    {
-    }
+	Vec< int> _table;
+	VecN2IndiceByTable()
+	{
+	}
+	VecN2IndiceByTable(const VecN<DIM,int>  &V)
+	{
+	}
 
     int VecN2Indice(const VecN<DIM,int> & size, const VecN<DIM,int> & x)const
     {
