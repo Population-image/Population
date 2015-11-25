@@ -65,10 +65,6 @@ namespace pop{
 #   define POP_DbgAssertMessage(condition, message) do { (void)(condition);(void) (message); } while (0)
 #endif
 
-#ifdef HAVE_ACML
-#define PROC 1
-#endif
-
 template<typename Function, typename F>
 struct FunctionTypeTraitsSubstituteF
 {

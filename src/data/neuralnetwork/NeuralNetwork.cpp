@@ -825,6 +825,7 @@ NeuralNet::NeuralNet()
     :_normalizationmatrixinput(new NormalizationMatrixInputMass())
 {}
 
+
 NeuralNet::NeuralNet(const NeuralNet & neural){
 
     this->_label2string = neural._label2string;
@@ -836,6 +837,19 @@ NeuralNet::NeuralNet(const NeuralNet & neural){
     _normalizationmatrixinput = neural._normalizationmatrixinput->clone();
 }
 
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
+}
 NeuralNet & NeuralNet::operator =(const NeuralNet & neural){
     this->_label2string = neural._label2string;
     this->clear();
@@ -1312,10 +1326,6 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     }
 }
 
-void NormalizationMatrixInputMass::print(){
-    std::cout<<"Mass"<<std::endl;
-}
-
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
@@ -1324,6 +1334,12 @@ NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(Normalizati
     :_normalization_value(normalization)
 {
 
+}
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
+}
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
 }
 
 VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8  & img,Vec2I32 domain){
@@ -1392,23 +1408,7 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     }
 }
 
-void NormalizationMatrixInputCentering::print(){
-    std::cout<<"bounding box"<<std::endl;
-}
 
-void NeuralNet::print(){
-    std::cout<<"NET STRUCTURE"<<std::endl;
-    for(unsigned int i =0;i<this->_v_layer.size();i++){
-        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
-        _v_layer[i]->print();
-    }
-    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
-    for(unsigned int i=0;i<this->_label2string.size();i++)
-        std::cout<<this->_label2string(i)<<" ";
-    std::cout<<std::endl;
-    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
-    this->_normalizationmatrixinput->print();
-}
 
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);

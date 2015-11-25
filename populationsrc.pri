@@ -83,9 +83,12 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/vec/VecN.h \
            $${PWD}/include/data/video/Video.h \
            $${PWD}/include/data/notstable/graph/Graph.h \
-           $${PWD}/include/data/functor/FunctorMatN.h \
-           $${PWD}/include/tensor/tensor.h \
+           $${PWD}/include/data/functor/FunctorMatN.h
+
+HAVE_ACML {
+HEADERS += $${PWD}/include/tensor/tensor.h \
            $${PWD}/include/algorithm/processingtensor.h
+}
 
 SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/algorithm/LinearAlgebra.cpp \
@@ -122,6 +125,9 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/utility/BasicUtility.cpp \
            $${PWD}/src/data/utility/Cryptography.cpp \
            $${PWD}/src/data/utility/XML.cpp \
-           $${PWD}/src/data/video/Video.cpp \
-           $${PWD}/src/tensor/tensor.cpp \
+           $${PWD}/src/data/video/Video.cpp
+
+HAVE_ACML {
+HEADERS += $${PWD}/src/tensor/tensor.cpp \
            $${PWD}/src/algorithm/processingtensor.cpp
+}
