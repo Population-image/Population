@@ -39,6 +39,7 @@ in the Software.
 #include"algorithm/Analysis.h"
 #include"algorithm/Draw.h"
 #include"data/mat/MatNIteratorE.h"
+#include <chrono>
 namespace pop
 {
 /** \defgroup Processing Processing
@@ -456,6 +457,7 @@ struct POP_EXPORTS Processing
     */
     template<typename PixelType>
     static MatN<2,UI8>  thresholdAdaptativeDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
+        std::cout << __FILE__ << "::" << __LINE__ << " sigma : " << sigma << " offset_value : " << offset_value << std::endl;
         MatN<2,PixelType> smooth = Processing::smoothDeriche(f,sigma);
         Mat2UI8 thresold(smooth.getDomain());
         for(unsigned int i=0;i<smooth.size();i++){

@@ -103,6 +103,7 @@ public:
     virtual void setTrainable(bool istrainable)=0;
     void setLearnableParameter(F32 mu);
     virtual NeuralLayer * clone()=0;
+    /** @brief save the layer to the corresponding nodechild of xml file */
     virtual void save(XMLNode& nodechild) = 0;
     virtual void print()=0;
     F32 _mu;

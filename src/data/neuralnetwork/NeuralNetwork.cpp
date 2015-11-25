@@ -285,6 +285,7 @@ void NeuralLayer::setLearnableParameter(F32 mu){
 NeuralLayerLinear::NeuralLayerLinear(unsigned int nbr_neurons)
     :__Y(nbr_neurons),__X(nbr_neurons)
 {
+
 }
 NeuralLayerLinear::NeuralLayerLinear(const NeuralLayerLinear & net){
     __Y=net.__Y;
