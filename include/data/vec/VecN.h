@@ -1381,7 +1381,7 @@ struct VecN2IndiceByTable
 	VecN2IndiceByTable()
 	{
 	}
-	VecN2IndiceByTable(const VecN<DIM,int>  &V)
+    VecN2IndiceByTable(const VecN<DIM,int>  &)
 	{
 	}
 

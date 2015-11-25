@@ -285,6 +285,7 @@ void NeuralLayer::setLearnableParameter(F32 mu){
 NeuralLayerLinear::NeuralLayerLinear(unsigned int nbr_neurons)
     :__Y(nbr_neurons),__X(nbr_neurons)
 {
+
 }
 NeuralLayerLinear::NeuralLayerLinear(const NeuralLayerLinear & net){
     __Y=net.__Y;
@@ -478,14 +479,36 @@ void NeuralLayerLinearFullyConnected::print(){
     NeuralLayerLinear::print();
 }
 
+void NeuralLayerLinearFullyConnected::save(XMLNode& nodechild) {
+    nodechild.addAttribute("type","NNLayer::FULLYCONNECTED");
+    nodechild.addAttribute("size",BasicUtility::Any2String(this->X().size()));
+
+    std::string weight_str;
+    for(unsigned int index_w=0;index_w<this->_W.size();index_w++){
+        weight_str+=BasicUtility::Any2String(this->_W[index_w])+";";
+    }
+    nodechild.addAttribute("weight",weight_str);
+}
+
 void NeuralLayerLinearFullyConnectedSoftmax::print() {
     std::cout<<"Softmax fully connected layer"<<std::endl;
     std::cout<<"Weight Size i="<<this->_W.sizeI()<<" j="<<this->_W.sizeJ()<<std::endl;
     NeuralLayerLinear::print();
 }
 
+void NeuralLayerLinearFullyConnectedSoftmax::save(XMLNode &nodechild) {
+    nodechild.addAttribute("type","NNLayer::FULLYCONNECTEDSOFTMAX");
+    nodechild.addAttribute("size",BasicUtility::Any2String(this->X().size()));
+
+    std::string weight_str;
+    for(unsigned int index_w=0;index_w<this->_W.size();index_w++){
+        weight_str+=BasicUtility::Any2String(this->_W[index_w])+";";
+    }
+    nodechild.addAttribute("weight",weight_str);
+}
+
 NeuralLayer * NeuralLayerLinearFullyConnected::clone(){
-    return new   NeuralLayerLinearFullyConnected(*this);
+    return new NeuralLayerLinearFullyConnected(*this);
 }
 
 NeuralLayerMatrixMaxPool::NeuralLayerMatrixMaxPool(unsigned int sub_scaling_factor,unsigned int sizei_map_previous,unsigned int sizej_map_previous,unsigned int nbr_map_previous)
@@ -502,6 +525,11 @@ void NeuralLayerMatrixMaxPool::print(){
     std::cout<<"Max pool layer"<<std::endl;
     std::cout<<"sub_resolution_factor size="<<_sub_resolution_factor<<std::endl;
     NeuralLayerMatrix::print();
+}
+
+void NeuralLayerMatrixMaxPool::save(XMLNode &nodechild) {
+    nodechild.addAttribute("type","NNLayer::MAXPOOL");
+    nodechild.addAttribute("sub_scaling",BasicUtility::Any2String(this->_sub_resolution_factor));
 }
 
 void NeuralLayerMatrixMaxPool::setTrainable(bool istrainable){
@@ -603,6 +631,26 @@ void NeuralLayerMatrixConvolutionSubScaling::print(){
     std::cout<<"Kernel number="<<_W_kernels.size()<<" size i="<<_W_kernels(0).sizeI()<<" size j="<<_W_kernels(0).sizeJ()<<std::endl ;
     std::cout<<"subscaling factor="<<_sub_resolution_factor <<std::endl;
     NeuralLayerMatrix::print();
+}
+
+void NeuralLayerMatrixConvolutionSubScaling::save(XMLNode &nodechild) {
+    nodechild.addAttribute("type","NNLayer::MATRIXCONVOLUTIONNAL");
+    nodechild.addAttribute("nbr_map",BasicUtility::Any2String(this->X_map().size()));
+    nodechild.addAttribute("sizekernel",BasicUtility::Any2String(this->_radius_kernel));
+    nodechild.addAttribute("subsampling",BasicUtility::Any2String(this->_sub_resolution_factor));
+
+    std::string weight_str;
+    for(unsigned int index_w=0;index_w<this->_W_biais.size();index_w++){
+        weight_str+=BasicUtility::Any2String(this->_W_biais[index_w])+";";
+    }
+    nodechild.addAttribute("weight_biais",weight_str);
+    weight_str.clear();
+    for(unsigned int index_w=0;index_w<this->_W_kernels.size();index_w++){
+        for(unsigned int index_weight_j=0;index_weight_j<this->_W_kernels(index_w).size();index_weight_j++){
+            weight_str+=BasicUtility::Any2String(this->_W_kernels(index_w)(index_weight_j))+";";
+        }
+    }
+    nodechild.addAttribute("weight_kernel",weight_str);
 }
 
 void NeuralLayerMatrixConvolutionSubScaling::setTrainable(bool istrainable){
@@ -744,6 +792,11 @@ void NeuralLayerLinearInput::print(){
     NeuralLayerLinear::print();
 }
 
+void NeuralLayerLinearInput::save(XMLNode &nodechild) {
+    nodechild.addAttribute("type","NNLayer::INPUTLINEAR");
+    nodechild.addAttribute("size",BasicUtility::Any2String(this->X().size()));
+}
+
 NeuralLayerMatrixInput::NeuralLayerMatrixInput(unsigned int sizei,unsigned int sizej,unsigned int nbr_map)
     :NeuralLayerMatrix(sizei,  sizej,  nbr_map){}
 void NeuralLayerMatrixInput::forwardCPU(const NeuralLayer& ) {}
@@ -760,9 +813,18 @@ void NeuralLayerMatrixInput::print() {
     NeuralLayerMatrix::print();
 }
 
+void NeuralLayerMatrixInput::save(XMLNode& nodechild) {
+    nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
+    nodechild.addAttribute("size",BasicUtility::Any2String(this->X_map()(0).getDomain()));
+    nodechild.addAttribute("nbr_map",BasicUtility::Any2String(this->X_map().size()));
+    //            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
+    //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+}
+
 NeuralNet::NeuralNet()
     :_normalizationmatrixinput(new NormalizationMatrixInputMass())
 {}
+
 
 NeuralNet::NeuralNet(const NeuralNet & neural){
 
@@ -775,6 +837,19 @@ NeuralNet::NeuralNet(const NeuralNet & neural){
     _normalizationmatrixinput = neural._normalizationmatrixinput->clone();
 }
 
+void NeuralNet::print(){
+    std::cout<<"NET STRUCTURE"<<std::endl;
+    for(unsigned int i =0;i<this->_v_layer.size();i++){
+        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
+        _v_layer[i]->print();
+    }
+    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
+    for(unsigned int i=0;i<this->_label2string.size();i++)
+        std::cout<<this->_label2string(i)<<" ";
+    std::cout<<std::endl;
+    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
+    this->_normalizationmatrixinput->print();
+}
 NeuralNet & NeuralNet::operator =(const NeuralNet & neural){
     this->_label2string = neural._label2string;
     this->clear();
@@ -1025,78 +1100,93 @@ void NeuralNet::load(XMLDocument &doc)
 void NeuralNet::save(const char * file)const
 {
     XMLDocument doc;
+//    XMLNode node1 = doc.addChild("label2String");
+//    node1.addAttribute("id",BasicUtility::Any2String(_label2string));
+//    XMLNode node = doc.addChild("layers");
+//    for(unsigned int i=0;i<this->_v_layer.size();i++){
+//        NeuralLayer * layer = this->_v_layer[i];
+//        if(const NeuralLayerMatrixInput *layer_matrix = dynamic_cast<const NeuralLayerMatrixInput *>(layer)){
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
+//            nodechild.addAttribute("size",BasicUtility::Any2String(layer_matrix->X_map()(0).getDomain()));
+//            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_matrix->X_map().size()));
+
+//            this->_normalizationmatrixinput->save(nodechild);
+//            //            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
+//            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+//        }
+//        else if(const NeuralLayerLinearInput *layer_linear = dynamic_cast<const NeuralLayerLinearInput *>(layer)){
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::INPUTLINEAR");
+//            nodechild.addAttribute("size",BasicUtility::Any2String(layer_linear->X().size()));
+//            this->_normalizationmatrixinput->save(nodechild);
+//            //            nodechild.addAttribute("method",BasicUtility::Any2String((_method)));
+//            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
+//        }else if(const NeuralLayerMatrixConvolutionSubScaling *layer_conv = dynamic_cast<const NeuralLayerMatrixConvolutionSubScaling *>(layer)){
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::MATRIXCONVOLUTIONNAL");
+//            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_conv->X_map().size()));
+//            nodechild.addAttribute("sizekernel",BasicUtility::Any2String(layer_conv->_radius_kernel));
+//            nodechild.addAttribute("subsampling",BasicUtility::Any2String(layer_conv->_sub_resolution_factor));
+
+//            std::string weight_str;
+//            for(unsigned int index_w=0;index_w<layer_conv->_W_biais.size();index_w++){
+//                weight_str+=BasicUtility::Any2String(layer_conv->_W_biais[index_w])+";";
+//            }
+//            nodechild.addAttribute("weight_biais",weight_str);
+//            weight_str.clear();
+//            for(unsigned int index_w=0;index_w<layer_conv->_W_kernels.size();index_w++){
+//                for(unsigned int index_weight_j=0;index_weight_j<layer_conv->_W_kernels(index_w).size();index_weight_j++){
+//                    weight_str+=BasicUtility::Any2String(layer_conv->_W_kernels(index_w)(index_weight_j))+";";
+//                }
+//            }
+//            nodechild.addAttribute("weight_kernel",weight_str);
+
+//        } else if (const NeuralLayerLinearFullyConnectedSoftmax* layer_fully_softmax = dynamic_cast<const NeuralLayerLinearFullyConnectedSoftmax*>(layer)) {
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::FULLYCONNECTEDSOFTMAX");
+//            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully_softmax->X().size()));
+
+//            std::string weight_str;
+//            for(unsigned int index_w=0;index_w<layer_fully_softmax->_W.size();index_w++){
+//                weight_str+=BasicUtility::Any2String(layer_fully_softmax->_W[index_w])+";";
+//            }
+//            nodechild.addAttribute("weight",weight_str);
+//        } else if(const NeuralLayerLinearFullyConnected *layer_fully= dynamic_cast<const NeuralLayerLinearFullyConnected *>(layer)) {
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::FULLYCONNECTED");
+//            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully->X().size()));
+
+//            std::string weight_str;
+//            for(unsigned int index_w=0;index_w<layer_fully->_W.size();index_w++){
+//                weight_str+=BasicUtility::Any2String(layer_fully->_W[index_w])+";";
+//            }
+//            nodechild.addAttribute("weight",weight_str);
+//        }else if(const NeuralLayerMatrixMaxPool *layer_max_pool= dynamic_cast<const NeuralLayerMatrixMaxPool *>(layer)){
+//            XMLNode nodechild = node.addChild("layer");
+//            nodechild.addAttribute("type","NNLayer::MAXPOOL");
+//            nodechild.addAttribute("sub_scaling",BasicUtility::Any2String(layer_max_pool->_sub_resolution_factor));
+//        }
+//    }
+    this->save(doc);
+    doc.save(file);
+}
+
+void NeuralNet::save(XMLDocument& doc) const {
     XMLNode node1 = doc.addChild("label2String");
     node1.addAttribute("id",BasicUtility::Any2String(_label2string));
     XMLNode node = doc.addChild("layers");
     for(unsigned int i=0;i<this->_v_layer.size();i++){
         NeuralLayer * layer = this->_v_layer[i];
-        if(const NeuralLayerMatrixInput *layer_matrix = dynamic_cast<const NeuralLayerMatrixInput *>(layer)){
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::INPUTMATRIX");
-            nodechild.addAttribute("size",BasicUtility::Any2String(layer_matrix->X_map()(0).getDomain()));
-            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_matrix->X_map().size()));
-
+        XMLNode nodechild = node.addChild("layer");
+        layer->save(nodechild);
+        // first layer : NeuralLayerMatrixInput or NeuralLayerLinearInput
+        if (i == 0) {
             this->_normalizationmatrixinput->save(nodechild);
-            //            nodechild.addAttribute("method",BasicUtility::Any2String(_method));
-            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
-        }
-        else if(const NeuralLayerLinearInput *layer_linear = dynamic_cast<const NeuralLayerLinearInput *>(layer)){
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::INPUTLINEAR");
-            nodechild.addAttribute("size",BasicUtility::Any2String(layer_linear->X().size()));
-            this->_normalizationmatrixinput->save(nodechild);
-            //            nodechild.addAttribute("method",BasicUtility::Any2String((_method)));
-            //            nodechild.addAttribute("normalization",BasicUtility::Any2String(_normalization_value));
-        }else if(const NeuralLayerMatrixConvolutionSubScaling *layer_conv = dynamic_cast<const NeuralLayerMatrixConvolutionSubScaling *>(layer)){
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::MATRIXCONVOLUTIONNAL");
-            nodechild.addAttribute("nbr_map",BasicUtility::Any2String(layer_conv->X_map().size()));
-            nodechild.addAttribute("sizekernel",BasicUtility::Any2String(layer_conv->_radius_kernel));
-            nodechild.addAttribute("subsampling",BasicUtility::Any2String(layer_conv->_sub_resolution_factor));
-
-            std::string weight_str;
-            for(unsigned int index_w=0;index_w<layer_conv->_W_biais.size();index_w++){
-                weight_str+=BasicUtility::Any2String(layer_conv->_W_biais[index_w])+";";
-            }
-            nodechild.addAttribute("weight_biais",weight_str);
-            weight_str.clear();
-            for(unsigned int index_w=0;index_w<layer_conv->_W_kernels.size();index_w++){
-                for(unsigned int index_weight_j=0;index_weight_j<layer_conv->_W_kernels(index_w).size();index_weight_j++){
-                    weight_str+=BasicUtility::Any2String(layer_conv->_W_kernels(index_w)(index_weight_j))+";";
-                }
-            }
-            nodechild.addAttribute("weight_kernel",weight_str);
-
-        }
-        else if(const NeuralLayerLinearFullyConnected *layer_fully= dynamic_cast<const NeuralLayerLinearFullyConnected *>(layer))
-        {
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::FULLYCONNECTED");
-            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully->X().size()));
-
-            std::string weight_str;
-            for(unsigned int index_w=0;index_w<layer_fully->_W.size();index_w++){
-                weight_str+=BasicUtility::Any2String(layer_fully->_W[index_w])+";";
-            }
-            nodechild.addAttribute("weight",weight_str);
-        } else if (const NeuralLayerLinearFullyConnectedSoftmax* layer_fully_softmax = dynamic_cast<const NeuralLayerLinearFullyConnectedSoftmax*>(layer)) {
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::FULLYCONNECTEDSOFTMAX");
-            nodechild.addAttribute("size",BasicUtility::Any2String(layer_fully_softmax->X().size()));
-
-            std::string weight_str;
-            for(unsigned int index_w=0;index_w<layer_fully_softmax->_W.size();index_w++){
-                weight_str+=BasicUtility::Any2String(layer_fully_softmax->_W[index_w])+";";
-            }
-            nodechild.addAttribute("weight",weight_str);
-        }else if(const NeuralLayerMatrixMaxPool *layer_max_pool= dynamic_cast<const NeuralLayerMatrixMaxPool *>(layer)){
-            XMLNode nodechild = node.addChild("layer");
-            nodechild.addAttribute("type","NNLayer::MAXPOOL");
-            nodechild.addAttribute("sub_scaling",BasicUtility::Any2String(layer_max_pool->_sub_resolution_factor));
         }
     }
-    doc.save(file);
 }
+
 void NeuralNet::setNormalizationMatrixInput(NormalizationMatrixInput * input){
     if(_normalizationmatrixinput!=NULL)
         delete _normalizationmatrixinput;
@@ -1236,10 +1326,6 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     }
 }
 
-void NormalizationMatrixInputMass::print(){
-    std::cout<<"Mass"<<std::endl;
-}
-
 NormalizationMatrixInputMass *NormalizationMatrixInputMass::clone(){
     return new NormalizationMatrixInputMass(_normalization_value);
 }
@@ -1248,6 +1334,12 @@ NormalizationMatrixInputCentering::NormalizationMatrixInputCentering(Normalizati
     :_normalization_value(normalization)
 {
 
+}
+void NormalizationMatrixInputCentering::print(){
+    std::cout<<"bounding box"<<std::endl;
+}
+void NormalizationMatrixInputMass::print(){
+    std::cout<<"Mass"<<std::endl;
 }
 
 VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8  & img,Vec2I32 domain){
@@ -1316,23 +1408,7 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     }
 }
 
-void NormalizationMatrixInputCentering::print(){
-    std::cout<<"bounding box"<<std::endl;
-}
 
-void NeuralNet::print(){
-    std::cout<<"NET STRUCTURE"<<std::endl;
-    for(unsigned int i =0;i<this->_v_layer.size();i++){
-        std::cout<<std::endl<<"LAYER "<<i<<std::endl;
-        _v_layer[i]->print();
-    }
-    std::cout<<std::endl<<"Meaning output neurons"<<std::endl;
-    for(unsigned int i=0;i<this->_label2string.size();i++)
-        std::cout<<this->_label2string(i)<<" ";
-    std::cout<<std::endl;
-    std::cout<<std::endl<<"Normalisation method for matrix"<<std::endl;
-    this->_normalizationmatrixinput->print();
-}
 
 NormalizationMatrixInputCentering *NormalizationMatrixInputCentering::clone(){
     return new NormalizationMatrixInputCentering(_normalization_value);

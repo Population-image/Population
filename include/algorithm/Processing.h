@@ -39,6 +39,7 @@ in the Software.
 #include"algorithm/Analysis.h"
 #include"algorithm/Draw.h"
 #include"data/mat/MatNIteratorE.h"
+#include <chrono>
 namespace pop
 {
 /** \defgroup Processing Processing
@@ -446,7 +447,7 @@ struct POP_EXPORTS Processing
         return fborder( Vec2I32(radius) , fborder.getDomain()-Vec2I32(radius));
     }
     /*!
-     * \brief adaptative mean
+     * \brief adaptative filter with deriche's smooth
      * \param f input function
      * \param sigma Deriche's smooth parameter
      * \param offset_value offset value
@@ -455,8 +456,38 @@ struct POP_EXPORTS Processing
      * pixel = ( pixel >  pixel_deriche - offset_value) ? object : background with pixel_deriche is the value of the smooth deriche image
     */
     template<typename PixelType>
-    static MatN<2,UI8>  thresholdAdaptativeDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
+
+    static MatN<2,UI8>  thresholdAdaptativeSmoothDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
         MatN<2,PixelType> smooth = Processing::smoothDeriche(f,sigma);
+        Mat2UI8 thresold(smooth.getDomain());
+        for(unsigned int i=0;i<smooth.size();i++){
+            if(f(i)>smooth(i)-offset_value){
+                thresold(i)=255;
+            }else{
+                thresold(i)=0;
+            }
+        }
+        return thresold;
+    }
+    /*!
+     * \brief adaptative filter with fast smooth
+     * \param f input function
+     * \param alpha smooth parameter
+     * \param offset_value offset value
+     * \return output function noted h
+     *
+     * pixel = ( pixel >  pixel_deriche - offset_value) ? object : background with pixel_deriche is the value of the smooth deriche image
+     *
+     * \code
+     *  Mat2UI8 img;//2d grey-level image object
+     *  img.load(POP_PROJECT_SOURCE_DIR+std::string("/image/iex.png"));//replace this path by those on your computer
+     *  img = Processing::thresholdAdaptativeSmoothFast(img,0.01);
+     *  img.display();
+     * \endcode
+    */
+    template<typename PixelType>
+    static MatN<2,UI8>  thresholdAdaptativeSmoothFast(const MatN<2,PixelType> & f,F32 alpha=0.1,F32 offset_value=0  ){
+        MatN<2,PixelType> smooth = Processing::smoothRecursiveFirstOrder(f,alpha);
         Mat2UI8 thresold(smooth.getDomain());
         for(unsigned int i=0;i<smooth.size();i++){
             if(f(i)>smooth(i)-offset_value){
@@ -1712,6 +1743,53 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM, typename PixelType>
     static MatN<DIM,PixelType> smoothDeriche(const MatN<DIM,PixelType> & f, F32 alpha=1){
         return FunctorMatN::smoothDeriche(f,alpha);
+    }
+
+    /*!
+     * \brief smooth filter with first order recursive filter
+     * \param f input matrix
+     * \param alpha in the range [0,1]
+     * \return h output function
+     *
+     * Smooth the input matrix with the alpha parameter (alpha=0.5=low, alpha=0.1=high)
+     *
+     * f_causal[i]=alpha*f[i-1]+(1-alpha)*f_causal[i]
+     *
+     * \code
+     * Mat2UI8 img;
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
+     * img = Processing::smoothRecursiveFirstOrder(img,0.1);
+     * img.display();
+     * \endcode
+     */
+    template<typename PixelType>
+    static MatN<2,PixelType> smoothRecursiveFirstOrder(const MatN<2,PixelType> & f, F32 alpha=0.1){
+        Mat2F32 m(f);
+        Mat2F32 filter_causal(m.getDomain()),filter_anticausal(m.getDomain());
+
+        for(int j=0;j<(int)m.sizeJ();j++){
+            filter_causal(0,j)=m(0,j);
+            for(int i=1;i<(int)m.sizeI();i++){
+                filter_causal(i,j)=(1-alpha)*filter_causal(i-1,j)+alpha*m(i,j);
+            }
+            filter_anticausal(m.sizeI()-1,j)=m(m.sizeI()-1,j);
+            for(int i=m.sizeI()-2;i>=0;i--){
+                filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i+1,j)+alpha*m(i,j);
+            }
+        }
+        m = filter_causal + filter_anticausal;
+        for(int i=0;i<(int)m.sizeI();i++){
+            filter_causal(i,0)=m(i,0);
+            for(int j=1;j<(int)m.sizeJ();j++){
+                filter_causal(i,j)=(1-alpha)*filter_causal(i,j-1)+alpha*m(i,j);
+            }
+            filter_anticausal(i,m.sizeJ()-1)=m(i,m.sizeJ()-1);
+            for(int j=m.sizeJ()-2;j>=0;j--){
+                filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i,j+1)+alpha*m(i,j);
+            }
+        }
+        m = (filter_causal + filter_anticausal)*.25f;
+        return m;
     }
 
     /*!

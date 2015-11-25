@@ -103,6 +103,8 @@ public:
     virtual void setTrainable(bool istrainable)=0;
     void setLearnableParameter(F32 mu);
     virtual NeuralLayer * clone()=0;
+    /** @brief save the layer to the corresponding nodechild of xml file */
+    virtual void save(XMLNode& nodechild) = 0;
     virtual void print()=0;
     F32 _mu;
 };
@@ -127,7 +129,7 @@ struct NeuralLayerLinear : public NeuralLayer
     const VecF32& X()const;
     VecF32& d_E_X();
     virtual void setTrainable(bool istrainable);
-        virtual void print();
+    virtual void print();
     VecF32 __Y;
     VecF32 __X;
     VecF32 _d_E_Y;
@@ -165,6 +167,7 @@ public:
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
     virtual void print();
+    virtual void save(XMLNode& nodechild);
 };
 
 class NeuralLayerMatrixInput : public NeuralLayerMatrix
@@ -178,6 +181,7 @@ public:
     void setTrainable(bool istrainable);
     virtual NeuralLayer * clone();
     virtual void print();
+    virtual void save(XMLNode& nodechild);
 };
 
 class NeuralLayerLinearFullyConnected : public NeuronSigmoid,public NeuralLayerLinear
@@ -190,6 +194,7 @@ public:
     void learn();
     virtual NeuralLayer * clone();
     virtual void print();
+    virtual void save(XMLNode& nodechild);
     Mat2F32 _W;
     VecF32 _X_biais;
     Mat2F32 _d_E_W;
@@ -199,12 +204,10 @@ class NeuralLayerLinearFullyConnectedSoftmax : public NeuralLayerLinearFullyConn
 {
 public:
     NeuralLayerLinearFullyConnectedSoftmax(unsigned int nbr_neurons_previous,unsigned int nbr_neurons);
-    //void setTrainable(bool istrainable);
     virtual void forwardCPU(const NeuralLayer &layer_previous);
     virtual void backwardCPU(NeuralLayer& layer_previous);
-    //void learn();
-    //virtual NeuralLayer * clone();
     virtual void print();
+    virtual void save(XMLNode& nodechild);
     Softmax _sm;
 };
 
@@ -219,6 +222,7 @@ public:
     void learn();
     virtual NeuralLayer * clone();
     virtual void print();
+    virtual void save(XMLNode& nodechild);
     Vec<Mat2F32> _W_kernels;
     Vec<F32> _W_biais;
     Vec<Mat2F32> _d_E_W_kernels;
@@ -236,6 +240,7 @@ public:
     virtual void backwardCPU(NeuralLayer& layer_previous);
     void learn();
     virtual NeuralLayer * clone();
+    virtual void save(XMLNode& nodechild);
     unsigned int _sub_resolution_factor;
     bool _istrainable;
     Vec<Mat2UI8> _v_map_index_max;
@@ -438,6 +443,13 @@ public:
     *
     */
     void save(const char * file)const;
+
+    /*!
+    * \brief save xml file
+    * \param xml output file
+    *
+    */
+    void save(XMLDocument& doc) const;
 
     /*!
     * \brief access information related to each output neuron (for instance "A","B","C","D",... for Latin script)
