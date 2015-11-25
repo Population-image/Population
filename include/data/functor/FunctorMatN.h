@@ -369,17 +369,17 @@ struct POP_EXPORTS FunctorMatN
             dir = 1;
             itorder.setDirection(dir);
             itorder.init();
-            start = std::chrono::high_resolution_clock::now();
+            //start = std::chrono::high_resolution_clock::now();
             fcausal = recursive(fprevious,itorder,funccausal);
-            end = std::chrono::high_resolution_clock::now();
-            std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+            //end = std::chrono::high_resolution_clock::now();
+            //std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
             dir = -1;
             itorder.setDirection(dir);
             itorder.init();
-            start = std::chrono::high_resolution_clock::now();
+            //start = std::chrono::high_resolution_clock::now();
             fanticausal= recursive(fprevious,itorder,funcanticausal);
-            end = std::chrono::high_resolution_clock::now();
-            std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " anti causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+            //end = std::chrono::high_resolution_clock::now();
+            //std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " anti causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
             fprevious = fcausal + fanticausal;
         }
         MatN<DIM,PixelType> h(fprevious);
