@@ -51,12 +51,13 @@ public:
 };
 
 class floatTensor: public Tensor {
-//protected:
-public:
+protected:
     // Data
     int* size;
     int* stride;
     float* data;
+
+public:
     // Method
     floatTensor();
     ~floatTensor();
@@ -97,8 +98,8 @@ public:
     select(floatTensor& src, int sd, int sliceIndex);
     void
     copy(floatTensor& src);
-    void
-    copy(floatTensor&, floatTensor&);
+//    void
+//    copy(floatTensor&, floatTensor&);
     void
     tieData(floatTensor& src);
 
@@ -160,17 +161,17 @@ public:
     float
     averageSquare();
 
-    float
-    averageSquareBig();
+//    float
+//    averageSquareBig();
 
-    int
-    testNan();
+//    int
+//    testNan();
 
-    int
-    testInf();
+//    int
+//    testInf();
 
-    int
-    testNanShow();
+//    int
+//    testNanShow();
 
     int*
     getSize();
@@ -242,6 +243,8 @@ public:
     // transpose
     void
     t();
+    void t(floatTensor& out);
+    //void tSwap();
 
 };
 
@@ -256,11 +259,11 @@ inline float floatTensor::operator()(int x, int y) const {
 
 inline float&
 floatTensor::operator()(int x) {
-    return data[x * stride[0]];
+    return data[x];
 }
 
 inline float floatTensor::operator()(int x) const {
-    return data[x * stride[0]];
+    return data[x];
 }
 
 #endif // TENSOR_H

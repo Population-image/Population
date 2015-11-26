@@ -92,6 +92,7 @@ void floatTensor::array2Tensor(float* data, int size0, int size1) {
     size[0] = size0;
     size[1] = size1;
     stride = new int[2];
+    // default, by columns
     stride[0] = 1;
     stride[1] = size[0];
     this->data = data;
@@ -143,24 +144,16 @@ void floatTensor::copy_and_delete(floatTensor& src_tensor) {
 void floatTensor::write() {
     std::cout << "# floatTensor" << std::endl;
     std::cout << "dimension " << size[0] << " " << size[1] << std::endl;
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            std::cout << data[i * stride[0] + j * stride[1]] << " ";
-        }
-        std::cout << std::endl;
+    for (int i = 0 ; i < length ; i ++) {
+        std::cout << data[i] << " ";
     }
+    std::cout << std::endl;
 }
 
 void floatTensor::info() {
     std::cout << "# floatTensor" << std::endl;
-    // for test
-    std::cout << "floatTensor::info size: " << size << std::endl;
     std::cout << "dimension " << size[0] << " " << size[1] << std::endl;
-    // for test
-    std::cout << "floatTensor::info stride: " << stride << std::endl;
     std::cout << "stride " << stride[0] << " " << stride[1] << std::endl;
-    // for test
-    std::cout << "floatTensor::info data: " << data << std::endl;
 }
 int floatTensor::resize(int size0, int size1) {
     if (haveMemory == 1 && size != NULL && size[0] == size0 && size[1] == size1) {
@@ -176,10 +169,12 @@ int floatTensor::resize(int size0, int size1) {
     size[1] = size1;
     stride[0] = 1;
     stride[1] = size0;
-    try {
-        data = new float[size0 * size1];
-    } catch (std::bad_alloc& ba) {
-        std::cerr << "ERROR floatTensor resize " << ba.what() << std::endl;
+    if (data == NULL) {
+        try {
+            data = new float[size0 * size1];
+        } catch (std::bad_alloc& ba) {
+            std::cerr << "ERROR floatTensor resize " << ba.what() << std::endl;
+        }
     }
 
     haveMemory = 1;
@@ -188,7 +183,7 @@ int floatTensor::resize(int size0, int size1) {
 }
 
 int floatTensor::resize(floatTensor& src) {
-    if (haveMemory == 1 && size[0] == src.size[0] && size[1] == src.size[1]) {
+    if (haveMemory == 1 && size[0] == src.size[0] && size[1] == src.size[1] && stride[0] == src.stride[0] && stride[1] == src.stride[1]) {
         return 0;
     }
     if (size == NULL) {
@@ -244,10 +239,8 @@ void floatTensor::select(floatTensor& src, int sd, int sliceIndex) {
 //Overload =
 floatTensor&
 floatTensor::operator=(float value) {
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            data[i * stride[0] + j * stride[1]] = value;
-        }
+    for (int i = 0 ; i < this->length ; i ++) {
+        data[i] = value;
     }
     return *this;
 }
@@ -257,38 +250,35 @@ void floatTensor::copy(floatTensor& src) {
         resize(src);
     }
     if (length != src.length || size[0] != src.size[0]
-            || size[1] != src.size[1]) {
+            || size[1] != src.size[1] || stride[0] != src.stride[0] || stride[1] != src.stride[1]) {
         std::cerr << "ERROR: Copy float tensor with different size\n";
         std::cerr << length << " " << src.length << " " << size[0] << " "
                 << src.size[0] << " " << size[1] << " " << src.size[1] << std::endl;
         exit(1);
     }
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            data[i * stride[0] + j * stride[1]] = src.data[i * src.stride[0]
-                    + j * src.stride[1]];
-        }
+    for (int i = 0 ; i < length ; i ++) {
+        data[i] = src.data[i];
     }
 }
 
-void floatTensor::copy(floatTensor& src, floatTensor& weight) {
-    if (size == NULL) {
-        resize(src);
-    }
-    if (length != src.length || size[0] != src.size[0]
-            || size[1] != src.size[1]) {
-        std::cerr << "ERROR: Copy float tensor with different size\n";
-        std::cerr << length << " " << src.length << " " << size[0] << " "
-                << src.size[0] << " " << size[1] << " " << src.size[1] << std::endl;
-        exit(1);
-    }
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            data[i * stride[0] + j * stride[1]] = src.data[i * src.stride[0]
-                    + j * src.stride[1]];
-        }
-    }
-}
+//void floatTensor::copy(floatTensor& src, floatTensor& weight) {
+//    if (size == NULL) {
+//        resize(src);
+//    }
+//    if (length != src.length || size[0] != src.size[0]
+//            || size[1] != src.size[1]) {
+//        std::cerr << "ERROR: Copy float tensor with different size\n";
+//        std::cerr << length << " " << src.length << " " << size[0] << " "
+//                << src.size[0] << " " << size[1] << " " << src.size[1] << std::endl;
+//        exit(1);
+//    }
+//    for (int i = 0; i < size[0]; i++) {
+//        for (int j = 0; j < size[1]; j++) {
+//            data[i * stride[0] + j * stride[1]] = src.data[i * src.stride[0]
+//                    + j * src.stride[1]];
+//        }
+//    }
+//}
 
 void floatTensor::tieData(floatTensor& src) {
     haveMemory = 0;
@@ -399,11 +389,8 @@ void floatTensor::softmax(floatTensor& src, floatTensor& vCol,
 }
 
 void floatTensor::product(floatTensor& src) {
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            data[i * stride[0] + j * stride[1]] *= src.data[i * stride[0]
-                    + j * stride[1]];
-        }
+    for (int i = 0 ; i < length ; i ++) {
+        data[i] *= src.data[i];
     }
 }
 void floatTensor::scal(float alpha) //y = ay
@@ -414,7 +401,8 @@ void floatTensor::scal(float alpha) //y = ay
 
 void floatTensor::axpy(floatTensor& tensor1, float alpha) //y = ax + y
         {
-    int lstride = stride[0];
+    int lstride;
+    lstride = stride[0];
     axpy_(&length, &alpha, tensor1.data, &lstride, data, &lstride);
 
 }
@@ -488,11 +476,8 @@ float floatTensor::dot(floatTensor& src) {
     } else {
         std::cout << "floatTensor::dot here1" << std::endl;
         float sum = 0;
-        for (int i = 0; i < size[0]; i++) {
-            for (int j = 0; j < size[1]; j++) {
-                sum += data[i * stride[0] + j * stride[1]]
-                        * src.data[i * stride[0] + j * stride[1]];
-            }
+        for (int i = 0 ; i < length ; i ++) {
+            sum += data[i] * src.data[i];
         }
         return sum;
     }
@@ -607,124 +592,124 @@ void floatTensor::setSize(int i, int value) {
     size[i] = value;
 }
 
-float floatTensor::averageSquareBig() {
-    float sum = 0;
-    if (size[0] > size[1]) {
-        for (int i = 0; i < size[0]; i++) {
-            floatTensor select;
-            select.select(*this, 0, i);
-            sum += select.averageSquare();
-        }
-        return sum / size[0];
-    } else {
-        for (int i = 0; i < size[1]; i++) {
-            floatTensor select;
-            select.select(*this, 1, i);
-            sum += select.averageSquare();
-        }
-        return sum / size[1];
-    }
-}
+//float floatTensor::averageSquareBig() {
+//    float sum = 0;
+//    if (size[0] > size[1]) {
+//        for (int i = 0; i < size[0]; i++) {
+//            floatTensor select;
+//            select.select(*this, 0, i);
+//            sum += select.averageSquare();
+//        }
+//        return sum / size[0];
+//    } else {
+//        for (int i = 0; i < size[1]; i++) {
+//            floatTensor select;
+//            select.select(*this, 1, i);
+//            sum += select.averageSquare();
+//        }
+//        return sum / size[1];
+//    }
+//}
 
-int floatTensor::testNan() {
-    if (size[0] < size[1]) {
-        for (int i = 0; i < size[1]; i++) {
-            floatTensor select;
-            select.select(*this, 1, i);
-            if (isnan(select.averageSquareBig()) != 0) {
-                return 1;
-            }
-        }
-    } else {
-        for (int i = 0; i < size[0]; i++) {
-            floatTensor select;
-            select.select(*this, 0, i);
-            if (isnan(select.averageSquareBig()) != 0) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
+//int floatTensor::testNan() {
+//    if (size[0] < size[1]) {
+//        for (int i = 0; i < size[1]; i++) {
+//            floatTensor select;
+//            select.select(*this, 1, i);
+//            if (isnan(select.averageSquareBig()) != 0) {
+//                return 1;
+//            }
+//        }
+//    } else {
+//        for (int i = 0; i < size[0]; i++) {
+//            floatTensor select;
+//            select.select(*this, 0, i);
+//            if (isnan(select.averageSquareBig()) != 0) {
+//                return 1;
+//            }
+//        }
+//    }
+//    return 0;
+//}
 
-int floatTensor::testInf() {
-    for (int i = 0; i < size[0]; i++) {
-        for (int j = 0; j < size[1]; j++) {
-            int res = isinf(data[i * stride[0] + j * stride[1]]);
-            if (res != 0) {
-                std::cout << "floatTensor::testInf " << res << " " << i << " " << j
-                        << std::endl;
-                return res;
-            }
-        }
-    }
-    return 0;
-}
+//int floatTensor::testInf() {
+//    for (int i = 0; i < size[0]; i++) {
+//        for (int j = 0; j < size[1]; j++) {
+//            int res = isinf(data[i * stride[0] + j * stride[1]]);
+//            if (res != 0) {
+//                std::cout << "floatTensor::testInf " << res << " " << i << " " << j
+//                        << std::endl;
+//                return res;
+//            }
+//        }
+//    }
+//    return 0;
+//}
 
-int floatTensor::testNanShow() {
-    if (size[0] < size[1]) {
-        for (int i = 0; i < size[1]; i++) {
-            floatTensor select;
-            select.select(*this, 1, i);
-            if (isnan(select.averageSquare()) != 0) {
-                return 1;
-            } else {
-                std::cout << "floatTensor::testNanShow 1" << std::endl;
-                std::cout << "floatTensor::testNanShow i: " << i << std::endl;
-                std::cout << "floatTensor::testNanShow aS: "
-                        << select.averageSquare() << std::endl;
-            }
-        }
-    } else {
-        for (int i = 0; i < size[0]; i++) {
-            floatTensor select;
-            select.select(*this, 0, i);
-            if (isnan(select.averageSquare()) != 0) {
-                return 1;
-            } else {
-                std::cout << "floatTensor::testNanShow 0" << std::endl;
-                std::cout << "floatTensor::testNanShow i: " << i << std::endl;
-                std::cout << "floatTensor::testNanShow aS: "
-                        << select.averageSquare() << std::endl;
-            }
-        }
-    }
-    return 0;
-}
+//int floatTensor::testNanShow() {
+//    if (size[0] < size[1]) {
+//        for (int i = 0; i < size[1]; i++) {
+//            floatTensor select;
+//            select.select(*this, 1, i);
+//            if (isnan(select.averageSquare()) != 0) {
+//                return 1;
+//            } else {
+//                std::cout << "floatTensor::testNanShow 1" << std::endl;
+//                std::cout << "floatTensor::testNanShow i: " << i << std::endl;
+//                std::cout << "floatTensor::testNanShow aS: "
+//                        << select.averageSquare() << std::endl;
+//            }
+//        }
+//    } else {
+//        for (int i = 0; i < size[0]; i++) {
+//            floatTensor select;
+//            select.select(*this, 0, i);
+//            if (isnan(select.averageSquare()) != 0) {
+//                return 1;
+//            } else {
+//                std::cout << "floatTensor::testNanShow 0" << std::endl;
+//                std::cout << "floatTensor::testNanShow i: " << i << std::endl;
+//                std::cout << "floatTensor::testNanShow aS: "
+//                        << select.averageSquare() << std::endl;
+//            }
+//        }
+//    }
+//    return 0;
+//}
 
-float floatTensor::angleDist(floatTensor& anotherVector) {
-    if (this->size[0] != anotherVector.size[0]
-            || this->size[1] != anotherVector.size[1]) {
-        std::cout << "The two vectors do not have same size" << std::endl;
-        this->info();
-        anotherVector.info();
-        return -1000;
-    } else {
-        float sum = 0;
-        if (size[0] > size[1]) {
-            for (int i = 0; i < size[0]; i++) {
-                floatTensor select1;
-                select1.select(*this, 0, i);
-                floatTensor select2;
-                select2.select(anotherVector, 0, i);
-                sum += select1.dot(select2);
-            }
-        } else {
-            for (int i = 0; i < size[1]; i++) {
-                floatTensor select1;
-                select1.select(*this, 1, i);
-                floatTensor select2;
-                select2.select(anotherVector, 1, i);
-                sum += select1.dot(select2);
-            }
-        }
-        return sum
-                / sqrt(
-                        this->averageSquare() * this->size[0] * this->size[1]
-                                * anotherVector.averageSquare()
-                                * anotherVector.size[0] * anotherVector.size[1]);
-    }
-}
+//float floatTensor::angleDist(floatTensor& anotherVector) {
+//    if (this->size[0] != anotherVector.size[0]
+//            || this->size[1] != anotherVector.size[1]) {
+//        std::cout << "The two vectors do not have same size" << std::endl;
+//        this->info();
+//        anotherVector.info();
+//        return -1000;
+//    } else {
+//        float sum = 0;
+//        if (size[0] > size[1]) {
+//            for (int i = 0; i < size[0]; i++) {
+//                floatTensor select1;
+//                select1.select(*this, 0, i);
+//                floatTensor select2;
+//                select2.select(anotherVector, 0, i);
+//                sum += select1.dot(select2);
+//            }
+//        } else {
+//            for (int i = 0; i < size[1]; i++) {
+//                floatTensor select1;
+//                select1.select(*this, 1, i);
+//                floatTensor select2;
+//                select2.select(anotherVector, 1, i);
+//                sum += select1.dot(select2);
+//            }
+//        }
+//        return sum
+//                / sqrt(
+//                        this->averageSquare() * this->size[0] * this->size[1]
+//                                * anotherVector.averageSquare()
+//                                * anotherVector.size[0] * anotherVector.size[1]);
+//    }
+//}
 
 //void floatTensor::correct(outils* otl) {
 //    for (int i = 0; i < size[0]; i++) {
@@ -748,3 +733,20 @@ void floatTensor::t() {
     stride[0] = stride[1];
     stride[1] = m;
 }
+
+void floatTensor::t(floatTensor &out) {
+    out.resize(getSize(1), getSize(0));
+    for (int j = 0 ; j < out.getSize(1) ; j ++) {
+        for (int i = 0 ; i < out.getSize(0) ; i ++) {
+            out(i, j) = data[i*stride[1] + j*stride[0]];
+        }
+    }
+}
+
+//void floatTensor::tSwap() {
+//    for (int j = 0 ; j < size[1] ; j ++) {
+//        for (int i = 0 ; i < size[0] ; i ++) {
+//            swap(&data[i*stride[0] + j*stride[1]], data[i])
+//        }
+//    }
+//}

@@ -128,6 +128,6 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/video/Video.cpp
 
 HAVE_ACML {
-HEADERS += $${PWD}/src/tensor/tensor.cpp \
+SOURCES += $${PWD}/src/tensor/tensor.cpp \
            $${PWD}/src/algorithm/processingtensor.cpp
 }

@@ -2,9 +2,14 @@
 #define PROCESSINGTENSOR_H
 
 #include "tensor/tensor.h"
+#include "Population.h"
 
 struct ProcessingTensor {
-    static floatTensor smoothDeriche(floatTensor & f, double alpha=1);
+    static void smoothDeriche(floatTensor & f, floatTensor& out, pop::F32 alpha=1);
+    static void pop2tensor(const pop::Mat2UI8& img, floatTensor& out);
+    static pop::Mat2UI8 tensor2pop(floatTensor& img);
+    static pop::Mat2UI8 thresoldAdaptiveSmoothDeriche(floatTensor& f, pop::F32 sigma=0.5, pop::F32 offset_value=0);
+    static pop::Mat2UI8 thresoldAdaptiveSmoothDeriche(const pop::Mat2UI8& f, pop::F32 sigma=0.5, pop::F32 offset_value=0);
 };
 
 namespace tensor {
@@ -20,6 +25,7 @@ namespace tensor {
                                double a0b0,
                                double a0b1, double a1b1, double b1b1, int slide, int dir);
         void transform(floatTensor& f, floatTensor& g);
+        void fastTransform(floatTensor& f, floatTensor& g);
     };
 }
 

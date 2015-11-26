@@ -355,7 +355,7 @@ struct POP_EXPORTS FunctorMatN
     template<int DIM, typename PixelType,typename FunctorCausal, typename FunctorAntiCausal>
     static MatN<DIM,PixelType> recursiveAllDirections(const MatN<DIM,PixelType> & f, FunctorCausal & funccausal, FunctorAntiCausal & funcanticausal )
     {
-        std::chrono::time_point<std::chrono::system_clock> start, end;
+        //std::chrono::time_point<std::chrono::system_clock> start, end;
         typename MatN<DIM,PixelType>::IteratorEOrder itorder (f.getIteratorEOrder());
         typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
         MatN<DIM,PixelTypeF32> fprevious(f);
@@ -369,17 +369,17 @@ struct POP_EXPORTS FunctorMatN
             dir = 1;
             itorder.setDirection(dir);
             itorder.init();
-            start = std::chrono::high_resolution_clock::now();
+            //start = std::chrono::high_resolution_clock::now();
             fcausal = recursive(fprevious,itorder,funccausal);
-            end = std::chrono::high_resolution_clock::now();
-            std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+            //end = std::chrono::high_resolution_clock::now();
+            //std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
             dir = -1;
             itorder.setDirection(dir);
             itorder.init();
-            start = std::chrono::high_resolution_clock::now();
+            //start = std::chrono::high_resolution_clock::now();
             fanticausal= recursive(fprevious,itorder,funcanticausal);
-            end = std::chrono::high_resolution_clock::now();
-            std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " anti causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+            //end = std::chrono::high_resolution_clock::now();
+            //std::cout << __FILE__ << "::" << __LINE__ << " i : " << i << " anti causal " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
             fprevious = fcausal + fanticausal;
         }
         MatN<DIM,PixelType> h(fprevious);
