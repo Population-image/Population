@@ -1765,21 +1765,27 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      */
     template<typename PixelType>
     static MatN<2,PixelType> smoothRecursiveFirstOrder(const MatN<2,PixelType> & f, F32 alpha=0.1){
+#define MT 1
+        // if 1 : optimised
         Mat2F32 m(f);
+#if (MT == 1)
         pop::F32 memory_causal[m.sizeJ()];
         pop::F32 memory_anticausal[m.sizeJ()];
+#endif
         Mat2F32 filter_causal(m.getDomain()),filter_anticausal(m.getDomain());
-//        for(int j=0;j<(int)m.sizeJ();j++){
-//            filter_causal(0,j)=m(0,j);
-//            for(int i=1;i<(int)m.sizeI();i++){
-//                filter_causal(i,j)=(1-alpha)*filter_causal(i-1,j)+alpha*m(i,j);
-//            }
-//            filter_anticausal(m.sizeI()-1,j)=m(m.sizeI()-1,j);
-//            for(int i=m.sizeI()-2;i>=0;i--){
-//                filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i+1,j)+alpha*m(i,j);
-//            }
-//        }
 
+#if (MT == 0)
+        for(int j=0;j<(int)m.sizeJ();j++){
+            filter_causal(0,j)=m(0,j);
+            for(int i=1;i<(int)m.sizeI();i++){
+                filter_causal(i,j)=(1-alpha)*filter_causal(i-1,j)+alpha*m(i,j);
+            }
+            filter_anticausal(m.sizeI()-1,j)=m(m.sizeI()-1,j);
+            for(int i=m.sizeI()-2;i>=0;i--){
+                filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i+1,j)+alpha*m(i,j);
+            }
+        }
+#else
         for (int j = 0 ; j < (int)m.sizeJ() ; j ++) {
             filter_causal(0, j) = m(0, j);
             memory_causal[j] = m(0, j);
@@ -1799,6 +1805,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
                 memory_anticausal[j] = filter_anticausal(i,j);
             }
         }
+#endif
         m = filter_causal + filter_anticausal;
 
         F32 cValue;
