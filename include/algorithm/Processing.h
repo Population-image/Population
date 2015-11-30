@@ -39,7 +39,6 @@ in the Software.
 #include"algorithm/Analysis.h"
 #include"algorithm/Draw.h"
 #include"data/mat/MatNIteratorE.h"
-#include <chrono>
 namespace pop
 {
 /** \defgroup Processing Processing

@@ -1,3 +1,7 @@
+#include "PopulationConfig.h"
+
+#if defined(HAVE_ACML)
+
 #include "algorithm/processingtensor.h"
 #include <cmath>
 
@@ -249,3 +253,5 @@ void tensor::FunctorRecursiveOrder2::fastTransform(floatTensor &f, floatTensor &
     sub_g.axpy(sub_f1, this->_a1 + this->_b1);
     sub_g.axpy(sub_f2, this->_a2 + this->_b2);
 }
+
+#endif // HAVE_ACML

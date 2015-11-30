@@ -1,3 +1,7 @@
+#include "PopulationConfig.h"
+
+#if defined(HAVE_ACML)
+
 #include <iostream>
 #include "tensor/tensor.h"
 
@@ -750,3 +754,5 @@ void floatTensor::t(floatTensor &out) {
 //        }
 //    }
 //}
+
+#endif // HAVE_ACML

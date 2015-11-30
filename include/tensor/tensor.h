@@ -1,6 +1,10 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "PopulationConfig.h"
+
+#if defined(HAVE_ACML)
+
 #define INTEL    0
 #define AMD      1
 #define CBLAS    2
@@ -265,5 +269,7 @@ floatTensor::operator()(int x) {
 inline float floatTensor::operator()(int x) const {
     return data[x];
 }
+
+#endif // HAVE_ACML
 
 #endif // TENSOR_H

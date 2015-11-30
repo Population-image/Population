@@ -1,6 +1,10 @@
 #ifndef PROCESSINGTENSOR_H
 #define PROCESSINGTENSOR_H
 
+#include "PopulationConfig.h"
+
+#if defined(HAVE_ACML)
+
 #include "tensor/tensor.h"
 #include "Population.h"
 
@@ -28,6 +32,8 @@ namespace tensor {
         void fastTransform(floatTensor& f, floatTensor& g);
     };
 }
+
+#endif // HAVE_ACML
 
 #endif // PROCESSINGTENSOR_H
 
