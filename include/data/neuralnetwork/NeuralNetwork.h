@@ -9,7 +9,6 @@
 #include <vector>
 #include "data/vec/Vec.h"
 #include "data/mat/MatN.h"
-#include "data/notstable/MatNReference.h"
 #include"algorithm/GeometricalTransformation.h"
 #include"data/utility/XML.h"
 
@@ -142,16 +141,16 @@ public:
     NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsigned int nbr_map);
     NeuralLayerMatrix(const NeuralLayerMatrix & net);
     NeuralLayerMatrix&  operator=(const NeuralLayerMatrix & net);
-    const Vec<MatNReference<2,F32,VecF32::iterator> > & X_map()const;
-    Vec<MatNReference<2,F32,VecF32::iterator> >& X_map();
-    const Vec<MatNReference<2,F32,VecF32::iterator> > & d_E_X_map()const;
-    Vec<MatNReference<2,F32,VecF32::iterator> >& d_E_X_map();
+    const Vec<MatN<2,F32> > & X_map()const;
+    Vec<MatN<2,F32> >& X_map();
+    const Vec<MatN<2,F32> > & d_E_X_map()const;
+    Vec<MatN<2,F32> >& d_E_X_map();
     virtual void setTrainable(bool istrainable);
     virtual void print();
-    Vec<MatNReference<2,F32,VecF32::iterator> > _X_reference;
-    Vec<MatNReference<2,F32,VecF32::iterator> > _Y_reference;
-    Vec<MatNReference<2,F32,VecF32::iterator> > _d_E_X_reference;
-    Vec<MatNReference<2,F32,VecF32::iterator> > _d_E_Y_reference;
+    Vec<MatN<2,F32> > _X_reference;
+    Vec<MatN<2,F32> > _Y_reference;
+    Vec<MatN<2,F32> > _d_E_X_reference;
+    Vec<MatN<2,F32> > _d_E_Y_reference;
 
 
 };

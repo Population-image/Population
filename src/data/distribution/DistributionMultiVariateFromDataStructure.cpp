@@ -63,7 +63,9 @@ VecF32 DistributionMultiVariateRegularStep::randomVariable()const {
     std::vector<F32>::const_iterator low=std::upper_bound (_repartition.begin(), _repartition.end(),u ); //
     I32 indice = I32(low- _repartition.begin()) ;
     if(_xmin.size()==2){
-        Vec2F32 v=VecNIndice<2>::Indice2VecN(_mat2d.getDomain(),indice);
+        Vec2I32 v;
+        v(0)= indice/_mat2d.sizeJ();
+        v(1)= indice-v(0)*_mat2d.sizeJ();
         VecF32 vv(2);
         vv(0)=v(0)*_step+_xmin(0);vv(1)=v(1)*_step+_xmin(1);
         return vv;

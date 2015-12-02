@@ -326,8 +326,8 @@ NeuralLayerMatrix::NeuralLayerMatrix(unsigned int sizei,unsigned int sizej,unsig
     :NeuralLayerLinear(sizei* sizej*nbr_map)
 {
     for(unsigned int i=0;i<nbr_map;i++){
-        _Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(sizei, sizej),this->__Y.begin()+sizei*sizej*i));
-        _X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(sizei, sizej),this->__X.begin()+sizei*sizej*i));
+        _Y_reference.push_back(MatN<2,F32>(Vec2I32(sizei, sizej),this->__Y.data()+sizei*sizej*i));
+        _X_reference.push_back(MatN<2,F32>(Vec2I32(sizei, sizej),this->__X.data()+sizei*sizej*i));
 
     }
 }
@@ -337,8 +337,8 @@ NeuralLayerMatrix::NeuralLayerMatrix(const NeuralLayerMatrix & net)
     _Y_reference.clear();
     _X_reference.clear();
     for(unsigned int i=0;i<net._X_reference.size();i++){
-        _Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._Y_reference(i).sizeI(), net._Y_reference(i).sizeJ()),this->__Y.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
-        _X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
+        _Y_reference.push_back(MatN<2,F32>(Vec2I32(net._Y_reference(i).sizeI(), net._Y_reference(i).sizeJ()),this->__Y.data()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
+        _X_reference.push_back(MatN<2,F32>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.data()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
     }
 }
 
@@ -346,8 +346,8 @@ NeuralLayerMatrix&  NeuralLayerMatrix::operator=(const NeuralLayerMatrix & net){
     _Y_reference.clear();
     _X_reference.clear();
     for(unsigned int i=0;i<net._X_reference.size();i++){
-        _Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._Y_reference(i).sizeI(), net._Y_reference(i).sizeJ()),this->__Y.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
-        _X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.begin()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
+        _Y_reference.push_back(MatN<2,F32>(Vec2I32(net._Y_reference(i).sizeI(), net._Y_reference(i).sizeJ()),this->__Y.data()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
+        _X_reference.push_back(MatN<2,F32>(Vec2I32(net._X_reference(i).sizeI(), net._X_reference(i).sizeJ()),this->__X.data()+net._Y_reference(i).sizeI()*net._Y_reference(i).sizeJ()*i));
     }
     return *this;
 }
@@ -355,21 +355,21 @@ void NeuralLayerMatrix::print(){
     std::cout<<"Number neuron matrix="<<this->_X_reference.size()<<" and size i="<<_X_reference(0).sizeI() <<" j="<<_X_reference(0).sizeJ()<<std::endl;
 }
 
-const Vec<MatNReference<2,F32,VecF32::iterator> > & NeuralLayerMatrix::X_map()const{return _X_reference;}
-Vec<MatNReference<2,F32,VecF32::iterator> >& NeuralLayerMatrix::X_map(){return _X_reference;}
+const Vec<MatN<2,F32> > & NeuralLayerMatrix::X_map()const{return _X_reference;}
+Vec<MatN<2,F32> >& NeuralLayerMatrix::X_map(){return _X_reference;}
 
 
 
-const Vec<MatNReference<2,F32,VecF32::iterator> > & NeuralLayerMatrix::d_E_X_map()const{return _d_E_X_reference;}
-Vec<MatNReference<2,F32,VecF32::iterator> >& NeuralLayerMatrix::d_E_X_map(){return _d_E_X_reference;}
+const Vec<MatN<2,F32> > & NeuralLayerMatrix::d_E_X_map()const{return _d_E_X_reference;}
+Vec<MatN<2,F32> >& NeuralLayerMatrix::d_E_X_map(){return _d_E_X_reference;}
 
 
 void NeuralLayerMatrix::setTrainable(bool istrainable){
     NeuralLayerLinear::setTrainable(istrainable);
     if(istrainable==true){
         for(unsigned int i=0;i<_X_reference.size();i++){
-            _d_E_Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(_X_reference(0).getDomain(),_d_E_Y.begin()+_X_reference(0).getDomain().multCoordinate()*i));
-            _d_E_X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(_X_reference(0).getDomain(),_d_E_X.begin()+_X_reference(0).getDomain().multCoordinate()*i));
+            _d_E_Y_reference.push_back(MatN<2,F32>(_X_reference(0).getDomain(),_d_E_Y.data()+_X_reference(0).getDomain().multCoordinate()*i));
+            _d_E_X_reference.push_back(MatN<2,F32>(_X_reference(0).getDomain(),_d_E_X.data()+_X_reference(0).getDomain().multCoordinate()*i));
         }
     }else{
         this->_d_E_Y_reference.clear();
@@ -541,8 +541,8 @@ void NeuralLayerMatrixMaxPool::forwardCPU(const NeuralLayer& layer_previous){
     if(const NeuralLayerMatrix * neural_matrix = dynamic_cast<const NeuralLayerMatrix *>(&layer_previous)){
         if(_istrainable==false){
             for(unsigned index_map=0;index_map<this->X_map().size();index_map++){
-                MatNReference<2,F32,VecF32::iterator> & map_layer = this->X_map()(index_map);
-                const MatNReference<2,F32,VecF32::iterator> & map_layer_previous = neural_matrix->X_map()(index_map);
+                MatN<2,F32> & map_layer = this->X_map()(index_map);
+                const MatN<2,F32> & map_layer_previous = neural_matrix->X_map()(index_map);
                 for(unsigned int i=0;i<map_layer.sizeI();i++){
                     for(unsigned int j=0;j<map_layer.sizeJ();j++){
                         F32 value =-2;
@@ -557,8 +557,8 @@ void NeuralLayerMatrixMaxPool::forwardCPU(const NeuralLayer& layer_previous){
             }
         }else{
             for(unsigned index_map=0;index_map<this->X_map().size();index_map++){
-                MatNReference<2,F32,VecF32::iterator> & map_layer = this->X_map()(index_map);
-                const MatNReference<2,F32,VecF32::iterator> & map_layer_previous = neural_matrix->X_map()(index_map);
+                MatN<2,F32> & map_layer = this->X_map()(index_map);
+                const MatN<2,F32> & map_layer_previous = neural_matrix->X_map()(index_map);
                 for(unsigned int i=0;i<map_layer.sizeI();i++){
                     for(unsigned int j=0;j<map_layer.sizeJ();j++){
                         F32 value =-2;
@@ -581,8 +581,8 @@ void NeuralLayerMatrixMaxPool::forwardCPU(const NeuralLayer& layer_previous){
 void NeuralLayerMatrixMaxPool::backwardCPU(NeuralLayer& layer_previous){
     if( NeuralLayerMatrix * neural_matrix = dynamic_cast< NeuralLayerMatrix *>(&layer_previous)){
         for(unsigned index_map=0;index_map<this->d_E_X_map().size();index_map++){
-            const MatNReference<2,F32,VecF32::iterator> & map_layer = this->d_E_X_map()(index_map);
-            MatNReference<2,F32,VecF32::iterator> & map_layer_previous = neural_matrix->d_E_X_map()(index_map);
+            const MatN<2,F32> & map_layer = this->d_E_X_map()(index_map);
+            MatN<2,F32> & map_layer_previous = neural_matrix->d_E_X_map()(index_map);
             map_layer_previous.fill(0);
             for(unsigned int i=0;i<map_layer.sizeI();i++){
                 for(unsigned int j=0;j<map_layer.sizeJ();j++){
@@ -679,7 +679,7 @@ void NeuralLayerMatrixConvolutionSubScaling::forwardCPU(const NeuralLayer& layer
 #pragma omp parallel for
 #endif
         for( int index_map=0;index_map<static_cast<int>(this->_Y_reference.size());index_map++){
-            MatNReference<2,F32,VecF32::iterator> &map_out =  this->_Y_reference[index_map];
+            MatN<2,F32> &map_out =  this->_Y_reference[index_map];
             int index_start_kernel = index_map*neural_matrix->X_map().size();
             for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
                 for(unsigned int j_map_next=0,j_map_previous=_radius_kernel;j_map_next<map_out.sizeJ();j_map_next++,j_map_previous+=_sub_resolution_factor){
@@ -719,7 +719,7 @@ void NeuralLayerMatrixConvolutionSubScaling::backwardCPU(NeuralLayer& layer_prev
             }
         }
         for(unsigned int index_map=0;index_map<this->_d_E_Y_reference.size();index_map++){
-            MatNReference<2,F32,VecF32::iterator> &map_error_out =  this->_d_E_Y_reference[index_map];
+            MatN<2,F32> &map_error_out =  this->_d_E_Y_reference[index_map];
 
             int index_start_kernel = index_map*neural_matrix->X_map().size();
             for(unsigned int i_map_next=0,i_map_previous=_radius_kernel;i_map_next<map_error_out.sizeI();i_map_next++,i_map_previous+=_sub_resolution_factor){
@@ -768,8 +768,8 @@ NeuralLayer * NeuralLayerMatrixConvolutionSubScaling::clone(){
     layer->_Y_reference.clear();
     layer->_X_reference.clear();
     for(unsigned int i=0;i<this->X_map().size();i++){
-        layer->_Y_reference.push_back(MatNReference<2,F32,VecF32::iterator>(this->X_map()(0).getDomain(),layer->__Y.begin()+this->X_map()(0).getDomain().multCoordinate()*i));
-        layer->_X_reference.push_back(MatNReference<2,F32,VecF32::iterator>(this->X_map()(0).getDomain(),layer->__X.begin()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_Y_reference.push_back(MatN<2,F32>(this->X_map()(0).getDomain(),layer->__Y.data()+this->X_map()(0).getDomain().multCoordinate()*i));
+        layer->_X_reference.push_back(MatN<2,F32>(this->X_map()(0).getDomain(),layer->__X.data()+this->X_map()(0).getDomain().multCoordinate()*i));
     }
     return layer;
 }
@@ -1255,7 +1255,7 @@ VecF32 NeuralNet::inputMatrixToInputNeuron(const MatN<2,UI8>  & matrix){
 //        return std::make_pair(Vec2I32(0),0);
 //    }
 //}
-//MatNReference<2,F32,VecF32::iterator>& NeuralNet::getMatrixOutput(int map_index)const{
+//MatN<2,F32>& NeuralNet::getMatrixOutput(int map_index)const{
 //    if(NeuralLayerMatrix* layer_matrix = dynamic_cast<NeuralLayerMatrix *>(*(this->_v_layer.rbegin()))){
 //        return layer_matrix->X_map()(map_index);
 //    }else{
@@ -1299,7 +1299,8 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     F32 maxi=pop::NumericLimits<F32>::minimumRange();
     F32 mini=pop::NumericLimits<F32>::maximumRange();
 
-    Mat2F32 mrf(domain);
+    VecF32 v_neural(domain.multCoordinate());
+    Mat2F32 mrf(domain,v_neural.data());
     ForEachDomain2D(xx,mrf){
         pop::Vec2F32 xxx(xx);
         xxx = (xxx-Vec2F32(domain)/2.)*homo + center_gravity;
@@ -1309,7 +1310,7 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
     }
     if(maxi-mini==0){
         mrf.fill(1);
-        return VecF32(mrf);
+        return v_neural;
     }else{
         if(_normalization_value==0){
             F32 diff = (maxi-mini)/2.f;
@@ -1322,7 +1323,7 @@ VecF32 NormalizationMatrixInputMass::inputMatrixToInputNeuron(const Mat2UI8  & i
                 mrf(xxx) = (mrf(xxx)-mini)/diff;
             }
         }
-        return VecF32(mrf);
+        return v_neural;
     }
 }
 
@@ -1371,7 +1372,7 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     }
 
     Mat2F32 mr = GeometricalTransformation::scale(m,Vec2F32(scale_factor,scale_factor),MATN_INTERPOLATION_BILINEAR);
-    Mat2F32 mrf(domain);
+
     Vec2I32 trans(0,0);
     if(index==0){
         trans(0)=0;
@@ -1384,14 +1385,16 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
     F32 maxi=pop::NumericLimits<F32>::minimumRange();
     F32 mini=pop::NumericLimits<F32>::maximumRange();
 
+    VecF32 v_neural(domain.multCoordinate());
+    Mat2F32 mrf(domain,v_neural.data());
     ForEachDomain2D(xx,mr){
         maxi=(std::max)(maxi,mr(xx));
         mini=(std::min)(mini,mr(xx));
         mrf(xx+trans)=mr(xx);
     }
+
     if(maxi-mini==0){
-        mrf.fill(1);
-        return VecF32(mrf);
+        return v_neural;
     }else{
         if(_normalization_value==0){
             F32 diff = (maxi-mini)/2.f;
@@ -1404,7 +1407,7 @@ VecF32 NormalizationMatrixInputCentering::inputMatrixToInputNeuron(const Mat2UI8
                 mrf(xxx) = (mrf(xxx)-mini)/diff;
             }
         }
-        return VecF32(mrf);
+        return v_neural;
     }
 }
 

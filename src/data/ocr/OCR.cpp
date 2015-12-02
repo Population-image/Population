@@ -67,7 +67,6 @@ int OCRNeuralNetwork::characterConfidence(){
 }
 
 bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
-   std::cout << "xmlfile : " << xmlfile << std::endl;
     if(BasicUtility::isFile(xmlfile)){
         _n.load(xmlfile.c_str());
         return true;
