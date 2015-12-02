@@ -191,7 +191,9 @@ bool  MatNInOut::_load( MatN<2, RGBUI8 > &img, const char * filename){
 
 
 void  MatNInOut::_savePNG(const MatN<2, UI8 > &img, const char * filename){
-    lodepng::encode(filename, img, img.sizeJ(), img.sizeI(),LCT_GREY,8);
+    std::vector<UI8> v(img.size());
+    std::copy(img.begin(),img.end(),v.begin());
+    lodepng::encode(filename, v, img.sizeJ(), img.sizeI(),LCT_GREY,8);
 }
 
 void  MatNInOut::_savePNG(const MatN<2, RGBUI8 > &img, const char * filename){

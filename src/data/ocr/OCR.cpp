@@ -45,6 +45,7 @@ char OCRNeuralNetwork::parseMatrix(const Mat2UI8 & m){
         //std::cout << "vout of neural network : " << vout << std::endl;
         //                _n.propagateFront(vin,vout);
         VecF32::iterator itt = std::max_element(vout.begin(),vout.end());
+        //std::cout << __FILE__ << "::" << __LINE__ << "itt : " << *itt << std::endl;
         int label_max = std::distance(vout.begin(),itt);
         F32 value_max = *itt;
 //        std::cout << "value_max : " << value_max << std::endl;
@@ -66,7 +67,6 @@ int OCRNeuralNetwork::characterConfidence(){
 }
 
 bool OCRNeuralNetwork::setDictionnary(std::string xmlfile){
-   std::cout << "xmlfile : " << xmlfile << std::endl;
     if(BasicUtility::isFile(xmlfile)){
         _n.load(xmlfile.c_str());
         return true;

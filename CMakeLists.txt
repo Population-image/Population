@@ -27,6 +27,7 @@ POP_OPTION(WITH_FFMPEG       "Include FFMPEG support"                      OFF  
 POP_OPTION(WITH_VLC          "Include VLC support"                      OFF   )
 POP_OPTION(WITH_QT           "Include QT"                      OFF   )
 POP_OPTION(WITH_OPENCV       "Include OpenCV"   OFF   )
+POP_OPTION(WITH_ACML       "Include ACML"   OFF   )
 
 # Population build components
 # ===================================================
@@ -41,7 +42,7 @@ POP_OPTION(WITH_CUDA         "Include Cuda"      OFF   )
 POP_OPTION(BUILD_PYTHON_SWIG "Build SWIG PYTHON" OFF )
 POP_OPTION(BUILD_TEST        "Test" OFF )
 POP_OPTION(BUILD_CUDA        "Cuda test" OFF )
-POP_OPTION(BUILD_WITH_C11    "build C11" OFF )
+POP_OPTION(BUILD_WITH_C11    "build C11" ON )
 POP_OPTION(CMAKE_VERBOSE     "Verbose mode" OFF )
 
 
@@ -112,13 +113,17 @@ if(WITH_QT)
     set(HAVE_QT true)
 endif(WITH_QT)
 
-
 if(WITH_OPENCV)
     set(HAVE_OPENCV true)
     find_package( OpenCV REQUIRED )
     set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${OpenCV_LIBS})
     set(POPULATION_LIBRARY ${POPULATION_LIBRARY} ${${OpenCV_INCLUDE_DIRS}})
 endif(WITH_OPENCV)
+
+if(WITH_ACML)
+	message(STATUS "Use ACML.")
+	set(HAVE_ACML true)
+endif(WITH_ACML)
 
 # C++11
 if(BUILD_WITH_C11)

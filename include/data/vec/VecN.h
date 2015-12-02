@@ -1294,138 +1294,32 @@ std::istream& operator >> (std::istream& in,  pop::VecN<D, Type>& x)
 template<int DIM>
 struct VecNIndice
 {
-    static   int VecN2Indice(const VecN<DIM,int> & size, const VecN<DIM,int> & x)
+    static   int VecN2Indice( const VecN<DIM,int> & stride, const VecN<DIM,int> & x)
     {
         int value=0;
-        int temp=1;
         for(int i=0;i<DIM;i++)
         {
-            value+=temp*x(i);
-            temp*=size(i);
+            value+=stride(i)*x(i);
         }
         return value;
 
-    }
-    static   int VecN2Indice(const VecN<DIM,int> & size, const Vec<int> & x)
-    {
-        int value=0;
-        int temp=1;
-        for(int i=0;i<DIM;i++)
-        {
-            value+=temp*x(i);
-            temp*=size(i);
-        }
-        return value;
-
-    }
-    static   VecN<DIM,int> Indice2VecN(const VecN<DIM,int> & size, int indice)
-    {
-        VecN<DIM,int> x;
-        for(int i=0;i<DIM;i++)
-        {
-            int temp=1;
-            for(int j=0;j<DIM-(i+1);j++)
-                temp*=size(j);
-            x(DIM-(i+1)) = indice/temp ;
-            indice -= (x(DIM-(i+1)) *temp);
-        }
-        return x;
     }
 };
 template<>
 struct VecNIndice<2>
 {
-    static   int VecN2Indice(const Vec2I32 & size, const Vec2I32 & x)
+    static   int VecN2Indice( const VecN<2,int> & stride, const Vec2I32 & x)
     {
-        return x(1)+x(0)*size(1);
-    }
-    static   int VecN2Indice(const Vec2I32 & size, const Vec<int> & x)
-    {
-        return x(1)+x(0)*size(1);
-    }
-    static   Vec2I32 Indice2VecN(const Vec2I32 & size, int indice)
-    {
-        Vec2I32 x;
-        x(0)=indice/size(1);
-        x(1)=indice - x(0)*size(1);
-        return x;
+        return x(1)*stride(1)+x(0)*stride(0);
     }
 };
 template<>
 struct VecNIndice<3>
 {
-    static   int VecN2Indice(const VecN<3,int> & size, const VecN<3,int> & x)
+    static   int VecN2Indice( const VecN<3,int> & stride, const VecN<3,int> & x)
     {
-        return x(1)+size(1)*(x(0)+size(0)*x(2));
-    }
-    static   int VecN2Indice(const VecN<3,int> & size, const Vec<int> & x)
-    {
-        return x(1)+size(1)*(x(0)+size(0)*x(2));
-    }
-    static   VecN<3,int> Indice2VecN(const VecN<3,int> & size, int indice)
-    {
-        VecN<3,int> x;
-        int s =size(1)*size(0);
-        x(2)=indice/s;
-        indice-=x(2)*s;
-        x(0)=indice/size(1);
-        x(1)=indice - x(0)*size(1);
-        return x;
+        return x(2)*stride(2)+x(1)*stride(1)+x(0)*stride(0);
     }
 };
-
-template<int DIM>
-struct VecN2IndiceByTable
-{
-	Vec< int> _table;
-	VecN2IndiceByTable()
-	{
-	}
-    VecN2IndiceByTable(const VecN<DIM,int>  &)
-	{
-	}
-
-    int VecN2Indice(const VecN<DIM,int> & size, const VecN<DIM,int> & x)const
-    {
-        int value=0;
-        int temp=1;
-        for(int i=0;i<DIM;i++)
-        {
-            value+=temp*x(i);
-            temp*=size(i);
-        }
-        return value;
-
-    }
-    int VecN2Indice(const VecN<DIM,int> & size, const Vec<int> & x)const
-    {
-        int value=0;
-        int temp=1;
-        for(int i=0;i<DIM;i++)
-        {
-            value+=temp*x(i);
-            temp*=size(i);
-        }
-        return value;
-
-    }
-    VecN<DIM,int> Indice2VecN(const VecN<DIM,int> & size, int indice)const
-    {
-        VecN<DIM,int> x;
-        for(int i=0;i<DIM;i++)
-        {
-            int temp=1;
-            for(int j=0;j<DIM-(i+1);j++)
-                temp*=size(j);
-            x(DIM-(i+1)) = indice/temp ;
-            indice -= (x(DIM-(i+1)) *temp);
-        }
-        return x;
-    }
-};
-
-
-
-
 }
 #endif

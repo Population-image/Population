@@ -1034,10 +1034,11 @@ typename Mat2x<PixelType,2,2>::Domain Mat2x<PixelType,2,2>::getDomain()const{
 
 template<int Dim, typename Result>
 MatN<Dim, Result>::MatN(const Mat2x<Result,2,2> m)
-    :Vec<Result>(4)
-{
-    _domain(0)=2;
-    _domain(1)=2;
+    :_data(new Result(4)),_is_owner_data(true)
+    {
+        _domain(0)=2;
+        _domain(1)=2;
+        _initStride();
     this->operator[](0)=m._dat[0];
     this->operator[](1)=m._dat[1];
     this->operator[](2)=m._dat[2];
@@ -1700,10 +1701,11 @@ Mat2x<PixelType,3,3> &Mat2x<PixelType,3,3>::operator =(const Mat2x& m)
 }
 template<int Dim, typename Result>
 MatN<Dim, Result>::MatN(const Mat2x<Result,3,3> m)
-:Vec<Result>(9)
+:_data(new Result(9)),_is_owner_data(true)
 {
     _domain(0)=3;
     _domain(1)=3;
+    _initStride();
     this->operator[](0)=m._dat[0];
     this->operator[](1)=m._dat[1];
     this->operator[](2)=m._dat[2];

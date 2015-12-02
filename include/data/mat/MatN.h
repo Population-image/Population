@@ -69,7 +69,7 @@ class  Mat2x;
 */
 
 template<int Dim, typename PixelType >
-class POP_EXPORTS MatN : public Vec<PixelType>
+class POP_EXPORTS MatN //: public Vec<PixelType>
 {
 public:
 
@@ -270,8 +270,10 @@ public:
     */
 
 protected:
+    PixelType * _data;
+    bool _is_owner_data;
     VecN<Dim,int> _domain;
-    VecN2IndiceByTable<Dim> _vec2_indice;
+    VecN<Dim,int> _stride;
 public:
 
     /*!
@@ -425,18 +427,18 @@ public:
 
      \sa  begin() end()
     */
-    typedef typename Vec<PixelType>::iterator iterator;
-    typedef typename Vec<PixelType>::value_type					 value_type;
-    typedef typename Vec<PixelType>::pointer           pointer;
-    typedef typename Vec<PixelType>::const_pointer     const_pointer;
-    typedef typename Vec<PixelType>::reference         reference;
-    typedef typename Vec<PixelType>::const_reference   const_reference;
-    typedef typename Vec<PixelType>::const_iterator const_iterator;
-    typedef typename Vec<PixelType>::const_reverse_iterator  const_reverse_iterator;
-    typedef typename Vec<PixelType>::reverse_iterator		 reverse_iterator;
-    typedef typename Vec<PixelType>::size_type					 size_type;
-    typedef typename Vec<PixelType>::difference_type				 difference_type;
-    typedef typename Vec<PixelType>::allocator_type                        		 allocator_type;
+    typedef typename std::vector<PixelType>::iterator iterator;
+    typedef typename std::vector<PixelType>::value_type					 value_type;
+    typedef typename std::vector<PixelType>::pointer           pointer;
+    typedef typename std::vector<PixelType>::const_pointer     const_pointer;
+    typedef typename std::vector<PixelType>::reference         reference;
+    typedef typename std::vector<PixelType>::const_reference   const_reference;
+    typedef typename std::vector<PixelType>::const_iterator const_iterator;
+    typedef typename std::vector<PixelType>::const_reverse_iterator  const_reverse_iterator;
+    typedef typename std::vector<PixelType>::reverse_iterator		 reverse_iterator;
+    typedef typename std::vector<PixelType>::size_type					 size_type;
+    typedef typename std::vector<PixelType>::difference_type				 difference_type;
+    typedef typename std::vector<PixelType>::allocator_type                        		 allocator_type;
 
 
     //-------------------------------------
@@ -448,6 +450,11 @@ public:
     * default constructor
     */
     MatN();
+
+    /*!
+    * destructor
+    */
+    ~MatN();
     /*!
     \param domain domain of definition
     \param v init pixel/voxel value
@@ -524,9 +531,11 @@ public:
     */
     explicit MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values );
     /*!
-    \param x domain size of the matrix
-    \param v_value affection values for the matrix elements
-     *
+    * \brief reference copy
+    * \param x domain size of the matrix
+    * \param v_value affection values for the matrix elements
+    *
+    * You copy only the pointer to the data structure and the destructor does not desallocate the data
     *
     \code
     UI8 _A[]={1,1,1,1,1,
@@ -541,7 +550,7 @@ public:
     cout<<LetterA<<endl;
     \endcode
     */
-    explicit MatN(const VecN<Dim,int> & x,const PixelType* v_value );
+    explicit MatN(const VecN<Dim,int> & domain, PixelType* v_value );
     /*!
     \param img object to copy
     *
@@ -875,11 +884,15 @@ public:
     * access the reference of the pixel/voxel value at the vector index (Vec contains pixel values)
     */
     PixelType & operator ()(unsigned int index);
-    PixelType & operator ()(size_type i,size_type j, const Vec< size_type>& _table)
-    {
-        return  this->operator[](j+_table[i]);
-    }
 
+    /*!
+    \param index vector index
+    \return pixel/voxel value
+    *
+    * access the reference of the pixel/voxel value at the vector index (Vec contains pixel values)
+    */
+    PixelType &operator[](int index) ;
+    const PixelType &operator[](int index) const ;
     const PixelType & operator ()(unsigned int index)const;
     /*!
     \param xf vector position in float value
@@ -1160,6 +1173,67 @@ public:
     * \image html plate_median_amoeba.jpg "median filter with ameaba kernel"
     */
     IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F32 distance_max=4,F32 lambda_param = 0.01 )const;
+
+
+    iterator begin(){ return iterator(this->_data); }
+
+    /**
+     *  Returns a read-only (constant) iterator that points to the
+     *  first element in the %vector.  Iteration is done in ordinary
+     *  element order.
+     */
+    const_iterator begin() const { return const_iterator(this->_data); }
+
+    /**
+     *  Returns a read/write iterator that points one past the last
+     *  element in the %vector.  Iteration is done in ordinary
+     *  element order.
+     */
+    iterator  end() { return iterator(this->_data+_domain.multCoordinate()); }
+
+    /**
+     *  Returns a read-only (constant) iterator that points one past
+     *  the last element in the %vector.  Iteration is done in
+     *  ordinary element order.
+     */
+    const_iterator end() const{ return const_iterator(this->_data+_domain.multCoordinate()); }
+
+    /**
+     *  Returns a read/write reverse iterator that points to the
+     *  last element in the %vector.  Iteration is done in reverse
+     *  element order.
+     */
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
+
+    /**
+     *  Returns a read-only (constant) reverse iterator that points
+     *  to the last element in the %vector.  Iteration is done in
+     *  reverse element order.
+     */
+    const_reverse_iterator rbegin() const  { return const_reverse_iterator(end()); }
+
+    /**
+     *  Returns a read/write reverse iterator that points to one
+     *  before the first element in the %vector.  Iteration is done
+     *  in reverse element order.
+     */
+    reverse_iterator rend()  { return reverse_iterator(begin()); }
+
+    /**
+     *  Returns a read-only (constant) reverse iterator that points
+     *  to one before the first element in the %vector.  Iteration
+     *  is done in reverse element order.
+     */
+    const_reverse_iterator  rend() const  { return const_reverse_iterator(begin()); }
+
+    /**
+     *  Returns true if the %vector is empty.  (Thus begin() would
+     *  equal end().)
+     */
+    bool empty() const { return begin() == end(); }
+    /**  Returns the number of elements  */
+    unsigned int size() const { return size_type(this->getDomain().multCoordinate()); }
+
     //@}
 
     //-------------------------------------
@@ -1501,36 +1575,43 @@ public:
     MatN(const MatN<Dim,UI8> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI8>::Range);
     }
     MatN(const MatN<Dim,UI16> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI16>::Range);
     }
     MatN(const MatN<Dim,UI32> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI32>::Range);
     }
     MatN(const MatN<Dim,F32> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,F32>::Range);
     }
     MatN(const MatN<Dim,RGBUI8> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBUI8>::Range);
     }
     MatN(const MatN<Dim,RGBF32> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBF32>::Range);
     }
     MatN(const MatN<Dim,ComplexF32> &img)
         :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
     {
+        _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,ComplexF32>::Range);
     }
     PixelType getValue(int i, int j)const{
@@ -1540,7 +1621,7 @@ public:
         return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
     }
     PixelType getValue(const E & x )const{
-        return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
+        return  this->operator[](VecNIndice<Dim>::VecN2Indice(_stride,x));
     }
     void setValue(int i, int j , PixelType value){
         this->operator[](j+i*_domain(1)) =value;
@@ -1549,11 +1630,46 @@ public:
         this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1)) =value;
     }
     void setValue(const E & x, PixelType value){
-        this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x)) =value;
+        this->operator[](VecNIndice<Dim>::VecN2Indice(_stride,x)) =value;
     }
 
 #endif
 
+
+    const VecN<Dim,int>& stride()const{
+        return _stride;
+    }
+    VecN<Dim,int>& stride(){
+        return _stride;
+    }
+    bool isOwnerData()const{
+        return _is_owner_data;
+    }
+    MatN selectColumn(int index_column){
+        MatN m(VecN<Dim,int>(_domain(0),1),this->data()+_stride[1]*index_column);
+        m._stride(0)=this->_stride(0);
+        m._stride(1)=1;
+        return m;
+    }
+
+    MatN selectRow(int index_row){
+        MatN m(VecN<Dim,int>(1,_domain(1)),this->data()+_stride[0]*index_row);
+        m._stride(1)=this->_stride(1);
+        m._stride(0)=1;
+        return m;
+    }
+
+private:
+    void _initStride(){
+        _stride[1]=1;
+        _stride[0]=_domain[1];
+        for(unsigned int i=2;i<DIM;i++){
+            if(i==2)
+                _stride[2]=_domain[1]*_domain[0];
+            else
+                _stride[i]=_domain[i-1]*_stride[i-1];
+        }
+    }
 };
 
 typedef MatN<2,UI8> Mat2UI8;
@@ -1581,49 +1697,62 @@ typedef MatN<3,VecN<3,F32> >  Mat3Vec3F32;
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN()
+    :_data(NULL),_is_owner_data(true)
 {
     _domain=0;
+    _initStride();
 }
-
+template<int Dim, typename PixelType>
+MatN<Dim,PixelType>::~MatN()
+{
+    if(_is_owner_data==true&& _data!=NULL)
+        delete[] _data;
+}
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const VecN<Dim,int>& domain,PixelType v)
-    :Vec<PixelType>(domain.multCoordinate(),PixelType(v)),_domain(domain),_vec2_indice(_domain)
+    :_data(new PixelType[domain.multCoordinate()]),_is_owner_data(true),_domain(domain)
 {
+    std::fill(this->begin(), this->end(), v);
+    _initStride();
 }
 
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei,unsigned int sizej)
-    :Vec<PixelType>(sizei*sizej,PixelType(0)),_domain(sizei,sizej),_vec2_indice(_domain)
+    :_data(new PixelType[sizei*sizej]),_is_owner_data(true),_domain(sizei,sizej)
 {
+    _initStride();
     POP_DbgAssertMessage(Dim==2,"In MatN::MatN(int i, int j), your matrix must be 2D");
 
 }
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
-    :Vec<PixelType>(sizei*sizej*sizek,PixelType(0)),_domain(sizei,sizej,sizek),_vec2_indice(_domain)
+    :_data(new PixelType[sizei*sizej*sizek]),_is_owner_data(true),_domain(sizei,sizej,sizek)
 {
+    _initStride();
     POP_DbgAssertMessage(Dim==3,"In MatN::MatN(int sizei, int sizej,int sizek), your matrix must be 3D");
 }
-template<int Dim, typename PixelType>
-MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values )
-    :Vec<PixelType>(data_values),_domain(x),_vec2_indice(_domain)
-{
-    POP_DbgAssertMessage((int)data_values.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data ), the size of input Vec data must be equal to the number of pixel/voxel");
-}
+//template<int Dim, typename PixelType>
+//MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values )
+//    :_data(new PixelType[x.multCoordinate()]),_is_owner_data(true),_domain(x)
+//{
+//    _initStride();
+//    POP_DbgAssertMessage((int)data_values.size()==_domain.multCoordinate(),"In MatN::MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data ), the size of input Vec data must be equal to the number of pixel/voxel");
+//}
 
 template<int Dim, typename PixelType>
-MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & x,const PixelType* v_value )
-    :Vec<PixelType>(x.multCoordinate(),PixelType()),_domain(x),_vec2_indice(_domain)
+MatN<Dim,PixelType>::MatN(const VecN<Dim,int> & domain, PixelType* v_value )
+    :_data(v_value),_is_owner_data(false),_domain(domain)
 {
-    std::copy(v_value,v_value + _domain.multCoordinate(),this->begin());
+    _initStride();
 }
 
 template<int Dim, typename PixelType>
 template<typename T1>
 MatN<Dim,PixelType>::MatN(const MatN<Dim, T1> & img )
-    :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain()),_vec2_indice(_domain)
+    :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
 {
+    _initStride();
     std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,T1>::Range);
 }
 
@@ -1631,24 +1760,39 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim, T1> & img )
 #ifndef HAVE_SWIG
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img )
-    :Vec<PixelType>(img),_domain(img.getDomain()),_vec2_indice(_domain)
 {
+    if(img._is_owner_data==false){
+        this->_is_owner_data = img._is_owner_data;
+        this->_data  = img._data;
+        this->_domain  = img._domain;
+
+
+    }else{
+        this->_data= new PixelType[img.getDomain().multCoordinate()];
+        this->_is_owner_data = img._is_owner_data;
+        this->_domain  = img._domain;
+        std::copy(img.begin(),img.end(),this->begin());
+    }
+    _initStride();
 }
 #endif
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const char * filepath )
+    :_data( NULL),_is_owner_data(true),_domain(0)
 {
     if(filepath!=0)
         load(filepath);
+    _initStride();
 }
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& xmin, const VecN<Dim,int> & xmax  )
+    :_data( new PixelType[(xmax-xmin).multCoordinate()]),_is_owner_data(true),_domain(xmax-xmin)
 {
     POP_DbgAssertMessage(xmin.allSuperiorEqual(0),"xmin must be superior or equal to 0");
     POP_DbgAssertMessage(xmax.allSuperior(xmin),"xmax must be superior to xmin");
     POP_DbgAssertMessage(xmax.allInferior(img.getDomain()+1),"xmax must be superior or equal to xmin");
-    this->resize(xmax-xmin);
+    _initStride();
     if(  DIM==2 ){
         if(_domain(1)==img.getDomain()(1)){
             if(_domain(0)==img.getDomain()(0))
@@ -1714,6 +1858,7 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
             }
         }
     }
+    _initStride();
 }
 template<int Dim, typename PixelType>
 typename MatN<Dim,PixelType>::Domain  MatN<Dim,PixelType>::getDomain()
@@ -1770,25 +1915,29 @@ bool MatN<Dim,PixelType>::isValid(int i,int j,int k)const{
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(unsigned int sizei,unsigned int sizej){
-    _domain(0)=sizei;
-    _domain(1)=sizej;
-    Vec<PixelType>::resize(_domain(0)*_domain(1));
+    VecN<Dim,int> d(sizei,sizej);
+    resize(d);
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(unsigned int sizei,unsigned int sizej,unsigned int sizek){
-    _domain(0)=sizei;
-    _domain(1)=sizej;
-    _domain(2)=sizek;
-    Vec<PixelType>::resize(_domain(0)*_domain(1)*_domain(2));
+    VecN<Dim,int> d(sizei,sizej,sizek);
+    resize(d);
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resize(const VecN<Dim,int> & d){
-    _domain=d;
-    Vec<PixelType>::resize(_domain.multCoordinate());
+
+    if(_is_owner_data==true){
+        if(_data!=NULL)
+            delete[] _data;
+        _domain=d;
+        _initStride();
+        _data = new PixelType[_domain.multCoordinate()];
+    }else{
+        std::cerr<<"[ERROR] in MatN::resize, reference structure, you cannot allocate data"<<std::endl;
+    }
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resizeInformation(unsigned int sizei,unsigned int sizej){
-
     Domain d;
     d(0)=sizei;
     d(1)=sizej;
@@ -1804,17 +1953,13 @@ void MatN<Dim,PixelType>::resizeInformation(unsigned int sizei,unsigned int size
 }
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::resizeInformation(const VecN<Dim,int>& d){
-
-    if(Dim==2&&d(1)==_domain(1)){
-        _domain=d;
-        Vec<PixelType>::resize(_domain.multCoordinate());
-    }else if(Dim==3&&d(0)==_domain(0)&&d(1)==_domain(1)){
-        _domain=d;
-        Vec<PixelType>::resize(_domain.multCoordinate());
-    }else{
+    if(_is_owner_data==true){
         MatN<Dim,PixelType> temp(*this);
         _domain=d;
-        Vec<PixelType>::resize(_domain.multCoordinate());
+        _initStride();
+        if(_data!=NULL)
+            delete[] _data;
+        _data = new PixelType[_domain.multCoordinate()];
         IteratorEDomain it(this->getIteratorEDomain());
         while(it.next()){
             if(temp.isValid(it.x())){
@@ -1823,6 +1968,8 @@ void MatN<Dim,PixelType>::resizeInformation(const VecN<Dim,int>& d){
                 this->operator ()(it.x())=0;
             }
         }
+    }else{
+        std::cerr<<"[ERROR] in MatN::resizeInformation, reference structure, you cannot allocate data"<<std::endl;
     }
 }
 template<int Dim, typename PixelType>
@@ -1835,14 +1982,18 @@ bool MatN<Dim,PixelType>::isEmpty()const{
 template<int Dim, typename PixelType>
 void MatN<Dim,PixelType>::clear(){
     _domain=0;
-    Vec<PixelType>::clear();
+    if(_is_owner_data==true){
+        if(_data!=NULL)
+            delete[] _data;
+        _data = NULL;
+    }
 }
 
 template<int Dim, typename PixelType>
 PixelType & MatN<Dim,PixelType>::operator ()(const VecN<Dim,int> & x)
 {
     POP_DbgAssert( x.allSuperiorEqual( E(0))&&x.allInferior(getDomain()));
-    return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
+    return  this->_data[VecNIndice<Dim>::VecN2Indice(_stride,x)];
 }
 
 template<int Dim, typename PixelType>
@@ -1850,13 +2001,13 @@ const PixelType & MatN<Dim,PixelType>::operator ()( const VecN<Dim,int>& x)
 const
 {
     POP_DbgAssert( x.allSuperiorEqual(E(0))&&x.allInferior(getDomain()));
-    return  this->operator[](VecNIndice<Dim>::VecN2Indice(_domain,x));
+    return  this->_data[VecNIndice<Dim>::VecN2Indice(_stride,x)];
 }
 template<int Dim, typename PixelType>
 PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)
 {
     POP_DbgAssert( i<(sizeI())&&j<(sizeJ()));
-    return  this->operator[](j+i*_domain(1));
+    return  this->_data[i*_stride[0]+j*_stride[1]];
 }
 
 
@@ -1864,26 +2015,34 @@ template<int Dim, typename PixelType>
 const PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j)const
 {
     POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ()));
-    return  this->operator[](j+i*_domain(1));
+    return  this->_data[i*_stride[0]+j*_stride[1]];
 }
 template<int Dim, typename PixelType>
 PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)
 {
     POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
-    return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
+    return  this->_data[i*_stride[0]+j*_stride[1]+k*_stride[2]];
 }
 
 template<int Dim, typename PixelType>
 const PixelType & MatN<Dim,PixelType>::operator ()(unsigned int i,unsigned int j,unsigned int k)const
 {
     POP_DbgAssert(i>=0&&j>=0&&i<(sizeI())&&j<(sizeJ())&&k<(sizeK()));
-    return  this->operator[](j+i*_domain(1)+k*_domain(0)*_domain(1));
+    return  this->_data[i*_stride[0]+j*_stride[1]+k*_stride[2]];
 }
 
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType> MatN<Dim,PixelType>::operator()(const VecN<Dim,int> & xmin, const VecN<Dim,int> & xmax) const{
     return MatN(*this,xmin,xmax);
 }
+template<int Dim, typename PixelType>
+PixelType &MatN<Dim,PixelType>::operator[](int index)
+{ return this->_data[index]; }
+
+template<int Dim, typename PixelType>
+const PixelType &MatN<Dim,PixelType>::operator[](int index) const
+{ return this->_data[index]; }
+
 template<int Dim, typename PixelType>
 PixelType & MatN<Dim,PixelType>::operator ()(unsigned int index)
 {
@@ -1978,14 +2137,31 @@ typename MatN<Dim,PixelType>::IteratorENeighborhoodAmoebas MatN<Dim,PixelType>::
 template<int Dim, typename PixelType>
 template<class T1>
 MatN<Dim,PixelType> & MatN<Dim,PixelType>::operator =(const MatN<Dim, T1> & img ){
-    this->resize(img.getDomain());
-    std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,T1>::Range);
+
+    if(img.isOwnerData()==false){
+        std::cerr<<"[ERROR] MatN::operator=, cannot copy MatN if PixelType are different and img is not the data owner"<<std::endl;
+    }else{
+        this->resize(img.getDomain());
+        std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,T1>::Range);
+    }
+
+
+
     return *this;
 }
 template<int Dim, typename PixelType>
 MatN<Dim,PixelType> & MatN<Dim,PixelType>::operator =(const MatN<Dim,PixelType> & img ){
-    this->resize(img.getDomain());
-    std::copy(img.begin(),img.end(),this->begin());
+    if(img.isOwnerData()==false){
+        if(this->_is_owner_data ==true&&_data!=NULL)
+            delete[] _data;
+        this->_is_owner_data = img.isOwnerData();
+        this->_data  = const_cast<PixelType*>(img.data());
+        this->_domain  = img.getDomain();
+        this->_stride = img.stride();
+    }else{
+        this->resize(img.getDomain());
+        std::copy(img.begin(),img.end(),this->begin());
+    }
     return *this;
 }
 template<int Dim, typename PixelType>
@@ -2181,9 +2357,15 @@ MatN<Dim, PixelType>  MatN<Dim,PixelType>::operator/(PixelType value)const{
 template<int DIM, typename PixelType>
 MatN<DIM,PixelType>  MatN<DIM,PixelType>::deleteRow(unsigned int i)const{
     POP_DbgAssert(i<sizeI());
-    MatN<DIM,PixelType> temp(*this);
-    temp._domain(0)--;
-    temp.erase( temp.begin()+i*temp._domain(1), temp.begin()+(i+1)*temp._domain(1)  );
+    MatN<DIM,PixelType> temp(this->sizeI()-1,this->sizeJ());
+    for(unsigned int i1=0;i1<temp.sizeI();i1++)
+        for(unsigned int j=0;j<temp.sizeJ();j++)
+        {
+            if(i1<i)
+                temp(i1,j)=this->operator ()(i1,j);
+            else
+                temp(i1,j)=this->operator ()(i1+1,j);
+        }
     return temp;
 }
 template<int DIM, typename PixelType>

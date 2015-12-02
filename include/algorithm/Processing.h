@@ -455,6 +455,7 @@ struct POP_EXPORTS Processing
      * pixel = ( pixel >  pixel_deriche - offset_value) ? object : background with pixel_deriche is the value of the smooth deriche image
     */
     template<typename PixelType>
+
     static MatN<2,UI8>  thresholdAdaptativeSmoothDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
         MatN<2,PixelType> smooth = Processing::smoothDeriche(f,sigma);
         Mat2UI8 thresold(smooth.getDomain());
@@ -487,6 +488,7 @@ struct POP_EXPORTS Processing
     static MatN<2,UI8>  thresholdAdaptativeSmoothFast(const MatN<2,PixelType> & f,F32 alpha=0.1,F32 offset_value=0  ){
         MatN<2,PixelType> smooth = Processing::smoothRecursiveFirstOrder(f,alpha);
         Mat2UI8 thresold(smooth.getDomain());
+
         for(unsigned int i=0;i<smooth.size();i++){
             if(f(i)>smooth(i)-offset_value){
                 thresold(i)=255;
@@ -1762,9 +1764,16 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      */
     template<typename PixelType>
     static MatN<2,PixelType> smoothRecursiveFirstOrder(const MatN<2,PixelType> & f, F32 alpha=0.1){
+#define MT 1
+        // if 1 : optimised
         Mat2F32 m(f);
+#if (MT == 1)
+        pop::F32 memory_causal[m.sizeJ()];
+        pop::F32 memory_anticausal[m.sizeJ()];
+#endif
         Mat2F32 filter_causal(m.getDomain()),filter_anticausal(m.getDomain());
 
+#if (MT == 0)
         for(int j=0;j<(int)m.sizeJ();j++){
             filter_causal(0,j)=m(0,j);
             for(int i=1;i<(int)m.sizeI();i++){
@@ -1775,17 +1784,45 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
                 filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i+1,j)+alpha*m(i,j);
             }
         }
-        m = filter_causal + filter_anticausal;
-        for(int i=0;i<(int)m.sizeI();i++){
-            filter_causal(i,0)=m(i,0);
-            for(int j=1;j<(int)m.sizeJ();j++){
-                filter_causal(i,j)=(1-alpha)*filter_causal(i,j-1)+alpha*m(i,j);
-            }
-            filter_anticausal(i,m.sizeJ()-1)=m(i,m.sizeJ()-1);
-            for(int j=m.sizeJ()-2;j>=0;j--){
-                filter_anticausal(i,j)=(1-alpha)*filter_anticausal(i,j+1)+alpha*m(i,j);
+#else
+        for (int j = 0 ; j < (int)m.sizeJ() ; j ++) {
+            filter_causal(0, j) = m(0, j);
+            memory_causal[j] = m(0, j);
+            filter_anticausal(m.sizeI()-1,j)=m(m.sizeI()-1,j);
+            memory_anticausal[j] = m(m.sizeI()-1, j);
+        }
+
+        for (int i = 0 ; i < (int)m.sizeI() ; i ++) {
+            for(int j=0;j<(int)m.sizeJ();j++){
+                filter_causal(i,j)=(1-alpha)*memory_causal[j]+alpha*m(i,j);
+                memory_causal[j] = filter_causal(i, j);
             }
         }
+        for(int i=m.sizeI()-2;i>=0;i--){
+            for(int j=0;j<(int)m.sizeJ();j++){
+                filter_anticausal(i,j)=(1-alpha)*memory_anticausal[j]+alpha*m(i,j);
+                memory_anticausal[j] = filter_anticausal(i,j);
+            }
+        }
+#endif
+        m = filter_causal + filter_anticausal;
+
+        F32 cValue;
+        for(int i=0;i<(int)m.sizeI();i++){
+            filter_causal(i,0)=m(i,0);
+            cValue = m(i,0);
+            for(int j=1;j<(int)m.sizeJ();j++){
+                filter_causal(i,j)=(1-alpha)*cValue+alpha*m(i,j);
+                cValue = filter_causal(i,j);
+            }
+            filter_anticausal(i,m.sizeJ()-1)=m(i,m.sizeJ()-1);
+            cValue = m(i,m.sizeJ()-1);
+            for(int j=m.sizeJ()-2;j>=0;j--){
+                filter_anticausal(i,j)=(1-alpha)*cValue+alpha*m(i,j);
+                cValue = filter_anticausal(i,j);
+            }
+        }
+
         m = (filter_causal + filter_anticausal)*.25f;
         return m;
     }
@@ -1809,8 +1846,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \image html LenaGradDeriche.jpg
      */
     template<int DIM, typename PixelType>
-    static MatN<DIM,F32>  gradientDeriche(const MatN<DIM,PixelType> & f, I32 direction, F32 alpha=1)
-    {
+    static MatN<DIM,F32>  gradientDeriche(const MatN<DIM,PixelType> & f, I32 direction, F32 alpha=1) {
         return FunctorMatN::gradientDeriche( f, direction, alpha);
     }
     /*!

@@ -19,11 +19,13 @@ static void *lock_vlc(void *data, void**p_pixels)
     *p_pixels = (unsigned char *)context->image_RV32->data();
     return NULL;
 }
+
 static void display_vlc(void *data, void *id)
 {
     (void) data;
     assert(id == NULL);
 }
+
 static void unlock_vlc(void *data, void *id, void *const *){
     ctx *context = static_cast<ctx*>(data);
     if(*context->index>=0){
@@ -41,9 +43,6 @@ VideoVLCDeprecated::VideoVLCDeprecated(bool vlc_debug)
     {
         "--verbose=2",
         "--extraintf=logger",
-        /* Logging things must be at the end of the array */
-        "--verbose=3",
-        "--extraintf=logger",
     };
     int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
     if (!vlc_debug) {
@@ -54,7 +53,7 @@ VideoVLCDeprecated::VideoVLCDeprecated(bool vlc_debug)
     mediaPlayer = NULL;
     context = new  ctx;
     context->pmutex = new tthread::mutex();
-    context->image_RV32 = new pop::MatN<2,pop::VecN<4,UI8> > (10,10);
+    context->image_RV32 = new pop::MatN<2,pop::VecN<4,UI8> > (2000,2000);
     context->index = new int(-1);
     my_index = -1;
     isplaying = false;
@@ -144,9 +143,9 @@ bool VideoVLCDeprecated::open(const std::string & path){
 #else
                 media = libvlc_media_new_path(instance, path.c_str());
 #endif
-            }
-            else
+            } else {
                 media = libvlc_media_new_location(instance,path.c_str() );
+            }
             mediaPlayer = libvlc_media_player_new(instance);
             libvlc_media_player_set_media( mediaPlayer, media);
             libvlc_media_release (media);
@@ -154,8 +153,9 @@ bool VideoVLCDeprecated::open(const std::string & path){
             libvlc_video_set_callbacks(mediaPlayer, lock_vlc, unlock_vlc, display_vlc, context);
             libvlc_video_set_format(mediaPlayer, "RV32", context->image_RV32->sizeJ(), context->image_RV32->sizeI(), context->image_RV32->sizeJ()*4);
             *(context->index) =0;
+            my_index = -1;
             //                std::cout<<"return true"<<std::endl;
-            //pop::BasicUtility::sleep_ms(1000);
+            pop::BasicUtility::sleep_ms(2000);
             return true;
         }else{
             libvlc_media_player_stop(mediaPlayer);
@@ -219,6 +219,7 @@ bool VideoVLCDeprecated::grabMatrixGrey(){
 
     while(my_index==*context->index){
         if(_isfile && !libvlc_media_player_is_playing(mediaPlayer)){
+           std::cout << "media is not playing" << std::endl;
             isplaying = false;
             return false;
         }
@@ -241,22 +242,7 @@ bool VideoVLCDeprecated::isFile() const{
     return _isfile;
 }
 bool VideoVLCDeprecated::grabMatrixRGB(){
-    if (!isplaying) {
-        return false;
-    }
-
-    while(my_index==*context->index){
-        if(_isfile && !libvlc_media_player_is_playing(mediaPlayer)){
-            isplaying = false;
-            return false;
-        }
-
-        if(!_isfile) {
-            pop::BasicUtility::sleep_ms(100);
-        }
-    }
-    my_index=*context->index;
-    return true;
+    return grabMatrixGrey();
 }
 Mat2RGBUI8& VideoVLCDeprecated::retrieveMatrixRGB(){
     context->pmutex->lock();

@@ -31,6 +31,9 @@
 /* debug mode */
 #cmakedefine HAVE_DEBUG
 
+/* ACML */
+#cmakedefine HAVE_ACML
+
 #define POP_PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}"
 
 #endif
