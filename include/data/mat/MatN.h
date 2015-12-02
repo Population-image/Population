@@ -1933,7 +1933,11 @@ void MatN<Dim,PixelType>::resize(const VecN<Dim,int> & d){
         _initStride();
         _data = new PixelType[_domain.multCoordinate()];
     }else{
-        std::cerr<<"[ERROR] in MatN::resize, reference structure, you cannot allocate data"<<std::endl;
+        //std::cerr<<"[ERROR] in MatN::resize, reference structure, you cannot allocate data"<<std::endl;
+        _domain=d;
+        _initStride();
+        _data = new PixelType[_domain.multCoordinate()];
+        _is_owner_data = true;
     }
 }
 template<int Dim, typename PixelType>

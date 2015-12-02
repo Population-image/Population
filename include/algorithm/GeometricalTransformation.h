@@ -132,13 +132,11 @@ struct POP_EXPORTS GeometricalTransformation
     template<  typename PixelType,typename Interpolation>
     static MatN<2,PixelType> _scale(const MatN<2,PixelType> & f,const VecN<2,F32> & scale,Interpolation )
     {
-
         Vec2I32 domain (scale*VecN<2,F32>(f.getDomain()));
         MatN<2,PixelType> temp(domain);
         Vec2F32 alpha = Vec2F32(1.f,1.f)/scale;
         Vec2I32 x (0,0);
         Vec2F32 x_f (-0.4999f,-0.4999f);
-
         for(x(0)=0;x(0)<(int)temp.sizeI();x(0)++,x_f(0)+=alpha(0)){
             x_f(1)=-0.4999f;
             for(x(1)=0;x(1)<(int)temp.sizeJ();x(1)++,x_f(1)+=alpha(1)){
@@ -150,13 +148,11 @@ struct POP_EXPORTS GeometricalTransformation
     template<  typename PixelType,typename Interpolation>
     static MatN<3,PixelType> _scale(const MatN<3,PixelType> & f,const VecN<3,F32> & scale,Interpolation )
     {
-
         Vec3I32 domain (scale*VecN<2,F32>(f.getDomain()));
         MatN<3,PixelType> temp(domain);
         Vec3F32 alpha = Vec2F32(1.f,1.f)/scale;
         Vec3I32 x (0,0,0);
         Vec3F32 x_f (-0.4999f,-0.4999f,-0.4999f);
-
         for(x(0)=0;x(0)<(int)temp.sizeI();x(0)++,x_f(0)+=alpha(0)){
             x_f(1)=-0.4999f;
             for(x(1)=0;x(1)<(int)temp.sizeJ();x(1)++,x_f(1)+=alpha(1)){
