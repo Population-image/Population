@@ -1659,6 +1659,12 @@ public:
         return m;
     }
 
+    MatN copyData()const{
+        MatN m(this->getDomain());
+        std::copy(this->begin(),this->end(),m.begin());
+        return m;
+    }
+
 private:
     void _initStride(){
         _stride[1]=1;
@@ -1933,11 +1939,7 @@ void MatN<Dim,PixelType>::resize(const VecN<Dim,int> & d){
         _initStride();
         _data = new PixelType[_domain.multCoordinate()];
     }else{
-        //std::cerr<<"[ERROR] in MatN::resize, reference structure, you cannot allocate data"<<std::endl;
-        _domain=d;
-        _initStride();
-        _data = new PixelType[_domain.multCoordinate()];
-        _is_owner_data = true;
+        std::cerr<<"[ERROR] in MatN::resize, reference structure, you cannot allocate data"<<std::endl;
     }
 }
 template<int Dim, typename PixelType>

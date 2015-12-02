@@ -63,7 +63,6 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/notstable/Descriptor.h \
            $${PWD}/include/data/notstable/Ransac.h \
            $${PWD}/include/data/notstable/Wavelet.h \
-           $${PWD}/include/data/notstable/MatNReference.h \
            $${PWD}/include/data/ocr/OCR.h \
            $${PWD}/include/data/population/PopulationData.h \
            $${PWD}/include/data/population/PopulationFunctor.h \
@@ -83,10 +82,7 @@ HEADERS += $${PWD}/include/Population.h \
            $${PWD}/include/data/vec/VecN.h \
            $${PWD}/include/data/video/Video.h \
            $${PWD}/include/data/notstable/graph/Graph.h \
-           $${PWD}/include/data/functor/FunctorMatN.h \
-#           $${PWD}/include/algorithm/blas.h \
-           $${PWD}/include/data/notstable/tensor/tensor.h \
-           $${PWD}/include/data/notstable/tensor/processingtensor.h
+           $${PWD}/include/data/functor/FunctorMatN.h
 
 SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/algorithm/LinearAlgebra.cpp \
@@ -123,7 +119,4 @@ SOURCES += $${PWD}/src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/src/data/utility/BasicUtility.cpp \
            $${PWD}/src/data/utility/Cryptography.cpp \
            $${PWD}/src/data/utility/XML.cpp \
-           $${PWD}/src/data/video/Video.cpp \
-#           $${PWD}/src/algorithm/blas.cpp \
-           $${PWD}/src/data/notstable/tensor/tensor.cpp \
-           $${PWD}/src/data/notstable/tensor/processingtensor.cpp
+           $${PWD}/src/data/video/Video.cpp
