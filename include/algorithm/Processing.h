@@ -468,6 +468,31 @@ struct POP_EXPORTS Processing
         }
         return thresold;
     }
+
+    /*!
+     * \brief adaptative filter with deriche's smooth, optimized implementation
+     * \param f input function
+     * \param sigma Deriche's smooth parameter
+     * \param offset_value offset value
+     * \return output function noted h
+     *
+     * pixel = ( pixel >  pixel_deriche - offset_value) ? object : background with pixel_deriche is the value of the smooth deriche image
+    */
+    template<typename PixelType>
+
+    static MatN<2,UI8>  fastThresholdAdaptativeSmoothDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
+        MatN<2,PixelType> smooth = Processing::fastSmoothDeriche(f,sigma);
+        Mat2UI8 thresold(smooth.getDomain());
+        for(unsigned int i=0;i<smooth.size();i++){
+            if(f(i)>smooth(i)-offset_value){
+                thresold(i)=255;
+            }else{
+                thresold(i)=0;
+            }
+        }
+        return thresold;
+    }
+
     /*!
      * \brief adaptative filter with fast smooth
      * \param f input function
@@ -1743,6 +1768,115 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
     template<int DIM, typename PixelType>
     static MatN<DIM,PixelType> smoothDeriche(const MatN<DIM,PixelType> & f, F32 alpha=1){
         return FunctorMatN::smoothDeriche(f,alpha);
+    }
+
+    /*!
+     * \brief Deriche's smooth filter, with optimized implementation
+     * \param f input matrix
+     * \param alpha inverse scale parameter
+     * \return h output function
+     *
+     * Smooth the input matrix with the inverse scale parameter (alpha=2=low, alpha=0.5=high)
+     * \code
+     * Mat2RGBUI8 img;
+     * img.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
+     * img = Processing::fastSmoothDeriche(img,0.5);
+     * img.display();
+     * \endcode
+     */
+    template<typename PixelType>
+    static MatN<2,PixelType> fastSmoothDeriche(const MatN<2,PixelType> & f, F32 alpha=1){
+        typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
+        F32 e_a = std::exp(- alpha);
+        F32 e_2a = std::exp(- 2.f * alpha);
+        F32 k = (1.f - e_a) * (1.f - e_a) / (1.f + (2 * alpha * e_a) - e_2a);
+
+        F32 a0_c= k;
+        F32 a1_c=  k * e_a * (alpha - 1.f);
+        F32 a2_c=  0;
+        F32 a0_ac= 0;
+        F32 a1_ac=  k * e_a * (alpha + 1.f);
+        F32 a2_ac=  - k * e_2a;
+
+        F32 b1= 2 * e_a;
+        F32 b2 = - e_2a;
+
+
+        F32 a0_c_border0 = ((a0_c + a1_c) / (1.f - b1 - b2));
+        F32 a0_c_border1 = a0_c ;
+        F32 a1_c_border1 = a1_c ;
+
+        F32 a0_ac_border0 = ((a1_ac + a2_ac) / (1.f - b1 - b2));
+        F32 a0_ac_border1 = 0 ;
+        F32 a1_ac_border1 = a1_ac + a2_ac ;
+
+        F32 b1_border1 = b1 + b2 ;
+
+        MatN<2, PixelTypeF32> out(f);
+        PixelTypeF32 mem1_causal[f.columns()], mem2_causal[f.columns()], mem1_anticausal[f.columns()], mem2_anticausal[f.columns()];
+        PixelTypeF32 mem1_causalS, mem2_causalS, mem1_anticausalS, mem2_anticausalS;
+
+        MatN<2, PixelTypeF32> filter_causal(f.getDomain()),filter_anticausal(f.getDomain());
+
+        for (int j = 0 ; j < out.sizeJ() ; j ++) {
+            filter_causal(0, j) = a0_c_border0*out(0, j);
+            mem1_causal[j] = filter_causal(0, j);
+            filter_causal(1, j) = b1_border1 * mem1_causal[j] + a1_c_border1 * out(0, j) + a0_c_border1 * out(1, j);
+            mem2_causal[j] = mem1_causal[j];
+            mem1_causal[j] = filter_causal(1, j);
+
+            filter_anticausal(out.sizeI()-1,j) = a0_ac_border0*out(out.sizeI()-1,j);
+            mem1_anticausal[j] = filter_anticausal(out.sizeI()-1,j);
+            filter_anticausal(out.sizeI() - 2, j) = b1_border1*mem1_anticausal[j] + a1_ac_border1*out(out.sizeI()-1, j) + a0_ac_border1*out(out.sizeI()-2, j);
+            mem2_anticausal[j] = mem1_anticausal[j];
+            mem1_anticausal[j] = filter_anticausal(out.sizeI() - 2, j);
+        }
+
+        for (int i = 2 ; i < out.sizeI() ; i ++) {
+            for(int j=0;j<out.sizeJ();j++){
+                filter_causal(i, j) = b1 * mem1_causal[j] + b2 * mem2_causal[j] + a2_c * out(i-2, j) + a1_c * out(i-1, j) + a0_c * out(i, j);
+                mem2_causal[j] = mem1_causal[j];
+                mem1_causal[j] = filter_causal(i, j);
+            }
+        }
+
+        for(int i = out.sizeI()-3 ; i >= 0 ; i--){
+            for(int j=0;j<out.sizeJ();j++){
+                filter_anticausal(i, j) = b1 * mem1_anticausal[j] + b2 * mem2_anticausal[j] + a2_ac * out(i+2, j) + a1_ac * out(i+1, j) + a0_ac * out(i, j);
+                mem2_anticausal[j] = mem1_anticausal[j];
+                mem1_anticausal[j] = filter_anticausal(i, j);
+            }
+        }
+
+        out = filter_causal + filter_anticausal;
+
+        for(int i=0;i<out.sizeI();i++){
+            filter_causal(i,0) = a0_c_border0 * out(i,0);
+            mem1_causalS = filter_causal(i,0);
+            filter_causal(i, 1) = b1_border1 * mem1_causalS + a1_c_border1 * out(i, 0) + a0_c_border1 * out(i, 1);
+            mem2_causalS = mem1_causalS;
+            mem1_causalS = filter_causal(i, 1);
+            for(int j=2;j<out.sizeJ();j++){
+                filter_causal(i,j) = b1 * mem1_causalS + b2 * mem2_causalS + a2_c * out(i, j-2) + a1_c * out(i, j-1) + a0_c * out(i, j);
+                mem2_causalS = mem1_causalS;
+                mem1_causalS = filter_causal(i,j);
+            }
+
+            filter_anticausal(i,out.sizeJ()-1) = a0_ac_border0 * out(i,out.sizeJ()-1);
+            mem1_anticausalS = filter_anticausal(i,out.sizeJ()-1);
+            filter_anticausal(i, out.sizeJ() - 2) = b1_border1 * mem1_anticausalS + a1_ac_border1 * out(i, out.sizeJ() - 1) + a0_ac_border1 * out(i, out.sizeJ() - 2);
+            mem2_anticausalS = mem1_anticausalS;
+            mem1_anticausalS = filter_anticausal(i, out.sizeJ() - 2);
+            for(int j=out.sizeJ()-3;j>=0;j--){
+                filter_anticausal(i,j) = b1*mem1_anticausalS + b2*mem2_anticausalS + a2_ac*out(i, j+2) + a1_ac*out(i, j+1) + a0_ac*out(i, j);
+                mem2_anticausalS = mem1_anticausalS;
+                mem1_anticausalS = filter_anticausal(i,j);
+            }
+        }
+
+        out = filter_causal + filter_anticausal;
+        MatN<2, PixelType>h(out);
+        return h;
     }
 
     /*!

@@ -26,8 +26,9 @@ int main(int argc, char* argv[]) {
 
 #if (METHOD == 0)
     // population
-    //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
-    pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
+    pop::Mat2UI8 threshold1 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+    //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
+    //pop::Mat2UI8 threshold = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
 #endif
 
 #if (METHOD == 1)
@@ -38,6 +39,40 @@ int main(int argc, char* argv[]) {
     end = std::chrono::high_resolution_clock::now();
     std::cout << __FILE__ << "::" << __LINE__ << "finish after " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
 
-    threshold.display();
+    start = std::chrono::high_resolution_clock::now();
+#if (METHOD == 0)
+    // population
+    //pop::Mat2UI8 threshol2 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+    //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
+    pop::Mat2UI8 threshold2 = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+#endif
+
+#if (METHOD == 1)
+    // tensor
+    pop::Mat2UI8 threshold = ProcessingTensor::thresoldAdaptiveSmoothDeriche(m, alpha, -10 + adpatative_filter_shift);
+#endif
+
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << __FILE__ << "::" << __LINE__ << "finish after " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+#if (METHOD == 0)
+    // population
+    //pop::Mat2UI8 threshol2 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+    pop::Mat2UI8 threshold3 = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
+    //pop::Mat2UI8 threshold2 = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+#endif
+
+#if (METHOD == 1)
+    // tensor
+    pop::Mat2UI8 threshold = ProcessingTensor::thresoldAdaptiveSmoothDeriche(m, alpha, -10 + adpatative_filter_shift);
+#endif
+
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << __FILE__ << "::" << __LINE__ << "finish after " << std::chrono::duration<double, std::milli>(end-start).count() << std::endl;
+
+    threshold1.display();
+    threshold2.display();
+    threshold3.display();
     return 0;
 }
