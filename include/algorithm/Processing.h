@@ -480,8 +480,8 @@ struct POP_EXPORTS Processing
     */
     template<typename PixelType>
 
-    static MatN<2,UI8>  fastThresholdAdaptativeSmoothDeriche(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
-        MatN<2,PixelType> smooth = Processing::fastSmoothDeriche(f,sigma);
+    static MatN<2,UI8>  thresholdAdaptativeSmoothDericheFast(const MatN<2,PixelType> & f,F32 sigma=0.5,F32 offset_value=0  ){
+        MatN<2,PixelType> smooth = Processing::smoothDericheFast(f,sigma);
         Mat2UI8 thresold(smooth.getDomain());
         for(unsigned int i=0;i<smooth.size();i++){
             if(f(i)>smooth(i)-offset_value){
@@ -1785,7 +1785,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
      * \endcode
      */
     template<typename PixelType>
-    static MatN<2,PixelType> fastSmoothDeriche(const MatN<2,PixelType> & f, F32 alpha=1){
+    static MatN<2,PixelType> smoothDericheFast(const MatN<2,PixelType> & f, F32 alpha=1){
         typedef typename  FunctionTypeTraitsSubstituteF<PixelType,F32>::Result PixelTypeF32;
         F32 e_a = std::exp(- alpha);
         F32 e_2a = std::exp(- 2.f * alpha);
