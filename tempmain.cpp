@@ -1,5 +1,5 @@
 #include<iostream>
-#include"Population.h"
+#include"../../include/Population.h"
 #include<chrono>
 
 int main(int argc, char* argv[]) {
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     // population
     //pop::Mat2UI8 threshol2 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
     //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
-    pop::Mat2UI8 threshold2 = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+    pop::Mat2UI8 threshold2 = pop::Processing::thresholdAdaptativeSmoothDericheFast(m,alpha,-10+ adpatative_filter_shift);
 #endif
 
 #if (METHOD == 1)

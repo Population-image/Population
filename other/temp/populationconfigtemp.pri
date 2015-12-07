@@ -14,7 +14,7 @@ CONFIG += HAVE_CIMG    #CIMG to display 2d image in windows
 DEFINES += 'POP_PROJECT_SOURCE_DIR=\'\"$${PWD}\"\''#path to the population library
 DEFINES+=HAVE_QMAKE#Do not include the popconfig.h generating by cmake
 
-INCLUDEPATH +=$${PWD}/include/ # header path
+INCLUDEPATH +=$${PWD}/../../include/ # header path
 
 
 

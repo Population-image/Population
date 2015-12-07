@@ -1875,8 +1875,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
 
         out = filter_causal + filter_anticausal;
-        MatN<2, PixelType>h(out);
-        return h;
+        return MatN<2, PixelType>(out);
     }
 
     /*!

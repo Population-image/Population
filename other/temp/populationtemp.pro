@@ -11,11 +11,11 @@ CONFIG += MAKE_EXE #comment this line to generate the shared library
 MAKE_EXE{
     CONFIG += executable
     TEMPLATE = app
-    SOURCES +=  $${PWD}/tempmain.cpp
+    SOURCES +=  $${PWD}/../../tempmain.cpp
 }else{
     CONFIG+=plugin
     TEMPLATE = lib
-    DESTDIR=$${PWD}/lib
+    DESTDIR=$${PWD}/../../lib
 }
 
 !include($${PWD}/populationconfigtemp.pri)
