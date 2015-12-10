@@ -160,6 +160,7 @@ public:
     *
     *   constructor the discrete uniform distribution in the intervale (xmin,xmax)
     */
+    DistributionUniformInt();
     DistributionUniformInt(int xmin, int xmax);
     F32 randomVariable()const ;
     DistributionUniformInt * clone()const ;

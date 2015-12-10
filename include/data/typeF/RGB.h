@@ -744,7 +744,7 @@ public:
             return std::sqrt(static_cast<F32>(this->_data[0]*this->_data[0]+this->_data[1]*this->_data[1]+this->_data[2]*this->_data[2]));
         else{
             F32 value = std::pow(absolute(static_cast<F32>(this->_data[0])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[1])),static_cast<F32>(p))+std::pow(absolute(static_cast<F32>(this->_data[2])),static_cast<F32>(p));
-            return std::pow(value,1.0/p);
+            return std::pow(value,1.f/p);
 			}
     }
 	F32 normPower(int p=-1)const{

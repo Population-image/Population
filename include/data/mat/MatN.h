@@ -37,7 +37,6 @@ in the Software.
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <iterator>
 #include <cmath>
 #include <string>
 #include <algorithm>
@@ -423,22 +422,12 @@ public:
     /*!
     \typedef iterator
 
-    Stl iterator (vector::iterator)
+
 
      \sa  begin() end()
     */
-    typedef typename std::vector<PixelType>::iterator iterator;
-    typedef typename std::vector<PixelType>::value_type					 value_type;
-    typedef typename std::vector<PixelType>::pointer           pointer;
-    typedef typename std::vector<PixelType>::const_pointer     const_pointer;
-    typedef typename std::vector<PixelType>::reference         reference;
-    typedef typename std::vector<PixelType>::const_reference   const_reference;
-    typedef typename std::vector<PixelType>::const_iterator const_iterator;
-    typedef typename std::vector<PixelType>::const_reverse_iterator  const_reverse_iterator;
-    typedef typename std::vector<PixelType>::reverse_iterator		 reverse_iterator;
-    typedef typename std::vector<PixelType>::size_type					 size_type;
-    typedef typename std::vector<PixelType>::difference_type				 difference_type;
-    typedef typename std::vector<PixelType>::allocator_type                        		 allocator_type;
+    typedef PixelType * iterator;
+    typedef const PixelType * const_iterator;
 
 
     //-------------------------------------
@@ -507,29 +496,6 @@ public:
     * construct an matrix of size i,j,k where each pixel/voxel value is set at 0\n
     */
     explicit MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek);
-    /*!
-    \param x domain size of the matrix
-    \param data_values value of each pixel/voxel
-    *
-    * construct an matrix of size domain(0),domain(1) for 2D matrix and  domain(0),domain(1),domain(2) for 3D matrix where each pixel/voxel is set by the values contained in the Vec \n
-    *   This code: \n
-    \code
-    Mat2UI8::Domain x;
-    x(0)=2;
-    x(1)=4;
-    Vec<Mat2UI8::F> v;
-    v.push_back(0);v.push_back(1);v.push_back(2);v.push_back(3);
-    v.push_back(3);v.push_back(2);v.push_back(1);v.push_back(0);
-    Mat2UI8 img(x,v);
-    std::cout<<img;
-    \endcode
-    produce this output\n
-    \code
-    0 1 2 3
-    3 2 1 0
-    \endcode
-    */
-    explicit MatN(const VecN<Dim,int> & x,const Vec<PixelType>& data_values );
     /*!
     * \brief reference copy
     * \param x domain size of the matrix
@@ -1175,56 +1141,28 @@ public:
     IteratorENeighborhoodAmoebas getIteratorENeighborhoodAmoebas(F32 distance_max=4,F32 lambda_param = 0.01 )const;
 
 
-    iterator begin(){ return iterator(this->_data); }
+    iterator begin(){ return this->_data; }
 
     /**
      *  Returns a read-only (constant) iterator that points to the
      *  first element in the %vector.  Iteration is done in ordinary
      *  element order.
      */
-    const_iterator begin() const { return const_iterator(this->_data); }
+    const_iterator begin() const { return this->_data; }
 
     /**
-     *  Returns a read/write iterator that points one past the last
+     *  Returns a read/write iterator that 1points one past the last
      *  element in the %vector.  Iteration is done in ordinary
      *  element order.
      */
-    iterator  end() { return iterator(this->_data+_domain.multCoordinate()); }
+    iterator  end() { return this->_data+_domain.multCoordinate(); }
 
     /**
      *  Returns a read-only (constant) iterator that points one past
      *  the last element in the %vector.  Iteration is done in
      *  ordinary element order.
      */
-    const_iterator end() const{ return const_iterator(this->_data+_domain.multCoordinate()); }
-
-    /**
-     *  Returns a read/write reverse iterator that points to the
-     *  last element in the %vector.  Iteration is done in reverse
-     *  element order.
-     */
-    reverse_iterator rbegin() { return reverse_iterator(end()); }
-
-    /**
-     *  Returns a read-only (constant) reverse iterator that points
-     *  to the last element in the %vector.  Iteration is done in
-     *  reverse element order.
-     */
-    const_reverse_iterator rbegin() const  { return const_reverse_iterator(end()); }
-
-    /**
-     *  Returns a read/write reverse iterator that points to one
-     *  before the first element in the %vector.  Iteration is done
-     *  in reverse element order.
-     */
-    reverse_iterator rend()  { return reverse_iterator(begin()); }
-
-    /**
-     *  Returns a read-only (constant) reverse iterator that points
-     *  to one before the first element in the %vector.  Iteration
-     *  is done in reverse element order.
-     */
-    const_reverse_iterator  rend() const  { return const_reverse_iterator(begin()); }
+    const_iterator end() const{ return this->_data+_domain.multCoordinate(); }
 
     /**
      *  Returns true if the %vector is empty.  (Thus begin() would
@@ -1232,7 +1170,7 @@ public:
      */
     bool empty() const { return begin() == end(); }
     /**  Returns the number of elements  */
-    unsigned int size() const { return size_type(this->getDomain().multCoordinate()); }
+    unsigned int size() const { return this->getDomain().multCoordinate(); }
 
     //@}
 
@@ -1573,43 +1511,43 @@ public:
 
 #ifdef HAVE_SWIG
     MatN(const MatN<Dim,UI8> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI8>::Range);
     }
     MatN(const MatN<Dim,UI16> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI16>::Range);
     }
     MatN(const MatN<Dim,UI32> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,UI32>::Range);
     }
     MatN(const MatN<Dim,F32> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,F32>::Range);
     }
     MatN(const MatN<Dim,RGBUI8> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBUI8>::Range);
     }
     MatN(const MatN<Dim,RGBF32> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,RGBF32>::Range);
     }
     MatN(const MatN<Dim,ComplexF32> &img)
-        :Vec<PixelType>(img.getDomain().multCoordinate()),_domain(img.getDomain())
+        :_data(new PixelType[img.getDomain().multCoordinate()]),_is_owner_data(true),_domain(img.getDomain())
     {
         _initStride();
         std::transform(img.begin(),img.end(),this->begin(),ArithmeticsSaturation<PixelType,ComplexF32>::Range);
@@ -1807,9 +1745,9 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
                 std::copy(img.begin()+ xmin(0)*img._domain(1),img.begin()+xmax(0)*img._domain(1),this->begin());
         }else{
 
-            typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
-            typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
-            typename Vec<PixelType>::iterator it = this->begin();
+            typename MatN<Dim,PixelType>::const_iterator itb = img.begin() + xmin(1)+xmin(0)*img._domain(1);
+            typename MatN<Dim,PixelType>::const_iterator ite = img.begin() + xmax(1)+xmin(0)*img._domain(1);
+            typename MatN<Dim,PixelType>::iterator it = this->begin();
             for( int i=xmin(0);i<xmax(0);i++){
                 std::copy(itb,ite,it);
                 itb+=img._domain(1);
@@ -1826,9 +1764,9 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
             else{
                 int intra_slice_add                = img._domain(1)*img._domain(0);
                 int intra_slice_add_this           = this->_domain(1)*this->_domain(0);
-                typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
-                typename Vec<PixelType>::iterator it        = this->begin();
+                typename MatN<Dim,PixelType>::const_iterator itb = img.begin() + xmin(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename MatN<Dim,PixelType>::const_iterator ite = img.begin() + xmax(0)*img._domain(1) + xmin(2)*intra_slice_add;
+                typename MatN<Dim,PixelType>::iterator it        = this->begin();
 
                 for( int k=xmin(2);k<xmax(2);k++){
                     std::copy(itb,ite,it);
@@ -1843,15 +1781,15 @@ MatN<Dim,PixelType>::MatN(const MatN<Dim,PixelType> & img, const VecN<Dim,int>& 
             unsigned int indexmaxi = xmax(0);
             int intra_slice_add      = img._domain(1)*img._domain(0);
             int intra_slice_add_this = this->_domain(1)*this->_domain(0);
-            typename Vec<PixelType>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-            typename Vec<PixelType>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
-            typename Vec<PixelType>::iterator it        = this->begin();
+            typename MatN<Dim,PixelType>::const_iterator itb = img.begin() + xmin(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename MatN<Dim,PixelType>::const_iterator ite = img.begin() + xmax(1) +indexmini*img._domain(1) + xmin(2)*intra_slice_add;
+            typename MatN<Dim,PixelType>::iterator it        = this->begin();
             unsigned int indexmin = xmin(2);
             unsigned int indexmax = xmax(2);
             for(unsigned int i=indexmin;i<indexmax;i++){
-                typename Vec<PixelType>::const_iterator itbb = itb;
-                typename Vec<PixelType>::const_iterator itee = ite;
-                typename Vec<PixelType>::iterator itt =it;
+                typename MatN<Dim,PixelType>::const_iterator itbb = itb;
+                typename MatN<Dim,PixelType>::const_iterator itee = ite;
+                typename MatN<Dim,PixelType>::iterator itt =it;
                 for(unsigned int j=indexmini;j<indexmaxi;j++){
                     std::copy(itbb ,itee,itt);
                     itbb+=img._domain(1);

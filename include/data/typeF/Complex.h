@@ -521,7 +521,7 @@ public:
         else if(p==2)
             return std::sqrt(normPowerValue(this->real(),2)+normPowerValue(this->img(),2));
         else
-            return std::pow(normPowerValue(this->real(),p)+normPowerValue(this->img(),p),1./p);
+            return std::pow(normPowerValue(this->real(),p)+normPowerValue(this->img(),p),1.f/p);
     }
     F32 normPower(F32 p=2)const{
         if(p==0)
