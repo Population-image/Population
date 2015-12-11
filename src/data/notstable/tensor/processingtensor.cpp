@@ -2,7 +2,7 @@
 
 #if defined(HAVE_ACML)
 
-#include "include/data/notstable/tensor/processingtensor.h"
+#include "data/notstable/tensor/processingtensor.h"
 #include <cmath>
 #include<chrono>
 

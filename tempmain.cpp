@@ -27,8 +27,6 @@ int main(int argc, char* argv[]) {
 #if (METHOD == 0)
     // population
     pop::Mat2UI8 threshold1 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
-    //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
-    //pop::Mat2UI8 threshold = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
 #endif
 
 #if (METHOD == 1)
@@ -41,9 +39,7 @@ int main(int argc, char* argv[]) {
 
     start = std::chrono::high_resolution_clock::now();
 #if (METHOD == 0)
-    // population
-    //pop::Mat2UI8 threshol2 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
-    //pop::Mat2UI8 threshold = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
+    // smoothDeriche fast
     pop::Mat2UI8 threshold2 = pop::Processing::thresholdAdaptativeSmoothDericheFast(m,alpha,-10+ adpatative_filter_shift);
 #endif
 
@@ -57,10 +53,8 @@ int main(int argc, char* argv[]) {
 
     start = std::chrono::high_resolution_clock::now();
 #if (METHOD == 0)
-    // population
-    //pop::Mat2UI8 threshol2 = pop::Processing::thresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
+    // smoothFast
     pop::Mat2UI8 threshold3 = pop::Processing::thresholdAdaptativeSmoothFast(m,alpha,-10+ adpatative_filter_shift);
-    //pop::Mat2UI8 threshold2 = pop::Processing::fastThresholdAdaptativeSmoothDeriche(m,alpha,-10+ adpatative_filter_shift);
 #endif
 
 #if (METHOD == 1)

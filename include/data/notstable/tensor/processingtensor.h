@@ -5,7 +5,7 @@
 
 #if defined(HAVE_ACML)
 
-#include "include/data/notstable/tensor/tensor.h"
+#include "data/notstable/tensor/tensor.h"
 #include "Population.h"
 
 struct ProcessingTensor {

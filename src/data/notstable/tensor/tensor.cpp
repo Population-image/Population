@@ -3,7 +3,7 @@
 #if defined(HAVE_ACML)
 
 #include <iostream>
-#include "include/data/notstable/tensor/tensor.h"
+#include "data/notstable/tensor/tensor.h"
 
 Tensor::Tensor() {
 }
