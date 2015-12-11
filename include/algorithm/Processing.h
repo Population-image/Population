@@ -1813,7 +1813,14 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         F32 b1_border1 = b1 + b2 ;
 
         MatN<2, PixelTypeF32> out(f);
+#ifdef _MSC_VER
+        PixelTypeF32* mem1_causal = new PixelTypeF32[f.columns()];
+        PixelTypeF32* mem2_causal = new PixelTypeF32[f.columns()];
+        PixelTypeF32* mem1_anticausal = new PixelTypeF32[f.columns()];
+        PixelTypeF32* mem2_anticausal = new PixelTypeF32[f.columns()];
+#else
         PixelTypeF32 mem1_causal[f.columns()], mem2_causal[f.columns()], mem1_anticausal[f.columns()], mem2_anticausal[f.columns()];
+#endif
         PixelTypeF32 mem1_causalS, mem2_causalS, mem1_anticausalS, mem2_anticausalS;
 
         MatN<2, PixelTypeF32> filter_causal(f.getDomain()),filter_anticausal(f.getDomain());
@@ -1873,6 +1880,13 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
                 mem1_anticausalS = filter_anticausal(i,j);
             }
         }
+		
+#ifdef _MSC_VER
+        delete[] mem1_causal;
+        delete[] mem2_causal;
+        delete[] mem1_anticausal;
+        delete[] mem2_anticausal;
+#endif
 
         out = filter_causal + filter_anticausal;
         return MatN<2, PixelType>(out);
