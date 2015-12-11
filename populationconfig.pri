@@ -98,5 +98,5 @@ HAVE_ACML {
 }
 
 #### C++ compiler #####
-CONFIG += c++11
+#CONFIG += c++11
 #QMAKE_CXX = clang++

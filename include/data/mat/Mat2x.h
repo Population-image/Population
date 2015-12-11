@@ -1650,7 +1650,7 @@ template<typename PixelType>
 Mat2x<PixelType,3,3> Mat2x<PixelType,3,3>::inverse()const{
     PixelType det= PixelType(1)/(this->_dat[0] * (this->_dat[4]*this->_dat[8] - this->_dat[7] * this->_dat[5])-this->_dat[1] * (this->_dat[3]*this->_dat[8] - this->_dat[6] * this->_dat[5]) +this->_dat[2] * (this->_dat[3]*this->_dat[7] - this->_dat[4] * this->_dat[6]));
     if(std::numeric_limits<PixelType>::infinity()==det||std::numeric_limits<PixelType>::infinity()==-det){
-        det=std::numeric_limits<PixelType>::max();
+        det=(std::numeric_limits<PixelType>::max)();
     }
     const PixelType t0=  this->_dat[4]*this->_dat[8]-this->_dat[7]*this->_dat[5];
     const PixelType t1=-(this->_dat[3]*this->_dat[8]-this->_dat[6]*this->_dat[5]);

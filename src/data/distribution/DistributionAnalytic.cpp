@@ -86,7 +86,10 @@ DistributionUniformInt * DistributionUniformInt::clone()const
 {
     return new DistributionUniformInt(_xmin,  _xmax);
 }
-
+DistributionUniformInt::DistributionUniformInt()
+    :DistributionDiscrete(0.1f),_xmin(0),_xmax(1)
+{
+}
 DistributionUniformInt::DistributionUniformInt(int min, int max)
     :DistributionDiscrete(0.1f),_xmin(min),_xmax(max)
 {

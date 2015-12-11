@@ -200,7 +200,7 @@ void  MatNInOut::_savePNG(const MatN<2, RGBUI8 > &img, const char * filename){
 
     std::vector<unsigned char> byte_array(img.sizeI()* img.sizeJ()*3);
     std::vector<unsigned char>::iterator itin =byte_array.begin();
-    std::vector<RGBUI8>::const_iterator itout =img.begin();
+    MatN<2, RGBUI8 >::const_iterator itout =img.begin();
     for(;itin!=byte_array.end();){
         *itin =itout->r();
         itin++;
@@ -236,7 +236,7 @@ bool  MatNInOut::_loadPNG( MatN<2, RGBUI8 > &img, const char * filename)
         }
         img.resize(height,width);
         std::vector<unsigned char>::iterator itin =byte_array.begin();
-        std::vector<RGBUI8>::iterator itout =img.begin();
+        MatN<2, RGBUI8 >::iterator itout =img.begin();
         for(;itin!=byte_array.end();){
             itout->r()=*itin;
             itin++;
@@ -354,7 +354,7 @@ bool  MatNInOut::_loadJPG( MatN<2, RGBUI8 > &img, const char * filename){
     }
     img.resize(height,width);
     unsigned char * ptr=dat;
-    for(std::vector<RGBUI8>::iterator itb = img.begin();itb!=img.end();itb++){
+    for( MatN<2, RGBUI8 >::iterator itb = img.begin();itb!=img.end();itb++){
         itb->r()=* ptr;
         ptr++;
         itb->g()=* ptr;
