@@ -86,6 +86,7 @@ HEADERS += $${PWD}/../../include/Population.h \
            $${PWD}/../../include/data/notstable/tensor/processingtensor.h \
            $${PWD}/../../include/data/notstable/tensor/tensor.h \
            $${PWD}/../../include/data/notstable/blas.h
+           #$${PWD}/../../include/data/notstable/neuralnetworkblas.h
 
 SOURCES += $${PWD}/../../src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/../../src/algorithm/LinearAlgebra.cpp \
@@ -126,3 +127,4 @@ SOURCES += $${PWD}/../../src/algorithm/GeometricalTransformation.cpp \
            $${PWD}/../../src/data/notstable/tensor/processingtensor.cpp \
            $${PWD}/../../src/data/notstable/tensor/tensor.cpp \
            $${PWD}/../../src/data/notstable/blas.cpp
+           #$${PWD}/../../src/data/notstable/neuralnetworkblas.cpp

@@ -2,11 +2,11 @@
 #include"data/notstable/blas.h"
 
 int main (int argc, char* argv[]) {
-    pop::testBlas::test_scal();
-    pop::testBlas::test_axpy();
-    pop::testBlas::test_ger();
-    pop::testBlas::test_gemv();
-    pop::testBlas::test_gemm();
-    pop::testBlas::test_dot();
+    popblas::testBlas::test_scal();
+    popblas::testBlas::test_axpy();
+    popblas::testBlas::test_ger();
+    popblas::testBlas::test_gemv();
+    popblas::testBlas::test_gemm();
+    popblas::testBlas::test_dot();
     return 0;
 }
