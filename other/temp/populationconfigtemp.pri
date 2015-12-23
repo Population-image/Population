@@ -9,7 +9,8 @@ CONFIG += HAVE_CIMG    #CIMG to display 2d image in windows
 #CONFIG += HAVE_VLC    #VideoVLC to load stream video as rtsp  stream or avi file
 #CONFIG += HAVE_FFMPEG  #FFMPEG to load stream video (as rtsp)  or file video (sudo apt-get install libavcodec-ffmpeg-dev  libavformat-ffmpeg-dev  libswscale-ffmpeg-dev )
 #CONFIG += HAVE_OPENCV #convert cv::Mat to pop::Mat2UI8 or pop::Mat2RGBUI8
-CONFIG += HAVE_ACML    # AMD Core Mathematical Library, optimizing matrical operations
+#CONFIG += HAVE_ACML    # AMD Core Mathematical Library, optimizing matrical operations
+CONFIG += HAVE_CUBLAS  # BLAS with CUDA
 
 DEFINES += 'POP_PROJECT_SOURCE_DIR=\'\"$${PWD}\"\''#path to the population library
 DEFINES+=HAVE_QMAKE#Do not include the popconfig.h generating by cmake
@@ -96,6 +97,13 @@ HAVE_ACML {
     LIBS += -L"/opt/acml5.3.1/gfortran64_mp/lib/"
     LIBS += -L"/home/dokhanh/logiciels/acml/amdlibm-3.1-lin64/lib/dynamic/"
     LIBS *= -lacml_mp -lamdlibm
+}
+
+HAVE_CUBLAS {
+    DEFINES += HAVE_CUBLAS
+    INCLUDEPATH += "/usr/local/cuda-7.0/include/"
+    LIBS += -L"/usr/local/cuda-7.0/lib64/"
+    LIBS *= -lcublas_static -lrt -lculibos -lcudart_static -lpthread -ldl
 }
 
 #### C++ compiler #####

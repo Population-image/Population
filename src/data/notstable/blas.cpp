@@ -165,7 +165,7 @@ void popblas::testBlas::test_dot() {
     pop::MatN<2, pop::F32> matA(pop::VecN<2, int>(3, 3), dataA);
     pop::MatN<2, pop::F32> matB(pop::VecN<2, int>(3, 3), dataB);
     std::cout << blas::dot(matA, matB) << std::endl;
-    pop::MatN<2, pop::F32> vecA = matA.selectRow(0);
-    pop::MatN<2, pop::F32> vecB = matB.selectColumn(0);
-    std::cout << blas::dot(vecA, vecB) << std::endl;
+//    pop::MatN<2, pop::F32> vecA = matA.selectRow(0);
+//    pop::MatN<2, pop::F32> vecB = matB.selectColumn(0);
+//    std::cout << blas::dot(vecA, vecB) << std::endl;
 }

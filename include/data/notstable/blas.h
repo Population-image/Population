@@ -2,9 +2,15 @@
 #define BLAS_H
 
 #include"data/mat/MatN.h"
+
 #ifdef HAVE_ACML
 #include "acml.h"
 #include "amdlibm.h"
+#endif
+
+#ifdef HAVE_CUBLAS
+#include <cuda_runtime.h>
+#include "cublas_v2.h"
 #endif
 
 #ifdef HAVE_ACML
@@ -19,6 +25,10 @@
 #define axpy_ saxpy_
 #define pow_  amd_vrsa_powxf
 #define tanh_ lost_
+#endif
+
+#ifdef HAVE_CUBLAS
+#define dot_ cublasSdot
 #endif
 
 namespace popblas {
@@ -36,6 +46,13 @@ struct otherMatN {
 };
 
 struct blas {
+#if HAVE_CUBLAS
+//    static cudaError_t cudaStat;
+//    static cublasStatus_t stat;
+//    static cublasHandle_t handle;
+//    static bool _is_cublas_create;
+#endif
+
     // Math matrix vector BLAS
     // y = ay
     template < int DIM, typename PixelType >
@@ -49,7 +66,7 @@ struct blas {
         std::cout << "use BLAS scal" << std::endl;
         int size = matY.getDomain().multCoordinate();
         scal_(&size, &alpha, &matY[0], &otherMatN::getStrideVector(matY));
-    }
+    } 
 #endif
 
     // y = ax + y
@@ -159,6 +176,28 @@ struct blas {
         std::cout << "use BLAS dot" << std::endl;
         int size = matY.getDomain().multCoordinate();
         return dot_(&size, &matY[0], &otherMatN::getStrideVector(matY), &matX[0], &otherMatN::getStrideVector(matX));
+    }
+#endif
+
+#ifdef HAVE_CUBLAS
+    template<int DIM >
+    static pop::F32 dot(pop::MatN<DIM, pop::F32> &matX, pop::MatN<DIM, pop::F32> &matY) {
+        cublasHandle_t handle;
+        cublasCreate(&handle);
+        int size = matX.getDomain().multCoordinate();
+        pop::F32 d_matX[size], d_matY[size];
+        //cudaAlloc(size, sizeof(matX[0]), (void**)&d_matX);
+        cudaMalloc((void**)&d_matX, size*sizeof(matX[0]));
+        //cudaAlloc(size, sizeof(matY[0]), (void**)&d_matY);
+        cudaMalloc((void**)&d_matY, size*sizeof(matY[0]));
+        //const float* dd_X = d_matX, dd_Y = d_matY;
+        cublasSetVector(size, sizeof(matX[0]), (void*)matX.data(), otherMatN::getStrideVector(matX), (void*)d_matX, 1);
+        cublasSetVector(size, sizeof(matY[0]), (void*)matY.data(), otherMatN::getStrideVector(matY), (void*)d_matY, 1);
+        float result;
+        cublasSdot(handle, size, d_matX, 1, d_matY, 1, &result);
+        cudaFree((void*)d_matX);
+        cudaFree((void*)d_matY);
+        return result;
     }
 #endif
 
