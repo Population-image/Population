@@ -41,6 +41,7 @@ VideoVLCDeprecated::VideoVLCDeprecated(bool vlc_debug)
 {
     char const *vlc_argv[] =
     {
+        "--network-caching=450",
         "--verbose=2",
         "--extraintf=logger",
     };

@@ -89,6 +89,7 @@ VideoVLC::VideoVLC(bool vlc_debug)
     {
         "--no-audio", /* skip any audio track */
         "--no-xlib", /* tell VLC to not use Xlib */
+        "--network-caching=450",
         /* Logging things must be at the end of the array */
         "--verbose=3",
         "--extraintf=logger",
