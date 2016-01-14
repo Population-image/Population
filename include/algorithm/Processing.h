@@ -1840,7 +1840,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
 
         for (int i = 2 ; i < out.sizeI() ; i ++) {
-            for(int j=0;j<out.sizeJ();j++){
+            for(unsigned int j=0;j<out.sizeJ();j++){
                 filter_causal(i, j) = b1 * mem1_causal[j] + b2 * mem2_causal[j] + a2_c * out(i-2, j) + a1_c * out(i-1, j) + a0_c * out(i, j);
                 mem2_causal[j] = mem1_causal[j];
                 mem1_causal[j] = filter_causal(i, j);
@@ -1848,7 +1848,7 @@ without  the application of greylevelRemoveEmptyValue, all grey-level excepted 0
         }
 
         for(int i = out.sizeI()-3 ; i >= 0 ; i--){
-            for(int j=0;j<out.sizeJ();j++){
+            for(unsigned int j=0;j<out.sizeJ();j++){
                 filter_anticausal(i, j) = b1 * mem1_anticausal[j] + b2 * mem2_anticausal[j] + a2_ac * out(i+2, j) + a1_ac * out(i+1, j) + a0_ac * out(i, j);
                 mem2_anticausal[j] = mem1_anticausal[j];
                 mem1_anticausal[j] = filter_anticausal(i, j);
