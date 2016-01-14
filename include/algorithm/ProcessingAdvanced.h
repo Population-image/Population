@@ -1249,8 +1249,8 @@ struct ProcessingAdvanced
         int cluster=0;
         std::vector<int > v_list_i;
         std::vector<int > v_list_j;
-        for(unsigned int i =0;i<f.sizeI();i++){
-            for(unsigned int j =0;j<f.sizeJ();j++){
+        for(unsigned int j =0;j<f.sizeJ();j++){
+            for(unsigned int i =0;i<f.sizeI();i++){
 
 
                 if(f(i,j)>0&&map(i,j)==0){
