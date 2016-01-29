@@ -109,8 +109,8 @@ AffineTransformationRANSACModel::AffineTransformationRANSACModel(const Vec<Data 
 
 ProjectionTransformationRANSACModel::ProjectionTransformationRANSACModel(const Vec<Data >& data)
 {
-    Vec2F32 src[4];
-    Vec2F32 dst[4];
+    VecN<4,Vec2F32> src;
+    VecN<4,Vec2F32> dst;
 
     src[0]=data(0)._src;
     src[1]=data(1)._src;

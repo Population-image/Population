@@ -620,8 +620,8 @@ struct POP_EXPORTS GeometricalTransformation
      * \code
     Mat2RGBUI8 m;
     m.load((std::string(POP_PROJECT_SOURCE_DIR)+"/image/Lena.bmp").c_str());
-    Vec2F32 src[4];
-    Vec2F32 dst[4];
+    VecN<4,Vec2F32> src;
+    VecN<4,Vec2F32> dst;
     src[0]=Vec2F32(0,0);
     src[1]=Vec2F32(m.getDomain()(0),0);
     src[2]=Vec2F32(0,m.getDomain()(1));
@@ -641,7 +641,7 @@ struct POP_EXPORTS GeometricalTransformation
      * \endcode
      * \image html lenaprojective.png
     */
-    static pop::Mat2x33F32 projective2D(const Vec2F32 src[4], const Vec2F32 dst[4],bool isfastinversion=true);
+    static pop::Mat2x33F32 projective2D( const VecN<4,Vec2F32>& src, const VecN<4,Vec2F32>& dst, bool isfastinversion=true);
 
 
     /*!

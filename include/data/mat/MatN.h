@@ -1665,6 +1665,7 @@ template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei,unsigned int sizej)
     :_data(new PixelType[sizei*sizej]),_is_owner_data(true),_domain(sizei,sizej)
 {
+    std::fill(this->begin(), this->end(), PixelType(0));
     _initStride();
     POP_DbgAssertMessage(Dim==2,"In MatN::MatN(int i, int j), your matrix must be 2D");
 
@@ -1673,6 +1674,7 @@ template<int Dim, typename PixelType>
 MatN<Dim,PixelType>::MatN(unsigned int sizei, unsigned int sizej,unsigned int sizek)
     :_data(new PixelType[sizei*sizej*sizek]),_is_owner_data(true),_domain(sizei,sizej,sizek)
 {
+    std::fill(this->begin(), this->end(), PixelType(0));
     _initStride();
     POP_DbgAssertMessage(Dim==3,"In MatN::MatN(int sizei, int sizej,int sizek), your matrix must be 3D");
 }

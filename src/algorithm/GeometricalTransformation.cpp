@@ -175,10 +175,10 @@ Mat2x33F32 GeometricalTransformation::affine2D(const Vec2F32 src[3], const Vec2F
  *   cij - matrix coefficients, c22 = 1
  */
 
-Mat2x33F32 GeometricalTransformation::projective2D(const Vec2F32 src[4], const Vec2F32 dst[4],bool isfastinversion)
+Mat2x33F32 GeometricalTransformation::projective2D( const VecN<4,Vec2F32>& src,  const VecN<4,Vec2F32>&dst, bool isfastinversion)
 {
     Mat2F32 m(8,8);
-
+    m.fill(0);
     m(0,0)=src[0](0);m(0,1)=src[0](1);m(0,2)=1;  m(0,6)=-src[0](0)*dst[0](0);m(0,7)=-src[0](1)*dst[0](0);
     m(1,0)=src[1](0);m(1,1)=src[1](1);m(1,2)=1;  m(1,6)=-src[1](0)*dst[1](0);m(1,7)=-src[1](1)*dst[1](0);
     m(2,0)=src[2](0);m(2,1)=src[2](1);m(2,2)=1;  m(2,6)=-src[2](0)*dst[2](0);m(2,7)=-src[2](1)*dst[2](0);
@@ -192,6 +192,7 @@ Mat2x33F32 GeometricalTransformation::projective2D(const Vec2F32 src[4], const V
 
     VecF32 V(8);
     V(0)=dst[0](0);V(1)=dst[1](0);V(2)=dst[2](0);V(3)=dst[3](0);V(4)=dst[0](1);V(5)=dst[1](1);V(6)=dst[2](1);V(7)=dst[3](1);
+
     if(isfastinversion==true){
         V=pop::LinearAlgebra::inverseGaussianElimination(m)*V;
     }else{
